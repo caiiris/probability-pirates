@@ -1,0 +1,821 @@
+# Alternatives & Gaps Log
+
+> Companion to the PRD. Every meaningful tradeoff captured: **what we chose**, **what we considered**, and the **gaps / risks** the chosen path leaves us with. Updated as new decisions are made during the build.
+
+## How to read an entry
+
+Each entry has a fixed shape so it stays scannable:
+
+- **ID + title** — stable identifier for cross-reference
+- **Status** — `resolved` or `open`
+- **Chose** — the path we're taking
+- **Considered** — the alternatives we evaluated and rejected
+- **Gaps / risks** — the price we're paying for the chosen path; things to revisit later
+
+D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps its number even if its section grouping changes. Within a section, entries are listed in ascending numeric order.
+
+## Section index
+
+| Section | Topic | Entries |
+|---|---|---|
+| A | Product & Pedagogy | D1–D8, D55, D56, D69 |
+| B | Stack | D9–D12 |
+| C | Data & Persistence | D13–D16 |
+| D | Auth & Identity | D17–D18 |
+| E | Visual & Motion | D19–D21, D67 |
+| F | Streaks & Engagement | D22 |
+| G | Scope Exclusions | D23–D27 |
+| H | Motivation & Habit Loop | D28–D35 |
+| I | UI Stack | D36–D37, D68 |
+| J | Project Structure & Tooling | D38–D48, D64 |
+| K | PRD Acceptance Criteria Style | D49–D54, D57–D62 |
+| L | Platform & Responsive | D63, D65, D66 |
+
+---
+
+## A. Product & Pedagogy
+
+### D1 — Subject
+- **Status:** resolved
+- **Chose:** Probability
+- **Considered:** Algebra (slope, balancing equations), Geometry (Pythagorean theorem, angles), Logic puzzles
+- **Gaps / risks:**
+  - Probability assumes the learner already grasps fractions and basic counting — a shakier-than-expected persona could trip on the very first concept ("favorable / total")
+  - Probability has class-anxiety associations for some HS students
+  - Less *tangible* than geometry — no spatial intuition to lean on for free; we have to construct the intuition entirely with visuals
+
+### D2 — Persona
+- **Status:** resolved
+- **Chose:** High school student learning probability for the first time (algebra background, no calculus)
+- **Considered:** Curious adult (poker/investing/news), Intro college / AP Stats student, Test prep (SAT/GRE)
+- **Gaps / risks:**
+  - HS students rarely *choose* learning apps voluntarily — distribution/marketing is a real challenge later (out of scope for Phase 1, but real)
+  - The test-prep persona would have more urgency and a clearer "done" state
+  - Tone calibration is delicate: must be friendly without being childish
+  - HS students vary wildly in math background — designing for "any HS student" is harder than designing for AP-specific
+
+### D3 — MVP lesson choice
+- **Status:** resolved
+- **Chose:** Lesson 1 — *"What is probability?"* (sample space + counting + 6×6 grid payoff)
+- **Considered:** Lesson 2 (Law of Large Numbers — more visceral hook), Lesson 4 (Monty Hall — maximum wow factor)
+- **Gaps / risks:**
+  - Less viral than Monty Hall — the demo might be less memorable for graders / first-look reviewers
+  - Doesn't yet show the simulation capability that becomes the spine of the course in Lesson 2+
+  - The grid is tap-based, not drag-based — less *tactile* than a slider with a live chart
+
+### D4 — Rich interaction (beyond multiple choice)
+- **Status:** resolved
+- **Chose:** Two-dice **6×6 grid** for compound events; learner taps cells matching an event, live counter shows `X / 36`
+- **Considered:** Single-die only (too thin), draggable spinner (more visual but conceptually mismatched with "counting outcomes")
+- **Gaps / risks:**
+  - 36 cells on a 390px viewport gets tight — sizing/touch-target work required
+  - Tap-based, not drag-based — less "tactile" than Brilliant's sliders
+  - "Wrong cells flash red" could feel punitive on mobile if a learner is poking around exploratively — need to tune so it's a gentle nudge, not a reprimand
+
+### D5 — Lesson length
+- **Status:** resolved
+- **Chose:** 9 steps, target ~4 minutes
+- **Considered:** 6 steps (faster but loses the counterintuitive payoff setup)
+- **Gaps / risks:**
+  - 9 steps = more hand-authored copy to write
+  - If pacing isn't tight, can drift past 5 min and lose the "before bed" promise
+  - No data yet on whether 9 is *actually* the right number — instinct, not validated
+
+### D6 — Course spine (6 lessons, 5 locked stubs)
+- **Status:** resolved
+- **Chose:** Show all 6 lessons in the course path; only Lesson 1 is real, Lessons 2–6 are visible-but-locked with title + blurb
+- **Considered:** Hide future lessons entirely; build two real lessons in MVP
+- **Gaps / risks:**
+  - Stubs without content could feel hollow if a learner is curious enough to tap them
+  - "Unlocks after Lesson N" toast for stubs is a tiny lie — Lesson N exists but unlocks nothing real
+  - We're committing publicly to a course shape we might want to revise after user feedback
+
+### D7 — Wrong-answer handling
+- **Status:** resolved
+- **Chose:** ~~2 strikes then full hand-written explanation appears and Continue unlocks — learner is never trapped~~ **Updated 2026-06-23 (superseded by D55):** 2 strikes show the variant's `explanation` as a hint alongside per-wrong feedback. **Continue stays locked until the learner produces a correct answer.** No bail-out, ever.
+- **Considered:** Infinite retries (frustrating), single attempt then move on (no learning loop), adaptive limits
+- **Gaps / risks:**
+  - 2 strikes might be too few for genuinely hard concepts later
+  - ~~"Continued without ever getting it right" isn't currently captured as a mastery signal (relevant for Phase 3)~~ — **Resolved 2026-06-23 by D55:** no learner can complete a lesson without answering every problem correctly; lesson completion is now a stronger mastery signal by construction.
+  - Same limit for all step types — some (e.g. grid taps with many cells) might warrant more attempts
+- **See also:** D55 (current rule), D31 (XP curve updated as a consequence)
+
+### D8 — Feedback authoring strategy
+- **Status:** resolved
+- **Chose:** `feedbackByWrongValue` / `feedbackByWrongAnswer` maps per step in the content model — one hint per *anticipated* wrong answer, plus a `feedbackDefault` for the rest
+- **Considered:** Single "Not quite, try again" default (too generic), AI-generated specific hints (Phase 2 territory, forbidden in Phase 1)
+- **Gaps / risks:**
+  - Authoring burden is significant — every step needs us to brainstorm common wrong answers
+  - Unanticipated wrong answers fall through to a generic default — exactly the gap Phase 2 AI could close
+  - Hint quality is bounded by the author's imagination, not the learner's actual mistakes
+- **See also:** D69 (`feedbackByCell` per-cell extension to the grid renderer)
+
+### D55 — Progressive hint model (no bail-out)
+- **Status:** resolved (supersedes D7's unlock behavior; triggered the D31 XP curve update)
+- **Chose:** **Continue is locked until the learner produces a correct answer on every problem slot.** After 2 wrong attempts on the same slot, the variant's `explanation` field (new, optional, on `BaseVariant`) is shown as an additional hint beneath the per-wrong feedback. The learner is never trapped *in the lesson* (they can always close and resume), but they cannot *bypass a problem*.
+- **Considered:**
+  - **Original D7 model** — explanation appears and Continue unlocks. Rejected because the unlock incentivizes cognitive offloading (learner learns to guess wrong twice to skip).
+  - **Strict — no explanation at all** — per-wrong feedback is the only help. Rejected because it risks rage-quit on hard problems.
+  - **Required `explanation` on every variant** — rejected for MVP to avoid backfilling 8 explanations on the already-shipped Lesson 1; the field is optional and authors opt in where it matters most.
+  - **Full progressive hint array (`hints: [{ afterStrike, text }]`) in MVP** — rejected as YAGNI for Phase 1; intermediate hand-authored hints are a high authoring burden without proportional MVP value.
+- **Gaps / risks:**
+  - A learner who genuinely cannot answer a hard problem will be stuck on that slot until they figure it out or close the app and never come back; we accept this for the pedagogy win and rely on the variant pool + replay to give them a fresh angle on return.
+  - Lesson 1 variants currently have no `explanation` field populated; until backfilled, the post-2-wrong behavior is a softer presentation of the same per-wrong copy (no new content). Backfill is a follow-up author task.
+  - "Cannot complete the lesson" becomes a real failure mode that the streak and progress system experience for the first time — if it happens often, we'll see it in the `stepAttempts` log and can add a "skip with mastery debt" lever in Phase 3.
+  - Schema is intentionally small (`explanation?: string`) rather than future-shaped (`hints: [{ afterStrike, text }]`); Phase 2 will migrate when the LLM lands and the richer structure pays for itself. The migration is additive — no breaking change to existing content.
+  - Same threshold (N=2) for every problem slot, regardless of difficulty. A hard grid problem and a binary multiple-choice get the same trigger. Easy to tune per-slot later if needed.
+- **See also:** D7 (original superseded rule), D31 (XP curve consequence)
+
+### D56 — Exploration vs commit in interactions
+- **Status:** resolved
+- **Chose:** **Keep the 2-step build-then-check model** with no separate exploration mode. Every tap during the build phase is reversible with no feedback; Check is the explicit commit. Add per-kind UX affordance copy ("Tap to mark. Tap again to unmark.") so first-time learners see the build-as-exploration distinction. (Option E + D from the design exploration.)
+- **Considered:**
+  - **A: 3-step Lock-In + Check** — separate explicit commit before evaluation. Rejected as ceremony; learners who skip Lock-In get stuck; demos slow down.
+  - **B: Side panel for exploration** — physical separation between scratch space and answer area. Rejected: doesn't fit 390px mobile; sandbox semantics differ wildly per kind (what does "explore" mean for fill-fraction or multiple-choice?).
+  - **C: Long-press to inspect** — long-press a grid cell to see info popover without selecting it. Rejected for MVP only — discoverability is weak on mobile and there's no clean desktop equivalent. Genuinely promising Phase 2/3 once grids get richer in Lesson 3+.
+  - **E alone (status quo)** — keep current model with no new copy. Rejected because the build-as-exploration affordance is currently invisible to first-time learners; small copy investment unlocks the clarity at near-zero cost.
+- **Gaps / risks:**
+  - Anxious or low-confidence learners may still hesitate to tap freely; the copy helps but doesn't remove the underlying anxiety
+  - Long-press inspect (option C) remains a real Phase 2/3 candidate — when Lesson 3+ ships with richer grids, the case strengthens
+  - No "what if?" sandbox — learners can't try a hypothesis without committing to it as their answer
+  - Per-kind copy adds a small authoring/translation surface — if we ever localize, every kind needs translated affordance copy
+  - Dismissible hint stored in `localStorage` means a learner who logs in on a second device sees the hint again — acceptable, but worth noting
+
+### D69 — `feedbackByCell` extension to `GridEventVariant`
+- **Status:** resolved
+- **Chose:** Add an optional `feedbackByCell?: Record<string, string>` map to `GridEventVariant` (keyed by `"row,col"`, 1-indexed). When a learner taps a wrong cell, the renderer prefers the per-cell hint over the variant's `feedbackDefault`. This is a targeted extension of D8's authoring pattern for the grid kind only — the other four interaction kinds keep `feedbackByWrong*` as their lookup.
+- **Considered:**
+  - **No per-cell hints** — fall back to `feedbackDefault` on every wrong grid cell. Rejected because the grid is the brief's "rich interaction" and the most expressive place to teach (e.g. for "sum to 7", the cell `(2,4)` deserves "Close — that's sum 6" while `(1,1)` deserves "That's sum 2 — way too low"). One-size-fits-all defaults waste the surface.
+  - **Generalize to a per-kind hint table on `BaseVariant`** — would unify the four `feedbackByWrong*` patterns into one. Rejected as YAGNI for MVP: each kind's "wrong answer" has a different shape (set vs scalar vs cell coord), and the per-kind specialization is what gives type-safe lookup. Revisit if a sixth interaction kind is added.
+  - **Author per-cell hints as a sparse comment in code** — no schema change, hint text lives near the cell coords in a comment. Rejected: not addressable by `scripts/audit-feedback.ts`; not testable; defeats the typed-content advantage.
+- **Gaps / risks:**
+  - Authoring per-cell hints for all 36 cells of a 6×6 grid is impractical; in practice authors will hand-write hints for ~5–10 high-value "close miss" cells and let the rest fall through to `feedbackDefault`. `audit-feedback.ts` should treat sparse per-cell hints as acceptable.
+  - String keys (`"row,col"`) are stringly-typed; a typo (`"1,7"` on a 6-col grid) silently never fires. A runtime invariant could catch out-of-bounds keys at load time (cheap follow-up).
+  - Extension is grid-only; if we add another grid-like kind in Phase 2 (e.g. tree-event), we'll need to decide whether to copy the pattern or generalize it.
+
+### D70 — Empty-Home first-session welcome card
+- **Status:** resolved (2026-06-23, addresses I008)
+- **Chose:** When a brand-new user (no `lessonProgress` docs **and** `profile.stepsCompleted === 0`) lands on Home, the hero card renders as `"Welcome, {displayUsername}. Let's begin."` with a Start CTA pointing at Lesson 1. As soon as the learner advances any slot, the condition flips false and the hero reverts to the standard Start/Resume/All-caught-up logic from `spec-course-path`. No client-side state, no localStorage flag — the welcome moment is derived from server data, which keeps it consistent across devices and reload.
+- **Considered:**
+  - **(a) Default to the standard `"Start Lesson 1: What is probability?"` hero with no personalization** — simplest, but skips the one moment in the product where a name acknowledgement reads warm rather than filler. Borderline acceptable; we chose welcome for the small humanization win.
+  - **(c) Skip Home on first session and route registration straight to `/lesson/what-is-probability`** — denies the learner a first sighting of the course shape (6 cards, locked future lessons) before being thrown into a problem. Rejected: the course-path view is part of the product's "what am I doing" answer and should be the first thing they see.
+- **Gaps / risks:**
+  - "Brand new" is derived from `stepsCompleted === 0` + empty `lessonProgress`. If a learner abandons mid-first-slot before any correct check, they'll still see the welcome on next visit. Acceptable (it just means they didn't get past hello).
+  - Copy is one sentence with a period (no exclamation, no tagline) per `docs/ui-directive.md`.
+  - This is the only personalized greeting in the product; no further "Hey {username}" sprinkled elsewhere.
+
+---
+
+## B. Stack
+
+### D9 — Frontend framework
+- **Status:** resolved
+- **Chose:** Vite + React 18 + TypeScript
+- **Considered:** Next.js 14 (App Router), Remix, plain CRA
+- **Gaps / risks:**
+  - Vite SPA = no SSR → poor first-load SEO (acceptable: this is a logged-in learning app, not a marketing site)
+  - No built-in serverless functions — Phase 2 (AI calls) will need Firebase Functions or a separate server, vs Next.js where API routes come free
+  - Manual setup for some things Next.js gives free (file-based routing, image optimization, route prefetching)
+
+### D10 — Backend / data
+- **Status:** resolved
+- **Chose:** Firebase — Auth, Firestore, Storage
+- **Considered:** Supabase (Postgres + Auth), Convex, Clerk + Convex, NextAuth + SQLite/Prisma + Railway
+- **Gaps / risks:**
+  - Firestore is NoSQL → no native unique constraints (we work around with the `/usernames/` sentinel pattern), no JOINs, harder ad-hoc analytical queries
+  - Firestore pricing scales with reads — a popular Phase 3+ app with many real-time listeners could get pricey
+  - Vendor lock-in: schema, security rules, and SDK are Firebase-specific; migrating off is non-trivial
+  - Firebase Auth doesn't natively support "login by username" — we build a workaround
+  - No server-side functions until we add Firebase Functions (cold-start latency a future consideration)
+
+### D11 — Routing
+- **Status:** resolved
+- **Chose:** React Router v6
+- **Considered:** TanStack Router, manual hash routing
+- **Gaps / risks:**
+  - Guarded-route boilerplate is hand-rolled (one `<RequireAuth>` wrapper) — minor, but a thing
+  - React Router data APIs are still relatively new; we'll keep usage minimal for MVP
+
+### D12 — Hosting
+- **Status:** resolved
+- **Chose:** Vercel (static SPA)
+- **Considered:** Netlify, Firebase Hosting, Cloudflare Pages
+- **Gaps / risks:**
+  - Firebase Hosting would consolidate everything under one Google bill — a small ops simplification we're declining for Vercel's better DX
+  - Vercel + Firebase = two providers, two dashboards, two billing pages
+
+---
+
+## C. Data & Persistence
+
+### D13 — Content model storage
+- **Status:** resolved
+- **Chose:** Lessons live as **TypeScript files in the repo** (typed `Lesson` objects), bundled with the client
+- **Considered:** Lessons in Firestore (enables a future authoring UI), Headless CMS (Sanity, Contentful)
+- **Gaps / risks:**
+  - Editing a lesson requires a code change + redeploy
+  - Non-developers can't author content (irrelevant for MVP; matters if we ever bring on a content team)
+  - Localization later requires a migration to a real CMS
+  - Trade win: zero DB reads on the critical path → easy <2s load target; type-checked content; version-controlled
+
+### D14 — Progress persistence model
+- **Status:** resolved
+- **Chose:** Two-doc pattern — `/users/{uid}/lessonProgress/{lessonId}` for current state, `/users/{uid}/stepAttempts/{autoId}` as an **append-only** log of every check
+- **Considered:** Single `lessonProgress` doc only (no history), summary stats only (correct/total per lesson)
+- **Gaps / risks:**
+  - More writes per user — Firestore writes are cheap but not free
+  - More data to delete if a user requests account deletion (Phase 3 / compliance concern)
+  - Trade win: free Phase 3 seed data for spaced repetition; verifiable "did the learner *actually* finish" trail
+
+### D15 — Mastery model
+- **Status:** resolved
+- **Chose:** 3-state machine per lesson — `not_started`, `in_progress`, `completed`
+- **Considered:** Per-concept mastery score (0–100%), spaced repetition intervals (FSRS-style)
+- **Gaps / risks:**
+  - Crude — doesn't distinguish "got it on first try" from "struggled through with 2 strikes per step"
+  - "Recommend next" is trivial today (first `in_progress`, else first `not_started`) — doesn't reflect mastery gaps
+  - Will likely be replaced/augmented in Phase 3 by a richer score that the `stepAttempts` log can feed
+
+### D16 — Username uniqueness pattern
+- **Status:** resolved
+- **Chose:** Sentinel doc per username — `/usernames/{lowercased}` containing `{ uid }`, created in the same `runTransaction` that writes `/users/{uid}`
+- **Considered:** Firestore extension for unique fields (heavyweight), Cloud Function trigger (latency)
+- **Gaps / risks:**
+  - Doubles the writes at registration (one to sentinel, one to user doc)
+  - Sentinel is **never released** in MVP — if a user deletes their account (Phase 3), their username stays claimed
+  - If the Firebase Auth `createUserWithEmailAndPassword` succeeds but the Firestore transaction fails, we need to clean up the orphan auth user (must implement)
+
+---
+
+## D. Auth & Identity
+
+### D17 — Auth providers
+- **Status:** resolved
+- **Chose:** Email + username + password only via Firebase Auth
+- **Considered:** Add Google sign-in (one toggle in Firebase Auth + a button)
+- **Gaps / risks:**
+  - Higher signup friction on mobile (typing email + password + confirm vs one-tap)
+  - More forgot-password support burden (Firebase handles the mechanics, but it's still a UX flow)
+  - HS students who only use school-managed Google accounts can't onboard
+  - Cheap to add later — flag for revisit if Phase 2 measures show signup drop-off
+
+### D18 — Login mechanism
+- **Status:** resolved
+- **Chose:** Accept email **or** username + password. If input isn't email-shaped, look up `/usernames/{lowercased}` → fetch `/users/{uid}.email` → call `signInWithEmailAndPassword` with that email
+- **Considered:** Email only (simpler)
+- **Gaps / risks:**
+  - One extra Firestore read per username-based login (cheap)
+  - Couples the username sentinel pattern to login flow — if we ever change the username system, login breaks
+  - Mirroring `email` into `/users/{uid}` means we have two sources of truth for email — must keep in sync if Firebase Auth email is ever changed
+
+---
+
+## E. Visual & Motion
+
+### D19 — Color palette
+- **Status:** resolved
+- **Chose:** Indigo `#4F46E5` primary, emerald `#10B981` correct, rose `#F43F5E` wrong, amber `#F59E0B` streak/flame, near-white `#FAFAFA` bg, near-black `#0F172A` text
+- **Considered:** Teal primary (more "math/science"), coral primary (warmer)
+- **Gaps / risks:**
+  - Indigo is *safe* but very common (Linear, every modern SaaS) — may not feel distinctive
+  - Rose for wrong is gentler than hard red but some users might miss the cue
+  - No dark mode in MVP — phone-at-night users will get a bright screen
+- **See also:** D67 (dark mode deferred but tracked)
+
+### D20 — Typography
+- **Status:** resolved
+- **Chose:** Inter for all UI (body, prompts, headings), 16px minimum body, 22–32px for prompts
+- **Considered:** Aktiv Grotesk (paid — Brilliant's font), Geist, system font stack
+- **Gaps / risks:**
+  - Inter is free and excellent but ubiquitous — won't carry distinctive brand on its own
+  - Extra ~50KB on first load for the font files (acceptable, but a perf cost)
+
+### D21 — Form factor
+- **Status:** resolved
+- **Chose:** PWA-friendly responsive web app, mobile-first, no native packaging
+- **Considered:** React Native, Capacitor wrap (App Store from same React codebase)
+- **Gaps / risks:**
+  - No App Store / Play Store presence — major discoverability gap for an HS-student audience
+  - No reliable push notifications on iOS (PWA push is recent and limited)
+  - Add-to-Home-Screen on iOS is browser-dependent and weak
+  - Capacitor is a real escape hatch later — same React code, but native shell
+  - "PWA-friendly" means the app loads and works in a PWA context but ships no PWA features in MVP (no manifest, no service worker, no offline). Phase 2 candidate; until then PRD §1 reads "web app (PWA-friendly)" rather than committing to PWA features.
+
+### D67 — Dark mode (`prefers-color-scheme`) deferred but tracked
+- **Status:** **open — Phase 2/3 candidate, intentionally tracked**
+- **Chose:** **No dark mode in Phase 1.** App ships light-mode only; no `prefers-color-scheme` media query handling. Acknowledged as a Phase 2/3 enhancement worth revisiting (user flagged it as interesting; HS students on phones at night is a real use case for the persona).
+- **Considered:**
+  - **Full dark mode in MVP** — design dual palettes for every color token, test contrast in both modes, add a toggle in Profile. Rejected: doubles design work, adds another testing dimension, and the brief doesn't require it.
+  - **Auto-only dark mode (no toggle)** — respect `prefers-color-scheme` silently. Less work than a full toggle but still requires both palettes. Rejected for MVP, same reason.
+  - **System-toggle support via Tailwind's `dark:` variant from day 1** — design only light, but use `dark:` prefixes throughout so adding dark mode later is mostly token work. Rejected: still requires picking dark token values eventually; YAGNI.
+- **Gaps / risks:**
+  - Phone-at-night learner gets a bright screen — known persona friction
+  - Some learners prefer dark for cognitive reasons (sensitivity, focus); we exclude them
+  - Re-themeing for dark mode in Phase 2 will touch every component that uses raw color tokens (manageable since shadcn CSS variables centralize the palette)
+  - **Follow-up:** evaluate during Phase 2 alongside the LLM integration; if Phase 2 demos show frequent late-evening usage, prioritize. Track in this entry.
+- **See also:** D19 (color palette source; dark variants will need to be defined here)
+
+---
+
+## F. Streaks & Engagement
+
+### D22 — Streak timezone
+- **Status:** resolved
+- **Chose:** Auto-detect from the browser via `Intl.DateTimeFormat().resolvedOptions().timeZone`; store `lastActiveDate` as `YYYY-MM-DD` in that timezone. **Detection happens per session, not persisted** (so a traveler picks up their new local-tz boundary automatically the next time they open the app)
+- **Considered:** Explicit timezone selector in Profile, UTC-only, persist-tz-at-registration
+- **Gaps / risks (all accepted for MVP; revisit if a real user complains):**
+  - Travelers crossing timezones can have weird-feeling streak day boundaries
+  - One weird DST transition per year (off-by-an-hour boundary)
+  - Devices with wrong system timezone (rare) get wrong streak math
+  - No way for the user to correct it without a Phase 3 settings screen
+  - Two devices in different timezones used the same day could double-count or miss a day; rare enough to ignore in MVP
+
+---
+
+## G. Scope Exclusions (each is a decision)
+
+### D23 — No AI features in MVP
+- **Status:** resolved (gate from the brief)
+- **Chose:** Zero AI in Phase 1 — no model calls, no generated content, no chatbot tutor, no AI grading
+- **Considered:** Sneaking in an AI-generated hint here or there
+- **Gaps / risks:**
+  - All hint coverage is human-authored — limited to what we anticipated
+  - Demo "wow factor" comes from the interaction quality alone, not AI tricks
+  - Phase 2 (Friday) is where AI lands; this is a sequencing choice, not a permanent one
+
+### D24 — No social features
+- **Status:** resolved
+- **Chose:** Solo experience — no follow/followers, no comments, no leaderboards, no friends
+- **Considered:** Friend leaderboards (known engagement lever), public profiles
+- **Gaps / risks:**
+  - Missing a proven retention mechanism (Duolingo / Brilliant both use social comparison)
+  - Phase 3 candidate
+  - Avatars + bios are in scope as personal-identity touches, but no graph
+
+### D25 — No offline / local persistence
+- **Status:** resolved
+- **Chose:** Server-side persistence only; no localStorage fallback, no Firestore offline mode toggle
+- **Considered:** Local-first with Firestore offline persistence (one config flag)
+- **Gaps / risks:**
+  - User on a plane / weak network is stuck
+  - Mobile networks drop briefly — could feel laggy mid-lesson
+  - Cheap to revisit — the Firestore SDK has offline persistence built in; we can opt in later
+
+### D26 — No content authoring UI
+- **Status:** resolved
+- **Chose:** Lessons authored by writing TypeScript files in the repo
+- **Considered:** Admin CMS for non-developers
+- **Gaps / risks:**
+  - Adding/editing a lesson requires a deploy
+  - Locks lesson-writing to people who can use git
+  - Will become a real bottleneck if we ever want a content team
+
+### D27 — No push / email reminders
+- **Status:** resolved
+- **Chose:** No push notifications, no email digest, no streak-warning emails in MVP
+- **Considered:** Daily streak reminder email, browser push
+- **Gaps / risks:**
+  - Misses a known engagement lever — streak retention drops without nudges
+  - Phase 3 territory
+  - iOS PWA push is limited anyway; would need a native shell to do this well
+
+---
+
+## H. Motivation & Habit Loop
+
+### D28 — Motivation system scope
+- **Status:** resolved
+- **Chose:** **Standard** — streaks + best streak + daily goal + XP + streak milestones (3/7/14/30/60/100) + lifetime stats + lesson completion celebration with confetti, XP count-up, streak update, milestone card, course progress, next-lesson recommendation
+- **Considered:** Light (streaks + celebration only), Heavy (+ trophies/badges + daily challenges)
+- **Gaps / risks:**
+  - More to build → real schedule pressure against the Wednesday gate
+  - XP without leaderboards is a weaker hook than Duolingo's social XP — solo XP can feel hollow without comparison
+  - Milestone celebrations only trigger on the *next* lesson completion, not the moment the streak hits the threshold — slight delay, but keeps the celebration in one consolidated screen
+  - No "comeback" mechanic — a learner who broke a long streak gets no special encouragement (Phase 3 candidate)
+
+### D29 — Question bank pattern
+- **Status:** resolved
+- **Chose:** **Slot/variant model** — each lesson is a sequence of slots; problem slots carry a pool of 1+ variants; one variant is materialized per slot per attempt
+- **Considered:** Fixed steps (no bank, every learner sees the same content always), per-step pools (smaller granularity than per-slot), random per-render with no seeding
+- **Gaps / risks:**
+  - The author must reason about both *slot shape* (interaction kind) and *variant content* (specific parameters) — slightly more conceptual overhead than "just a step"
+  - Variants in a slot share an interaction kind — can't mix a grid question and a fill-fraction question in the same slot (good for renderer simplicity; minor authoring constraint)
+  - Type guards needed to enforce that all variants in a slot match the slot's `interactionKind` (runtime + unit test, not just type system)
+
+### D30 — Variants per slot in MVP Lesson 1
+- **Status:** resolved
+- **Chose:** **2 variants per problem slot** for the shipped Lesson 1
+- **Considered:** Structure-only (1 variant), 3+ variants for real practice depth
+- **Gaps / risks:**
+  - 2 variants means a second-pass replay is fresh, but a *third* pass shows variant A again — pattern detectable
+  - Authoring cost ~doubles for problem slots (concept and wrap slots are unaffected since they're fixed)
+  - Cheap to extend later — just append a variant object literal
+
+### D31 — XP awarding rule
+- **Status:** resolved
+- **Chose:** ~~10 XP first-try correct / 5 XP second-try correct / 2 XP unlocked-after-2-strikes / +50 XP lesson completion bonus. XP never decreases.~~ **Updated 2026-06-23 (consequence of D55):** 10 XP first-try correct / 5 XP second-try correct / **2 XP for third-try-or-later correct (persistence reward)** / 0 XP for any wrong attempt / +50 XP lesson completion bonus. XP never decreases. The third bucket no longer rewards "unlocked-without-getting-it-right" (D55 removed that case); it now rewards "got it eventually after struggling."
+- **Considered:** Flat XP regardless of attempts (no incentive to try hard), XP decaying steeply per attempt (punishing), no XP at all (lighter), no XP for 3rd+ attempts (rejected: would punish persistence under the no-bail-out rule)
+- **Gaps / risks:**
+  - The 10/5/2 curve is intuition, not validated — could be tuned later from real attempt data
+  - Lesson bonus is a flat 50 XP regardless of lesson length — short lessons feel "more rewarding per minute" than long ones
+  - No XP differentiation by difficulty / interaction kind — a tap-outcomes step pays the same as a grid-event step despite different cognitive load
+  - Same 2 XP for 3rd-, 4th-, 5th-try correct — diminishing returns are coarse; could be smoother (e.g. `max(2, floor(10/attemptNumber))`) but YAGNI for MVP
+- **See also:** D55 (pedagogy decision that drove this update), D7 (original wrong-answer model that the old XP curve was built for)
+
+### D32 — Streak milestones
+- **Status:** resolved
+- **Chose:** Celebrate at `{3, 7, 14, 30, 60, 100}` days; each milestone triggers once (tracked in `milestonesReached`); celebration happens on the *next* lesson completion after the threshold is crossed
+- **Considered:** Famous-only `{7, 30}`, dense `{1, 2, 3, 5, 7, 10, 14, 21, 30, ...}`, Duolingo-style every-10 forever
+- **Gaps / risks:**
+  - 6 milestones might be too dense at the start (3 → 7 is fast) and too sparse later (60 → 100 is a long gap)
+  - No celebration at the exact moment of crossing — there's a delay until the next lesson completion (acceptable: keeps surface UI consolidated)
+  - 100 days is the ceiling for MVP — beyond that there are no further milestones until we add them
+
+### D33 — Variant selection seeding
+- **Status:** resolved
+- **Chose:** Deterministic selection via `hash(userId + lessonId + attemptId + slotId) mod variants.length`, persisted to `selectedVariantIds` on first slot-visit
+- **Considered:** Pure random per render (breaks resume), random + persist (works but no deterministic replay debugging), round-robin (skips personalization potential later)
+- **Gaps / risks:**
+  - Hash function choice matters — must be stable across deploys (use a tiny pure-function hash, not anything depending on engine internals)
+  - Without `attemptId` regeneration on replay, second-pass would show identical variants — requires careful replay-handling code
+  - Future per-user balancing (e.g. "this learner always sees the easier variant") is not free with this approach — would need additional logic
+
+### D34 — No streak freeze / save mechanism
+- **Status:** resolved
+- **Chose:** Miss a day → `currentStreak` resets to 0. No freeze, no save, no buy-back.
+- **Considered:** Duolingo-style streak freeze (cosmetic or paid), grace period of one missed day
+- **Gaps / risks:**
+  - Real-world life gets in the way; rigid streaks can feel punishing and drive churn
+  - No revenue surface for streak-related purchases (irrelevant: MVP isn't monetized)
+  - Easy to add later — just add a `streakFreezesAvailable` counter and consume one before reset
+
+### D35 — Authoring workflow
+- **Status:** resolved
+- **Chose:** One TypeScript file per lesson under `src/content/lessons/`. Variants for a slot live inline with the slot. Adding a hint = small edit to a single variant. Adding a variant = appending an object literal. Type system enforces presence of `feedbackCorrect` and `feedbackDefault`.
+- **Considered:** Separate `questions.json` files per slot, a YAML/MDX content format, a small admin CMS
+- **Gaps / risks:**
+  - Lesson files can grow long with multiple slots × multiple variants — could exceed several hundred lines
+  - No syntax highlighting for hand-written feedback as it's just TypeScript strings
+  - No preview of how a variant *looks* without running the app — author needs a dev mode "lesson preview" page
+  - Files-in-repo means lesson updates require a git push and Vercel deploy
+
+---
+
+## I. UI Stack
+
+### D36 — Component library foundation
+- **Status:** resolved
+- **Chose:** [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS for all app chrome — buttons, cards, inputs, progress, badges, avatars, dialogs, toasts. Components copied into the repo via CLI, themed once with PRD color tokens as CSS variables.
+- **Considered:** Headless UI + custom Tailwind (more boilerplate), MUI/Chakra (heavier, harder to match Brilliant aesthetic), Radix primitives directly (shadcn is already Radix + Tailwind)
+- **Gaps / risks:**
+  - shadcn components need initial setup time (`npx shadcn init` + adding ~10 components)
+  - Default shadcn aesthetic skews "SaaS dashboard" — requires deliberate theming to feel Brilliant-like
+  - Community registry items vary in quality — must review before installing
+  - Tied to Tailwind v4/v3 migration path as shadcn evolves
+
+### D37 — Animation layer (Framer + selective Animbits)
+- **Status:** resolved
+- **Chose:** Framer Motion as the primary animation layer for lesson player (slot transitions, correct/wrong feedback, tap states). [Animbits](https://www.animbits.dev/) used selectively (max 2–3 components) for celebration-screen polish only — confetti, XP count-up. Install via `npx shadcn add @animbits/<component>`.
+- **Considered:** Framer only (no Animbits), Animbits for all interactions (inconsistent with shadcn motion feel), CSS animations only (harder to coordinate sequences), React Spring
+- **Gaps / risks:**
+  - Two animation sources (Framer + Animbits) can feel inconsistent if Animbits spreads beyond celebration
+  - Animbits is a third-party shadcn registry — must review generated code on install
+  - Framer Motion adds ~30KB gzip — acceptable for the interaction quality it enables
+  - If Animbits confetti doesn't fit, fall back to a short Framer particle snippet — no hard dependency
+
+### D68 — Impeccable as future UI tooling (deferred, tracked)
+- **Status:** **open — Phase 2 candidate, intentionally tracked**
+- **Chose:** **Do not adopt [Impeccable](https://impeccable.style/designing/) for the Phase 1 MVP.** Continue with the current UI workflow: shadcn/ui scaffolded by hand, Framer Motion + selective Animbits for motion, all rules in [`docs/ui-stack.md`](ui-stack.md). Revisit Impeccable after the MVP first iteration ships, ideally as part of the Phase 2 brand/polish pass.
+- **Considered:**
+  - **Adopt Impeccable now (Phase 1)** — would require writing `PRODUCT.md` and `DESIGN.md` context files, learning the 23-command surface, and reconciling its opinions with `docs/ui-stack.md`. Rejected: pulls focus from shipping the MVP; the brief explicitly prioritizes "deployed and public" by Wednesday.
+  - **Subset adoption: `/impeccable detect` in CI only** — the anti-pattern detector runs deterministically (`npx impeccable detect src/`) with a JSON output and exit code, so it would slot into CI without changing the design workflow. Genuinely appealing but still requires the context files to be useful; deferred along with the full tool to keep the Phase 2 conversation in one place.
+  - **Skip Impeccable entirely** — Loses a real lever for the Phase 2 brand pass (Impeccable's `/extract` consolidates drift, `/document` re-captures the system, `/critique` and `/audit` add a structured review surface). Rejected as too final; better to keep on the radar.
+- **Gaps / risks:**
+  - We will accumulate **design debt during MVP** that Impeccable's `/extract` and `/document` are literally designed to pay down later — acceptable per the "build first, polish second" sequencing, but it means Phase 2 will have a real consolidation chunk
+  - **Conflict warning from Impeccable's own docs:** running Impeccable alongside Anthropic's `frontend-design` skill cancels both out ("they collide on vocabulary"). We currently have `frontend-design` installed at `~/.claude/plugins/cache/claude-plugins-official/frontend-design/`. When we adopt Impeccable we'll need to retire `frontend-design` or pick one per task — decision to make at adoption time.
+  - **Tool requires context files** Impeccable expects `PRODUCT.md` (audience, voice, anti-references) and `DESIGN.md` (tokens, components). `docs/prd.md` is most of `PRODUCT.md` already; `docs/ui-stack.md` is most of `DESIGN.md`. A short adapter pass at Phase 2 should map these over rather than re-authoring.
+  - **Skill activation policy** Per D46, ambient skills must be opt-in. When we install Impeccable, follow the same pattern (`disable-model-invocation: true` unless we want auto-firing on UI tasks).
+  - **Follow-up:** evaluate adoption at the start of Phase 2 alongside the LLM integration; lesson 2–6 build-out is the natural moment to invest in design tooling since we'll be touching UI heavily. Track in this entry.
+
+**Canonical reference:** [`docs/ui-stack.md`](./ui-stack.md) — all specs must point here for UI implementation rules.
+
+---
+
+## J. Project Structure & Tooling
+
+### D38 — Product name
+- **Status:** resolved
+- **Chose:** **Pascal** (after Blaise Pascal, co-founder of probability theory)
+- **Considered:** Generic working names ("brilliant-clone"), subject-themed names (Dicey, Roll, Bayes), placeholder until launch
+- **Gaps / risks:**
+  - "Pascal" is also a programming language — possible name collision in search results
+  - If we ever expand beyond probability, the name no longer reflects subject (likely fine — most great learning brands aren't subject-bound)
+  - Domain availability not checked
+
+### D39 — Spec structure (PRD vs detailed specs)
+- **Status:** resolved
+- **Chose:** Slim high-level PRD + one detailed spec per major feature under `docs/specs/spec-*.md`. Each spec implementation detail is one sentence appropriate for a junior engineer.
+- **Considered:** Single monolithic PRD with every detail inline, no specs at all
+- **Gaps / risks:**
+  - Cross-spec consistency requires manual diligence — easy to update one spec and forget another (e.g. progress schema referenced from auth, lesson player, course path)
+  - Specs duplicate small amounts of context (e.g. data model snippets appear in multiple places)
+  - More files to keep in sync as we make build-time decisions
+
+### D40 — Linting + formatting + CI gate
+- **Status:** resolved
+- **Chose:** ESLint flat config (typescript-eslint) + Prettier + EditorConfig; CI runs `typecheck && lint && format:check && test && audit-feedback` on every push / PR
+- **Considered:** Biome (all-in-one, faster), no CI for MVP (relying on local discipline), Husky pre-commit hooks
+- **Gaps / risks:**
+  - ESLint + Prettier is the slower combo vs Biome (~2× cold-start)
+  - No pre-commit hooks means lint errors can be pushed before CI catches them
+  - `audit-feedback` is a custom script — not standard; new contributors won't know what it does without reading `scripts/audit-feedback.ts`
+
+### D41 — Sentry as the only error tracker
+- **Status:** resolved
+- **Chose:** Sentry for client-side error tracking, React Error Boundary at the route level, inline toasts for persistence failures
+- **Considered:** Firebase Crashlytics (Firebase-native), no error tracking for MVP, console-only
+- **Gaps / risks:**
+  - Sentry free tier has event limits — could be hit during demo-day traffic spike
+  - Two dashboards to check post-incident (Sentry + Firebase console + Vercel logs = three)
+  - Sentry SDK adds ~50KB gzip — acceptable but real
+
+### D42 — One Firebase project + local emulator strategy
+- **Status:** resolved
+- **Chose:** One shared Firebase project for MVP. Local development uses the Firebase emulator suite (no real reads/writes during dev). Production data goes straight to the shared project.
+- **Considered:** Separate dev/staging/prod Firebase projects (cleaner but ~3× setup), production-only (no emulator — every dev test hits real DB)
+- **Gaps / risks:**
+  - No staging environment — any breaking schema change ships directly to "prod"
+  - Test data could accumulate in the prod project during pre-launch development
+  - Emulator behavior diverges from prod in edge cases (security rule evaluation, timestamps)
+  - Phase 2 candidate: split into dev/prod projects before adding paying users or partner accounts
+
+### D43 — Lesson stub policy
+- **Status:** resolved
+- **Chose:** Lessons 2–6 ship as one-file stubs with title, blurb, `comingSoon: true` flag, and zero slots; lesson player refuses to start them; course path shows them as locked
+- **Considered:** Hide future lessons entirely until built, ship stubs with placeholder lorem-ipsum content
+- **Gaps / risks:**
+  - Type system needs to allow `comingSoon: true` AND empty `slots: []` together — a `Lesson` type variant
+  - Tests must skip invariant checks for `comingSoon` lessons (e.g. don't enforce ≥1 slot)
+  - Tappable-but-locked lessons might frustrate exploratory learners who tap to peek
+
+### D44 — Documentation in `docs/`, not in code comments
+- **Status:** resolved
+- **Chose:** All architectural decisions, specs, and rationale live in `docs/*.md`. Code comments only explain non-obvious *implementation* trade-offs (per agent code-style rules), not design motivation.
+- **Considered:** JSDoc-heavy code with design rationale inline, README-only documentation, Notion/external wiki
+- **Gaps / risks:**
+  - Devs reading only code might not discover the spec — onboarding requires reading `docs/` first
+  - Two places to keep in sync if a decision changes (code + docs)
+  - Cross-linking between specs is manual
+
+### D45 — `docs/architecture.md` as the cross-cutting source of truth
+- **Status:** resolved
+- **Chose:** A single architecture doc covers state management, directory layout, environment strategy, routing, error handling, observability, performance budget, and testing — all things multiple specs reference
+- **Considered:** Inline these concerns into each spec individually (duplication risk), skip architecture doc entirely for MVP
+- **Gaps / risks:**
+  - Architecture doc must be kept current — drift between it and individual specs is a documentation smell
+  - Heavy single file (~290 lines) — devs may not read it cover-to-cover before working on a feature
+
+### D46 — Skill policy in `~/.cursor/skills/`
+- **Status:** resolved
+- **Chose:** Superpowers (14 skills) installed with `disable-model-invocation: true` — they activate only when explicitly named. Vercel React Best Practices left ambient — auto-activates on React work.
+- **Considered:** Auto-activate all Superpowers (heavy context every chat), install Superpowers per-project under `.cursor/skills/` (no sharing across projects), don't install at all
+- **Gaps / risks:**
+  - Easy to forget Superpowers skills exist since they don't auto-prompt — requires the user to name them
+  - Skills live in a personal directory, not in the repo — a teammate cloning the repo wouldn't get them automatically (project-local copy at `.cursor/skills/` would be required for that)
+  - Vercel skill auto-firing on any React work could pull React/Next.js-flavored advice into Vite-specific contexts (mostly fine; Vite is React)
+
+### D47 — Brainstorming-first workflow for new docs
+- **Status:** resolved
+- **Chose:** Use the `brainstorming` skill explicitly when authoring new design artifacts (e.g. alternatives log, PRD). Skip the skill for routine doc edits or pure-extraction tasks (e.g. moving an already-drafted log into the repo).
+- **Considered:** Always invoke brainstorming, never invoke brainstorming, invoke for every doc regardless of size
+- **Gaps / risks:**
+  - "Routine vs design" is a judgment call — risk of skipping brainstorm when we shouldn't
+  - The skill's HARD-GATE wants approval before any artifact is written — for pure extraction this slows us down without value
+
+### D48 — Age gate at registration
+- **Status:** resolved
+- **Chose:** **No age-gate checkbox at registration in MVP.** Registration captures email, username, and password only. The `/users/{uid}` doc does not store an `ageGate13` field, and the security rule does not require one.
+- **Considered:** "I am at least 13 years old" self-attestation checkbox (originally in `spec-auth.md`); hard age verification via ID upload (heavy, out of scope); blocking under-18 users entirely (cuts a chunk of the HS persona)
+- **Gaps / risks:**
+  - COPPA technically applies to data collection from children under 13 in the US; without a gate we have no documented defense for "we did not knowingly collect from under-13"
+  - The HS persona includes 9th graders, some of whom are 13 — soft edge case; we'll be relying on parental / institutional context (school issuing access, parent installing PWA)
+  - `docs/privacy.md` (pending) must now state the posture explicitly: "We do not collect data from users under 13 knowingly. We do not currently age-gate; we rely on the deployment context (HS students, no public marketing) until Phase 2."
+  - Cheap to add back later — one checkbox at registration, one field on the user doc, one line in the security rule
+  - If we ever do a real launch (App Store, public marketing), an age gate becomes a hard requirement, not a soft one
+
+### D64 — Bundle-size CI enforcement deferred
+- **Status:** resolved (with follow-up)
+- **Chose:** **Bundle-size budget (≤300 KB gz first-load JS) is checked manually on every deploy, not enforced in CI for MVP.** Performance AC #4 states the budget; the deploy checklist (pending) gates on a manual check.
+- **Considered:**
+  - **CI enforcement now** via `@vercel/budget` or `bundlewatch` (would catch regressions automatically, but adds CI complexity and risks spurious failures during scaffolding)
+  - **No budget at all** (relies on Lighthouse score alone — too coarse; Lighthouse can pass while bundle balloons)
+- **Gaps / risks:**
+  - A dev can ship a regression that bumps bundle from 280 → 350 KB and only catch it at deploy time, not in PR
+  - Lighthouse desktop run will likely surface large bundles via Performance score, but only after deploy
+  - Easy to wire in CI later — `bundlewatch` integrates with Vercel; the AC contract doesn't change, just the enforcement mechanism
+  - **Follow-up:** add `bundlewatch` (or equivalent) to CI in Phase 2 polish pass; track in `docs/deploy-checklist.md` (pending)
+
+---
+
+## K. PRD Acceptance Criteria Style
+
+> Captured during the AC walkthrough that produces `docs/prd.md`. Each entry locks in how PRD-level AC bullets are written so future feature ACs follow the same pattern.
+
+### D49 — AC grain: validation rules
+- **Status:** resolved
+- **Chose:** One PRD-level AC bullet per *category* of validation ("client-side validation rejects invalid inputs and shows a specific message per failure mode"). The spec's test plan enumerates per-rule cases.
+- **Considered:** One bullet per validation rule (~5 bullets in Auth alone), one umbrella bullet with no enumeration at all
+- **Gaps / risks:**
+  - A PRD reader who wants to know exactly which rules fire (email format vs username regex vs password length) has to open `spec-auth.md`
+  - If a rule is dropped or added later, the PRD bullet doesn't change — drift between PRD and spec is possible if we forget to re-sync
+  - Trade win: PRD stays scannable; reviewers can read the contract in one screen
+
+### D50 — AC copy enshrinement
+- **Status:** resolved
+- **Chose:** PRD ACs describe error messages by *intent* ("a single generic message — never reveals whether the identifier exists"), not exact strings. The spec owns the wording.
+- **Considered:** Enshrining exact strings in the PRD (e.g. "Email/username or password is incorrect."), which would make the PRD the canonical copy source
+- **Gaps / risks:**
+  - Copywriting changes don't force a PRD update — good for velocity, but means a casual PRD reader doesn't see the actual user-visible string
+  - Two sources of truth (PRD + spec) for the same constraint; reviewer must trust the spec for the final string
+  - For UX-critical phrases (security messages especially), small copy changes can change *meaning*; spec owners must be careful
+
+### D51 — Double-submit protection as PRD-level AC
+- **Status:** resolved
+- **Chose:** Include a dedicated AC bullet for "form is disabled during in-flight request" on Auth, and presumably any later forms (Profile edit, etc.). It's a real failure mode worth contracting on at PRD level.
+- **Considered:** Leave it implicit; assume any framework's loading state will give it to us for free; only call it out in the spec
+- **Gaps / risks:**
+  - Slightly duplicative — most form frameworks (and our shadcn `Button` with `disabled` prop) make this trivial
+  - But the AC catches the case where a dev forgets the `disabled` binding — the test plan now requires it explicitly
+  - If we ship many forms, this pattern should appear in `docs/ui-stack.md` as a UI convention so individual specs don't re-derive it
+
+### D52 — Cross-device sync latency contract
+- **Status:** resolved
+- **Chose:** AC for cross-device sync says "within one refresh" without committing to a specific latency number (e.g. "<2s via Firestore listeners")
+- **Considered:** Hard latency promise ("Firestore listeners propagate within 2s"), lazy-only ("changes show on next reload, no real-time")
+- **Gaps / risks:**
+  - We don't make a real-time promise — if Firestore latency degrades, we have no contractual recourse; we're inheriting Firebase's SLA
+  - "One refresh" is vague — a reviewer might interpret it as "user must hit reload" when in practice Firestore's `onSnapshot` updates are sub-second
+  - The spec's test plan can be more concrete (emulator + manual cross-device verification)
+
+### D53 — Replay variant freshness wording
+- **Status:** resolved
+- **Chose:** AC #3 (Progress) says "produces a *different mix* of variants when slots have ≥2 variants" without an explicit probability number
+- **Considered:** Spell out the probability ("~94% chance at least one slot differs in MVP Lesson 1"); require strictly-guaranteed-different (would need a different selection algorithm that tracks history)
+- **Gaps / risks:**
+  - A learner who happens to draw the same variants on replay might feel cheated — possible in MVP since only 2 variants per problem slot
+  - The `attemptId` regeneration makes this rare but not impossible; the spec's test plan acknowledges "with high probability"
+  - Once Lesson 2+ ships with 3+ variants per slot, the probability of an identical-mix replay drops to near-zero — the AC will naturally tighten in practice without re-wording
+
+### D54 — Server-side abuse cap (rule + naming)
+- **Status:** resolved
+- **Chose:** A server-side Firestore security rule rejects any `stepAttempt` create whose `attemptNumber` exceeds **10** on a single slot in one sitting. The rule is named **"abuse cap"** in PRD AC §9.2 #6 and in `spec-progress-persistence.md`. The cap is silent — the UI never surfaces it for legitimate use.
+- **Considered:**
+  - **No cap** — trust the client to retry sensibly. Rejected: a runaway client (or hostile script) could write thousands of attempts before billing notices.
+  - **Higher cap of 25** — less likely to false-positive on a genuinely struggling learner. Rejected for MVP: under D55 the learner *must* eventually answer correctly, so the realistic distribution of attempts/slot is heavily skewed toward ≤5; 10 leaves wide headroom while keeping the cap meaningful.
+  - **Soft client-only throttle** — visible to the user, defeats the protection against a buggy/hostile client.
+  - **Alternative naming: "stuck-client cap"** — friendlier framing but less honest about the threat model.
+  - **No label at all** — rule exists, isn't named. Rejected: makes cross-doc references awkward ("the >10 thing").
+- **Gaps / risks:**
+  - "Abuse cap" frames the threat model as adversarial; the cap actually protects against both bad actors and buggy clients — minor terminology friction. Affects PR/marketing language if the rule ever surfaces externally; not user-visible.
+  - A reviewer reading "abuse cap" might wonder whether we have other abuse defenses (we don't — this is the only one in MVP); doc accordingly if it ever comes up.
+  - Cap of 10 is intuition, not validated — could be tuned later if the `stepAttempts` log shows many legitimate >10-attempt sessions under D55's no-bail-out rule.
+  - Cap is per-create-call, not per-window — a determined client could close and reopen the lesson to reset; acceptable for MVP since `attemptId` regeneration on resume is mostly continuous within a single session.
+
+### D57 — Numeric magnitudes in PRD AC
+- **Status:** resolved
+- **Chose:** PRD-level AC bullets describe the *shape* of numeric mechanics, not their *magnitudes*. Specific values (XP values `10 / 5 / 2 / +50`, milestone thresholds `{3,7,14,30,60,100}`, attempt cap `10`, etc.) live in the spec and `docs/alternatives.md` decision entries.
+- **Considered:** Enshrine the magnitudes in PRD ACs (more concrete contract, easier to verify, but tightens the PRD to every tuning pass); omit numeric AC bullets entirely (loses the shape-level contract)
+- **Gaps / risks:**
+  - A PRD reader wanting to know "how much XP for first-try?" must follow the link to spec/D31 — one extra hop
+  - Shape-level wording ("progressively less but always >0") is loose enough that two implementations could both satisfy it differently; the spec is the source of truth for the actual curve
+  - When we tune values in Phase 2, only the spec + alternatives entry need updating — no PRD churn
+
+### D58 — Visual tokens in PRD AC
+- **Status:** resolved
+- **Chose:** PRD AC bullets describe state *intent* ("visually distinguished when active vs zero") rather than specific tokens ("amber when active, gray when zero"). `docs/ui-stack.md` owns the actual color/typography tokens.
+- **Considered:** Enshrine the color names in PRD AC (more concrete but couples PRD to design churn); make no claim about the visual distinction at all (loses the contract that there *is* a distinction)
+- **Gaps / risks:**
+  - A reviewer reading the PRD doesn't see what the active state looks like without opening `ui-stack.md`
+  - "Visually distinguished" is satisfiable by many treatments (color, weight, icon) — gives implementers freedom but loses precision
+  - Color tokens are already named in PRD §4 (UI Direction) as a high-level palette commitment; the duplication-avoidance argument applies
+
+### D59 — Daily goal rollover semantics in AC
+- **Status:** resolved
+- **Chose:** AC #9 (Habit Loop) explicitly says the daily-goal pill rolls over at **local midnight in the learner's detected timezone (per D22)** — not "nightly" or "every 24 hours."
+- **Considered:** "Resets nightly" (vague — could mean a server-side cron at UTC midnight), "every 24 hours after last completion" (sliding window, would feel buggy), UTC-only (would break for non-UTC learners)
+- **Gaps / risks:**
+  - Couples the AC to D22's timezone-detection mechanism; if D22 is ever revisited (e.g. explicit timezone picker), this AC needs an update
+  - Travelers crossing timezones see the boundary shift (already a gap noted in D22)
+  - "Detected timezone" puts trust in `Intl.DateTimeFormat().resolvedOptions().timeZone`; broken on devices with misconfigured system clocks (rare)
+
+### D60 — Replay UX granularity in PRD AC
+- **Status:** resolved
+- **Chose:** AC #8 (Course Path) says "a Replay affordance" — the existence of the path is the contract; the UX mechanism (button vs dialog vs slide-up sheet) is owned by `spec-course-path`.
+- **Considered:** Require an explicit confirmation dialog in the AC ("Replay opens a confirm dialog"); skip the Replay AC entirely (let the spec own it); require a one-tap replay with no confirmation
+- **Gaps / risks:**
+  - A spec author could implement a one-tap replay (no confirmation) and satisfy the AC, even though the spec's edge-case section currently calls for a confirmation dialog — minor drift risk
+  - If user testing reveals confirmation friction, the spec can change without a PRD update
+  - PRD doesn't lock in *when* replay variant reshuffling happens — that's covered by Progress AC #3
+
+### D61 — Validation magnitudes vs tuning magnitudes in PRD AC
+- **Status:** resolved
+- **Chose:** **Two postures toward numbers in PRD AC bullets, by kind:**
+  - **Validation magnitudes** (user-facing constraints that appear in error messages or limit user input): enshrined as concrete numbers in the AC. Examples: username 3–20 chars, password ≥6 chars, bio ≤150 chars, avatar ≤2 MB, abuse cap = 10 attempts/slot.
+  - **Tuning magnitudes** (mechanic values the learner doesn't see numerically): shape-level in PRD, magnitudes in spec. Examples: XP curve (`10/5/2/+50`), milestone thresholds (`{3,7,14,30,60,100}`), performance budgets (`<100ms`, `<2s`, `60 FPS`).
+- **Considered:** All magnitudes in spec only (extends D57 universally — PRD reader has to dig for every number); all magnitudes in PRD AC (concrete contract but tightens PRD to every tuning pass).
+- **Gaps / risks:**
+  - The boundary is fuzzy in edge cases — is the abuse cap of 10 a *validation* (security/quota boundary, user could hit it) or a *tuning* (defense against runaway clients)? We currently treat it as validation because it's a hard server-side rejection.
+  - Performance budgets (`<100ms`, `<2s`) are arguably user-facing ("feedback should feel instant") but expressed as numbers a learner never sees; D57 treats them as tuning. Slight inconsistency with the "user sees the number" heuristic.
+  - Future AC reviewers must apply this rule consistently; ambiguity will resurface. Default rule of thumb: **if the user sees the number in a UI string or in their own actions hitting the limit, it's validation → PRD AC concrete.**
+
+### D62 — "One-refresh contract" consolidation
+- **Status:** resolved (PRD assembly pass, 2026-06-23)
+- **Chose:** **Keep per-feature** with cross-references. Three ACs restate the one-refresh contract independently: Progress AC #2 (cross-device sync), Course Path AC #10 (Home updates after completion), Profile AC #10 (stats update after completion). The latter two explicitly cite "same one-refresh contract as Progress AC #2" so the canonical source is Progress AC #2.
+- **Considered:** Promote to a single cross-cutting AC under §9.8 Performance; create a new "Data Freshness" bucket (would be 1-AC-thick — over-cutting); never consolidate (accept the duplication without cross-refs).
+- **Gaps / risks:**
+  - 3× references — if the freshness contract tightens (e.g. to "<2s via real-time listener"), Progress AC #2 changes and the other two cite it; cheap to update
+  - Implementation cost is identical for all three (one Firestore `onSnapshot` per relevant collection); no per-feature divergence expected
+  - Trade win: each feature's AC list reads as self-contained for that bucket reviewer
+
+---
+
+## L. Platform & Responsive
+
+### D63 — Desktop strategy: truly responsive (Pattern B)
+- **Status:** resolved
+- **Chose:** **Pattern B — truly responsive design with per-breakpoint layouts.** Every screen reflows for mobile (≤640px), tablet (`md:` 768px+), and desktop (`lg:` 1024px+). Tailwind responsive prefixes throughout. Bottom nav on mobile transitions to sidebar on `md:`. Home lesson list goes 1-col → 2-col → 3-col grid. Profile stats grid 2-col → 3-col. Lesson player capped at `max-w-2xl` and centered on wide viewports. Interaction touch targets scale up (44px → 56px → 64px). Both mobile and desktop are first-class.
+- **Considered:**
+  - **Pattern A: Phone-shaped container** (Brilliant/Duolingo style — fixed `max-w-[430px]` centered on neutral background). Rejected: user explicitly flagged desktop as "arguably more important than mobile" (demos, teachers projecting, parents installing).
+  - **Pattern C: Mobile-only with desktop blocker** (QR code "open on your phone"). Rejected: kills demo accessibility.
+- **Gaps / risks:**
+  - **~30–40% more UI work** vs Pattern A — every screen needs explicit breakpoint layouts; cross-breakpoint visual regressions are a new risk
+  - **Wednesday-deadline pressure** — design + implementation work both grow; some polish may slip
+  - **Per-breakpoint testing** — Lighthouse desktop + mobile audits both gate deploys; manual testing matrix expands
+  - **Lesson player desktop UX is under-specified** — wider viewport invites "side panel for hints / illustrations" but adding that turns into a Pattern B+ design pass; for MVP just center the mobile player in a `max-w-2xl` container and leave side panels for Phase 2
+  - **Orientation** — landscape phone view is now a real case (phone is "wide-ish"); reuse the desktop layout for landscape rather than designing a third state
+  - **Grid sizing** — 6×6 grid on a 1080p monitor with 64×64 cells is visually small; consider scaling more aggressively (96×96?) once we see it in context
+- **See also:** D65 (verification scope), D66 (orientation policy that falls out of Pattern B)
+
+### D65 — Pattern B verification scope
+- **Status:** resolved
+- **Chose:** **Qualitative layout-shift verification on resize**; **320px minimum supported viewport width**; **measurement via Lighthouse + Chrome DevTools (no custom CLS-on-resize tooling)**.
+- **Considered:**
+  - **Strict CLS measurement on resize** (e.g. Chrome DevTools Performance > Layout Shift recording across resize events) — more rigorous but high-effort for MVP; Phase 2 polish
+  - **Lower viewport floor (280px) for ancient Androids** — D2 persona doesn't include sub-320px devices; 320px is iPhone SE width and the modern floor
+  - **Higher viewport floor (375px)** — would exclude iPhone SE; rejected
+- **Gaps / risks:**
+  - "No layout flash" is qualitative — two implementations could both satisfy it differently
+  - 320px floor means iPhone SE works but no older devices; acceptable per persona
+  - Resize regressions can ship between Lighthouse audits — depend on dev discipline to verify resize manually
+
+### D66 — Orientation: graceful degradation, no force-lock
+- **Status:** resolved
+- **Chose:** **No orientation lock.** Phone landscape automatically activates the `md:` (tablet) layout since the viewport now meets that breakpoint. No third "landscape phone" layout is designed; no JavaScript or `<meta>` is used to force portrait.
+- **Considered:**
+  - **Force portrait via `screen.orientation.lock('portrait')` or CSS rotation** — feels paternalistic; breaks user agency (iPad-in-landscape, learner-in-bed cases); browser support is patchy
+  - **Design a third dedicated landscape-phone layout** — extra work for a rare orientation; the desktop layout already works well enough at landscape-phone dimensions
+- **Gaps / risks:**
+  - Landscape phone keyboard takes up significant vertical space — fill-fraction input may need scrolling
+  - The desktop layout at landscape-phone width (e.g. 844×390) leaves cramped grid cells; the breakpoint scaling treats 844px-wide as desktop-tier (64px cells) which may feel oversized
+  - Could add a more refined landscape adjustment later if user testing flags it
+
+### D71 — Tablet+ navigation uses the shadcn `Sidebar` block
+- **Status:** resolved (2026-06-23, addresses I016)
+- **Chose:** At `md:` and above, navigation chrome is the **shadcn `Sidebar` block** (installed via `npx shadcn add sidebar`). Collapsible, mobile-aware out of the box. Bottom nav is preserved at mobile widths; the sidebar replaces it at `md:` per D63. Hidden entirely on `/lesson/:id` and `/celebration/:id` at every breakpoint (lesson/celebration are immersive).
+- **Considered:**
+  - **Hand-roll a flex sidebar from shadcn `Button` + `Avatar` primitives** — more control, less code we don't own, but no real benefit for a two-item nav (Home, Profile); the shadcn block already handles the collapse, focus management, and mobile-aware behavior we'd otherwise rebuild.
+- **Gaps / risks:**
+  - The shadcn `Sidebar` block ships with a default look (rail + variants) that we need to tune to match the rest of the app's visual register; trivial CSS work but worth not skipping per the UI directive's "no defaults shipped as choices" rule.
+  - Only two nav items in MVP (Home, Profile), so the sidebar will feel sparse on desktop. Acceptable; do not pad it with link sections that don't exist.
+
+### D72 — Firebase Storage deferred (Spark plan; avatar upload out of MVP scope for now)
+- **Status:** resolved (2026-06-23, addresses I026)
+- **Chose:** **Do not enable Cloud Storage on the Firebase project for MVP.** Cloud Storage requires the Blaze (pay-as-you-go) plan; the project stays on Spark. Avatar upload is **out of scope until Storage is enabled.** Profile shows `DefaultAvatar` (colored circle + initial) for all users. Bio edit, stats, milestones, and log out ship normally. `avatarUrl` on `/users/{uid}` stays `null`.
+- **Considered:**
+  - **Upgrade to Blaze now** — free tier covers MVP avatar traffic; requires a card on file. Rejected for now because the owner has no card / no budget headroom; revisit when ready.
+  - **Store avatars in Firestore as base64** — blows doc size limits and read costs; rejected.
+  - **Use a third-party image host** — adds dependency and auth complexity; rejected for MVP.
+- **Implementer rules:**
+  - Do **not** wire `avatarService.uploadAvatar`, Storage rules deploy, or the "Change photo" control in Edit Profile for MVP.
+  - Do **not** block on Storage emulator setup for spec-profile; skip avatar upload tests until D72 is reversed.
+  - `firebase/storage.rules` and Storage emulator config may be omitted from the initial `firebase/` scaffold; add them when Blaze is enabled.
+  - `VITE_FIREBASE_STORAGE_BUCKET` may remain in `.env.local` (harmless; unused until Storage ships).
+- **Gaps / risks:**
+  - Learners cannot personalize with a photo until Blaze + Storage are enabled and spec-profile avatar upload is implemented.
+  - Re-enabling later is a small, self-contained spec-profile follow-up (upload UI + `avatarService` + rules deploy).
+- **Reversal trigger:** Owner upgrades Firebase project to Blaze, enables Storage in console, then closes I026 and implements avatar upload per `spec-profile.md`.
+
+---
+
+## Update Protocol
+
+This document is updated whenever:
+
+1. **A new decision is made** during the build that has at least one rejected alternative — add a new `D{n}` entry in the appropriate section. D-numbers are stable IDs assigned in resolution order, not section indices; within a section, entries are listed in ascending numeric order.
+2. **An existing decision is changed** — strikethrough the old line, add a `**Updated:** YYYY-MM-DD` note and the new choice. Don't delete history. If the change is large enough to warrant a new entry, supersede with a new `D{n}` and cross-link both ways (see D7 ↔ D55 ↔ D31 for the canonical pattern).
+3. **A risk in `Gaps / risks` materializes** — annotate with `**Realized:** YYYY-MM-DD — <what happened>` so we know which warnings were prescient and which were noise.
+4. **We hit a Phase boundary** (Phase 2 Friday, Phase 3 Sunday) — sweep the doc, mark which gaps are now resolved, retired, or escalated.
+
+Cross-link conventions:
+- Use `**See also:** D## (one-line label)` at the bottom of an entry to point forward/sideways to related entries.
+- When entry A supersedes entry B, strike through the superseded text in B with an `**Updated YYYY-MM-DD (superseded by D##):**` note, and have A name B in its own status line.
