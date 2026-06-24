@@ -165,9 +165,9 @@ export function dailyGoalDone(lastCompletionDate: string | null, today: string):
 
 ## Out of scope
 
-- Streak freezes / save items (alternatives D34).
-- XP leaderboards / friend comparison (alternatives D24).
+- ~~Streak freezes / save items~~ — **shipped:** coin-bought Streak Freeze auto-consumes before reset (alternatives D79 supersedes D34).
+- ~~XP leaderboards / friend comparison~~ — **shipped:** friends-only weekly XP leaderboard (alternatives D24 reversed; see [`spec-social.md`](spec-social.md)).
 - Daily XP goals beyond "complete a lesson" (Phase 3).
-- Badges / trophies beyond streak milestones (Phase 3).
-- Push notifications for streak risk (alternatives D27).
+- ~~Badges / trophies beyond streak milestones~~ — **partially shipped:** an achievement set + a trophy checkpoint now exist (see [`spec-social.md`](spec-social.md) and alternatives D83 for the coin payouts).
+- Push notifications for streak risk (alternatives D27 — still out of scope; the in-app schedule reminder D82 is not a streak-risk push).
 - "Comeback" celebration after breaking a long streak (Phase 3).

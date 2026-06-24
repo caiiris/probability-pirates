@@ -8,4 +8,6 @@ tools/
 *.log
 coverage/
 firebase/seed/
+.firebase/
+*.tsbuildinfo
 

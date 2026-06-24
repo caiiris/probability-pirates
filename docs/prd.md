@@ -101,31 +101,31 @@ High-level feel only. **Implementation rules, component choices, design tokens, 
 
 ## 5. Course strategy
 
-The course is 6 lessons. MVP ships **Lesson 1** fully; Lessons 2–6 appear as locked stubs on the course path so the learner can see where the curriculum is taking them.
+The course is 6 lessons. MVP shipped **Lesson 1** fully at first; Lessons 2-5 followed (see D73, D76); Lesson 6 (Distributions) remains a locked stub on the course path so the learner can see where the curriculum is taking them.
 
 The 6-lesson spine is designed so each lesson earns the next by making the previous tool break down:
 
 1. **What is probability?** — small countable cases; counting works.
 2. **Law of large numbers** — numbers get bigger; counting still works but simulation is faster.
-3. **Counting gets hard** — combinations, birthday paradox; counting collapses, combinatorics takes over.
-4. **Conditional probability** — Monty Hall; counterintuitive payoff lesson.
-5. **Distributions** — binomial shape emerges from many flips.
-6. **Central limit theorem** — even weird distributions become normal.
+3. **Counting carefully** — multiplication, permutations, combinations, complements; the tools that count without listing. (D76)
+4. **Counting gets hard** — birthday paradox; even with the tools, the intuition lies and simulation rescues the count.
+5. **Conditional probability** — Monty Hall; counterintuitive payoff lesson.
+6. **Distributions** — binomial shape emerges from many flips. (Stub; was preceded by a Central Limit Theorem stub, dropped under D76 to keep the course at 6.)
 
 ```mermaid
 flowchart TD
     L1["Lesson 1<br/>What is probability?<br/>Counting works"]
-    L2["Lesson 2<br/>Law of large numbers<br/>Counting tedious — simulate"]
-    L3["Lesson 3<br/>Counting gets hard<br/>Combinatorics takes over"]
-    L4["Lesson 4<br/>Conditional probability<br/>Monty Hall payoff"]
-    L5["Lesson 5<br/>Distributions<br/>Binomial emerges"]
-    L6["Lesson 6<br/>Central limit theorem<br/>Even weird → normal"]
+    L2["Lesson 2<br/>Law of large numbers<br/>Counting tedious, simulate"]
+    L3["Lesson 3<br/>Counting carefully<br/>Combinatorics tools"]
+    L4["Lesson 4<br/>Counting gets hard<br/>Birthday paradox"]
+    L5["Lesson 5<br/>Conditional probability<br/>Monty Hall payoff"]
+    L6["Lesson 6<br/>Distributions<br/>Binomial emerges"]
 
     L1 -- "Big numbers break counting" --> L2
-    L2 -- "Too many cases to enumerate" --> L3
-    L3 -- "Outcomes depend on prior info" --> L4
-    L4 -- "Aggregate many trials" --> L5
-    L5 -- "Aggregate many distributions" --> L6
+    L2 -- "Counting tools, not lists" --> L3
+    L3 -- "Tools still hit a wall" --> L4
+    L4 -- "Outcomes depend on prior info" --> L5
+    L5 -- "Aggregate many trials" --> L6
 ```
 
 This progression turns "probability with big numbers is hard to visualize" from an obstacle into the *premise* of the course.
@@ -180,17 +180,19 @@ From the brief, every one of these must be true to pass the MVP gate:
 
 - **No AI features of any kind** (Phase 2 — D23).
 - **No spaced repetition, adaptive difficulty, or per-concept mastery scoring** (Phase 3).
-- **No social features** (follow, comments, leaderboards, friend XP — D24).
+- ~~**No social features**~~ → **Shipped since the original cut:** follow/followers, friend search, friends-only weekly leaderboard, kudos. Comments are still out of scope. See [`spec-social.md`](specs/spec-social.md); reverses D24.
 - **No content authoring UI** — lessons are TypeScript files in the repo (D26 / D35).
-- **No payments / subscriptions.**
+- **No payments / subscriptions / real money.** A *cosmetic-only* coin economy shipped (coins are earned in-app, never purchased — D83, with cosmetic/forgiveness sinks D79–D80); this bullet still holds for real-money transactions.
 - **No offline mode** (D25 — Firestore offline persistence intentionally off).
-- **No push notifications / email reminders** (D27).
-- **No streak freezes / save-streak items** (D34).
+- **No off-app push / email reminders** (D27 — still holds). An *in-app* home-screen schedule reminder shipped (D82); it only fires while the app is open, so it does not replace push.
+- ~~**No streak freezes / save-streak items**~~ → **Shipped:** coin-bought Streak Freeze (D79 supersedes D34).
 - **No age-gate at registration** in MVP (D48 — privacy posture documented in [`docs/privacy.md`](privacy.md) *(pending)*).
 - **No dark mode** (D67 — tracked for Phase 2/3).
 - **No bail-out from problems** (D55 — Continue locks until correct).
 - **No bundle-size CI enforcement** (D64 — manual deploy check for MVP).
 - Only **Lesson 1** is real; Lessons 2–6 are visible-but-locked stubs (D43).
+
+> **Note (2026-06-23):** Several items above have shipped since the original Phase 1 cut (social, a cosmetic coin economy, streak freeze, avatar/flair cosmetics, an in-app schedule reminder + event detail). The strikethroughs and D79–D84 / spec-social references above are the reconciliation; the per-decision rationale lives in [`docs/alternatives.md`](alternatives.md) and the dated summary in [`docs/design-iterations.md`](design-iterations.md).
 
 ---
 
@@ -375,17 +377,17 @@ Each bucket below is the user-observable contract for a major feature. Implement
 > The MVP is shipped when the following are observably **absent** from the deployed app. Negative criteria protect Phase 2/3 scope and let reviewers verify "we did what we said we would, and we didn't sneak in what we said we wouldn't."
 
 1. **No AI in MVP** — No model API calls (OpenAI, Anthropic, Google, etc.) anywhere in the codebase. No LLM SDKs in `package.json`. No model API keys in `.env` or the deployed build. Verified by a [`docs/deploy-checklist.md`](deploy-checklist.md) *(pending)* `git grep` over the bundle.
-2. **No social features** — No follow / followers / friends / comments / leaderboards in UI or Firestore. No social graph data model. (Avatars and bios are personal identity, not social — they remain in scope.)
-3. **No payments** — No Stripe or other payment SDK in dependencies; no pricing UI; no paywall.
+2. ~~**No social features**~~ — **Reversed (Phase 2):** follow/followers, friend search, friends-only weekly leaderboard, and kudos now exist in UI + Firestore (social graph under `users/{uid}` subcollections + `publicProfiles`). Comments remain absent. See [`spec-social.md`](specs/spec-social.md).
+3. **No real-money payments** — No Stripe or other payment SDK in dependencies; no pricing UI; no paywall. (The coin economy is in-app earned currency only, D83 — no real money changes hands.)
 4. **No content authoring UI** — Lessons are TypeScript files in the repo; modifying a lesson requires a git commit. No admin route exists.
 5. **No offline mode** — Firestore offline persistence is not enabled. The user is shown an "offline" banner when `navigator.onLine === false`, but their actions do not queue locally.
-6. **No notifications / email reminders** — No Firebase Cloud Messaging, no email service integration, no scheduled push, no streak-warning emails.
-7. **No streak freezes** — Streak math is strict per D34: miss a day → reset to 0. No "save streak" UI affordance.
+6. **No off-app notifications** — No Firebase Cloud Messaging, no email service integration, no scheduled push, no streak-warning emails. (An *in-app* schedule reminder dialog exists, D82, but only renders while the app is open.)
+7. ~~**No streak freezes**~~ — **Reversed:** a coin-bought Streak Freeze auto-consumes before the reset (D79 supersedes D34). Without freezes available, streak math is still strict (miss → reset to 0).
 8. **No mastery scoring / spaced repetition** — Lesson progress is a 3-state machine (`not_started` / `in_progress` / `completed`). No per-concept mastery score; no spaced-repetition queue.
 9. **Only Lesson 1 is real** — Lessons 2–6 all have `comingSoon: true` and zero slots in their content files; the lesson player refuses to open them.
 10. **No age-gate at registration** (D48) — Registration captures email + username + password only. No "I am 13+" checkbox; no `ageGate13` field on the user doc.
 
-→ Decisions: D23–D27, D34, D43, D48.
+→ Decisions: D23–D27, D34, D43, D48; reconciliations D79–D84 + [`spec-social.md`](specs/spec-social.md).
 
 ---
 

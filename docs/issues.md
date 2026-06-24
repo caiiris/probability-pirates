@@ -174,15 +174,15 @@ IDs are monotonically increasing, zero-padded to 3 digits, **never reused**.
 - **Description:** Architecture says Sentry initializes only if `VITE_SENTRY_DSN` is set. No Sentry project exists, no DSN. Error visibility in prod is zero until this is wired.
 - **Proposed action:** Human task — create Sentry project (free tier), drop DSN into Vercel env vars. Implementation should gracefully no-op when DSN is missing (so dev keeps working).
 
-### I015 — Lesson stubs (lessons 2–6) have empty `slots: []` with no concept teaser
+### I015 — Lesson 6 (Distributions) stub has empty `slots: []` with no concept teaser
 
-- **Status:** open
+- **Status:** open (narrowed twice: lessons 2-4 shipped 2026-06-23 as I028; new combinatorics lesson and CLT-stub drop landed under D76 on 2026-06-23, so this gap now applies only to L6 Distributions)
 - **Type:** known-gap
 - **Severity:** minor
 - **Discovered:** 2026-06-23 during PRD assembly (pending todo `lesson_stubs_polish`)
-- **Spec ref:** `src/content/lessons/02-*.ts` through `06-*.ts`
-- **Description:** Stubs only carry id/number/title/blurb/`comingSoon: true`. When the user visits the Home screen, the locked card has a blurb but no preview of *what* they'll learn. A single concept-slot teaser would improve the "what's next" affordance without committing to authoring problem slots.
-- **Proposed action:** Add one concept slot per stub with a teaser illustration and one-line preview. Defer until Lesson 1 ships.
+- **Spec ref:** `src/content/lessons/06-distributions.ts`
+- **Description:** Lessons 1-5 now ship real content. Lesson 6 (Distributions) is the only remaining coming-soon stub: it carries id/number/title/blurb/`comingSoon: true` only, so the locked Home card has a blurb but no preview of what it will teach. A single concept-slot teaser would improve the "what's next" affordance without authoring problem slots; alternatively, build it out fully and graduate from the stub.
+- **Proposed action:** Add one concept slot to the Distributions stub with a teaser illustration and a one-line preview, or build the lesson out fully.
 
 ### I018 — README.md not yet written
 
@@ -285,9 +285,110 @@ IDs are monotonically increasing, zero-padded to 3 digits, **never reused**.
 - **Description:** The UI directive bans em dashes. Internal spec narrative (e.g. `spec-habit-loop.md` line 13 "small chip near the streak flame — increments visibly after each correct slot") contains many. Per §12.11 scope, the directive's hard rules apply to **shipped strings** (UI copy, lesson content, error messages, etc.), not retroactively to engineering docs. Reasoning: docs need precision, the volume of edits would be churn-only, and Sonnet's behavior is governed by the guardrail + the issues log, not by every prose detail of the spec.
 - **Proposed action:** none unless you want a full sweep. If you want a sweep, say the word, it's straightforward but invasive.
 
+### I029 — Lesson 2-4 feedback copy authored by the agent (departs from §12.6)
+
+- **Status:** open (awaiting your review)
+- **Type:** ad-hoc-decision
+- **Severity:** minor
+- **Discovered:** 2026-06-23 during the Lessons 2-4 build
+- **Spec ref:** `docs/architecture.md` §12.6 ("do not invent feedback copy"); `src/content/lessons/0{2,3,4}-*.ts`
+- **Description:** §12.6 says the implementer should leave `FEEDBACK_TODO()` placeholders and let the content owner author copy. The owner explicitly asked for finished, good lessons, so all prompts, `feedbackCorrect`, `feedbackDefault`, per-wrong hints, and `explanation` strings for Lessons 2-4 were written by the agent in Lesson 1's voice and under `ui-directive.md` (no em dashes, sentence case, plain verbs, no filler). `explanation` is populated on every variant (so these lessons do not carry the I001 gap). This is the one deliberate departure from the guardrail and is flagged here so it stays auditable.
+- **Proposed action:** read the copy in the three lesson files and edit anything off-voice or factually loose. `npm run audit-feedback` shows no TODO placeholders for these lessons.
+
 ---
 
 ## Closed issues
+
+### I032 — Schedule promoted from "study sessions" to first-class event types (tests / homework / study / other)
+
+- **Status:** resolved 2026-06-23
+- **Type:** ad-hoc-decision (feature expansion)
+- **Severity:** minor (additive; backwards-compatible with existing events)
+- **Discovered:** 2026-06-23, user feedback — "schedule should allow you to add events. like upcoming tests and things like that"
+- **Spec ref:** `src/features/schedule/eventTypes.ts`, `scheduleService.ts`, `SchedulePage.tsx`, `useStudyEvents.test.ts`, `firebase/firestore.rules`, `src/lib/analytics.ts`
+- **Description:** The schedule already persisted free-text events, but every entry rendered identically and tests had no way to stand out. Added a closed enum `EventType = 'study' | 'test' | 'homework' | 'other'` with per-type metadata (icon + color token + badge class) and an optional `time` field (HH:MM 24h) for timed events.
+  - **`AddEventDialog`** now leads with a 4-up chip picker for type (icon + label), and shows a Date/Time pair instead of date-only. The title placeholder rewrites based on type (e.g. picking "Test" prompts "AP Statistics midterm"). The dialog title changed from "Add study event" to "Add to schedule" and the page subtitle from "Plan study sessions and future lessons" to "Plan tests, homework, and study sessions." A primary Add button was also surfaced in the page header (was only reachable from the day-list footer before).
+  - **`DayEventList`** rows show a type badge (icon + label), a clock + formatted time when present, and a 3px left-edge color accent in the type's color so tests catch the eye at a glance.
+  - **`UpcomingStrip`** swapped the per-row treatment from "primary color + lesson icon" to a typed icon tile (color-mixed background in the type color), and surfaces the formatted time on the right.
+  - **Calendar dots** now render one dot per distinct pending type for the day (red for test, primary for study, amber for homework, muted for other) instead of a single primary dot.
+- **Backward compatibility:** legacy events written before this change lack `eventType`; `eventTypeOf()` normalizes any missing/unknown value to `'study'` at read time, so they render with the default treatment instead of crashing.
+- **Firestore rules:** `studyEvents` create rule now validates `eventType ∈ {study, test, homework, other}` and `time ∈ HH:MM` regex; both remain optional. Update allowlist extended with `eventType, time`. `notes` length-capped to 1000 chars at the rules layer (was unenforced). Rules validated via `firebase_validate_security_rules` and deployed.
+- **Analytics:** added custom event `study_event_added` with `{event_type, has_lesson, has_time, days_out}`. `days_out` is computed in the user's local timezone (midnight-to-midnight delta) so the metric is stable for a given user regardless of when they sit down.
+- **Resolution:** shipped. `npm run verify` 118/118. Firestore rules redeployed to live project (`brilliant-clone-102a7`).
+
+### I031 — Google sign-in added (Firebase Auth Google provider + first-time username flow)
+
+- **Status:** resolved 2026-06-23 (pending manual provider enable in Firebase Console)
+- **Type:** ad-hoc-decision (auth surface area expansion)
+- **Severity:** minor (additive; email/password still works exactly as before)
+- **Discovered:** 2026-06-23 during Firebase plugin pass
+- **Spec ref:** `src/features/auth/userService.ts`, `AuthProvider.tsx`, `RequireAuth.tsx`, `GoogleSignInButton.tsx`, `UsernameSetupPage.tsx`, `LoginPage.tsx`, `RegisterPage.tsx`, `App.tsx`
+- **Description:** Email + username + password + verification email was the only signup path. New "Continue with Google" button on both LoginPage and RegisterPage. Google sign-in goes through Firebase Auth `signInWithPopup(GoogleAuthProvider)`. The data-model gotcha — Google doesn't provide a username — is handled by a two-phase flow:
+  - Phase 1: `signInWithGoogle()` completes OAuth, checks if a `/users/{uid}` profile exists. Returning user → fires `login {method: 'google'}` and AuthProvider lands them on `/`.
+  - Phase 2: First-time user has Firebase Auth but no Firestore profile. `AuthProvider` detects this (via `providerData.some(p => p.providerId === 'google.com')` + `!snap.exists()`) and exposes a new `needs_username` auth state. `RequireAuth` routes that state to `/setup-username`. `UsernameSetupPage` collects a username, calls `claimUsername()`, which runs the same transactional sentinel write as `registerUser` (so Firestore rules from B051 apply unchanged). On success it fires `sign_up {method: 'google'}` — chosen so the GA funnel reflects "completed signup", not "clicked Sign in with Google."
+- **Auth state machine after this change:** `loading | unauthenticated | needs_username | authenticated`. The new `needs_username` variant is gated separately so existing `auth.status === 'authenticated'` checks behave identically for the email/password path. The `isGoogleUser` provider check in AuthProvider keeps email-signup's brief auth-then-create window from flickering through `needs_username`.
+- **Routes:** `/setup-username` is intentionally **not** wrapped in `<RequireAuth>` — that would loop. The page enforces its own state guards (loading → null, unauthenticated → /login, authenticated → /, needs_username → render form).
+- **Analytics:** `sign_up` and `login` events extended with `method: 'email_password' | 'google'`. Catalog in `src/lib/analytics.ts` and I030 table updated.
+- **Operator setup required:** in [Firebase Console → Authentication → Sign-in method](https://console.firebase.google.com/project/brilliant-clone-102a7/authentication/providers) enable the **Google** provider (one toggle, support email auto-filled). Also enable **"One account per email address"** under Authentication → Settings → User actions, so a Google sign-in with `alice@gmail.com` can't silently coexist with a password account at the same address.
+- **Resolution:** shipped. `npm run verify` 104/104 (post-change). Pending only the two console toggles above; without them, the Google button errors with `auth/operation-not-allowed` (already surfaces as a user-friendly message).
+
+### I030 — Firebase Analytics (GA4) + Performance Monitoring introduced
+
+- **Status:** resolved 2026-06-23
+- **Type:** ad-hoc-decision (observability addition)
+- **Severity:** minor (additive, no behavior change)
+- **Discovered:** 2026-06-23 during Firebase plugin pass
+- **Spec ref:** `src/lib/analytics.ts`, `src/lib/firebase.ts`, `src/main.tsx`
+- **Description:** Before this change Pascal had Sentry for crashes but zero behavioral telemetry. We had no answer to "where do learners drop off in Lesson 1" or "how long does the average session take." Wired up two free Firebase services on the existing Spark plan:
+  - **Firebase Analytics (GA4):** measurement ID `G-HDFLRQ8LMX` already provisioned in the Firebase project (pre-existing GA4 link). `src/lib/analytics.ts` defines a typed event catalog (`PascalEvent` map) and a `track(event, params)` helper that fire-and-forgets through `getAnalyticsSafe()`. The helper preflights with `isSupported()`, returns null in jsdom / emulator / missing-measurementId, and never throws.
+  - **Performance Monitoring:** initialized once in `main.tsx` via `ensurePerformanceMonitoring()`. Auto-tracks page loads + outbound network requests; no custom traces yet.
+- **Event catalog:**
+
+  | Event | Where fired | Why |
+  |---|---|---|
+  | `sign_up` (GA4 standard) | `userService.registerUser` success | New-user funnel |
+  | `login` (GA4 standard) | `userService.signIn` success | Returning-user funnel |
+  | `lesson_start` | `LessonPlayerInner` once on mount, after first progress snapshot | Distinguishes `mode: 'new' \| 'resume'` |
+  | `attempt_checked` | `handleCheck` after `recordAttempt` resolves | Drives slot-level drop-off analysis (lesson + slot + variant + attempt_number + was_correct + xp_awarded) |
+  | `attempt_hinted` | `handleCheck` when the 2nd wrong attempt reveals `variant.explanation` (D55) | How often the progressive hint actually triggers, per slot/variant |
+  | `lesson_complete` | `handleContinue` final-slot path, right before navigate | Includes `xp_earned` (final, accounts for habit retry) + `duration_sec` since lesson_start |
+  | `daily_goal_complete` | After `lesson_complete` when `isNewStreakDay` is true | First lesson of the day; pairs with the daily-goal pill in UI |
+  | `streak_milestone_reached` | After `lesson_complete`, one event per item in `newMilestones` | Threshold crossings (`streak-3`, `streak-7`, etc.); pairs with the milestone trophy cards in CelebrationScreen |
+
+- **Env setup required by operator:** add `VITE_FIREBASE_MEASUREMENT_ID=G-HDFLRQ8LMX` to `.env.local`. With the var unset, the wrapper no-ops (no errors). `.env.example` updated. Emulator mode (`VITE_USE_EMULATOR=true`) also no-ops — by design, so dev sessions don't pollute the GA4 dashboard.
+- **Verification path:** with the var set, DevTools → Network → filter `google-analytics` should show `collect` requests on each event. GA4 dashboard surfaces real events within ~24h; for instant feedback enable GA4 DebugView in the Firebase console.
+- **Resolution:** shipped. `npm run verify` 92/92 (post-change).
+
+### I028 — Two new interaction kinds added for Lessons 2-4 (`simulate-proportion`, `monty-hall`)
+
+- **Status:** resolved 2026-06-23 (decision folded into the spec + `docs/alternatives.md` D73)
+- **Type:** ad-hoc-decision (architectural addition, owner-approved in chat before build)
+- **Severity:** minor (additive; the existing 5 kinds are unchanged)
+- **Discovered:** 2026-06-23 during the Lessons 2-4 build
+- **Spec ref:** `spec-interactions.md` (now documents 7 kinds, §6-7); `spec-content-model.md` (new variant types); `docs/alternatives.md` D73; `src/content/types.ts`
+- **Description:** The three payoff moments (LLN convergence, birthday paradox, Monty Hall) are simulations, central to the PRD's premise. Rather than degrade them to multiple-choice, two new `InteractionKind`s were added: `simulate-proportion` (scenario-driven: `coin` / `die-six` / `birthday`) and `monty-hall`. Both grade on engagement (`minTrials` / `minGames`), so Check stays disabled until the learner has run the simulation; there is no synthetic wrong state, preserving D55. They share `ProportionChart` (inline SVG) and `src/lib/simulations.ts` (pure, tested). New illustrations `Door` and `Calendar` were added, and `IllustrationRef.kind` extended with `'doors'` / `'calendar'`.
+- **Resolution:** `spec-interactions.md` and `spec-content-model.md` now formally document all 7 kinds, and the tradeoff is recorded as D73 in `docs/alternatives.md`. The `feedbackByWrongValue.incomplete` hint is near-unreachable in normal play (Check disabled below threshold), kept as a safety net (parallels B045). Renderer/copy UX review rolls into I029.
+
+### I027 — Remote Config introduced for lesson availability (kill-switch / launch coordination)
+
+- **Status:** resolved 2026-06-23
+- **Type:** ad-hoc-decision (architectural addition during Firebase plugin pass)
+- **Severity:** minor (improves operability; no behavior change at default)
+- **Discovered:** 2026-06-23 during Firebase plugin pass
+- **Spec ref:** `src/features/flags/`, `src/content/types.ts` (`Lesson.comingSoon`), `src/lib/firebase.ts`
+- **Description:** Lesson 2–6 currently ship with `comingSoon: true` hardcoded in their TS files. Going live with each lesson previously required a code change + redeploy; rolling back a broken lesson required the same. Introduced Firebase Remote Config as the source of truth for which lessons are playable.
+  - **New param:** `available_lesson_ids` (STRING, JSON array). Default: `["what-is-probability"]`, matching today's bundled state.
+  - **Semantics:** a lesson is `comingSoon` iff its id is **not** in `available_lesson_ids` **or** its `slots` array is empty. The empty-slots check is a hard safety net: Remote Config can never flip a contentless lesson live.
+  - **New files:** `src/features/flags/remoteFlagsConfig.ts` (defaults + parser), `RemoteFlagsProvider.tsx` (context, `fetchAndActivate` on mount), `useLessons.ts` (`useLessons()` + `useLessonById()` hooks that wrap the static catalog with RC overrides), `remoteFlagsConfig.test.ts` (5 tests).
+  - **Refactored:** `HomePage`, `LessonPlayer`, `CelebrationScreen`, `ProfilePage` now read lessons via `useLessons()` instead of importing the static `lessons` array directly.
+  - **Firebase init:** `src/lib/firebase.ts` exposes `getRemoteConfigSafe()` (returns `null` under jsdom so tests don't construct it).
+  - **Cache window:** 10s in dev (fast iteration), 1h in prod (default Firebase recommendation).
+  - **Template:** published to live project as version 1 via Firebase MCP `remoteconfig_update_template`.
+- **Operator notes:**
+  - **Launch a lesson:** add its id to `available_lesson_ids` in the Firebase console (Remote Config). No redeploy required (clients pick it up on next fetch — within 1h in prod, ~10s in dev). Lesson must have populated `slots` in code for the flag to take effect.
+  - **Kill switch:** remove an id from the array. Existing players inside that lesson finish their current session; new entries land on the "coming soon" toast.
+  - **Rollback:** Remote Config templates are versioned; use `remoteconfig_update_template` with `version_number` to roll back.
+- **Resolution:** shipped. Files committed in same pass as B051. `npm run verify` 65/65.
 
 ### I008 — Empty Home screen for brand-new users is unspecified
 

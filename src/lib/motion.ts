@@ -11,3 +11,18 @@ export const SHAKE_KEYFRAMES = {
   x: [0, -8, 8, -8, 8, 0],
   transition: MOTION.shake,
 };
+
+/**
+ * Returns motion props that respect `prefers-reduced-motion`.
+ * When the OS accessibility setting is active, animations are disabled
+ * by passing `initial={false}` and empty `animate`/`transition` objects.
+ */
+export function reducedMotionProps(prefersReduced: boolean) {
+  if (!prefersReduced) return {};
+  return {
+    initial: false,
+    animate: {},
+    exit: {},
+    transition: { duration: 0 },
+  };
+}

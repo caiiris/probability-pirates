@@ -95,8 +95,10 @@ match /avatars/{filename} {
 
 ## Out of scope
 
-- Friends / following (alternatives D24).
-- Public profiles (other users viewing yours).
+- Friends / following, public profiles, username search, friends leaderboard, and
+  the expanded achievement system — these shipped later and now live in
+  [spec-social.md](spec-social.md). (This reverses the original MVP exclusion
+  noted in alternatives D24.)
 - Account settings (timezone, notifications, language) — Phase 3.
 - Account deletion / data export — Phase 3 GDPR.
 - Avatar cropping UI — pickers handle native cropping on iOS; Android accepts as-is; we don't ship a custom cropper.

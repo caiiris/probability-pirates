@@ -1,0 +1,590 @@
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useNavigate, useParams, useSearchParams, Navigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { useLessonProgress } from '@/features/progress/useLessonProgress';
+import {
+  getOrCreateProgress,
+  recordAttempt,
+  recordVariantSelection,
+  markLessonCompleted,
+  advanceSlot,
+} from '@/features/progress/progressService';
+import {
+  applyAttemptOutcome,
+  applyLessonCompletion,
+  applySlotAdvance,
+} from '@/features/habit/habitService';
+import { checkAnswer } from './checkAnswer';
+import { useSlotState } from './useSlotState';
+import { LessonHeader } from './LessonHeader';
+import { LessonFooter } from './LessonFooter';
+import { ConceptSlotView } from './ConceptSlotView';
+import { WrapSlotView } from './WrapSlotView';
+import { ProblemSlotView } from './ProblemSlotView';
+import { CaptainPascal } from '@/features/captain/CaptainPascal';
+import { useLessonById, useLessons } from '@/features/flags/useLessons';
+import type { AttemptPayload } from '@/features/progress/progressService';
+import type { Lesson } from '@/content/types';
+import type { UserProfile } from '@/features/auth/AuthProvider';
+import type { MilestoneId } from '@/lib/milestones';
+import { ACHIEVEMENT_BY_ID } from '@/lib/achievements';
+import type { AchievementId } from '@/lib/achievements';
+import { MOTION } from '@/lib/motion';
+import { track } from '@/lib/analytics';
+import { ERROR_COPY } from '@/lib/errors';
+
+// ---------------------------------------------------------------------------
+// ReviewBanner — thin strip under the header so the read-only nature of
+// review mode stays visible while the regular LessonFooter drives the CTA.
+// ---------------------------------------------------------------------------
+
+function ReviewBanner() {
+  return (
+    <div
+      role="status"
+      className="shrink-0 border-b bg-muted/40 px-4 py-1.5 text-center"
+    >
+      <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+        Review · retries don&apos;t affect XP or progress
+      </span>
+    </div>
+  );
+}
+
+/** Surface newly-earned achievements as lightweight toasts. */
+function toastAchievements(ids: AchievementId[]): void {
+  for (const id of ids) {
+    const def = ACHIEVEMENT_BY_ID[id];
+    if (def) toast(`Achievement unlocked: ${def.title}`, { icon: '🏆' });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// ComingSoonRedirect — shows toast in effect (not during render)
+// ---------------------------------------------------------------------------
+function ComingSoonRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    toast(ERROR_COPY.progress.lessonNotReady);
+    navigate('/', { replace: true });
+  }, [navigate]);
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// LessonPlayer — outer guard (hooks run unconditionally after this)
+// ---------------------------------------------------------------------------
+export function LessonPlayer() {
+  const { lessonId = '' } = useParams<{ lessonId: string }>();
+  const auth = useAuth();
+  const lessonById = useLessonById();
+
+  const uid = auth.status === 'authenticated' ? auth.user.uid : '';
+  const profile = auth.status === 'authenticated' ? auth.profile : null;
+
+  const lesson = lessonById.get(lessonId);
+
+  if (!lesson) return <Navigate to="/" replace />;
+  if (lesson.comingSoon) return <ComingSoonRedirect />;
+
+  return <LessonPlayerInner uid={uid} profile={profile} lesson={lesson} />;
+}
+
+// ---------------------------------------------------------------------------
+// LessonPlayerInner
+// ---------------------------------------------------------------------------
+function LessonPlayerInner({
+  uid,
+  profile,
+  lesson,
+}: {
+  uid: string;
+  profile: UserProfile | null;
+  lesson: Lesson;
+}) {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // Read-only review of a finished lesson: walk every step from the start,
+  // nothing is written and no XP/completion is re-awarded.
+  const isReview = searchParams.get('mode') === 'review';
+  const progressState = useLessonProgress(uid, lesson.id);
+  const courseTotal = useLessons().filter((l) => !l.comingSoon).length;
+  const [currentAnswer, setCurrentAnswer] = useState<AttemptPayload | null>(null);
+  const pickedVariantIdRef = useRef('');
+  const [pickedVariantId, setPickedVariantId] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  // Track whether today was a new streak day (set on first correct check of day)
+  const isNewStreakDayRef = useRef(false);
+  // Achievement signals for this lesson session:
+  //   allFirstTry — no problem was ever answered wrong (=> 'flawless')
+  //   hadComeback — at least one correct answer followed a wrong one (=> 'bounce-back')
+  const allFirstTryRef = useRef(true);
+  const hadComebackRef = useRef(false);
+  // Wall-clock start of this lesson session, for the `lesson_complete` event
+  const sessionStartedAtRef = useRef<number>(Date.now());
+  // Guard so `lesson_start` only fires once per mount (progress snapshot can
+  // re-emit and we don't want duplicate events).
+  const lessonStartLoggedRef = useRef(false);
+
+  // Ensure progress doc exists on first visit — use effect, not render body (B010)
+  useEffect(() => {
+    if (!uid || !lesson.id) return;
+    getOrCreateProgress(uid, lesson.id).catch((err) => {
+      console.error('Failed to initialize progress:', err);
+    });
+  }, [uid, lesson.id]);
+
+  // Fire lesson_start once we know whether this is a fresh attempt vs resume.
+  useEffect(() => {
+    if (lessonStartLoggedRef.current) return;
+    if (progressState.status !== 'ready') return;
+    const mode = progressState.data.slotIndex > 0 ? 'resume' : 'new';
+    track('lesson_start', {
+      lesson_id: lesson.id,
+      lesson_number: lesson.number,
+      mode,
+    });
+    sessionStartedAtRef.current = Date.now();
+    lessonStartLoggedRef.current = true;
+  }, [progressState, lesson.id, lesson.number]);
+
+  const slotIndex =
+    progressState.status === 'ready' ? progressState.data.slotIndex : 0;
+  const slots = lesson.slots;
+
+  // viewSlotIndex allows the learner to navigate back through completed slots
+  // without changing Firestore progress. It tracks up to slotIndex. In review
+  // mode we start at the very first step instead of the leading edge.
+  const [viewSlotIndex, setViewSlotIndex] = useState(isReview ? 0 : slotIndex);
+
+  // Keep viewSlotIndex at the leading edge when Firestore progress advances —
+  // but never in review mode, where the learner drives navigation themselves.
+  useEffect(() => {
+    if (isReview) return;
+    setViewSlotIndex((prev) => Math.max(prev, slotIndex));
+  }, [slotIndex, isReview]);
+
+  // In review mode every step is read-only; otherwise only steps behind the
+  // leading edge are.
+  const isReviewMode = isReview || viewSlotIndex < slotIndex;
+  const displayIndex = Math.min(viewSlotIndex, slots.length - 1);
+  const slot = slots[displayIndex];
+
+  const { state: slotState, dispatch } = useSlotState(slot.id);
+
+  // Record variant selection the first time we see it. Review mode is purely
+  // local — never persist a new selection (the original variant pick already
+  // lives in `progress.selectedVariantIds`).
+  const handleVariantPicked = useCallback(
+    (variantId: string) => {
+      if (!variantId || variantId === pickedVariantIdRef.current) return;
+      pickedVariantIdRef.current = variantId;
+      setPickedVariantId(variantId);
+      if (isReview) return;
+      const progress = progressState.status === 'ready' ? progressState.data : null;
+      if (progress && !progress.selectedVariantIds[slot.id]) {
+        recordVariantSelection(uid, lesson.id, slot.id, variantId).catch(console.error);
+      }
+    },
+    [uid, lesson.id, slot.id, progressState, isReview],
+  );
+
+  // Review-mode "check" — local-only. Computes feedback via the same pure
+  // `checkAnswer` and dispatches CORRECT/WRONG to the local slot reducer, but
+  // never writes to Firestore, awards XP, touches streaks/achievements, or
+  // fires analytics. The user can keep retrying as many times as they want;
+  // their saved progress and stats stay exactly as they were.
+  function handleCheckReview() {
+    if (!currentAnswer || slot.kind !== 'problem' || submitting) return;
+    const variant =
+      slot.variants.find((v) => v.id === pickedVariantIdRef.current) ?? slot.variants[0];
+    const result = checkAnswer(variant, currentAnswer);
+    if (result.wasCorrect) {
+      dispatch({ type: 'CORRECT', answer: currentAnswer });
+    } else {
+      dispatch({ type: 'WRONG', answer: currentAnswer });
+    }
+  }
+
+  // Review-mode "continue" — local-only. Advances `viewSlotIndex` without
+  // writing to Firestore. At the end, returns the learner to the home screen.
+  function handleContinueReview() {
+    if (submitting) return;
+    const isLastSlot = viewSlotIndex >= slots.length - 1;
+    if (isLastSlot) {
+      navigate('/');
+      return;
+    }
+    setCurrentAnswer(null);
+    setViewSlotIndex(viewSlotIndex + 1);
+  }
+
+  async function handleCheck() {
+    if (!currentAnswer || slot.kind !== 'problem' || submitting) return;
+    setSubmitting(true);
+
+    // Use ref for instant access — avoids stale state race (B013)
+    const variant =
+      slot.variants.find((v) => v.id === pickedVariantIdRef.current) ?? slot.variants[0];
+    const result = checkAnswer(variant, currentAnswer);
+
+    const attemptNumber = slotState.attemptNumber;
+    const xpAwarded = result.wasCorrect
+      ? attemptNumber === 1 ? 10 : attemptNumber === 2 ? 5 : 2
+      : 0;
+
+    const saved = await recordAttempt({
+      uid,
+      lessonId: lesson.id,
+      slotId: slot.id,
+      variantId: variant.id,
+      attemptNumber,
+      wasCorrect: result.wasCorrect,
+      xpAwarded,
+      answerPayload: currentAnswer,
+    });
+
+    if (!saved.ok) {
+      toast(ERROR_COPY.progress.saveAnswer);
+    }
+
+    track('attempt_checked', {
+      lesson_id: lesson.id,
+      slot_id: slot.id,
+      variant_id: variant.id,
+      attempt_number: attemptNumber,
+      was_correct: result.wasCorrect,
+      xp_awarded: xpAwarded,
+    });
+
+    // The 2nd wrong attempt reveals variant.explanation via useSlotState
+    // (state.attemptNumber >= 2 after WRONG dispatch). Fire once at the
+    // moment of reveal so we can measure how often learners need the hint.
+    if (!result.wasCorrect && attemptNumber === 2 && variant.explanation) {
+      track('attempt_hinted', {
+        lesson_id: lesson.id,
+        slot_id: slot.id,
+        variant_id: variant.id,
+        attempt_number: attemptNumber,
+      });
+    }
+
+    // Record achievement signals for this lesson before mutating state.
+    if (!result.wasCorrect) {
+      allFirstTryRef.current = false; // any wrong attempt rules out 'flawless'
+    } else if (attemptNumber > 1) {
+      hadComebackRef.current = true; // correct after a wrong attempt => 'bounce-back'
+    }
+
+    if (profile) {
+      const habitResult = await applyAttemptOutcome(
+        uid,
+        profile,
+        attemptNumber,
+        result.wasCorrect,
+      );
+      if (habitResult.ok && habitResult.result.isNewStreakDay) {
+        isNewStreakDayRef.current = true;
+      }
+      if (habitResult.ok) {
+        if (habitResult.result.streakFreezeUsed) {
+          toast(
+            `Streak Freeze used — your ${habitResult.result.currentStreak}-day streak is safe!`,
+            { icon: '❄️' },
+          );
+        }
+        toastAchievements(habitResult.result.newAchievements);
+      }
+    } else {
+      // profile null while authenticated — warn but continue (B044)
+      toast(ERROR_COPY.progress.profileUnavailable, { id: 'no-profile' });
+    }
+
+    if (result.wasCorrect) {
+      dispatch({ type: 'CORRECT', answer: currentAnswer });
+    } else {
+      dispatch({ type: 'WRONG', answer: currentAnswer });
+    }
+
+    setSubmitting(false);
+  }
+
+  async function handleContinue() {
+    if (submitting) return;
+    setSubmitting(true);
+
+    const isLastSlot = viewSlotIndex >= slots.length - 1;
+
+    if (isLastSlot) {
+      // Increment stepsCompleted for the final wrap slot (B008)
+      if (slot.kind !== 'problem' && uid) {
+        applySlotAdvance(uid).catch(console.error);
+      }
+
+      const saved = await markLessonCompleted(uid, lesson.id);
+      if (!saved.ok) {
+        toast(ERROR_COPY.progress.saveCompletion);
+        setSubmitting(false);
+        return;
+      }
+
+      const progress = progressState.status === 'ready' ? progressState.data : null;
+      const xpEarned = progress?.xpEarnedThisAttempt ?? 0;
+      let xpEarnedThisLesson = xpEarned + 50;
+      let celebrationParams = `xp=${xpEarnedThisLesson}&streak=0&streakDelta=0&milestones=&completed=1`;
+      let finalCurrentStreak = 0;
+      let finalIsNewStreakDay = false;
+      let finalNewMilestones: MilestoneId[] = [];
+
+      const completionSummary = {
+        allFirstTry: allFirstTryRef.current,
+        hadComeback: hadComebackRef.current,
+        courseTotal,
+      };
+
+      if (profile) {
+        const habitResult = await applyLessonCompletion(
+          uid,
+          profile,
+          xpEarned,
+          isNewStreakDayRef.current,
+          completionSummary,
+        );
+        const apply = (r: typeof habitResult) => {
+          if (!r.ok) return false;
+          const { xpEarnedThisLesson: xp, newCurrentStreak, isNewStreakDay, newMilestones, newLessonsCompleted, newAchievements } =
+            r.result;
+          xpEarnedThisLesson = xp;
+          finalCurrentStreak = newCurrentStreak;
+          finalIsNewStreakDay = isNewStreakDay;
+          finalNewMilestones = newMilestones;
+          toastAchievements(newAchievements);
+          const streakDelta = isNewStreakDay ? 1 : 0;
+          celebrationParams =
+            `xp=${xp}&streak=${newCurrentStreak}` +
+            `&streakDelta=${streakDelta}&milestones=${newMilestones.join(',')}` +
+            `&completed=${newLessonsCompleted}`;
+          return true;
+        };
+
+        if (!apply(habitResult)) {
+          // Habit write failed — retry once
+          const retry = await applyLessonCompletion(
+            uid,
+            profile,
+            xpEarned,
+            isNewStreakDayRef.current,
+            completionSummary,
+          );
+          if (!apply(retry)) {
+            toast(ERROR_COPY.progress.xpPartial, { duration: 5000 });
+          }
+        }
+      } else {
+        toast(ERROR_COPY.progress.completionProfileUnavailable, { id: 'no-profile' });
+      }
+
+      track('lesson_complete', {
+        lesson_id: lesson.id,
+        lesson_number: lesson.number,
+        xp_earned: xpEarnedThisLesson,
+        duration_sec: Math.round((Date.now() - sessionStartedAtRef.current) / 1000),
+      });
+
+      if (finalIsNewStreakDay) {
+        track('daily_goal_complete', {
+          lesson_id: lesson.id,
+          new_streak: finalCurrentStreak,
+        });
+      }
+
+      for (const milestone of finalNewMilestones) {
+        track('streak_milestone_reached', {
+          milestone_id: milestone,
+          new_streak: finalCurrentStreak,
+        });
+      }
+
+      // New running XP total → lets the celebration detect a level-up. Derived
+      // from the (client) pre-lesson total + what this lesson awarded.
+      const totalXpAfter = (profile?.xp ?? 0) + xpEarnedThisLesson;
+      navigate(`/celebration/${lesson.id}?${celebrationParams}&total=${totalXpAfter}`);
+      return;
+    }
+
+    // Non-last slot: increment stepsCompleted for concept/wrap advances (B008)
+    if (slot.kind !== 'problem' && uid) {
+      applySlotAdvance(uid).catch(console.error);
+    }
+
+    const nextIndex = viewSlotIndex + 1;
+    const advanced = await advanceSlot(uid, lesson.id, nextIndex);
+    if (!advanced.ok) {
+      toast(ERROR_COPY.progress.saveProgress);
+    }
+
+    setCurrentAnswer(null);
+    setSubmitting(false);
+    setViewSlotIndex(nextIndex);
+  }
+
+  // -------------------------------------------------------------------------
+  // Derive feedback copy
+  // -------------------------------------------------------------------------
+
+  let feedbackCorrectText: string | undefined;
+  let feedbackWrongText: string | undefined;
+  let explanationText: string | undefined;
+
+  if (slot.kind === 'problem') {
+    const variant =
+      slot.variants.find((v) => v.id === pickedVariantId) ?? slot.variants[0];
+    feedbackCorrectText = variant.feedbackCorrect;
+
+    if (slotState.feedbackState === 'wrong' && slotState.lastAnswer) {
+      const result = checkAnswer(variant, slotState.lastAnswer);
+      if (!result.wasCorrect) {
+        const key = result.matchedWrongKey;
+        let hint: string | undefined;
+
+        switch (variant.interactionKind) {
+          case 'tap-outcomes':
+            hint = variant.feedbackByWrongValue?.[key];
+            break;
+          case 'fill-fraction':
+            hint = variant.feedbackByWrongAnswer?.[key];
+            break;
+          case 'tap-event':
+            hint = variant.feedbackByWrongOutcome?.[key];
+            break;
+          case 'grid-event':
+            hint = variant.feedbackByCell?.[key];
+            break;
+          case 'multiple-choice':
+            hint = variant.feedbackByOption[key];
+            break;
+          case 'simulate-proportion':
+            hint = variant.feedbackByWrongValue?.[key];
+            break;
+          case 'monty-hall':
+            hint = variant.feedbackByWrongValue?.[key];
+            break;
+        }
+
+        feedbackWrongText = hint ?? variant.feedbackDefault;
+        explanationText = variant.explanation;
+      }
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Loading state — treat 'empty' the same as 'loading' (B015)
+  // -------------------------------------------------------------------------
+
+  if (progressState.status === 'loading' || progressState.status === 'empty') {
+    return (
+      <div className="flex flex-col h-screen">
+        <Skeleton className="h-14 w-full rounded-none" />
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
+          <Skeleton className="h-32 w-32 rounded-xl" />
+          <Skeleton className="h-6 w-64 rounded" />
+          <Skeleton className="h-4 w-48 rounded" />
+        </div>
+        <Skeleton className="h-20 w-full rounded-none" />
+      </div>
+    );
+  }
+
+  const progress = progressState.status === 'ready' ? progressState.data : null;
+  const streak = profile?.currentStreak ?? 0;
+  const currentXp = profile?.xp ?? 0;
+
+  // -------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------
+
+  return (
+    <div className="flex flex-col h-screen overflow-hidden">
+      <LessonHeader
+        slotIndex={displayIndex}
+        totalSlots={slots.length}
+        currentStreak={streak}
+        currentXp={currentXp}
+        canGoBack={displayIndex > 0}
+        onBack={() => setViewSlotIndex((prev) => Math.max(0, prev - 1))}
+        canGoForward={isReviewMode && displayIndex < slots.length - 1}
+        onForward={() =>
+          setViewSlotIndex((prev) => Math.min(isReview ? slots.length - 1 : slotIndex, prev + 1))
+        }
+      />
+
+      {/* Review banner — keeps the read-only nature visible while the regular
+          LessonFooter handles Check/Continue. */}
+      {isReviewMode && <ReviewBanner />}
+
+      {/* Captain Pascal cameo — a short briefing on the lesson's first beat */}
+      {displayIndex === 0 && !isReviewMode && (
+        <div className="border-b bg-[color:var(--primary-soft)]/50 px-4 py-3">
+          <div className="max-w-2xl mx-auto">
+            <CaptainPascal
+              context="lessonIntro"
+              name={profile?.displayUsername}
+              title={lesson.title}
+              compact
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Slot body */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-2xl mx-auto w-full h-full">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={slot.id}
+              initial={{ x: 40, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -40, opacity: 0 }}
+              transition={MOTION.slide}
+              className="h-full"
+            >
+              {slot.kind === 'concept' && <ConceptSlotView slot={slot} />}
+              {slot.kind === 'wrap' && <WrapSlotView slot={slot} />}
+              {slot.kind === 'problem' && progress && (
+                <ProblemSlotView
+                  slot={slot}
+                  progress={progress}
+                  uid={uid}
+                  lessonId={lesson.id}
+                  feedbackState={slotState.feedbackState}
+                  attemptNumber={slotState.attemptNumber}
+                  wrongTick={slotState.wrongTick}
+                  onChange={setCurrentAnswer}
+                  onVariantPicked={handleVariantPicked}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </main>
+
+      <LessonFooter
+        slotKind={slot.kind}
+        feedbackState={slotState.feedbackState}
+        wrongTick={slotState.wrongTick}
+        feedbackCorrectText={feedbackCorrectText}
+        feedbackWrongText={feedbackWrongText}
+        explanationText={explanationText}
+        explanationRevealed={slotState.explanationRevealed}
+        isReady={currentAnswer !== null}
+        isSubmitting={submitting}
+        onCheck={isReviewMode ? handleCheckReview : handleCheck}
+        onContinue={isReviewMode ? handleContinueReview : handleContinue}
+      />
+    </div>
+  );
+}

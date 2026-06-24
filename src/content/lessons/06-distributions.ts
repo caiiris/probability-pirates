@@ -1,8 +1,8 @@
 import type { Lesson } from '../types';
 
-export const lesson5: Lesson = {
+export const lesson6: Lesson = {
   id: 'distributions',
-  number: 5,
+  number: 6,
   title: 'Distributions',
   blurb: 'Flip many coins. Watch the binomial shape emerge from randomness.',
   estimatedMinutes: 5,

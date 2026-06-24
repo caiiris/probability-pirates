@@ -23,6 +23,10 @@ const FEEDBACK_FIELDS_BY_KIND: Record<
   'tap-event': [{ field: 'feedbackByWrongOutcome', requirement: 'required' }],
   'grid-event': [{ field: 'feedbackByCell', requirement: 'optional' }],
   'multiple-choice': [{ field: 'feedbackByOption', requirement: 'required' }],
+  // Simulation kinds only need the 'incomplete' nudge; it falls back to
+  // feedbackDefault, so the per-key hint is optional.
+  'simulate-proportion': [{ field: 'feedbackByWrongValue', requirement: 'optional' }],
+  'monty-hall': [{ field: 'feedbackByWrongValue', requirement: 'optional' }],
 };
 
 const BASE_STRING_FIELDS = [
@@ -38,7 +42,9 @@ function getVariantFeedbackRecord(
 ): Record<string, string> | undefined {
   switch (field) {
     case 'feedbackByWrongValue':
-      return variant.interactionKind === 'tap-outcomes'
+      return variant.interactionKind === 'tap-outcomes' ||
+        variant.interactionKind === 'simulate-proportion' ||
+        variant.interactionKind === 'monty-hall'
         ? variant.feedbackByWrongValue
         : undefined;
     case 'feedbackByWrongAnswer':

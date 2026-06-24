@@ -1,0 +1,200 @@
+import { memo, useState, useCallback, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Dices } from 'lucide-react';
+import { Die } from '@/components/illustrations/Die';
+import type { GridEventVariant } from '@/content/types';
+import type { InteractionProps } from './InteractionProps';
+import { MOTION } from '@/lib/motion';
+import { HintDisclosure, HintReferenceGrid } from './HintDisclosure';
+
+type Props = InteractionProps<GridEventVariant>;
+
+// Memoized cell — only re-renders when its own selected/flash state changes
+const GridCell = memo(function GridCell({
+  row,
+  col,
+  label,
+  isSelected,
+  flashWrong,
+  locked,
+  onToggle,
+}: {
+  row: number;
+  col: number;
+  label: string;
+  isSelected: boolean;
+  flashWrong: boolean;
+  locked: boolean;
+  onToggle: (row: number, col: number) => void;
+}) {
+  const selectedStyle =
+    isSelected && flashWrong
+      ? 'bg-[color:var(--coral-soft)] text-[color:var(--coral-deep)] border-[color:var(--coral-base)]' // wrong flash
+      : isSelected
+      ? 'bg-primary text-primary-foreground border-primary' // correct
+      : 'bg-card border-border text-muted-foreground hover:border-primary/40';
+
+  return (
+    <motion.button
+      className={`
+        flex items-center justify-center rounded border text-xs font-medium
+        w-11 h-11 md:w-14 md:h-14 lg:w-16 lg:h-16
+        touch-manipulation
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1
+        transition-colors
+        ${selectedStyle}
+        ${locked ? 'cursor-default' : 'cursor-pointer'}
+      `}
+      style={{ touchAction: 'manipulation' }}
+      aria-pressed={isSelected}
+      aria-label={`Cell ${row},${col}: ${label}`}
+      onClick={() => !locked && onToggle(row, col)}
+      whileTap={locked ? {} : { scale: 0.94 }}
+      transition={MOTION.pop}
+    >
+      {label}
+    </motion.button>
+  );
+});
+
+/** Animated simulation roller shown when simulationEnabled is true. */
+function DiceSimulator() {
+  const [roll, setRoll] = useState<{ d1: number; d2: number; key: number } | null>(null);
+  const [rolling, setRolling] = useState(false);
+  const tickRef = useRef(0);
+
+  function handleRoll() {
+    if (rolling) return;
+    setRolling(true);
+    const tick = ++tickRef.current;
+
+    // Brief "tumbling" phase — swap faces quickly then settle
+    let ticks = 0;
+    const interval = setInterval(() => {
+      setRoll({
+        d1: Math.ceil(Math.random() * 6),
+        d2: Math.ceil(Math.random() * 6),
+        key: tick * 100 + ticks,
+      });
+      ticks++;
+      if (ticks >= 8) {
+        clearInterval(interval);
+        setRolling(false);
+      }
+    }, 80);
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <button
+        type="button"
+        onClick={handleRoll}
+        disabled={rolling}
+        className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-60 select-none"
+      >
+        <Dices className="w-4 h-4" aria-hidden="true" />
+        Roll the dice!
+      </button>
+
+      <AnimatePresence mode="wait">
+        {roll && (
+          <motion.div
+            key={roll.key}
+            className="flex items-center gap-3"
+            initial={{ opacity: 0.6, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.08 }}
+          >
+            <Die value={roll.d1} className="w-12 h-12 drop-shadow-md" />
+            <span className="text-lg font-bold text-muted-foreground">+</span>
+            <Die value={roll.d2} className="w-12 h-12 drop-shadow-md" />
+            {!rolling && (
+              <span className="ml-2 text-base font-semibold text-primary">
+                = {roll.d1 + roll.d2}
+              </span>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export function GridEvent({ variant, feedbackState, wrongTick, onChange }: Props) {
+  const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
+  const [flashWrong, setFlashWrong] = useState(false);
+  const locked = feedbackState === 'correct';
+
+  // Re-flash on every wrong submission (keyed off wrongTick so it fires each time)
+  useEffect(() => {
+    if (feedbackState === 'wrong') {
+      setFlashWrong(true);
+      const timer = setTimeout(() => setFlashWrong(false), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [wrongTick]); // intentional: only re-flash when a new wrong submission arrives
+
+  const toggle = useCallback((row: number, col: number) => {
+    const key = `${row},${col}`;
+    setSelectedCells((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      const cells = [...next].map((k) => k.split(',').map(Number) as [number, number]);
+      onChange(cells.length > 0 ? { selectedCells: cells } : null);
+      return next;
+    });
+  }, [onChange]);
+
+  const count = selectedCells.size;
+  const counterText = variant.liveCounterTemplate.replace('{count}', String(count));
+
+  return (
+    <div className="flex flex-col items-center gap-6 px-4 py-6">
+      <p className="text-xl font-medium text-center">{variant.prompt}</p>
+      {variant.simulationEnabled && <DiceSimulator />}
+
+      {/* Column headers (die faces 1–cols) */}
+      <div className="overflow-x-auto w-full flex justify-center">
+        <div className="inline-grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${variant.cols}, minmax(0, 1fr))` }}>
+          {Array.from({ length: variant.rows }, (_, r) =>
+            Array.from({ length: variant.cols }, (_, c) => {
+              const row = r + 1;
+              const col = c + 1;
+              const key = `${row},${col}`;
+              return (
+                <GridCell
+                  key={key}
+                  row={row}
+                  col={col}
+                  label={`${row}+${col}`}
+                  isSelected={selectedCells.has(key)}
+                  flashWrong={flashWrong}
+                  locked={locked}
+                  onToggle={toggle}
+                />
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Live counter */}
+      <p className="text-sm font-semibold text-primary tabular-nums" aria-live="polite">
+        {counterText}
+      </p>
+
+      {/* Opt-in comparison hint (read-only reference grid, amber, can't be tapped) */}
+      {variant.hint && (
+        <HintDisclosure>
+          <HintReferenceGrid rows={6} cols={6} highlightCells={variant.hint.highlightCells} />
+          <p className="max-w-xs text-center text-xs text-muted-foreground">{variant.hint.label}</p>
+        </HintDisclosure>
+      )}
+    </div>
+  );
+}

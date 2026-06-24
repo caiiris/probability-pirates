@@ -29,8 +29,14 @@ export type Slot = ConceptSlot | WrapSlot | ProblemSlot;
 
 export type ConceptSlot = {
   id: string; kind: 'concept';
-  prompt: string;
+  prompt: string;                     // lede sentence (required)
   illustration: IllustrationRef;
+  title?: string;                     // D75 — short heading / term being introduced
+  body?: string[];                    // D75 — supporting paragraphs (the "teach")
+  example?: {                         // D75 — optional short worked example / derivation
+    title?: string;
+    steps: string[];                  // ordered short lines; `{a/b}` segments render as stacked fractions
+  };
 };
 
 export type WrapSlot = {
@@ -47,11 +53,13 @@ export type ProblemSlot = {
 
 export type InteractionKind =
   | 'tap-outcomes' | 'fill-fraction' | 'tap-event'
-  | 'grid-event' | 'multiple-choice';
+  | 'grid-event' | 'multiple-choice'
+  | 'simulate-proportion' | 'monty-hall'; // D73 — simulation kinds for Lessons 2-4
 
 export type Variant =
   | TapOutcomesVariant | FillFractionVariant | TapEventVariant
-  | GridEventVariant | MultipleChoiceVariant;
+  | GridEventVariant | MultipleChoiceVariant
+  | SimulateProportionVariant | MontyHallVariant;
 
 type BaseVariant = {
   id: string;
@@ -98,12 +106,37 @@ export type GridEventVariant = BaseVariant & {
 
 export type MultipleChoiceVariant = BaseVariant & {
   interactionKind: 'multiple-choice';
-  options: { id: string; label: string }[];
+  options: { id: string; label: string; subtext?: string }[];
   correctOptionId: string;
   feedbackByOption: Record<string, string>;
+  context?: string; // optional blurb shown above the options
 };
 
-export type IllustrationRef = { kind: 'die' | 'coin' | 'cards'; faceValue?: number };
+// D73 — simulation kinds (Lessons 2-4). Both grade on engagement: the renderer
+// emits a non-null answer only once the trial/game threshold is reached, so the
+// Check button stays disabled until the learner has run the simulation. There is
+// no synthetic "wrong" state, which preserves the no-bail-out rule (D55).
+
+export type SimulateProportionVariant = BaseVariant & {
+  interactionKind: 'simulate-proportion';
+  scenario: 'coin' | 'die-six' | 'birthday'; // drives the per-trial visual + generator
+  targetProbability: number;  // 0..1, drawn as the reference line
+  targetLabel: string;        // e.g. "True P(heads) = 50%"
+  minTrials: number;          // engagement gate before Continue unlocks
+  roomSize?: number;          // people per room for the birthday scenario
+  feedbackByWrongValue?: Record<string, string>; // keyed by 'incomplete'
+};
+
+export type MontyHallVariant = BaseVariant & {
+  interactionKind: 'monty-hall';
+  minGames: number; // total games (manual + autopilot) before Continue unlocks
+  feedbackByWrongValue?: Record<string, string>; // keyed by 'incomplete'
+};
+
+export type IllustrationRef = {
+  kind: 'die' | 'coin' | 'cards' | 'doors' | 'calendar';
+  faceValue?: number;
+};
 ```
 
 ## Implementation outline

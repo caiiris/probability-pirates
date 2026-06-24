@@ -2,34 +2,143 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // spec-auth
+    // ------------------------------------------------------------------
+    // /users/{uid} — owner-only access (was: any auth user, leaked email
+    // and other PII to all signed-in clients).
+    // Updates restricted to the field allowlist that habitService and
+    // userService actually write, so an adversarial client can't wipe
+    // createdAt / username / email or invent arbitrary fields.
+    // ------------------------------------------------------------------
     match /users/{uid} {
-      allow read: if request.auth != null;
-      allow create: if request.auth.uid == uid
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      allow create: if request.auth != null
+                    && request.auth.uid == uid
                     && request.resource.data.xp == 0
-                    && request.resource.data.currentStreak == 0;
-      allow update: if request.auth.uid == uid;
+                    && request.resource.data.currentStreak == 0
+                    && request.resource.data.bestStreak == 0
+                    && request.resource.data.stepsCompleted == 0
+                    && request.resource.data.lessonsCompleted == 0
+                    && request.resource.data.displayUsername is string
+                    && request.resource.data.displayUsername.size() <= 30
+                    && request.resource.data.bio is string
+                    && request.resource.data.bio.size() <= 200;
+
+      allow update: if request.auth != null
+                    && request.auth.uid == uid
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly([
+                         'xp', 'stepsCompleted',
+                         'currentStreak', 'bestStreak', 'lastActiveDate',
+                         'lessonsCompleted', 'milestonesReached',
+                         'bio', 'avatarUrl',
+                         'activityDates',
+                         'achievements', 'weeklyXp', 'weekKey',
+                         'coins', 'claimedChests', 'streakFreezes',
+                         'avatarStyle', 'ownedAvatarStyles',
+                         'profileFlair', 'ownedFlair'
+                       ])
+                    && request.resource.data.bio.size() <= 200;
+
       allow delete: if false;
 
       // spec-progress-persistence
       match /lessonProgress/{lessonId} {
-        allow read, write: if request.auth.uid == uid;
+        allow read, write: if request.auth != null && request.auth.uid == uid;
       }
+
       match /stepAttempts/{attemptId} {
-        allow read: if request.auth.uid == uid;
-        allow create: if request.auth.uid == uid
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null
+                      && request.auth.uid == uid
+                      && request.resource.data.attemptNumber is int
                       && request.resource.data.attemptNumber >= 1
-                      && request.resource.data.attemptNumber <= 10;
+                      && request.resource.data.attemptNumber <= 10
+                      && request.resource.data.xpAwarded is int
+                      && request.resource.data.xpAwarded >= 0
+                      && request.resource.data.xpAwarded <= 20
+                      && request.resource.data.wasCorrect is bool;
         allow update, delete: if false;
+      }
+
+      // studyEvents — owner CRUD, title/notes length-capped.
+      // `eventType` is a closed enum (see src/features/schedule/eventTypes.ts).
+      // `time` is an optional 24-hour "HH:MM" string for tests/timed sessions.
+      match /studyEvents/{eventId} {
+        allow read, delete: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null
+                      && request.auth.uid == uid
+                      && request.resource.data.title is string
+                      && request.resource.data.title.size() >= 1
+                      && request.resource.data.title.size() <= 200
+                      && request.resource.data.date is string
+                      && request.resource.data.completed is bool
+                      && (!('eventType' in request.resource.data)
+                          || request.resource.data.eventType in ['study', 'test', 'homework', 'other'])
+                      && (!('time' in request.resource.data)
+                          || (request.resource.data.time is string
+                              && request.resource.data.time.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')))
+                      && (!('notes' in request.resource.data)
+                          || request.resource.data.notes.size() <= 1000);
+        allow update: if request.auth != null
+                      && request.auth.uid == uid
+                      && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['title', 'date', 'eventType', 'time', 'lessonId', 'notes', 'completed']);
       }
     }
 
-    // spec-auth
+    // ------------------------------------------------------------------
+    // /publicProfiles/{uid} — PII-free projection of /users/{uid}. Readable by
+    // any signed-in user (powers search, public profiles, leaderboard); only
+    // the owner may write their own. Validation is tolerant of partial merges
+    // (gamification writes touch only a few fields) but hard-blocks `email`.
+    // ------------------------------------------------------------------
+    match /publicProfiles/{uid} {
+      allow read: if request.auth != null;
+
+      allow create, update: if request.auth != null
+                    && request.auth.uid == uid
+                    && !('email' in request.resource.data)
+                    && (!('xp' in request.resource.data)
+                        || (request.resource.data.xp is int && request.resource.data.xp >= 0))
+                    && (!('weeklyXp' in request.resource.data)
+                        || request.resource.data.weeklyXp >= 0)
+                    && (!('bio' in request.resource.data)
+                        || request.resource.data.bio.size() <= 200);
+
+      allow delete: if false;
+
+      // Who this user follows. The list owner manages it.
+      match /following/{followeeUid} {
+        allow read: if request.auth != null;
+        allow create, delete: if request.auth != null && request.auth.uid == uid;
+      }
+
+      // Who follows this user. The FOLLOWER writes their own entry (doc id is
+      // their uid), so following someone adds a row to their followers list.
+      match /followers/{followerUid} {
+        allow read: if request.auth != null;
+        allow create, delete: if request.auth != null && request.auth.uid == followerUid;
+      }
+
+      // Kudos/cheers. The SENDER writes their own entry (doc id is their uid).
+      match /kudos/{fromUid} {
+        allow read: if request.auth != null;
+        allow create, delete: if request.auth != null && request.auth.uid == fromUid;
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // /usernames/{name} — public read needed for username→email login
+    // resolution. Create-only, length-capped to prevent storage abuse.
+    // ------------------------------------------------------------------
     match /usernames/{name} {
       allow read: if true;
       allow create: if request.auth != null
                     && request.resource.data.uid == request.auth.uid
-                    && name == name.lower();
+                    && name == name.lower()
+                    && name.size() >= 3
+                    && name.size() <= 30;
       allow update, delete: if false;
     }
   }

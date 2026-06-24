@@ -13,19 +13,23 @@ flowchart LR
     Auth["Firebase Auth"]
     Firestore["Cloud Firestore"]
     Storage["Firebase Storage"]
+    RemoteConfig["Firebase Remote Config"]
+    Analytics["Firebase Analytics (GA4) + Performance"]
     Sentry["Sentry (client errors)"]
 
     Browser -->|loads bundle| Vercel
     Browser -->|sign in / sign up| Auth
     Browser -->|reads/writes user data| Firestore
     Browser -->|avatar upload| Storage
+    Browser -->|lesson availability flags| RemoteConfig
+    Browser -.->|funnel + page-load metrics| Analytics
     Browser -.->|errors| Sentry
 ```
 
 - **Frontend:** Vite-built React SPA, deployed to Vercel.
-- **Backend:** Firebase managed services (Auth, Firestore, Storage). No custom Node server.
-- **Content:** Lesson definitions are TypeScript files bundled into the SPA (see `spec-content-model`). Zero DB reads for lesson content.
-- **Observability:** Sentry for client errors; Firebase console for backend health.
+- **Backend:** Firebase managed services (Auth, Firestore, Storage, Remote Config). No custom Node server.
+- **Content:** Lesson definitions are TypeScript files bundled into the SPA (see `spec-content-model`). Zero DB reads for lesson content. **Lesson availability** (which lessons are playable vs `comingSoon`) is gated by Remote Config — see §4 and `docs/issues.md` I027.
+- **Observability:** Sentry for client errors; Firebase Analytics (GA4) for funnel + behavioral events; Firebase Performance Monitoring for page-load and network latency; Firebase console for backend health. Analytics catalog lives in `src/lib/analytics.ts` (`PascalEvent` map) — see `docs/issues.md` I028.
 
 ---
 
@@ -163,6 +167,13 @@ brilliant-clone/
 - Deploys go through Vercel preview branches; merging to `main` deploys to production.
 - Firestore rules and indexes are deployed manually via `firebase deploy --only firestore` until we wire up an action. (Phase 3 candidate.)
 
+### Remote Config (lesson availability)
+- A single STRING parameter `available_lesson_ids` (JSON array) controls which lessons render as playable vs `Coming soon`. Default: `["what-is-probability"]` (matches what ships in `src/content/lessons/01-*.ts`).
+- Clients fetch in `src/features/flags/RemoteFlagsProvider.tsx` via `fetchAndActivate`. Cache window: 10 s in dev, 1 h in prod.
+- Hard safety net in `useLessons()`: a lesson with `slots.length === 0` is ALWAYS `comingSoon`, regardless of Remote Config — flipping a contentless lesson live is impossible.
+- Management: Firebase console → Remote Config, or via the Firebase MCP tool `remoteconfig_update_template`. Templates are versioned; rollback by `remoteconfig_update_template` with `version_number`.
+- See `docs/issues.md` I027 for the full operator playbook.
+
 ### `.env.example` (committed)
 ```
 VITE_FIREBASE_API_KEY=
@@ -250,7 +261,13 @@ Per PRD §7:
 - Lighthouse mobile target ≥ 90 for Performance, Accessibility, Best Practices.
 
 ### Bundle size budget
-- Total first-load JS: **< 300KB gz**. CI does not yet enforce this; track manually until budget is wired.
+- **Eager (entry) first-load JS: soft target ≤ 350 KB gz.** Updated 2026-06-23
+  (was a hard 300 KB; owner relaxed it). The real gate is load performance, not
+  the raw number: keep Lighthouse mobile Performance ≥ 90 and TTI healthy.
+- Heavy, non-entry surfaces must be **route-split** (`React.lazy`) so they don't
+  weigh down the eager chunk. Currently split: lesson player, celebration,
+  schedule, profile (see `src/App.tsx`). Entry chunk is ~281 KB gz.
+- CI does not yet enforce this; track manually until budget is wired.
 
 ---
 

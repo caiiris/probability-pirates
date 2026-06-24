@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { assertLessonInvariants } from '../assertLessonInvariants';
 import { lessons } from '../index';
 import { lesson1 } from './01-what-is-probability';
-import type { GridEventVariant, Lesson } from '../types';
+import type { ConceptSlot, GridEventVariant, Lesson } from '../types';
 
 describe('lesson1 invariants', () => {
   it('passes assertLessonInvariants', () => {
@@ -14,13 +14,69 @@ describe('lesson1 invariants', () => {
     const problemSlots = lesson1.slots.filter((slot) => slot.kind === 'problem');
     const wrapSlots = lesson1.slots.filter((slot) => slot.kind === 'wrap');
 
-    expect(conceptSlots).toHaveLength(2);
-    expect(problemSlots).toHaveLength(5);
+    // Three-act arc: 6 concept teach beats, 6 problems, 1 wrap.
+    expect(conceptSlots).toHaveLength(6);
+    expect(problemSlots).toHaveLength(6);
     expect(wrapSlots).toHaveLength(1);
 
     for (const slot of problemSlots) {
       expect(slot.variants).toHaveLength(2);
     }
+  });
+
+  it('uses the enriched concept-slot shape on teach beats (title + body + theorem or derivation)', () => {
+    const enrichedIds = ['equally-likely', 'two-dice-intro'];
+    for (const id of enrichedIds) {
+      const slot = lesson1.slots.find((s) => s.id === id);
+      expect(slot?.kind).toBe('concept');
+      if (slot?.kind === 'concept') {
+        expect(slot.title).toBeTruthy();
+        expect(slot.body && slot.body.length).toBeGreaterThan(0);
+        // D77: every enriched teach beat has at least one structured artifact:
+        // a named theorem, a worked example, or a derivation.
+        expect(
+          Boolean(slot.theorem || slot.example || slot.derivation),
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('promotes the equally-likely slot to a named theorem (D77)', () => {
+    const slot = lesson1.slots.find((s) => s.id === 'equally-likely');
+    expect(slot?.kind).toBe('concept');
+    if (slot?.kind === 'concept') {
+      expect(slot.theorem?.name).toBeTruthy();
+      expect(slot.theorem?.statement.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('routes the two-dice-intro proof beat through the derivation field (D77)', () => {
+    for (const id of ['two-dice-intro']) {
+      const slot = lesson1.slots.find((s) => s.id === id);
+      expect(slot?.kind).toBe('concept');
+      if (slot?.kind === 'concept') {
+        expect(slot.derivation?.title).toBeTruthy();
+        expect(slot.derivation?.steps.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("makes two-dice-intro's derivation a flippable flashcard with a leading question (D78)", () => {
+    const slot = lesson1.slots.find((s) => s.id === 'two-dice-intro');
+    expect(slot?.kind).toBe('concept');
+    if (slot?.kind === 'concept') {
+      expect(slot.derivation?.question).toMatch(/sample space.*two/i);
+    }
+  });
+
+  it('throws when a derivation question is empty (D78 invariant)', () => {
+    const broken: Lesson = structuredClone(lesson1);
+    const slot = broken.slots.find((s) => s.id === 'two-dice-intro') as ConceptSlot | undefined;
+    expect(slot?.kind).toBe('concept');
+    if (slot?.kind === 'concept' && slot.derivation) {
+      slot.derivation.question = '   ';
+    }
+    expect(() => assertLessonInvariants(broken)).toThrow(/derivation\.question/);
   });
 
   it('throws when a variant interactionKind mismatches its slot', () => {
@@ -32,6 +88,36 @@ describe('lesson1 invariants', () => {
     }
 
     expect(() => assertLessonInvariants(broken)).toThrow(/does not match slot interactionKind/);
+  });
+
+  it('throws when a concept slot derivation has empty steps', () => {
+    const broken: Lesson = structuredClone(lesson1);
+    const slot = broken.slots.find((s) => s.id === 'two-dice-intro') as ConceptSlot | undefined;
+    expect(slot?.kind).toBe('concept');
+    if (slot?.kind === 'concept' && slot.derivation) {
+      slot.derivation.steps = [];
+    }
+    expect(() => assertLessonInvariants(broken)).toThrow(/derivation\.steps/);
+  });
+
+  it('throws when a concept slot theorem statement is empty', () => {
+    const broken: Lesson = structuredClone(lesson1);
+    const slot = broken.slots.find((s) => s.id === 'equally-likely') as ConceptSlot | undefined;
+    expect(slot?.kind).toBe('concept');
+    if (slot?.kind === 'concept' && slot.theorem) {
+      slot.theorem.statement = '   ';
+    }
+    expect(() => assertLessonInvariants(broken)).toThrow(/theorem\.statement/);
+  });
+
+  it('throws when a concept slot body contains an empty paragraph', () => {
+    const broken: Lesson = structuredClone(lesson1);
+    const slot = broken.slots.find((s) => s.id === 'hook') as ConceptSlot | undefined;
+    expect(slot?.kind).toBe('concept');
+    if (slot?.kind === 'concept' && slot.body) {
+      slot.body[0] = '   ';
+    }
+    expect(() => assertLessonInvariants(broken)).toThrow(/body\[0\]/);
   });
 
   it('throws when grid correctCells are out of bounds', () => {
@@ -48,9 +134,34 @@ describe('lesson1 invariants', () => {
 });
 
 describe('course catalog', () => {
-  it('exports six lessons with lesson1 playable', () => {
-    expect(lessons).toHaveLength(6);
-    expect(lessons[0]?.comingSoon).toBeUndefined();
-    expect(lessons.slice(1).every((lesson) => lesson.comingSoon)).toBe(true);
+  it('ships five authored lessons first, then blank/locked stubs (live + roadmap)', () => {
+    // Lessons 1-5 carry content and no comingSoon flag.
+    expect(lessons.slice(0, 5).every((lesson) => !lesson.comingSoon)).toBe(true);
+    expect(lessons.slice(0, 5).every((lesson) => lesson.slots.length > 0)).toBe(true);
+    // Everything from index 5 on (distributions + roadmap stubs) is an empty,
+    // coming-soon stub. Blank slots also auto-lock via useLessons.
+    expect(lessons.slice(5).every((lesson) => lesson.comingSoon)).toBe(true);
+    expect(lessons.slice(5).every((lesson) => lesson.slots.length === 0)).toBe(true);
+  });
+
+  it('keeps the five live lessons first, in their authored order (D76)', () => {
+    expect(lessons.slice(0, 6).map((l) => l.id)).toEqual([
+      'what-is-probability',
+      'law-of-large-numbers',
+      'counting-carefully',
+      'counting-gets-hard',
+      'conditional-probability',
+      'distributions',
+    ]);
+    expect(lessons.slice(0, 6).map((l) => l.number)).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+
+  it('has globally unique lesson ids and monotonically numbered stubs', () => {
+    const ids = lessons.map((l) => l.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    // Numbering stays sequential down the whole catalog so "Lesson N" is monotonic.
+    expect(lessons.map((l) => l.number)).toEqual(
+      lessons.map((_, i) => i + 1),
+    );
   });
 });

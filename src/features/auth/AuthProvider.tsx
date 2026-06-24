@@ -3,6 +3,7 @@ import type { User } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { ensurePublicProfile } from '@/features/social/publicProfile';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -21,11 +22,37 @@ export type UserProfile = {
   bestStreak: number;
   lastActiveDate: string | null;
   milestonesReached: string[];
+  activityDates?: string[];
+  /** Earned achievement ids (src/lib/achievements.ts). Optional for back-compat
+   *  with profiles created before achievements shipped. */
+  achievements?: string[];
+  /** Weekly leaderboard bucket — XP earned within `weekKey` (src/lib/weeklyXp.ts). */
+  weeklyXp?: number;
+  weekKey?: string | null;
+  /** Cosmetic/forgiveness currency balance (src/lib/coins.ts). */
+  coins?: number;
+  /** Checkpoint chest ids already claimed, so each pays out once. */
+  claimedChests?: string[];
+  /** Owned Streak Freezes; each can cover one missed day. */
+  streakFreezes?: number;
+  /** Equipped avatar style id (public, shown to others). Defaults to 'classic'. */
+  avatarStyle?: string;
+  /** Avatar style ids the user owns (private). Always includes 'classic'. */
+  ownedAvatarStyles?: string[];
+  /** Equipped profile flair id (public, shown to others). Defaults to 'none'. */
+  profileFlair?: string;
+  /** Profile flair ids the user owns (private). Always includes 'none'. */
+  ownedFlair?: string[];
 };
 
 type AuthState =
   | { status: 'loading' }
   | { status: 'unauthenticated' }
+  // Google sign-in succeeded but the user hasn't claimed a Pascal username yet.
+  // <RequireAuth> redirects this state to /setup-username. Treat the user as
+  // signed in to Firebase Auth but NOT yet a full Pascal account — no profile,
+  // no lessons, no XP writes.
+  | { status: 'needs_username'; user: User }
   | { status: 'authenticated'; user: User; profile: UserProfile | null };
 
 type AuthContextValue = AuthState;
@@ -44,27 +71,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({ status: 'loading' });
 
   useEffect(() => {
-    // Subscribe to Firebase Auth state
+    // Track active profile listener so we can tear it down when the user changes
+    let unsubProfile: (() => void) | null = null;
+
     const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
+      // Always tear down the previous profile listener before starting a new one
+      if (unsubProfile) {
+        unsubProfile();
+        unsubProfile = null;
+      }
+
       if (!firebaseUser) {
         setState({ status: 'unauthenticated' });
         return;
       }
 
-      // Authenticated: subscribe to the user's profile doc
+      // Authenticated: subscribe to the user's profile doc.
+      // For Google sign-in the profile doc may not exist yet — we treat that
+      // case as `needs_username` (RequireAuth routes them to /setup-username).
+      // For email signup the doc is written transactionally in registerUser,
+      // so we only branch on `needs_username` when the provider is Google.
+      // This avoids a flicker during email signup's brief auth-then-create
+      // window.
+      const isGoogleUser = firebaseUser.providerData.some(
+        (p) => p.providerId === 'google.com',
+      );
       const userRef = doc(db, 'users', firebaseUser.uid);
-      const unsubProfile = onSnapshot(userRef, (snap) => {
+      unsubProfile = onSnapshot(userRef, (snap) => {
+        if (!snap.exists() && isGoogleUser) {
+          setState({ status: 'needs_username', user: firebaseUser });
+          return;
+        }
         const profile = snap.exists() ? (snap.data() as UserProfile) : null;
         setState({ status: 'authenticated', user: firebaseUser, profile });
+        // Backfill/repair the public projection for accounts that predate it.
+        // One-shot per session, best-effort (never blocks auth).
+        if (profile) {
+          void ensurePublicProfile(firebaseUser.uid, profile);
+        }
       });
-
-      // Return a cleanup that both the profile subscription and the outer scope use.
-      // We rely on the onAuthStateChanged unsubscribe to handle the outer cleanup;
-      // the profile unsubscribe runs when the auth state changes to signed-out.
-      return unsubProfile;
     });
 
-    return unsubAuth;
+    return () => {
+      unsubAuth();
+      if (unsubProfile) unsubProfile();
+    };
   }, []);
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;

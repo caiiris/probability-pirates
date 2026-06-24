@@ -22,7 +22,7 @@ Turn a `Lesson` object plus a `LessonProgress` doc into a full-screen, mobile-fi
 
 ### Slot body
 - One slot fills the screen. Renderer is chosen from `slot.kind`:
-  - `concept` → `<ConceptSlotView>` — illustration + prompt + "Got it." CTA.
+  - `concept` → `<ConceptSlotView>` — illustration + prompt + "Got it." CTA. With the enriched fields from D75 (`title`, `body[]`, `example.steps[]`), the view becomes a real "teach" beat: heading in the display face, lede `prompt`, body paragraphs at a comfortable measure, and the worked example as a bordered card with mono-numeric steps. The CTA is unchanged. Slots that omit the new fields keep the legacy centered one-liner so unconverted lessons stay visually intact.
   - `problem` → `<ProblemSlotView>` — picks the variant via `pickVariantForSlot`, then renders the matching interaction component (see `spec-interactions`).
   - `wrap` → `<WrapSlotView>` — celebration title + body + segue. Tapping Continue triggers `markLessonCompleted` and routes to the celebration screen (see `spec-habit-loop`).
 - Slot enters from the right (slide); exits to the left. Framer Motion `AnimatePresence`.
@@ -61,7 +61,7 @@ And calls:
 
 1. Create `src/features/lesson/LessonPlayer.tsx` — top-level route component. Reads `:lessonId` param, looks up lesson, fetches progress, renders the header + current slot + CTA. Returns `<Navigate to="/" />` if lesson is `comingSoon` or doesn't exist.
 2. Create `src/features/lesson/SlotRenderer.tsx` — switch on `slot.kind`. Returns `<ConceptSlotView>`, `<ProblemSlotView>`, or `<WrapSlotView>`. Wraps in `<motion.div>` with slide-in animation.
-3. Create `src/features/lesson/ConceptSlotView.tsx` — illustration (from `src/components/illustrations/`) + prompt + nothing else; the player chrome supplies the CTA.
+3. Create `src/features/lesson/ConceptSlotView.tsx` — illustration (from `src/components/illustrations/`) + prompt. With the D75 fields (`title`, `body[]`, `example.steps[]`), additionally render the title in the display face, paragraphs at a comfortable measure, and the worked example as a bordered card; step strings support `{a/b}` segments which render via `<Fraction>` (a tiny CSS-only stacked component in `src/components/`). The player chrome supplies the CTA.
 4. Create `src/features/lesson/WrapSlotView.tsx` — large title + body + small segue card. The player's bottom CTA shows "Continue" here.
 5. Create `src/features/lesson/ProblemSlotView.tsx` — picks the variant once per slot visit (memoize with `useMemo` keyed on `slot.id` and `progress.attemptId`), writes the selection on first visit, then renders one of the 5 interaction components from `spec-interactions`. Passes down `onSubmit(answerPayload) => Promise<void>`.
 6. Create `src/features/lesson/useSlotState.ts` — hook owning per-slot UI state: `attemptNumber`, `feedbackState: 'idle' | 'correct' | 'wrong'`, `explanationRevealed: boolean` (becomes `true` once `attemptNumber > 2` on a wrong submission), `lastAnswer`. Resets on slot change.

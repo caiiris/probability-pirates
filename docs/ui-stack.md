@@ -14,7 +14,7 @@
 | **Lesson motion** | Framer Motion | Step transitions, correct/wrong feedback, celebration screen animations |
 | **Optional polish** | [Animbits](https://www.animbits.dev/) (selective) | Confetti, count-up, tap feedback — only where it clearly beats a short Framer snippet |
 | **Icons** | Lucide React (shadcn default) | Nav, streak flame, lock, check, close |
-| **Font** | Inter via `@fontsource/inter` or Google Fonts | All UI copy |
+| **Type** | Bricolage Grotesque (display) · Inter (body) · JetBrains Mono (data), all via `@fontsource` | Headings · UI copy · numerals |
 
 **Do not add:** a second component library (MUI, Chakra), a third animation library, or ad-hoc CSS-in-JS beyond Tailwind utilities.
 
@@ -22,20 +22,45 @@
 
 ## Design tokens
 
-Set once in `src/index.css` as shadcn CSS variables, then reference via Tailwind classes everywhere.
+> **Updated 2026-06-23 (design overhaul, Category 1).** Tokens now live in a
+> three-layer system in `src/index.css`. Components reference Layer 2/3 tokens
+> only — never raw hex. JS (confetti, illustration palettes, charts) reads the
+> same accent ramp from `src/lib/theme.ts`. See the header comment in
+> `index.css` for how to add a new accent hue.
+>
+> - **Layer 1 — primitive ramps:** the only place hex lives. Neutrals plus six
+>   accents (`violet`, `blue`, `teal`, `green`, `amber`, `coral`), each with
+>   `-soft` (tint), `-base`, `-deep` (text/edge).
+> - **Layer 2 — semantic tokens:** the shadcn contract (`--primary`,
+>   `--muted`, …) plus Pascal additions (`--success`, `--streak`, `--info`,
+>   `--primary-soft`, `--primary-deep`). Remap here to retheme.
+> - **Layer 3 — `@theme inline`:** exposes everything as Tailwind utilities
+>   (`bg-primary`, `bg-teal-soft`, `text-coral-deep`, `shadow-soft`, …) and the
+>   font roles (`font-display`, `font-sans`, `font-mono`).
 
 | Token | Hex | Usage |
 | --- | --- | --- |
-| `--primary` | `#4F46E5` | CTAs, active nav, grid cell highlight, links |
-| `--success` / correct | `#10B981` | Correct feedback, completed badge |
-| `--destructive` / wrong | `#F43F5E` | Wrong feedback flash (use sparingly — shake first) |
+| `--primary` | `#6B4EFF` | CTAs, active nav, grid cell highlight, links (Pascal violet) |
+| `--primary-soft` / `--primary-deep` | `#EEE9FF` / `#3A2A8C` | Tinted primary surfaces / chunky-button depth, pressed |
+| `--success` / correct | `#22C55E` | Correct feedback, completed badge |
+| `--destructive` / wrong | `#FB5E58` | Wrong feedback flash (use sparingly — shake first) |
 | `--streak` | `#F59E0B` | Flame icon, daily goal done, milestone trophies |
-| `--background` | `#FAFAFA` | Page background |
-| `--foreground` | `#0F172A` | Body text, headings |
+| `--info` | `#2E8FFF` | Informational accents, neutral highlights |
+| `--background` | `#FAFAFC` | Page background (warm, faintly plum-tinted) |
+| `--foreground` | `#211C30` | Body text, headings (warm plum-charcoal) |
 
-Map `--success` and `--streak` as custom properties alongside shadcn's built-in `--primary`, `--destructive`, etc.
+**Color discipline:** chrome stays calm (primary + neutrals + semantic). The
+full accent ramp is for *playful* surfaces — illustrations, lesson nodes, tags —
+so the app reads colorful (Brilliant-like) without rainbow chrome.
 
-**Typography:** 16px minimum body (`text-base`), prompts `text-xl`–`text-2xl`, lesson titles `text-2xl`–`text-3xl`. Use shadcn `Card` for lesson slots — no custom card CSS per screen.
+`--radius` is `0.75rem` (rounder, friendlier). `--btn-depth` (`4px`) is the
+solid bottom offset reserved for tactile/chunky buttons (Category 4).
+
+**Typography:** Bricolage Grotesque (`font-display`) on `h1`–`h3`; Inter
+(`font-sans`) for body and UI; JetBrains Mono (`font-mono` / `.num`) for
+numerals (XP, fractions, stats). 16px minimum body (`text-base`), prompts
+`text-xl`–`text-2xl`, lesson titles `text-2xl`–`text-3xl`. Use shadcn `Card`
+for lesson slots — no custom card CSS per screen.
 
 **Touch targets:** minimum 44×44px on mobile; scales to 56px on tablet (`md:`) and 64px on desktop (`lg:`) for grid cells and primary interactive elements. Full-width primary CTA on the lesson player. Use shadcn `Button` with `size="lg"` and `className="w-full md:w-auto md:min-w-[280px]"` for Check / Continue (full-width on mobile, generous fixed width on tablet+).
 

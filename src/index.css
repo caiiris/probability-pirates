@@ -2,55 +2,115 @@
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/700.css";
+@import "@fontsource-variable/bricolage-grotesque/wght.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
-/* Pascal design tokens — overrides shadcn defaults with our specific palette */
+/* ============================================================================
+   PASCAL DESIGN TOKENS
+   ----------------------------------------------------------------------------
+   Three layers, edited top-down. Components NEVER hard-code a color; they read
+   a Layer 2 / Layer 3 token. To retheme, remap in Layer 2. To grow the system,
+   add to Layer 1 then expose in Layer 3.
+
+     Layer 1  Primitive ramps  raw brand colors (the only place hex lives)
+     Layer 2  Semantic tokens  map meaning -> primitive (the shadcn contract)
+     Layer 3  @theme inline     expose tokens as Tailwind utilities + fonts
+
+   JS consumers (confetti, illustration palettes, charts) read the same accent
+   ramp from src/lib/theme.ts. Keep theme.ts in sync with Layer 1.
+
+   ADD A NEW ACCENT HUE (e.g. "grape"):
+     1. Layer 1  add  --grape-soft / --grape-base / --grape-deep
+     2. Layer 3  add  --color-grape-soft/base/deep: var(--grape-...)
+     3. theme.ts add  grape: { soft, base, deep } to ACCENTS
+   It is then usable as bg-grape-base / text-grape-deep and ACCENTS.grape in JS.
+   ============================================================================ */
+
 :root {
-  --background: oklch(0.985 0 0);          /* #FAFAFA */
-  --foreground: oklch(0.145 0.024 262.5);  /* #0F172A */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0.024 262.5);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0.024 262.5);
-  --primary: oklch(0.491 0.243 264.4);     /* #4F46E5 indigo */
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.145 0.024 262.5);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0.013 262.5);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.145 0.024 262.5);
-  --destructive: oklch(0.642 0.220 13.0);  /* #F43F5E rose */
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.922 0.005 262.5);
-  --input: oklch(0.922 0.005 262.5);
-  --ring: oklch(0.491 0.243 264.4);
+  /* ---- Layer 1: Primitive ramps ------------------------------------------ */
 
-  /* Pascal-specific: success (emerald) and streak (amber) */
-  --success: oklch(0.696 0.195 155.8);     /* #10B981 */
-  --success-foreground: oklch(1 0 0);
-  --streak: oklch(0.777 0.175 80.5);       /* #F59E0B */
-  --streak-foreground: oklch(1 0 0);
+  /* neutral — warm, faintly plum-tinted (not pure gray, not cream) */
+  --paper:       #FAFAFC; /* page background        */
+  --surface:     #FFFFFF; /* cards, popovers, sheets */
+  --ink:         #211C30; /* primary text            */
+  --ink-soft:    #6B6577; /* secondary / muted text  */
+  --line:        #ECEAF1; /* borders, dividers       */
+  --line-strong: #DAD7E2; /* visible rules: path connectors, separators */
+  --fill:        #F4F3F8; /* muted/secondary fills   */
 
-  --radius: 0.5rem;
+  /* brand — Pascal violet. Each accent: -soft (tint), -base, -deep (text/edge) */
+  --violet-soft: #EEE9FF;  --violet-base: #6B4EFF;  --violet-deep: #3A2A8C;
 
-  /* Sidebar tokens */
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0.024 262.5);
-  --sidebar-primary: oklch(0.491 0.243 264.4);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.145 0.024 262.5);
-  --sidebar-border: oklch(0.922 0.005 262.5);
-  --sidebar-ring: oklch(0.491 0.243 264.4);
+  /* accents — color lives here and in illustrations; chrome stays calm */
+  --blue-soft:   #E4F0FF;  --blue-base:   #2E8FFF;  --blue-deep:   #1B4F99;
+  --teal-soft:   #DEF6F1;  --teal-base:   #14B8A6;  --teal-deep:   #0B6B61;
+  --green-soft:  #E3F7EA;  --green-base:  #22C55E;  --green-deep:  #15803D;
+  --amber-soft:  #FEF1DA;  --amber-base:  #F59E0B;  --amber-deep:  #B45309;
+  --coral-soft:  #FFE7E6;  --coral-base:  #FB5E58;  --coral-deep:  #B42318;
+
+  /* ---- Layer 2: Semantic tokens (shadcn contract + Pascal additions) ------
+     Components reference THESE. Remap the right-hand side to retheme. */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+
+  --primary: var(--violet-base);
+  --primary-foreground: #ffffff;
+  --primary-soft: var(--violet-soft);   /* tinted primary surfaces        */
+  --primary-deep: var(--violet-deep);   /* chunky-button depth, pressed   */
+
+  --secondary: var(--fill);
+  --secondary-foreground: var(--ink);
+  --muted: var(--fill);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--violet-soft);
+  --accent-foreground: var(--violet-deep);
+
+  --destructive: var(--coral-base);
+  --destructive-foreground: #ffffff;
+
+  /* Pascal additions */
+  --success: var(--green-base);
+  --success-foreground: #ffffff;
+  --streak: var(--amber-base);
+  --streak-foreground: #ffffff;
+  --info: var(--blue-base);
+  --info-foreground: #ffffff;
+
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--violet-base);
+
+  --radius: 0.75rem;
+  --btn-depth: 4px; /* solid bottom offset for tactile/chunky buttons */
+
+  /* sidebar */
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--violet-base);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--violet-soft);
+  --sidebar-accent-foreground: var(--violet-deep);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--violet-base);
 }
 
 @theme inline {
-  --font-sans: 'Inter', system-ui, sans-serif;
+  /* ---- Layer 3: Tailwind utilities ---------------------------------------- */
 
+  /* type roles */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* semantic colors (shadcn) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -59,6 +119,8 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-deep: var(--primary-deep);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -70,10 +132,38 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Pascal semantic additions */
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-streak: var(--streak);
   --color-streak-foreground: var(--streak-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  /* accent ramp — playful color for illustrations, lesson nodes, tags.
+     Usable as bg-violet-base, bg-teal-soft, text-coral-deep, etc.
+     (Names + -soft/-base/-deep do not collide with Tailwind's numeric scales.) */
+  --color-violet-soft: var(--violet-soft);
+  --color-violet-base: var(--violet-base);
+  --color-violet-deep: var(--violet-deep);
+  --color-blue-soft: var(--blue-soft);
+  --color-blue-base: var(--blue-base);
+  --color-blue-deep: var(--blue-deep);
+  --color-teal-soft: var(--teal-soft);
+  --color-teal-base: var(--teal-base);
+  --color-teal-deep: var(--teal-deep);
+  --color-green-soft: var(--green-soft);
+  --color-green-base: var(--green-base);
+  --color-green-deep: var(--green-deep);
+  --color-amber-soft: var(--amber-soft);
+  --color-amber-base: var(--amber-base);
+  --color-amber-deep: var(--amber-deep);
+  --color-coral-soft: var(--coral-soft);
+  --color-coral-base: var(--coral-base);
+  --color-coral-deep: var(--coral-deep);
+
+  /* sidebar */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -83,10 +173,15 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* radii */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 4px);
   --radius-xl: calc(var(--radius) + 8px);
+
+  /* elevation — one ambient card shadow, one lifted/pop shadow */
+  --shadow-soft: 0 1px 2px rgb(33 28 48 / 0.06), 0 6px 16px rgb(33 28 48 / 0.05);
+  --shadow-pop: 0 10px 32px rgb(33 28 48 / 0.12);
 }
 
 @layer base {
@@ -96,11 +191,28 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-sans);
     font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Display face carries headings; intentional negative tracking for tight,
+     confident titles. Body and UI text stay Inter. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  /* Numerals (XP, fractions, stats) read as data, not prose. Opt in with
+     `font-mono tabular-nums` or the .num helper. */
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
   }
 
   /* Prevent layout shift from scrollbar — important for lesson player stability */
@@ -112,5 +224,16 @@
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

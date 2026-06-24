@@ -1,6 +1,6 @@
 # Spec: Interactions
 
-> The five variant renderers — one per `InteractionKind`. Each is a self-contained React component that displays the question, captures the learner's input, and reports an `answerPayload` up to the lesson player. **The grid-event is the brief's required "rich interaction beyond multiple choice."**
+> The seven variant renderers — one per `InteractionKind`. Each is a self-contained React component that displays the question, captures the learner's input, and reports an `answerPayload` up to the lesson player. **The grid-event is the brief's required "rich interaction beyond multiple choice."** Kinds 6-7 (`simulate-proportion`, `monty-hall`) were added for Lessons 2-4 (see `docs/alternatives.md` D73).
 
 ## Purpose
 
@@ -26,6 +26,8 @@ Every interaction renders a small, persistent instructional hint above or below 
 | `tap-event` | "Tap to mark. Tap again to unmark." |
 | `grid-event` | "Tap cells to count them. Tap again to remove." |
 | `multiple-choice` | "Tap your choice. You can change it before tapping Check." |
+| `simulate-proportion` | "Run trials and watch the share settle. Run more to see it steady." |
+| `monty-hall` | "Play a few rounds, then run a batch on autopilot to compare the strategies." |
 
 The copy is rendered in `text-muted-foreground` at body size, dismissible by tapping a small `×` (state stored per-user in `localStorage` under `interactionHintsDismissed`). Exact wording owned by `docs/ui-stack.md`.
 
@@ -62,6 +64,21 @@ The copy is rendered in `text-muted-foreground` at body size, dismissible by tap
 - Single-select (tap an option → outlined indigo).
 - `answerPayload`: `{ optionId: string }`.
 - On wrong: the chosen option flashes rose; hint from `feedbackByOption[optionId]`.
+- Optional `context` blurb renders above the options; each option may carry `subtext`.
+
+### 6. `SimulateProportion` — convergence simulator (D73)
+- Runs a binary trial many times and plots the **running share of successes** converging to a horizontal reference line at `targetProbability`. Custom inline SVG (`ProportionChart`), no chart library.
+- `scenario` drives the per-trial visual and the generator: `coin` (last flip), `die-six` (last face, highlighted on a six), `birthday` (a room of `roomSize` birthdays with collisions marked).
+- Run buttons batch trials (`+1 / +10 / +50`, or `+1 / +25 / +100 rooms` for birthday). Trial generators are pure functions in `src/lib/simulations.ts`; the chart history is decimated to ~160 points so redraws stay cheap.
+- **Engagement gate:** `onChange({ trials })` only once `trials >= minTrials`, otherwise `onChange(null)`. Check stays disabled until then. There is no real "wrong" — the slot is "correct" the moment the learner has actually watched the convergence.
+- `answerPayload`: `{ trials: number }`.
+
+### 7. `MontyHall` — the conditional-probability payoff (D73)
+- Three doors. Manual mode: tap a door to pick → the host opens a goat door → Switch / Stay → the result reveals all doors (car vs goats), the picked door ringed emerald on a win, rose on a loss.
+- Autopilot mode: a "Run 100 games" button simulates 100 always-switch and 100 always-stay games, accumulating win rates plotted as two series converging to the `2/3` and `1/3` reference lines.
+- Manual outcomes are attributed to the strategy chosen (switch or stay) so the on-screen rates stay honest.
+- **Engagement gate:** `onChange({ games })` only once total games (manual + autopilot) `>= minGames`; Check disabled until then.
+- `answerPayload`: `{ games: number }`.
 
 ## Data model
 
@@ -99,6 +116,8 @@ The audit-feedback script (`scripts/audit-feedback.ts`) is updated to flag grid 
 | `tap-event` | `{ selected: string[] }` |
 | `grid-event` | `{ selectedCells: Array<[number, number]> }` |
 | `multiple-choice` | `{ optionId: string }` |
+| `simulate-proportion` | `{ trials: number }` |
+| `monty-hall` | `{ games: number }` |
 
 ### `checkAnswer` semantics (this defines correctness)
 
@@ -109,6 +128,8 @@ The audit-feedback script (`scripts/audit-feedback.ts`) is updated to flag grid 
 | `tap-event` | `selected` (as a set) equals `correctOutcomes` (as a set) | the first wrong outcome in `selected` |
 | `grid-event` | `selectedCells` (as a set of `"row,col"`) equals `correctCells` (as a set) | the first wrong cell in `selectedCells`, key `"row,col"` |
 | `multiple-choice` | `optionId === correctOptionId` | `optionId` |
+| `simulate-proportion` | `trials >= variant.minTrials` | `'incomplete'` (near-unreachable: Check is gated below threshold) |
+| `monty-hall` | `games >= variant.minGames` | `'incomplete'` (near-unreachable: Check is gated below threshold) |
 
 ## Implementation outline
 
@@ -152,7 +173,7 @@ The audit-feedback script (`scripts/audit-feedback.ts`) is updated to flag grid 
 ## Out of scope
 
 - Drag-and-drop interactions (Phase 2+).
-- Slider interactions (Phase 2 — needed for Lesson 2 LLN).
+- ~~Slider interactions (Phase 2 — needed for Lesson 2 LLN).~~ **Resolved 2026-06-23 (D73):** Lesson 2 LLN ships via the `simulate-proportion` run-batch buttons, not a slider. Sliders remain out of scope.
 - Free-text input (Phase 2 / AI grading).
 - Multi-select keyboard navigation (Phase 3 a11y polish).
-- Custom interaction kinds beyond the 5 above (extend the union when adding a new lesson).
+- Custom interaction kinds beyond the 7 above (extend the union when adding a new lesson; see D73 for the pattern).

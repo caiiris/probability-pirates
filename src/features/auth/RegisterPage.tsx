@@ -4,7 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { CaptainPascal } from '@/features/captain/CaptainPascal';
+import { AuthHero } from './AuthHero';
 import { registerUser } from './userService';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 type FieldErrors = {
   email?: string;
@@ -29,10 +32,12 @@ export function RegisterPage() {
 
   function validate(): FieldErrors {
     const errs: FieldErrors = {};
-    if (!fields.email.includes('@') || fields.email.length < 5) {
+    const email = fields.email.trim();
+    const username = fields.username.trim();
+    if (!email.includes('@') || email.length < 5) {
       errs.email = 'Enter a valid email address.';
     }
-    if (!USERNAME_RE.test(fields.username)) {
+    if (!USERNAME_RE.test(username)) {
       errs.username = 'Username must be 3-20 characters: letters, numbers, underscores only.';
     }
     if (fields.password.length < 6) {
@@ -55,8 +60,8 @@ export function RegisterPage() {
     setSubmitting(true);
 
     const result = await registerUser({
-      email: fields.email,
-      username: fields.username,
+      email: fields.email.trim(),
+      username: fields.username.trim(),
       password: fields.password,
     });
 
@@ -90,16 +95,27 @@ export function RegisterPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Pascal</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Probability, one lesson at a time.</p>
+        <div className="mb-5">
+          <AuthHero />
         </div>
 
-        <Card>
-          <CardHeader className="pb-4">
+        <Card className="rounded-2xl shadow-soft">
+          <CardHeader className="pb-3">
             <h2 className="text-lg font-semibold">Create account</h2>
           </CardHeader>
           <CardContent>
+            <CaptainPascal context="welcome" compact className="mb-4" />
+            <GoogleSignInButton
+              onError={(message) => setErrors({ form: message })}
+              label="Sign up with Google"
+            />
+
+            <div className="my-5 flex items-center gap-3">
+              <span className="h-px flex-1 bg-border" />
+              <span className="text-xs uppercase tracking-wider text-muted-foreground">or</span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
               {errors.form && (
                 <p className="text-sm text-destructive" role="alert">
@@ -175,7 +191,7 @@ export function RegisterPage() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full" disabled={submitting}>
+              <Button type="submit" size="lg" className="w-full" disabled={submitting}>
                 {submitting ? 'Creating account...' : 'Create account'}
               </Button>
             </form>

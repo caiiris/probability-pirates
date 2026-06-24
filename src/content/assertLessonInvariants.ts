@@ -89,6 +89,29 @@ function assertVariantInvariants(
       }
       break;
     }
+    case 'simulate-proportion': {
+      if (variant.targetProbability < 0 || variant.targetProbability > 1) {
+        throw new Error(
+          `${basePath}: targetProbability must be between 0 and 1`,
+        );
+      }
+      if (variant.minTrials <= 0) {
+        throw new Error(`${basePath}: minTrials must be positive`);
+      }
+      assertNonEmptyString(variant.targetLabel, `${basePath}.targetLabel`);
+      if (variant.scenario === 'birthday' && (variant.roomSize ?? 0) < 2) {
+        throw new Error(
+          `${basePath}: birthday scenario requires roomSize >= 2`,
+        );
+      }
+      break;
+    }
+    case 'monty-hall': {
+      if (variant.minGames <= 0) {
+        throw new Error(`${basePath}: minGames must be positive`);
+      }
+      break;
+    }
     default: {
       const exhaustive: never = variant;
       throw new Error(`${basePath}: unknown variant kind ${JSON.stringify(exhaustive)}`);
@@ -102,6 +125,44 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
   switch (slot.kind) {
     case 'concept': {
       assertNonEmptyString(slot.prompt, `${basePath}.prompt`);
+      if (slot.title !== undefined) {
+        assertNonEmptyString(slot.title, `${basePath}.title`);
+      }
+      if (slot.body !== undefined) {
+        if (slot.body.length === 0) {
+          throw new Error(`${basePath}.body: must not be empty when present`);
+        }
+        slot.body.forEach((para, i) => assertNonEmptyString(para, `${basePath}.body[${i}]`));
+      }
+      if (slot.example !== undefined) {
+        if (slot.example.title !== undefined) {
+          assertNonEmptyString(slot.example.title, `${basePath}.example.title`);
+        }
+        if (slot.example.steps.length === 0) {
+          throw new Error(`${basePath}.example.steps: must not be empty`);
+        }
+        slot.example.steps.forEach((step, i) =>
+          assertNonEmptyString(step, `${basePath}.example.steps[${i}]`),
+        );
+      }
+      if (slot.theorem !== undefined) {
+        if (slot.theorem.name !== undefined) {
+          assertNonEmptyString(slot.theorem.name, `${basePath}.theorem.name`);
+        }
+        assertNonEmptyString(slot.theorem.statement, `${basePath}.theorem.statement`);
+      }
+      if (slot.derivation !== undefined) {
+        assertNonEmptyString(slot.derivation.title, `${basePath}.derivation.title`);
+        if (slot.derivation.steps.length === 0) {
+          throw new Error(`${basePath}.derivation.steps: must not be empty`);
+        }
+        slot.derivation.steps.forEach((step, i) =>
+          assertNonEmptyString(step, `${basePath}.derivation.steps[${i}]`),
+        );
+        if (slot.derivation.question !== undefined) {
+          assertNonEmptyString(slot.derivation.question, `${basePath}.derivation.question`);
+        }
+      }
       break;
     }
     case 'wrap': {
