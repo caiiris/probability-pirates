@@ -13,7 +13,7 @@ At time of audit the codebase is green:
 - `eslint` — clean
 - `vitest` — **193/193 tests pass** across 26 files
 
-So nothing below represents a *currently failing* build or test; these are latent correctness, dead-code, and efficiency issues found by reading.
+So nothing below represents a _currently failing_ build or test; these are latent correctness, dead-code, and efficiency issues found by reading.
 
 ## How to read this document
 
@@ -33,7 +33,7 @@ Severity legend:
 
 **Type:** Bug (data integrity)
 **Location:** `src/features/lesson/LessonPlayer.tsx` (`LessonPlayerInner`), with the only guard living in `src/features/course/LessonNode.tsx`.
-**Tracked:** Partially — the *card-layer* version of this was fixed as B003/B009, but the fix did not move to the engine. Related to open issue I009 (browser-back behavior unspecified).
+**Tracked:** Partially — the _card-layer_ version of this was fixed as B003/B009, but the fix did not move to the engine. Related to open issue I009 (browser-back behavior unspecified).
 
 **Evidence**
 
@@ -83,16 +83,14 @@ Severity legend:
       ...
 ```
 
-**Reachability (confirmed):** The normal completion flow navigates `/lesson/:id` → `/celebration/:id` → (CTA) `/`. Pressing the **browser Back button** twice from Home returns to `/celebration/:id` and then to `/lesson/:id` in *non-review* mode. For a completed lesson, `slotIndex` is the final (wrap) slot, so the footer shows **Continue**; pressing it re-runs `markLessonCompleted` + `applyLessonCompletion`, awarding another +50 XP and another `lessonsCompleted` increment. A manually typed/bookmarked `/lesson/:id` URL reaches the same state. `startReplay()` (the only legitimate progress-reset path) is never called anywhere (see L5), so review mode is the *only* intended re-entry — and it bypasses this hole, which is exactly why the hole is easy to miss.
+**Reachability (confirmed):** The normal completion flow navigates `/lesson/:id` → `/celebration/:id` → (CTA) `/`. Pressing the **browser Back button** twice from Home returns to `/celebration/:id` and then to `/lesson/:id` in _non-review_ mode. For a completed lesson, `slotIndex` is the final (wrap) slot, so the footer shows **Continue**; pressing it re-runs `markLessonCompleted` + `applyLessonCompletion`, awarding another +50 XP and another `lessonsCompleted` increment. A manually typed/bookmarked `/lesson/:id` URL reaches the same state. `startReplay()` (the only legitimate progress-reset path) is never called anywhere (see L5), so review mode is the _only_ intended re-entry — and it bypasses this hole, which is exactly why the hole is easy to miss.
 
 **Why it matters:** Inflates `xp`, `lessonsCompleted`, and `weeklyXp` (leaderboard), and re-evaluates milestones/achievements. Violates PRD §9.3 AC #7 (completion is recorded once, server-authoritatively).
 
 **Recommended fix:** At the top of `LessonPlayerInner`, once progress is `ready`, if `progress.state === 'completed' && !isReview`, redirect to review (or Home):
 
 ```tsx
-if (progressState.status === 'ready'
-    && progressState.data.state === 'completed'
-    && !isReview) {
+if (progressState.status === 'ready' && progressState.data.state === 'completed' && !isReview) {
   return <Navigate to={`/lesson/${lesson.id}?mode=review`} replace />;
 }
 ```
@@ -154,7 +152,7 @@ The "first follow / first kudos" achievement + coin award is gated solely by a *
 **Location:** `src/components/EmailVerificationBanner.tsx`
 **Tracked:** No.
 
-**Evidence:** The banner reads *"Please verify your email address to unlock all features"* (`:34`), but nothing in the app is gated on `user.emailVerified` — no route, lesson, or social action checks it. It also uses raw Tailwind palette utilities (`bg-amber-50 border-amber-200 text-amber-800`, `:31`) instead of the three-layer design tokens the design overhaul standardized on (`design-iterations.md`, "recolored emerald/rose → tokens").
+**Evidence:** The banner reads _"Please verify your email address to unlock all features"_ (`:34`), but nothing in the app is gated on `user.emailVerified` — no route, lesson, or social action checks it. It also uses raw Tailwind palette utilities (`bg-amber-50 border-amber-200 text-amber-800`, `:31`) instead of the three-layer design tokens the design overhaul standardized on (`design-iterations.md`, "recolored emerald/rose → tokens").
 
 **Why it matters:** The copy makes a promise the product doesn't keep, and the hard-coded `amber-*` classes are an inconsistency with the token system (will not respond to theme changes).
 
@@ -216,7 +214,7 @@ The "first follow / first kudos" achievement + coin award is gated solely by a *
 **Location:** `src/features/progress/progressService.ts:212`
 **Tracked:** No.
 **Evidence:** Searching `src/` finds `startReplay` only in its own definition. The completed-lesson re-entry flow uses read-only `?mode=review` (which does not reset progress), so the progress-resetting replay path is unreachable.
-**Why it matters:** Minor, but its absence is relevant to H1: there is no legitimate way to re-open a completed lesson's *write* path, which makes the back-button hole the only one — and easy to overlook.
+**Why it matters:** Minor, but its absence is relevant to H1: there is no legitimate way to re-open a completed lesson's _write_ path, which makes the back-button hole the only one — and easy to overlook.
 **Recommendation:** Either wire a "Replay (reset progress)" affordance to it, or delete it. Note: do **not** wire replay without also fixing H1.
 
 ---
@@ -277,7 +275,7 @@ The following were specifically checked and are sound:
 
 ## Suggested priority order
 
-1. **H1** — one-line guard; real data-integrity bug reachable via the Back button. *Fix first.*
+1. **H1** — one-line guard; real data-integrity bug reachable via the Back button. _Fix first._
 2. **M2** — small, prevents weekly-XP loss at week boundaries.
 3. **H2** — document accurately now; engineer server-side enforcement post-MVP.
 4. **M1** — quick copy + token fix.

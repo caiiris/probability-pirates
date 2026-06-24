@@ -7,28 +7,23 @@
  * per Self-Determination Theory) rather than empty praise.
  */
 
-export type CaptainContext =
-  | 'welcome'
-  | 'allCaught'
-  | 'courseComplete'
-  | 'lessonIntro'
-  | 'tip';
+export type CaptainContext = 'welcome' | 'allCaught' | 'courseComplete' | 'lessonIntro' | 'tip';
 
 /** `{name}` and `{title}` are replaced when present (with safe fallbacks). */
 export const CAPTAIN_LINES: Record<CaptainContext, string[]> = {
   welcome: [
     "Ahoy, {name}! I'm Captain Pascal. Chance is a strange sea, but we'll learn to read it together.",
-    "Welcome aboard, {name}. Every great navigator started with one lesson. Shall we?",
+    'Welcome aboard, {name}. Every great navigator started with one lesson. Shall we?',
     "Glad to have you, {name}. Probability looks choppy from shore, but it's calmer once we're sailing.",
   ],
   allCaught: [
-    "All caught up, well sailed! Rest in port today. Spacing your practice makes it stick.",
+    'All caught up, well sailed! Rest in port today. Spacing your practice makes it stick.',
     "Decks are clear, {name}. A day's rest sets the lessons deeper. Back at it tomorrow.",
     "Nothing left on the charts for now. Come about tomorrow and we'll press on.",
   ],
   courseComplete: [
     "Land ho! You've charted every shore of probability. Proud to have sailed with you, {name}.",
-    "The whole map, explored. That took real persistence, {name}. The mark of a true navigator.",
+    'The whole map, explored. That took real persistence, {name}. The mark of a true navigator.',
   ],
   lessonIntro: [
     "New waters: {title}. We'll take it one step at a time. Try things; mistakes are welcome.",
@@ -36,12 +31,12 @@ export const CAPTAIN_LINES: Record<CaptainContext, string[]> = {
     "Casting off into {title}. Curiosity over speed; that's how a navigator learns.",
   ],
   tip: [
-    "Short daily sessions beat one long cram. Spacing your practice locks it in.",
-    "Got one wrong? Good. A mistake you fix is remembered better than a lucky guess.",
-    "Try to recall the idea before you check it. That effort is what makes it stick.",
-    "Stuck? Name what you *do* know first; the rest of the chart often fills itself in.",
-    "Streaks are about showing up, not being perfect. A few minutes still counts.",
-    "Explain a step out loud, as if teaching me. If you can teach it, you know it.",
+    'Short daily sessions beat one long cram. Spacing your practice locks it in.',
+    'Got one wrong? Good. A mistake you fix is remembered better than a lucky guess.',
+    'Try to recall the idea before you check it. That effort is what makes it stick.',
+    'Stuck? Name what you *do* know first; the rest of the chart often fills itself in.',
+    'Streaks are about showing up, not being perfect. A few minutes still counts.',
+    'Explain a step out loud, as if teaching me. If you can teach it, you know it.',
   ],
 };
 
@@ -59,7 +54,9 @@ export function captainLine(
   let line = lines[i];
 
   const name = opts?.name?.trim();
-  line = name ? line.replaceAll('{name}', name) : line.replaceAll(', {name}', '').replaceAll('{name}', 'friend');
+  line = name
+    ? line.replaceAll('{name}', name)
+    : line.replaceAll(', {name}', '').replaceAll('{name}', 'friend');
 
   const title = opts?.title?.trim();
   line = line.replaceAll('{title}', title || 'this lesson');

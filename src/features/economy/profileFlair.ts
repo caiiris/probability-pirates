@@ -7,13 +7,7 @@
  * `FlairBadge` so this module stays React-free.
  */
 
-export type FlairIconKey =
-  | 'compass'
-  | 'map'
-  | 'storm'
-  | 'gem'
-  | 'anchor'
-  | 'crown';
+export type FlairIconKey = 'compass' | 'map' | 'storm' | 'gem' | 'anchor' | 'crown';
 
 export type ProfileFlair = {
   id: string;

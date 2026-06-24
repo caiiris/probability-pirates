@@ -3,6 +3,7 @@
 > **Source of truth for voice, copy, and visual judgment.** Every spec, every component, every string ships under this directive. When this directive conflicts with another doc, this one wins. Authored by the product owner; do not edit without their approval.
 >
 > See also:
+>
 > - `docs/ui-stack.md` — implementation primitives (shadcn, Tailwind tokens, motion timings).
 > - `docs/architecture.md` §12.11 — guardrail that requires every PR to self-audit against this directive.
 
@@ -10,7 +11,7 @@
 
 > **Amendment — 2026-06-23 (owner-approved design overhaul).** The anti-AI
 > rules below stand unchanged. This amendment resolves how they apply to a
-> deliberately *playful* learning product (audience: high schoolers; references:
+> deliberately _playful_ learning product (audience: high schoolers; references:
 > Brilliant, Duolingo, Khan):
 >
 > - **Color is allowed to be lively, but it lives in the illustrations and

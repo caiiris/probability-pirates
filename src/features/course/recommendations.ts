@@ -13,9 +13,7 @@ export function nextRecommendedLesson(
   const real = lessons.filter((l) => !l.comingSoon);
 
   // Prefer the in-progress one (most recently updated if multiple)
-  const inProgress = real.filter(
-    (l) => progressMap.get(l.id)?.state === 'in_progress',
-  );
+  const inProgress = real.filter((l) => progressMap.get(l.id)?.state === 'in_progress');
   if (inProgress.length > 0) {
     return inProgress.sort((a, b) => {
       const ua = progressMap.get(a.id)?.updatedAt?.seconds ?? 0;
@@ -59,16 +57,12 @@ export function courseProgress(
 /**
  * True if any lesson has been completed today (local tz).
  */
-export function dailyGoalDone(
-  progressMap: Map<string, LessonProgress>,
-  today: string,
-): boolean {
+export function dailyGoalDone(progressMap: Map<string, LessonProgress>, today: string): boolean {
   for (const prog of progressMap.values()) {
     if (prog.completedAt) {
-      const completedDate = new Date(prog.completedAt.seconds * 1000)
-        .toLocaleDateString('en-CA', {
-          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        });
+      const completedDate = new Date(prog.completedAt.seconds * 1000).toLocaleDateString('en-CA', {
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
       if (completedDate === today) return true;
     }
   }

@@ -105,7 +105,8 @@ export function CelebrationScreen() {
   const nextLesson = lessonIndex >= 0 ? lessons[lessonIndex + 1] : undefined;
 
   // `completed` param carries the actual lessonsCompleted count after this lesson (B017)
-  const completedCount = parseInt(searchParams.get('completed') ?? '0', 10) || (lesson ? lesson.number : 1);
+  const completedCount =
+    parseInt(searchParams.get('completed') ?? '0', 10) || (lesson ? lesson.number : 1);
   // Denominator is the *full planned course* (live + locked roadmap stubs), so
   // the progress bar reflects the user's share of the whole curriculum and
   // "course complete" only fires when truly every lesson is done — not when
@@ -132,7 +133,6 @@ export function CelebrationScreen() {
       <Confetti />
 
       <div className="relative z-10 w-full max-w-md mx-auto px-4 pt-16 pb-12 flex flex-col gap-8">
-
         {/* Lesson complete header */}
         <motion.div
           className="text-center"
@@ -240,7 +240,9 @@ export function CelebrationScreen() {
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>Course progress</span>
-              <span>{Math.min(completedCount, courseTotal)} / {courseTotal} lessons</span>
+              <span>
+                {Math.min(completedCount, courseTotal)} / {courseTotal} lessons
+              </span>
             </div>
             <Progress value={progressPct} className="h-2" />
           </div>
@@ -263,11 +265,7 @@ export function CelebrationScreen() {
         </motion.div>
 
         {/* Back to Home CTA */}
-        <Button
-          size="lg"
-          className="w-full"
-          onClick={() => navigate('/')}
-        >
+        <Button size="lg" className="w-full" onClick={() => navigate('/')}>
           Back to home
         </Button>
       </div>

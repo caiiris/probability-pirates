@@ -7,12 +7,7 @@ import { MOTION } from '@/lib/motion';
 import { useInteractionHint } from './useInteractionHint';
 import { InteractionHint } from './InteractionHint';
 import { ProportionChart } from './ProportionChart';
-import {
-  setupMontyGame,
-  switchTarget,
-  montyHallWins,
-  type MontyGame,
-} from '@/lib/simulations';
+import { setupMontyGame, switchTarget, montyHallWins, type MontyGame } from '@/lib/simulations';
 
 const AFFORDANCE = 'Play a few rounds, then run a batch on autopilot to compare the strategies.';
 const MAX_SAMPLES = 160;
@@ -79,12 +74,18 @@ export function MontyHall({ variant, feedbackState, onChange }: Props) {
       setPhase('result');
 
       if (choseSwitch) {
-        const next = { games: switchRef.current.games + 1, wins: switchRef.current.wins + (won ? 1 : 0) };
+        const next = {
+          games: switchRef.current.games + 1,
+          wins: switchRef.current.wins + (won ? 1 : 0),
+        };
         switchRef.current = next;
         setSwitchTally(next);
         setSwitchHist((prev) => decimate([...prev, next.wins / next.games], MAX_SAMPLES));
       } else {
-        const next = { games: stayRef.current.games + 1, wins: stayRef.current.wins + (won ? 1 : 0) };
+        const next = {
+          games: stayRef.current.games + 1,
+          wins: stayRef.current.wins + (won ? 1 : 0),
+        };
         stayRef.current = next;
         setStayTally(next);
         setStayHist((prev) => decimate([...prev, next.wins / next.games], MAX_SAMPLES));
@@ -127,7 +128,8 @@ export function MontyHall({ variant, feedbackState, onChange }: Props) {
     emitProgress(sw.games + st.games);
   }, [locked, emitProgress]);
 
-  const switchPct = switchTally.games > 0 ? Math.round((switchTally.wins / switchTally.games) * 100) : 0;
+  const switchPct =
+    switchTally.games > 0 ? Math.round((switchTally.wins / switchTally.games) * 100) : 0;
   const stayPct = stayTally.games > 0 ? Math.round((stayTally.wins / stayTally.games) * 100) : 0;
 
   function doorState(door: number): 'closed' | 'goat' | 'car' {
@@ -186,7 +188,7 @@ export function MontyHall({ variant, feedbackState, onChange }: Props) {
               onClick={() => decide(true)}
               className="px-4 py-2 rounded-xl text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              Switch to door {(switchTarget(game) + 1)}
+              Switch to door {switchTarget(game) + 1}
             </button>
             <button
               type="button"
@@ -200,7 +202,9 @@ export function MontyHall({ variant, feedbackState, onChange }: Props) {
       )}
       {phase === 'result' && (
         <div className="flex flex-col items-center gap-2">
-          <p className={`text-base font-semibold ${lastWon ? 'text-emerald-700' : 'text-rose-600'}`}>
+          <p
+            className={`text-base font-semibold ${lastWon ? 'text-emerald-700' : 'text-rose-600'}`}
+          >
             {lastWon ? 'You won the car.' : 'A goat. You lost this round.'}
           </p>
           <button

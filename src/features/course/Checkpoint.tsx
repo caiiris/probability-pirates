@@ -39,11 +39,7 @@ export function Checkpoint(props: Props) {
  * Claim a chest's coins (idempotent) and return a toast suffix like " +100 coins"
  * when freshly awarded, or '' if it was already claimed / not eligible.
  */
-async function openChestReward(
-  uid: string,
-  chestId: string,
-  reward: number,
-): Promise<string> {
+async function openChestReward(uid: string, chestId: string, reward: number): Promise<string> {
   if (!uid) return '';
   track('chest_opened', { chest_id: chestId, reward });
   const res = await claimChest(uid, chestId, reward);

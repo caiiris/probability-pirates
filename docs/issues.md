@@ -2,7 +2,8 @@
 
 > Running log of open issues, ambiguities, and blockers discovered before or during implementation.
 > Companion to:
-> - `docs/alternatives.md` — *closed* design decisions with rationale.
+>
+> - `docs/alternatives.md` — _closed_ design decisions with rationale.
 > - `docs/prd.md` — what we contracted to build.
 > - `docs/build-order.md` — the order we ship features in.
 >
@@ -14,14 +15,14 @@
 
 When you, the implementer:
 
-| Situation | Action |
-| --- | --- |
-| The spec leaves something genuinely ambiguous (two valid interpretations) | **Stop.** Log it under "Open — ambiguity". Ask in chat. Do not silently pick one. |
-| You need to make a design decision the spec/alternatives don't cover | Log it under "Open — needs-decision" *with* your proposed answer + reasoning. Ask. If approved, the answer gets promoted into `docs/alternatives.md`. |
-| You find a real bug in spec or code | Log it under "Open — bug". |
-| You're blocked on something external (Firebase project not yet created, missing credential, etc.) | Log it under "Open — blocker". Surface it; do not work around. |
-| You knowingly skipped a non-essential feature for now | Log it under "Open — known-gap" with what's missing and what would unblock it. |
-| You decided something locally and shipped (e.g. picked a small visual default) | Log it under "Closed — ad-hoc decision" so it can be audited later. Do not let these accumulate silently. |
+| Situation                                                                                         | Action                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The spec leaves something genuinely ambiguous (two valid interpretations)                         | **Stop.** Log it under "Open — ambiguity". Ask in chat. Do not silently pick one.                                                                     |
+| You need to make a design decision the spec/alternatives don't cover                              | Log it under "Open — needs-decision" _with_ your proposed answer + reasoning. Ask. If approved, the answer gets promoted into `docs/alternatives.md`. |
+| You find a real bug in spec or code                                                               | Log it under "Open — bug".                                                                                                                            |
+| You're blocked on something external (Firebase project not yet created, missing credential, etc.) | Log it under "Open — blocker". Surface it; do not work around.                                                                                        |
+| You knowingly skipped a non-essential feature for now                                             | Log it under "Open — known-gap" with what's missing and what would unblock it.                                                                        |
+| You decided something locally and shipped (e.g. picked a small visual default)                    | Log it under "Closed — ad-hoc decision" so it can be audited later. Do not let these accumulate silently.                                             |
 
 ### Issue format
 
@@ -51,7 +52,7 @@ IDs are monotonically increasing, zero-padded to 3 digits, **never reused**.
 - **Severity:** major
 - **Discovered:** 2026-06-23 during PRD review
 - **Spec ref:** `src/content/lessons/01-what-is-probability.ts`; convention in `src/content/types.ts` (`BaseVariant.explanation?`)
-- **Description:** D55 introduced the progressive hint model — after 2 wrong attempts on a slot, the player surfaces `variant.explanation` as a deeper hint. Lesson 1 was authored *before* the field existed, so none of its 9 variants populate it. With no `explanation`, a stuck learner just sees the same `feedbackDefault` over and over.
+- **Description:** D55 introduced the progressive hint model — after 2 wrong attempts on a slot, the player surfaces `variant.explanation` as a deeper hint. Lesson 1 was authored _before_ the field existed, so none of its 9 variants populate it. With no `explanation`, a stuck learner just sees the same `feedbackDefault` over and over.
 - **Proposed action:** Author one `explanation` per variant in Lesson 1 before shipping the player. Use the `FEEDBACK_TODO()` helper as a placeholder so `npm run audit-feedback` surfaces them; the user (content owner) fills them in.
 
 ### I002 — `firebase/` config files do not exist in the repo yet
@@ -244,20 +245,20 @@ IDs are monotonically increasing, zero-padded to 3 digits, **never reused**.
 - **Description:** Lesson 1 carried 12 em dashes that the UI directive forbids absolutely. Per-user direction (2026-06-23), accept the mechanical substitutions for now and revisit during a dedicated content pass later. No further action required from Sonnet; the strings ship as-is.
 - **The 12 substitutions:**
 
-  | Field | Before | After |
-  | --- | --- | --- |
-  | `intro.prompt` | `... total outcomes — when every outcome ...` | `... total outcomes, when every outcome ...` |
-  | `d6.feedbackByWrongValue.duplicate` | `... tapped that face — each outcome ...` | `... tapped that face. Each outcome ...` |
-  | `coin.feedbackDefault` | `Tap each side once — heads and tails.` | `Tap each side once, heads and tails.` |
-  | `even-d6.feedbackCorrect` | `Exactly — 3 even faces ...` | `Exactly. 3 even faces ...` |
-  | `even-d6.feedbackByWrongAnswer['1/6']` | `... one face out of six — but even ...` | `... one face out of six, but even ...` |
-  | `even-d6.feedbackByWrongAnswer['2/6']` | `Close on the numerator — how many ...` | `Close on the numerator. How many ...` |
-  | `heads-coin.feedbackCorrect` | `Yes — 1 favorable outcome ...` | `Yes. 1 favorable outcome ...` |
-  | `heads-coin.feedbackByWrongAnswer['1/1']` | `... two sides — heads is only ...` | `... two sides; heads is only ...` |
-  | `evens-d6.feedbackCorrect` | `Perfect — the event "even" ...` | `Perfect. The event "even" ...` |
-  | `red-cards.feedbackCorrect` | `Right — hearts and diamonds ...` | `Right. Hearts and diamonds ...` |
-  | `sum-seven.feedbackCorrect` | `Yes — 6 cells out of 36 ...` | `Yes. 6 cells out of 36 ...` |
-  | `sum-six.feedbackCorrect` | `Correct — 5 cells out of 36 ...` | `Correct. 5 cells out of 36 ...` |
+  | Field                                     | Before                                        | After                                        |
+  | ----------------------------------------- | --------------------------------------------- | -------------------------------------------- |
+  | `intro.prompt`                            | `... total outcomes — when every outcome ...` | `... total outcomes, when every outcome ...` |
+  | `d6.feedbackByWrongValue.duplicate`       | `... tapped that face — each outcome ...`     | `... tapped that face. Each outcome ...`     |
+  | `coin.feedbackDefault`                    | `Tap each side once — heads and tails.`       | `Tap each side once, heads and tails.`       |
+  | `even-d6.feedbackCorrect`                 | `Exactly — 3 even faces ...`                  | `Exactly. 3 even faces ...`                  |
+  | `even-d6.feedbackByWrongAnswer['1/6']`    | `... one face out of six — but even ...`      | `... one face out of six, but even ...`      |
+  | `even-d6.feedbackByWrongAnswer['2/6']`    | `Close on the numerator — how many ...`       | `Close on the numerator. How many ...`       |
+  | `heads-coin.feedbackCorrect`              | `Yes — 1 favorable outcome ...`               | `Yes. 1 favorable outcome ...`               |
+  | `heads-coin.feedbackByWrongAnswer['1/1']` | `... two sides — heads is only ...`           | `... two sides; heads is only ...`           |
+  | `evens-d6.feedbackCorrect`                | `Perfect — the event "even" ...`              | `Perfect. The event "even" ...`              |
+  | `red-cards.feedbackCorrect`               | `Right — hearts and diamonds ...`             | `Right. Hearts and diamonds ...`             |
+  | `sum-seven.feedbackCorrect`               | `Yes — 6 cells out of 36 ...`                 | `Yes. 6 cells out of 36 ...`                 |
+  | `sum-six.feedbackCorrect`                 | `Correct — 5 cells out of 36 ...`             | `Correct. 5 cells out of 36 ...`             |
 
 - **Proposed action:** `git diff src/content/lessons/01-what-is-probability.ts` and reject any substitution you disagree with. If you'd rather restructure the sentence entirely on some of these (more aligned with the directive's "restructure the sentence" option), do it now — Sonnet will mimic whatever style you settle on. Close this issue when you've reviewed.
 
@@ -298,28 +299,29 @@ IDs are monotonically increasing, zero-padded to 3 digits, **never reused**.
 ### I033 — Reported cross-device "progress sync": XP/achievements appear shared between distinct accounts
 
 - **Status:** resolved 2026-06-24 — root cause confirmed as the `AuthProvider` stale-profile leak (B055); not a backend data bug.
-- **Confirming evidence (2026-06-24, from reporter):** the affected accounts were `caiiris1011` (824 XP) and `janestreetsthegoat`. When `janestreetsthegoat` *first* signed in, the header showed `caiiris1011`'s XP, then it **corrected to its own** once the profile snapshot loaded; `kittysnowball43` started at 0 normally. The "shows the other user's value, then corrects" pattern is the exact signature of B055: the previous user's profile lingered in React state during the account switch until the new `onSnapshot` arrived. `kittysnowball43` didn't reproduce it because that session had no prior high-XP profile in memory (no in-app account switch / fresh load). The earlier "separate devices" framing is reconciled by the switching device having had `caiiris1011` loaded first and switching accounts without a full page reload (React state survives; Firestore's default in-memory cache does not).
+- **Confirming evidence (2026-06-24, from reporter):** the affected accounts were `caiiris1011` (824 XP) and `janestreetsthegoat`. When `janestreetsthegoat` _first_ signed in, the header showed `caiiris1011`'s XP, then it **corrected to its own** once the profile snapshot loaded; `kittysnowball43` started at 0 normally. The "shows the other user's value, then corrects" pattern is the exact signature of B055: the previous user's profile lingered in React state during the account switch until the new `onSnapshot` arrived. `kittysnowball43` didn't reproduce it because that session had no prior high-XP profile in memory (no in-app account switch / fresh load). The earlier "separate devices" framing is reconciled by the switching device having had `caiiris1011` loaded first and switching accounts without a full page reload (React state survives; Firestore's default in-memory cache does not).
 - **Resolution:** fixed by **B055** — on a genuine uid change `AuthProvider` immediately resets `profile` to `null`, and the profile `onSnapshot` now has an error handler that falls back to `null` instead of leaving stale data. Verified the live data layer is correct and per-user (table below); no server-side sharing or hardcoding exists.
 - **Type:** bug
 - **Severity:** major (if real: a user could see another user's progress)
 - **Discovered:** 2026-06-24 by user report — "when someone else signs up, all our progress is synced; the xp, achievements etc appear to be hardcoded." User states the two testers were on **separate devices**.
 - **Spec ref:** `src/features/auth/AuthProvider.tsx`, `src/features/auth/userService.ts` (`registerUser`, `claimUsername`), `src/features/social/publicProfile.ts`, `firebase/firestore.rules`
 - **Investigation (2026-06-24, via Firebase MCP against live `brilliant-clone-102a7`):**
-  - **Backend data is NOT shared.** All 5 accounts have *distinct* per-user values. Snapshot at time of investigation:
+  - **Backend data is NOT shared.** All 5 accounts have _distinct_ per-user values. Snapshot at time of investigation:
 
-    | username | uid (prefix) | provider | xp | achievements |
-    | --- | --- | --- | ---: | ---: |
-    | caiiris1011 | nlgmAC… | google (+password) | 824 | 7 |
-    | janestreetsthegoat | m3iCaU… | google | 122 | 4 |
-    | orchardoak | jZqyd… | google | 40 | 0 |
-    | ee89 | u4cHc2… | google | 0 | 0 |
-    | kittysnowball43 | Il2HJF… | google | 0 | 0 |
+    | username           | uid (prefix) | provider           |  xp | achievements |
+    | ------------------ | ------------ | ------------------ | --: | -----------: |
+    | caiiris1011        | nlgmAC…      | google (+password) | 824 |            7 |
+    | janestreetsthegoat | m3iCaU…      | google             | 122 |            4 |
+    | orchardoak         | jZqyd…       | google             |  40 |            0 |
+    | ee89               | u4cHc2…      | google             |   0 |            0 |
+    | kittysnowball43    | Il2HJF…      | google             |   0 |            0 |
 
   - **Fresh sign-ups correctly start at 0** (`ee89`, `kittysnowball43`). Nothing is hardcoded server-side.
   - **Registration is atomic and correct.** `registerUser` (email) and `claimUsername` (Google first-time) both write `/usernames/{name}`, `/users/{uid}`, and `/publicProfiles/{uid}` in a single `runTransaction`, all seeded with `xp:0`. Verified `kittysnowball43`: all three docs present and consistent. No orphans.
   - **All reads key on the live `uid`.** `AuthProvider` subscribes to `/users/{firebaseUser.uid}`; `AppHeader`, `ProfilePage`, `ProfileBody`, `StatsGrid`, `LevelBadge`/`RankPanel`, `TrophyCase`, `useAllLessonProgress`, and `useLeaderboard` all read from the per-uid profile / per-uid `publicProfiles`. No component renders hardcoded or globally-shared stats. Firestore rules enforce owner-only reads on `/users/{uid}`.
-  - **Conclusion:** there is no code path or data state by which two *distinct* accounts on *separate* devices could show identical XP/achievements. The report cannot currently be reproduced.
-- **Fixed sub-cause (B055):** a *same-browser* account switch left the previous user's profile in React state (and `onSnapshot` had no error handler), so account B could transiently — or permanently, on a profile-read error — render account A's stats. Fixed in `AuthProvider`. This fully explains the symptom **only** for same-device/same-browser testing.
+  - **Conclusion:** there is no code path or data state by which two _distinct_ accounts on _separate_ devices could show identical XP/achievements. The report cannot currently be reproduced.
+
+- **Fixed sub-cause (B055):** a _same-browser_ account switch left the previous user's profile in React state (and `onSnapshot` had no error handler), so account B could transiently — or permanently, on a profile-read error — render account A's stats. Fixed in `AuthProvider`. This fully explains the symptom **only** for same-device/same-browser testing.
 - **Leading hypotheses for a genuine cross-device report (need data to disambiguate):**
   1. **Both devices authenticated as the same Google account.** All accounts use Google sign-in; `signInWithGoogle` sets `prompt: 'select_account'`, but if a tester picked the same Google identity (or the second device reused an existing session), both land on the same uid → same data by design, not a bug.
   2. **Misread surface.** The locked `/progress` insights page is an identical "Coming soon" placeholder for everyone; the friends leaderboard shows other users' XP by design. Either could be misread as "my progress is shared."
@@ -394,16 +396,16 @@ IDs are monotonically increasing, zero-padded to 3 digits, **never reused**.
   - **Performance Monitoring:** initialized once in `main.tsx` via `ensurePerformanceMonitoring()`. Auto-tracks page loads + outbound network requests; no custom traces yet.
 - **Event catalog:**
 
-  | Event | Where fired | Why |
-  |---|---|---|
-  | `sign_up` (GA4 standard) | `userService.registerUser` success | New-user funnel |
-  | `login` (GA4 standard) | `userService.signIn` success | Returning-user funnel |
-  | `lesson_start` | `LessonPlayerInner` once on mount, after first progress snapshot | Distinguishes `mode: 'new' \| 'resume'` |
-  | `attempt_checked` | `handleCheck` after `recordAttempt` resolves | Drives slot-level drop-off analysis (lesson + slot + variant + attempt_number + was_correct + xp_awarded) |
-  | `attempt_hinted` | `handleCheck` when the 2nd wrong attempt reveals `variant.explanation` (D55) | How often the progressive hint actually triggers, per slot/variant |
-  | `lesson_complete` | `handleContinue` final-slot path, right before navigate | Includes `xp_earned` (final, accounts for habit retry) + `duration_sec` since lesson_start |
-  | `daily_goal_complete` | After `lesson_complete` when `isNewStreakDay` is true | First lesson of the day; pairs with the daily-goal pill in UI |
-  | `streak_milestone_reached` | After `lesson_complete`, one event per item in `newMilestones` | Threshold crossings (`streak-3`, `streak-7`, etc.); pairs with the milestone trophy cards in CelebrationScreen |
+  | Event                      | Where fired                                                                  | Why                                                                                                            |
+  | -------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+  | `sign_up` (GA4 standard)   | `userService.registerUser` success                                           | New-user funnel                                                                                                |
+  | `login` (GA4 standard)     | `userService.signIn` success                                                 | Returning-user funnel                                                                                          |
+  | `lesson_start`             | `LessonPlayerInner` once on mount, after first progress snapshot             | Distinguishes `mode: 'new' \| 'resume'`                                                                        |
+  | `attempt_checked`          | `handleCheck` after `recordAttempt` resolves                                 | Drives slot-level drop-off analysis (lesson + slot + variant + attempt_number + was_correct + xp_awarded)      |
+  | `attempt_hinted`           | `handleCheck` when the 2nd wrong attempt reveals `variant.explanation` (D55) | How often the progressive hint actually triggers, per slot/variant                                             |
+  | `lesson_complete`          | `handleContinue` final-slot path, right before navigate                      | Includes `xp_earned` (final, accounts for habit retry) + `duration_sec` since lesson_start                     |
+  | `daily_goal_complete`      | After `lesson_complete` when `isNewStreakDay` is true                        | First lesson of the day; pairs with the daily-goal pill in UI                                                  |
+  | `streak_milestone_reached` | After `lesson_complete`, one event per item in `newMilestones`               | Threshold crossings (`streak-3`, `streak-7`, etc.); pairs with the milestone trophy cards in CelebrationScreen |
 
 - **Env setup required by operator:** add `VITE_FIREBASE_MEASUREMENT_ID=G-HDFLRQ8LMX` to `.env.local`. With the var unset, the wrapper no-ops (no errors). `.env.example` updated. Emulator mode (`VITE_USE_EMULATOR=true`) also no-ops — by design, so dev sessions don't pollute the GA4 dashboard.
 - **Verification path:** with the var set, DevTools → Network → filter `google-analytics` should show `collect` requests on each event. GA4 dashboard surfaces real events within ~24h; for instant feedback enable GA4 DebugView in the Firebase console.
@@ -473,7 +475,7 @@ These aren't actionable bugs — they're things to be alert for. Promote to a nu
 - **Firebase free-tier limits.** 50K reads/day, 20K writes/day. Live `onSnapshot` listeners count as reads on every update. A user playing through Lesson 1 generates ~30 writes (one per attempt + slot progression) and a handful of reads from the snapshot listener. Should be fine for MVP but worth a glance if you onboard a class of 30.
 - **Vite HMR + Firebase emulator quirks.** Emulator connections sometimes hold open across HMR reloads and exhaust file handles. Reproduces by saving a service file rapidly. Workaround: full reload.
 - **`crypto.randomUUID` on Safari < 15.4.** Spec assumes it exists. iPhone SE (320px floor) running an old iOS may lack it. Fall back to a `Math.random` UUID per `spec-progress-persistence.md` edge case.
-- **Time on the celebration screen.** Confetti + count-up + milestone animation could compound into 3+ seconds. Per-component motion budgets live in `docs/ui-stack.md`; verify the *total* doesn't exceed ~1.5s.
+- **Time on the celebration screen.** Confetti + count-up + milestone animation could compound into 3+ seconds. Per-component motion budgets live in `docs/ui-stack.md`; verify the _total_ doesn't exceed ~1.5s.
 - **Two writes from the same Check tap.** Without double-submit protection, a fast double-tap on Check could submit twice → double XP. PRD §9 has the AC; implementation must disable the button immediately on click.
 - **Profile updates while another tab is open.** `useAuth().profile` is a live subscription, so this is fine, but a stale optimistic update in the Edit dialog could overwrite a remote change. Plan: read fresh on dialog open, last-write-wins on save.
 - **Lighthouse score regression on adding any one heavy component.** Animbits is bundle-friendly but framer-motion isn't. Verify bundle stays < 300KB gz after each feature.

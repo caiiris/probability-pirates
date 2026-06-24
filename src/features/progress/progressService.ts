@@ -60,10 +60,7 @@ function randomUUID(): string {
 // Read / create
 // ---------------------------------------------------------------------------
 
-export async function getOrCreateProgress(
-  uid: string,
-  lessonId: string,
-): Promise<LessonProgress> {
+export async function getOrCreateProgress(uid: string, lessonId: string): Promise<LessonProgress> {
   const ref = progressRef(uid, lessonId);
   const snap = await getDoc(ref);
 
@@ -122,9 +119,15 @@ export async function recordAttempt(params: {
   nextSlotIndex?: number;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   const {
-    uid, lessonId, slotId, variantId,
-    attemptNumber, wasCorrect, xpAwarded,
-    answerPayload, nextSlotIndex,
+    uid,
+    lessonId,
+    slotId,
+    variantId,
+    attemptNumber,
+    wasCorrect,
+    xpAwarded,
+    answerPayload,
+    nextSlotIndex,
   } = params;
 
   try {
@@ -251,10 +254,7 @@ export async function startReplay(
  * nothing to prune. Uses a single batched write so all deletes commit
  * atomically (or none do).
  */
-export async function pruneStaleProgress(
-  uid: string,
-  staleLessonIds: string[],
-): Promise<void> {
+export async function pruneStaleProgress(uid: string, staleLessonIds: string[]): Promise<void> {
   if (!uid || staleLessonIds.length === 0) return;
   try {
     if (staleLessonIds.length === 1) {

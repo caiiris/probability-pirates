@@ -9,8 +9,9 @@ const DISMISS_KEY = 'captainsLog:dismissed';
 /** Read today's dismissal flag from localStorage. Safe in private-browsing. */
 function readDismissedToday(): boolean {
   try {
-    return typeof window !== 'undefined' &&
-      window.localStorage.getItem(DISMISS_KEY) === todayLocalDate();
+    return (
+      typeof window !== 'undefined' && window.localStorage.getItem(DISMISS_KEY) === todayLocalDate()
+    );
   } catch {
     return false;
   }

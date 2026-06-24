@@ -4,7 +4,8 @@ export const lesson3: Lesson = {
   id: 'counting-carefully',
   number: 3,
   title: 'Counting carefully',
-  blurb: 'Multiplication, permutations, combinations, and the complement trick. The four moves that count anything.',
+  blurb:
+    'Multiplication, permutations, combinations, and the complement trick. The four moves that count anything.',
   estimatedMinutes: 7,
   slots: [
     // --- Hook -----------------------------------------------------------
@@ -14,7 +15,8 @@ export const lesson3: Lesson = {
       kind: 'concept',
       illustration: { kind: 'die' },
       title: 'When listing stops working',
-      prompt: 'In Lesson 1 you listed every outcome. A five-card poker hand has more than 2.5 million outcomes. You will not be listing those.',
+      prompt:
+        'In Lesson 1 you listed every outcome. A five-card poker hand has more than 2.5 million outcomes. You will not be listing those.',
       body: [
         'The fix is not to count faster, it is to count without listing. There are four moves that do that, and almost every counting problem you will meet uses one or two of them.',
         'You already saw the first one without a name: rolling two dice gave 6 x 6 = 36 ordered pairs. That trick has a name.',
@@ -28,7 +30,8 @@ export const lesson3: Lesson = {
       kind: 'concept',
       illustration: { kind: 'die' },
       title: 'The multiplication principle',
-      prompt: 'If one choice has m options and a second independent choice has n options, the two together have m × n outcomes.',
+      prompt:
+        'If one choice has m options and a second independent choice has n options, the two together have m × n outcomes.',
       body: [
         'Each m-option pairs with every n-option, so the total fans out as a grid (or a tree, if you draw it that way).',
         'This extends to as many stages as you want. Three stages with a, b, c options each give a × b × c outcomes.',
@@ -57,7 +60,8 @@ export const lesson3: Lesson = {
         {
           id: 'dinner-menu',
           interactionKind: 'multiple-choice',
-          prompt: 'A restaurant offers 4 entrees and 3 desserts. How many different two-course dinners can you order?',
+          prompt:
+            'A restaurant offers 4 entrees and 3 desserts. How many different two-course dinners can you order?',
           context: 'Each entree pairs with each dessert.',
           options: [
             { id: '7', label: '7' },
@@ -67,18 +71,21 @@ export const lesson3: Lesson = {
           ],
           correctOptionId: '12',
           feedbackCorrect: '4 entrees times 3 desserts is 12 different dinners.',
-          feedbackDefault: 'Each entree pairs with every dessert. That is multiplication, not addition.',
+          feedbackDefault:
+            'Each entree pairs with every dessert. That is multiplication, not addition.',
           feedbackByOption: {
             '7': 'That is 4 + 3. Adding gives the size of one menu, not the number of pairings.',
             '24': 'Closer to the order of magnitude, but the count is 4 x 3 = 12, not 4 x 6 or 8 x 3.',
             '34': 'That is 4 x 3 with the digits rearranged. Multiply: 4 x 3 = 12.',
           },
-          explanation: 'Two independent stages: 4 options then 3 options. By the multiplication principle, 4 x 3 = 12.',
+          explanation:
+            'Two independent stages: 4 options then 3 options. By the multiplication principle, 4 x 3 = 12.',
         },
         {
           id: 'plate-prefix',
           interactionKind: 'multiple-choice',
-          prompt: 'A license plate prefix is one letter followed by three digits. How many different prefixes are possible?',
+          prompt:
+            'A license plate prefix is one letter followed by three digits. How many different prefixes are possible?',
           context: '26 letters, 10 digits per position, repeats allowed.',
           options: [
             { id: '36', label: '36' },
@@ -88,11 +95,14 @@ export const lesson3: Lesson = {
           ],
           correctOptionId: '26000',
           feedbackCorrect: '26 x 10 x 10 x 10 = 26,000.',
-          feedbackDefault: 'Four stages: a letter, then a digit, then a digit, then a digit. Multiply.',
+          feedbackDefault:
+            'Four stages: a letter, then a digit, then a digit, then a digit. Multiply.',
           feedbackByOption: {
             '36': 'That is 26 + 10. Adding gives the number of symbols in one slot, not the number of plates.',
-            '260': 'That is 26 x 10, which would be one letter and one digit. There are three digits, not one.',
-            '2600': 'That is 26 x 10 x 10, which is one letter and two digits. There are three digits.',
+            '260':
+              'That is 26 x 10, which would be one letter and one digit. There are three digits, not one.',
+            '2600':
+              'That is 26 x 10 x 10, which is one letter and two digits. There are three digits.',
           },
           explanation: 'Four independent slots: 26 x 10 x 10 x 10 = 26,000.',
         },
@@ -106,7 +116,8 @@ export const lesson3: Lesson = {
       kind: 'concept',
       illustration: { kind: 'die' },
       title: 'The addition principle',
-      prompt: 'If the choices are mutually exclusive (either-or, not both), the total is the sum, not the product.',
+      prompt:
+        'If the choices are mutually exclusive (either-or, not both), the total is the sum, not the product.',
       body: [
         'Multiplication is for stages: one choice, then another, then another. Addition is for alternatives: this group of options, or that group, but not both at once.',
         'The simplest test: is the second choice a new stage in the same outcome (multiply), or a different bucket of possible outcomes (add)?',
@@ -135,7 +146,8 @@ export const lesson3: Lesson = {
         {
           id: 'ice-cream-or-pastry',
           interactionKind: 'multiple-choice',
-          prompt: 'A cafe sells 6 ice creams and 4 pastries. You will buy exactly one item. How many choices do you have?',
+          prompt:
+            'A cafe sells 6 ice creams and 4 pastries. You will buy exactly one item. How many choices do you have?',
           context: 'You are not building a meal, you are picking one item.',
           options: [
             { id: '10', label: '10' },
@@ -156,7 +168,8 @@ export const lesson3: Lesson = {
         {
           id: 'two-course-or-one',
           interactionKind: 'multiple-choice',
-          prompt: 'A diner offers 5 sandwiches and a separate menu of 3 soup-and-salad combos. You will order exactly one option from one menu. How many choices?',
+          prompt:
+            'A diner offers 5 sandwiches and a separate menu of 3 soup-and-salad combos. You will order exactly one option from one menu. How many choices?',
           context: 'You order one item: either a sandwich or a combo, not both.',
           options: [
             { id: '8', label: '8' },
@@ -166,7 +179,8 @@ export const lesson3: Lesson = {
           ],
           correctOptionId: '8',
           feedbackCorrect: '5 + 3 = 8. Two menus, one pick, so add.',
-          feedbackDefault: 'You are not building stages. You are choosing one item from one of two menus.',
+          feedbackDefault:
+            'You are not building stages. You are choosing one item from one of two menus.',
           feedbackByOption: {
             '15': '5 x 3 would count sandwich-and-combo pairs, but you are ordering one thing.',
             '2': '2 is the number of menus, not the number of options.',
@@ -184,7 +198,8 @@ export const lesson3: Lesson = {
       kind: 'concept',
       illustration: { kind: 'cards' },
       title: 'Permutations: order matters',
-      prompt: 'A permutation is an arrangement of distinct things in order. Three people in a row can be arranged in 3 × 2 × 1 = 6 ways.',
+      prompt:
+        'A permutation is an arrangement of distinct things in order. Three people in a row can be arranged in 3 × 2 × 1 = 6 ways.',
       body: [
         'Pick the first slot: 3 choices. The second slot has 2 left. The third slot has 1. By multiplication, 3 × 2 × 1.',
         'That product has a name: 3 factorial, written 3! With n distinct things, there are n! ways to put them in order. If you only fill k of the n slots, you stop the product after k terms.',
@@ -234,7 +249,8 @@ export const lesson3: Lesson = {
         {
           id: 'podium',
           interactionKind: 'multiple-choice',
-          prompt: 'From 5 runners, how many different gold-silver-bronze podiums are possible? (Top 3 only, in order.)',
+          prompt:
+            'From 5 runners, how many different gold-silver-bronze podiums are possible? (Top 3 only, in order.)',
           context: 'Order matters: gold then silver then bronze.',
           options: [
             { id: '10', label: '10' },
@@ -248,7 +264,8 @@ export const lesson3: Lesson = {
           feedbackByOption: {
             '10': '10 would count unordered groups of 3 (combinations), but the podium positions are ordered.',
             '15': 'Close shape, wrong arithmetic. 5 x 4 x 3 = 60.',
-            '125': '5 x 5 x 5 would let one runner take all three medals. Each runner can only finish once.',
+            '125':
+              '5 x 5 x 5 would let one runner take all three medals. Each runner can only finish once.',
           },
           explanation: 'Three slots filled in order from 5 distinct runners: 5 x 4 x 3 = 60.',
         },
@@ -262,7 +279,8 @@ export const lesson3: Lesson = {
       kind: 'concept',
       illustration: { kind: 'cards' },
       title: 'Combinations: order does not matter',
-      prompt: 'When order is irrelevant, divide a permutation by the ways its members can rearrange.',
+      prompt:
+        'When order is irrelevant, divide a permutation by the ways its members can rearrange.',
       body: [
         'Pick 2 of 4 friends to sit together. There are 4 × 3 = 12 ordered pairs (A then B, B then A, A then C, …). But the pair {A, B} and the pair {B, A} are the same unordered pair, so each pair is counted twice. Divide by 2: there are 6 unordered pairs.',
         'In general, choosing k things from n when order does not matter is "n choose k", written nCk. It equals nPk divided by k! (the number of orderings of the k chosen).',
@@ -292,8 +310,10 @@ export const lesson3: Lesson = {
         {
           id: 'ice-cream-trio',
           interactionKind: 'multiple-choice',
-          prompt: 'A shop has 5 flavors. You pick 3 different flavors for a sundae. The flavors are mixed together, so order does not matter. How many different sundaes are possible?',
-          context: 'A sundae of vanilla, chocolate, strawberry is the same as strawberry, chocolate, vanilla.',
+          prompt:
+            'A shop has 5 flavors. You pick 3 different flavors for a sundae. The flavors are mixed together, so order does not matter. How many different sundaes are possible?',
+          context:
+            'A sundae of vanilla, chocolate, strawberry is the same as strawberry, chocolate, vanilla.',
           options: [
             { id: '10', label: '10' },
             { id: '15', label: '15' },
@@ -313,7 +333,8 @@ export const lesson3: Lesson = {
         {
           id: 'handshakes',
           interactionKind: 'multiple-choice',
-          prompt: 'Six people at a party each shake every other person\'s hand once. How many handshakes happen in total?',
+          prompt:
+            "Six people at a party each shake every other person's hand once. How many handshakes happen in total?",
           context: 'A handshake between A and B is the same handshake as B and A.',
           options: [
             { id: '6', label: '6' },
@@ -341,7 +362,8 @@ export const lesson3: Lesson = {
       kind: 'concept',
       illustration: { kind: 'cards' },
       title: 'Order or not?',
-      prompt: 'The first decision in a counting problem is almost always: does the order of the chosen items matter?',
+      prompt:
+        'The first decision in a counting problem is almost always: does the order of the chosen items matter?',
       body: [
         'A quick test: take any two items in the outcome and swap them. If the outcome is now different, order matters and you want a permutation. If it is the same, order does not matter and you want a combination.',
         'Get this wrong and the answer is off by a factor of k!, which is exactly the kind of mistake that compounds in larger problems.',
@@ -356,7 +378,8 @@ export const lesson3: Lesson = {
         {
           id: 'lottery-ticket',
           interactionKind: 'multiple-choice',
-          prompt: 'You pick 3 different numbers from 1 to 49 for a lottery ticket. The ticket {7, 23, 41} wins the same prize as {41, 7, 23}. Does order matter?',
+          prompt:
+            'You pick 3 different numbers from 1 to 49 for a lottery ticket. The ticket {7, 23, 41} wins the same prize as {41, 7, 23}. Does order matter?',
           options: [
             { id: 'ordered', label: 'Order matters (permutation)' },
             { id: 'unordered', label: 'Order does not matter (combination)' },
@@ -365,14 +388,17 @@ export const lesson3: Lesson = {
           feedbackCorrect: 'Right. Same numbers, same ticket, same prize. Count with 49C3.',
           feedbackDefault: 'If swapping two numbers gives the same ticket, order does not matter.',
           feedbackByOption: {
-            ordered: 'The two arrangements pay the same prize, which means the lottery treats them as the same ticket. Order does not matter.',
+            ordered:
+              'The two arrangements pay the same prize, which means the lottery treats them as the same ticket. Order does not matter.',
           },
-          explanation: 'The prize is determined by the set of numbers, not the order. Combination: 49C3.',
+          explanation:
+            'The prize is determined by the set of numbers, not the order. Combination: 49C3.',
         },
         {
           id: 'race-vs-team',
           interactionKind: 'multiple-choice',
-          prompt: 'A coach picks 5 of 12 players for a starting basketball team. Does order matter when counting possible starting fives?',
+          prompt:
+            'A coach picks 5 of 12 players for a starting basketball team. Does order matter when counting possible starting fives?',
           context: 'The team plays together regardless of who was picked first.',
           options: [
             { id: 'ordered', label: 'Order matters (permutation)' },
@@ -380,11 +406,14 @@ export const lesson3: Lesson = {
           ],
           correctOptionId: 'unordered',
           feedbackCorrect: 'Right. A starting five is a set of players. Count with 12C5.',
-          feedbackDefault: 'If swapping two picks gives the same team on the floor, order does not matter.',
+          feedbackDefault:
+            'If swapping two picks gives the same team on the floor, order does not matter.',
           feedbackByOption: {
-            ordered: 'Players have positions, but the question asks how many starting fives are possible, not how many seating orders. The team is a set.',
+            ordered:
+              'Players have positions, but the question asks how many starting fives are possible, not how many seating orders. The team is a set.',
           },
-          explanation: 'The team is determined by which 5 players, not the pick order. Combination: 12C5.',
+          explanation:
+            'The team is determined by which 5 players, not the pick order. Combination: 12C5.',
         },
       ],
     },
@@ -396,7 +425,8 @@ export const lesson3: Lesson = {
       kind: 'concept',
       illustration: { kind: 'coin' },
       title: 'Count what you do not want',
-      prompt: 'Sometimes the outcomes you want are a tangle, but the outcomes you do not want are a single clean case. Count the bad case, subtract from 1.',
+      prompt:
+        'Sometimes the outcomes you want are a tangle, but the outcomes you do not want are a single clean case. Count the bad case, subtract from 1.',
       body: [
         'P(event happens) = 1 minus P(event does not happen). It looks small, but it is the trick that cracks the birthday paradox in the next lesson.',
         'Use it whenever "at least one" appears in a question. The complement of "at least one" is "none", which is usually much easier to count.',
@@ -425,18 +455,24 @@ export const lesson3: Lesson = {
         {
           id: 'at-least-one-six',
           interactionKind: 'fill-fraction',
-          prompt: 'Roll two fair dice. What is P(at least one six)? Enter the fraction in lowest terms or as it falls out of the calculation.',
+          prompt:
+            'Roll two fair dice. What is P(at least one six)? Enter the fraction in lowest terms or as it falls out of the calculation.',
           numerator: 11,
           denominator: 36,
           feedbackCorrect: '1 - (5/6)^2 = 1 - 25/36 = 11/36.',
-          feedbackDefault: 'Complement: "no sixes at all". Each die avoids the six with probability 5/6.',
+          feedbackDefault:
+            'Complement: "no sixes at all". Each die avoids the six with probability 5/6.',
           feedbackByWrongAnswer: {
-            '1/6': 'That is P(six) on one die. Two dice with "at least one six" needs the complement of "no sixes on either".',
-            '2/6': 'Adding the two single-die probabilities double-counts the case where both dice show a six. Use the complement instead.',
+            '1/6':
+              'That is P(six) on one die. Two dice with "at least one six" needs the complement of "no sixes on either".',
+            '2/6':
+              'Adding the two single-die probabilities double-counts the case where both dice show a six. Use the complement instead.',
             '25/36': 'That is P(no sixes), the complement. Subtract from 1: 1 - 25/36 = 11/36.',
-            '1/36': 'That is P(both sixes). "At least one" includes both-sixes plus exactly-one-six.',
+            '1/36':
+              'That is P(both sixes). "At least one" includes both-sixes plus exactly-one-six.',
           },
-          explanation: 'P(no six on either die) = (5/6)(5/6) = 25/36. P(at least one six) = 1 - 25/36 = 11/36.',
+          explanation:
+            'P(no six on either die) = (5/6)(5/6) = 25/36. P(at least one six) = 1 - 25/36 = 11/36.',
         },
         {
           id: 'no-clubs',
@@ -447,10 +483,13 @@ export const lesson3: Lesson = {
           feedbackCorrect: '1 - (1/2)^4 = 1 - 1/16 = 15/16.',
           feedbackDefault: 'Complement: "no heads at all", i.e. four tails in a row.',
           feedbackByWrongAnswer: {
-            '1/2': 'That is P(heads) on one flip. Four flips with "at least one" needs the complement.',
+            '1/2':
+              'That is P(heads) on one flip. Four flips with "at least one" needs the complement.',
             '1/16': 'That is P(four tails), the complement. Subtract from 1: 1 - 1/16 = 15/16.',
-            '4/16': 'Four single-flip probabilities cannot just be added, that overcounts overlaps. Use the complement.',
-            '1/4': 'That is P(heads) over 4 flips treated independently, which is not how probability works for "at least one".',
+            '4/16':
+              'Four single-flip probabilities cannot just be added, that overcounts overlaps. Use the complement.',
+            '1/4':
+              'That is P(heads) over 4 flips treated independently, which is not how probability works for "at least one".',
           },
           explanation: 'P(no heads) = (1/2)^4 = 1/16. P(at least one head) = 1 - 1/16 = 15/16.',
         },
@@ -463,8 +502,7 @@ export const lesson3: Lesson = {
       id: 'wrap',
       kind: 'wrap',
       title: 'Four moves that count anything',
-      body:
-        'Multiplication for stages. Addition for either-or. Permutations when order matters, combinations when it does not. And complements when the bad case is the clean one. Next: the most counterintuitive counting result in probability. Twenty-three people, 253 pairs, and the birthday paradox.',
+      body: 'Multiplication for stages. Addition for either-or. Permutations when order matters, combinations when it does not. And complements when the bad case is the clean one. Next: the most counterintuitive counting result in probability. Twenty-three people, 253 pairs, and the birthday paradox.',
       segueToLessonId: 'counting-gets-hard',
     },
   ],

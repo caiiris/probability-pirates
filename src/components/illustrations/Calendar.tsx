@@ -17,9 +17,23 @@ export function Calendar({ className }: { className?: string }) {
       aria-label="Calendar with two days marked"
     >
       {/* Body */}
-      <rect x="4" y="8" width="64" height="60" rx="6" fill="currentColor" opacity="0.06" stroke="currentColor" strokeWidth="2" />
+      <rect
+        x="4"
+        y="8"
+        width="64"
+        height="60"
+        rx="6"
+        fill="currentColor"
+        opacity="0.06"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
       {/* Header bar */}
-      <path d="M4 18 a6 6 0 0 1 6 -6 h52 a6 6 0 0 1 6 6 v3 H4 Z" fill="currentColor" opacity="0.85" />
+      <path
+        d="M4 18 a6 6 0 0 1 6 -6 h52 a6 6 0 0 1 6 6 v3 H4 Z"
+        fill="currentColor"
+        opacity="0.85"
+      />
       {/* Binding rings */}
       <rect x="18" y="4" width="4" height="10" rx="2" fill="currentColor" />
       <rect x="50" y="4" width="4" height="10" rx="2" fill="currentColor" />

@@ -14,17 +14,17 @@ under 13. There is no age-gate checkbox in MVP (D48); the deployment context
 
 ## What we collect
 
-| Data | Where | Why |
-|---|---|---|
-| Email address | Firebase Auth + `/users/{uid}` | Account identity, login, password reset path |
-| Username (chosen) | `/users/{uid}`, `/usernames/{name}`, `/publicProfiles/{uid}` | Login-by-username, public profile, leaderboard display |
-| Password | Firebase Auth (hashed by Google; we never see it) | Authentication |
-| Bio (optional, ≤150 chars) | `/users/{uid}`, `/publicProfiles/{uid}` | Profile personalization |
-| Learning progress, attempts, XP, streaks | `/users/{uid}/lessonProgress`, `/stepAttempts`, `/users/{uid}` | Resume, mastery, habit loop |
-| Coins / cosmetic items | `/users/{uid}` | In-app cosmetics (no real money) |
-| Schedule events (optional, user-entered) | `/users/{uid}/studyEvents` | Personal study planner |
-| Social graph (follows, kudos) | `/publicProfiles/{uid}/{following,followers,kudos}` | Following + cheers |
-| Analytics events (GA4) | Firebase Analytics, only if `VITE_FIREBASE_MEASUREMENT_ID` set | Aggregate funnel / drop-off; not used to identify individuals |
+| Data                                     | Where                                                          | Why                                                           |
+| ---------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------- |
+| Email address                            | Firebase Auth + `/users/{uid}`                                 | Account identity, login, password reset path                  |
+| Username (chosen)                        | `/users/{uid}`, `/usernames/{name}`, `/publicProfiles/{uid}`   | Login-by-username, public profile, leaderboard display        |
+| Password                                 | Firebase Auth (hashed by Google; we never see it)              | Authentication                                                |
+| Bio (optional, ≤150 chars)               | `/users/{uid}`, `/publicProfiles/{uid}`                        | Profile personalization                                       |
+| Learning progress, attempts, XP, streaks | `/users/{uid}/lessonProgress`, `/stepAttempts`, `/users/{uid}` | Resume, mastery, habit loop                                   |
+| Coins / cosmetic items                   | `/users/{uid}`                                                 | In-app cosmetics (no real money)                              |
+| Schedule events (optional, user-entered) | `/users/{uid}/studyEvents`                                     | Personal study planner                                        |
+| Social graph (follows, kudos)            | `/publicProfiles/{uid}/{following,followers,kudos}`            | Following + cheers                                            |
+| Analytics events (GA4)                   | Firebase Analytics, only if `VITE_FIREBASE_MEASUREMENT_ID` set | Aggregate funnel / drop-off; not used to identify individuals |
 
 We do **not** collect: real name, phone, location, contacts, photos (avatars are
 generated, not uploaded — see I026), or payment data (there are no payments).

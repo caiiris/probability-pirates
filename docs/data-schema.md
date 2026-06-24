@@ -3,6 +3,7 @@
 > One screen view of every Firestore collection, Storage path, and security rule for Pascal Phase 1. Authoritative bodies live in each spec; this doc cross-links and exists so an implementer can sanity-check the whole shape in one place.
 >
 > Sources of truth (in case of conflict, the spec wins):
+>
 > - `docs/specs/spec-auth.md` — `/users/{uid}`, `/usernames/{name}`
 > - `docs/specs/spec-progress-persistence.md` — `/users/{uid}/lessonProgress/{lessonId}`, `/users/{uid}/stepAttempts/{autoId}`
 > - `docs/specs/spec-habit-loop.md` — mutations on `/users/{uid}` (xp, streak, milestones)
@@ -47,21 +48,21 @@ storage/
 
 Created at registration, mutated by every feature that touches the learner.
 
-| Field | Type | Default | Owner spec | Notes |
-| --- | --- | --- | --- | --- |
-| `username` | string | required | spec-auth | lowercased; lookup key |
-| `displayUsername` | string | required | spec-auth | preserves user casing |
-| `email` | string | required | spec-auth | mirrored from Firebase Auth at registration |
-| `bio` | string | `''` | spec-profile | ≤ 150 chars |
-| `avatarUrl` | string \| null | `null` | spec-profile | Storage download URL |
-| `xp` | number | `0` | spec-habit-loop | lifetime XP |
-| `lessonsCompleted` | number | `0` | spec-habit-loop | denormalized counter — see I022 |
-| `stepsCompleted` | number | `0` | spec-habit-loop | per D55: only correct answers count |
-| `currentStreak` | number | `0` | spec-habit-loop | calendar days |
-| `bestStreak` | number | `0` | spec-habit-loop | `max(bestStreak, currentStreak)` |
-| `lastActiveDate` | string \| null | `null` | spec-habit-loop | `YYYY-MM-DD` in learner's local tz |
-| `milestonesReached` | string[] | `[]` | spec-habit-loop | e.g. `['streak-3', 'streak-7']` |
-| `createdAt` | Timestamp | `serverTimestamp()` | spec-auth | |
+| Field               | Type           | Default             | Owner spec      | Notes                                       |
+| ------------------- | -------------- | ------------------- | --------------- | ------------------------------------------- |
+| `username`          | string         | required            | spec-auth       | lowercased; lookup key                      |
+| `displayUsername`   | string         | required            | spec-auth       | preserves user casing                       |
+| `email`             | string         | required            | spec-auth       | mirrored from Firebase Auth at registration |
+| `bio`               | string         | `''`                | spec-profile    | ≤ 150 chars                                 |
+| `avatarUrl`         | string \| null | `null`              | spec-profile    | Storage download URL                        |
+| `xp`                | number         | `0`                 | spec-habit-loop | lifetime XP                                 |
+| `lessonsCompleted`  | number         | `0`                 | spec-habit-loop | denormalized counter — see I022             |
+| `stepsCompleted`    | number         | `0`                 | spec-habit-loop | per D55: only correct answers count         |
+| `currentStreak`     | number         | `0`                 | spec-habit-loop | calendar days                               |
+| `bestStreak`        | number         | `0`                 | spec-habit-loop | `max(bestStreak, currentStreak)`            |
+| `lastActiveDate`    | string \| null | `null`              | spec-habit-loop | `YYYY-MM-DD` in learner's local tz          |
+| `milestonesReached` | string[]       | `[]`                | spec-habit-loop | e.g. `['streak-3', 'streak-7']`             |
+| `createdAt`         | Timestamp      | `serverTimestamp()` | spec-auth       |                                             |
 
 **Mutators:** `userService.registerUser` (create), `userService.updateProfile` (bio/avatar), `habitService.awardXpAndStreak` (xp/streak/milestones), `progressService.markLessonCompleted` (lessonsCompleted).
 
@@ -71,12 +72,12 @@ Created at registration, mutated by every feature that touches the learner.
 
 ## 3. `/usernames/{lowercasedUsername}` — username uniqueness sentinel
 
-Write-once doc that reserves a username. The doc *being created* is the uniqueness check.
+Write-once doc that reserves a username. The doc _being created_ is the uniqueness check.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `uid` | string | the owning user's UID |
-| `createdAt` | Timestamp | `serverTimestamp()` |
+| Field       | Type      | Notes                 |
+| ----------- | --------- | --------------------- |
+| `uid`       | string    | the owning user's UID |
+| `createdAt` | Timestamp | `serverTimestamp()`   |
 
 **Mutators:** `userService.registerUser` (create), `userService.changeUsername` (rename: create new + delete old sentinel in one transaction — D16 amendment 2026-06-24).
 
@@ -88,15 +89,15 @@ Write-once doc that reserves a username. The doc *being created* is the uniquene
 
 One document per lesson the learner has touched. Document absence = `not_started`.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `state` | `'in_progress' \| 'completed'` | — |
-| `slotIndex` | number | 0-based; resume target |
-| `attemptId` | string | UUID; seeds variant selection; regenerated on replay |
-| `selectedVariantIds` | `Record<string, string>` | `{ [slotId]: variantId }`; lazy-populated |
-| `xpEarnedThisAttempt` | number | resets to `0` on replay |
-| `completedAt` | Timestamp \| null | set on `in_progress → completed` transition |
-| `updatedAt` | Timestamp | `serverTimestamp()` on every write |
+| Field                 | Type                           | Notes                                                |
+| --------------------- | ------------------------------ | ---------------------------------------------------- |
+| `state`               | `'in_progress' \| 'completed'` | —                                                    |
+| `slotIndex`           | number                         | 0-based; resume target                               |
+| `attemptId`           | string                         | UUID; seeds variant selection; regenerated on replay |
+| `selectedVariantIds`  | `Record<string, string>`       | `{ [slotId]: variantId }`; lazy-populated            |
+| `xpEarnedThisAttempt` | number                         | resets to `0` on replay                              |
+| `completedAt`         | Timestamp \| null              | set on `in_progress → completed` transition          |
+| `updatedAt`           | Timestamp                      | `serverTimestamp()` on every write                   |
 
 **Mutators:** `progressService.getOrCreateProgress` (create), `progressService.recordAttempt` (slotIndex + xpEarnedThisAttempt), `progressService.recordVariantSelection` (selectedVariantIds), `progressService.markLessonCompleted` (state + completedAt), `progressService.startReplay` (full reset).
 
@@ -108,16 +109,16 @@ One document per lesson the learner has touched. Document absence = `not_started
 
 Every Check submission writes one doc. Server enforces `1 ≤ attemptNumber ≤ 10` (D54 abuse cap).
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `lessonId` | string | |
-| `slotId` | string | matches `Slot.id` |
-| `variantId` | string | matches `Variant.id` |
-| `attemptNumber` | number | 1–10 within one slot in one sitting |
-| `wasCorrect` | boolean | |
-| `xpAwarded` | number | per `spec-habit-loop` |
-| `answerPayload` | map | what the learner submitted |
-| `createdAt` | Timestamp | `serverTimestamp()` |
+| Field           | Type      | Notes                               |
+| --------------- | --------- | ----------------------------------- |
+| `lessonId`      | string    |                                     |
+| `slotId`        | string    | matches `Slot.id`                   |
+| `variantId`     | string    | matches `Variant.id`                |
+| `attemptNumber` | number    | 1–10 within one slot in one sitting |
+| `wasCorrect`    | boolean   |                                     |
+| `xpAwarded`     | number    | per `spec-habit-loop`               |
+| `answerPayload` | map       | what the learner submitted          |
+| `createdAt`     | Timestamp | `serverTimestamp()`                 |
 
 **Mutators:** `progressService.recordAttempt` (create only).
 
@@ -131,14 +132,14 @@ In-app inbox for the recipient. Today the only `type` is `follow` (the doc id is
 `follow_{fromUid}` so re-following refreshes the same row rather than stacking
 duplicates).
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `type` | `'follow'` | closed enum in rules; extensible |
-| `fromUid` | string | must equal `request.auth.uid` |
-| `fromUsername` | string | lowercased, ≤ 30 |
-| `fromDisplayUsername` | string | ≤ 30 |
-| `createdAt` | Timestamp | `serverTimestamp()` (rules enforce `== request.time`) |
-| `read` | boolean | `false` on create; recipient flips to `true` |
+| Field                 | Type       | Notes                                                 |
+| --------------------- | ---------- | ----------------------------------------------------- |
+| `type`                | `'follow'` | closed enum in rules; extensible                      |
+| `fromUid`             | string     | must equal `request.auth.uid`                         |
+| `fromUsername`        | string     | lowercased, ≤ 30                                      |
+| `fromDisplayUsername` | string     | ≤ 30                                                  |
+| `createdAt`           | Timestamp  | `serverTimestamp()` (rules enforce `== request.time`) |
+| `read`                | boolean    | `false` on create; recipient flips to `true`          |
 
 **Mutators:** `notificationsService.queueFollowNotification` (create, batched
 inside `socialService.follow`); `markNotificationRead` /
@@ -161,15 +162,15 @@ Append-only inbox for in-app feedback. Written from the footer's "Send feedback"
 dialog (`src/features/feedback/`). Create-only from signed-in clients; no client
 read/update/delete — the owner reviews submissions in the Firebase console.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `uid` | string | must equal `request.auth.uid` |
-| `username` | string | submitter's lowercased username, ≤ 30 (context only) |
-| `type` | `'bug' \| 'feedback'` | closed enum in rules |
-| `message` | string | 1–2000 chars |
-| `route` | string | pathname the user was on, ≤ 200 (triage context) |
-| `userAgent` | string | `navigator.userAgent`, ≤ 500 (triage context) |
-| `createdAt` | Timestamp | `serverTimestamp()` (rules enforce `== request.time`) |
+| Field       | Type                  | Notes                                                 |
+| ----------- | --------------------- | ----------------------------------------------------- |
+| `uid`       | string                | must equal `request.auth.uid`                         |
+| `username`  | string                | submitter's lowercased username, ≤ 30 (context only)  |
+| `type`      | `'bug' \| 'feedback'` | closed enum in rules                                  |
+| `message`   | string                | 1–2000 chars                                          |
+| `route`     | string                | pathname the user was on, ≤ 200 (triage context)      |
+| `userAgent` | string                | `navigator.userAgent`, ≤ 500 (triage context)         |
+| `createdAt` | Timestamp             | `serverTimestamp()` (rules enforce `== request.time`) |
 
 **Mutators:** `feedbackService.submitFeedback` (create only).
 
@@ -293,14 +294,14 @@ If a future query needs ordering + filtering (e.g. `where('lessonId', '==', X).o
 
 For one learner finishing Lesson 1 (5 problem slots, 2 wrong + 1 correct average, 7 slots total):
 
-| Operation | Count | Source |
-| --- | --- | --- |
-| Reads via `useAuth().profile` subscription | 1 initial + N updates | spec-auth |
-| Reads via `useLessonProgress(lessonId)` | 1 initial + N updates | spec-progress |
-| Writes to `stepAttempts` (one per Check) | ~15 | spec-progress |
-| Writes to `lessonProgress` (slotIndex, selectedVariantIds, xpEarnedThisAttempt) | ~7 | spec-progress |
-| Writes to `/users/{uid}` (xp, streak, lessonsCompleted) | ~6 | spec-habit-loop |
-| **Total writes per Lesson 1 completion** | **~28** | |
+| Operation                                                                       | Count                 | Source          |
+| ------------------------------------------------------------------------------- | --------------------- | --------------- |
+| Reads via `useAuth().profile` subscription                                      | 1 initial + N updates | spec-auth       |
+| Reads via `useLessonProgress(lessonId)`                                         | 1 initial + N updates | spec-progress   |
+| Writes to `stepAttempts` (one per Check)                                        | ~15                   | spec-progress   |
+| Writes to `lessonProgress` (slotIndex, selectedVariantIds, xpEarnedThisAttempt) | ~7                    | spec-progress   |
+| Writes to `/users/{uid}` (xp, streak, lessonsCompleted)                         | ~6                    | spec-habit-loop |
+| **Total writes per Lesson 1 completion**                                        | **~28**               |                 |
 
 Free tier: 20K writes/day. A class of 30 doing 1 lesson/day = ~840 writes/day. Healthy margin. Profile/home views add reads but Firestore's listener cache de-dupes.
 

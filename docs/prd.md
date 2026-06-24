@@ -25,23 +25,23 @@
 - **Product name:** **Pascal** (after Blaise Pascal, co-founder of probability theory — see D38)
 - **Subject:** Probability.
 - **Persona:** A high-school student learning probability for the first time. Algebra background, no calculus. Phone in hand, attention measured in minutes.
-- **Platform:** **Truly responsive web app (PWA-friendly) — mobile, tablet, and desktop are all first-class** (Pattern B, see D63). Mobile design target is **390 × 844 px** (iPhone 14-class); minimum supported width is **320 px** (iPhone SE, per D65). Scales up via Tailwind breakpoints to tablet (`md:` 768 px) and desktop (`lg:` 1024 px). Bottom nav on mobile → sidebar on tablet/desktop; lesson list grows from 1-col → 2-col → 3-col; interaction touch targets scale 44 → 56 → 64 px. *"PWA-friendly"* means the app loads cleanly in a PWA context but ships no PWA features in MVP (no manifest, no service worker, no offline — per D21 / D25).
+- **Platform:** **Truly responsive web app (PWA-friendly) — mobile, tablet, and desktop are all first-class** (Pattern B, see D63). Mobile design target is **390 × 844 px** (iPhone 14-class); minimum supported width is **320 px** (iPhone SE, per D65). Scales up via Tailwind breakpoints to tablet (`md:` 768 px) and desktop (`lg:` 1024 px). Bottom nav on mobile → sidebar on tablet/desktop; lesson list grows from 1-col → 2-col → 3-col; interaction touch targets scale 44 → 56 → 64 px. _"PWA-friendly"_ means the app loads cleanly in a PWA context but ships no PWA features in MVP (no manifest, no service worker, no offline — per D21 / D25).
 - **Stack:** Vite + React 18 + TypeScript + Tailwind + **shadcn/ui** + Framer Motion + React Router + Firebase (Auth, Firestore, Storage) + Vercel.
 
-*Why this stack* lives in [`docs/alternatives.md`](alternatives.md) (D9–D12, D36–D37). *How to use the UI layer* lives in [`docs/ui-stack.md`](ui-stack.md). *Architecture cross-cuts (state, routing, errors, observability, perf budget)* live in [`docs/architecture.md`](architecture.md). *Feature implementation* lives in the spec docs.
+_Why this stack_ lives in [`docs/alternatives.md`](alternatives.md) (D9–D12, D36–D37). _How to use the UI layer_ lives in [`docs/ui-stack.md`](ui-stack.md). _Architecture cross-cuts (state, routing, errors, observability, perf budget)_ live in [`docs/architecture.md`](architecture.md). _Feature implementation_ lives in the spec docs.
 
 ---
 
 ## 2. Concept & audience
 
-- **One-sentence pitch:** *A learn-by-doing probability app for high-school students who want probability to actually click — not just pass a test.*
+- **One-sentence pitch:** _A learn-by-doing probability app for high-school students who want probability to actually click — not just pass a test._
 - **The core loop:** Open the app → pick up where you left off in a 3–5 minute interactive lesson → get instant hand-written feedback on every tap → finish the lesson → see XP, streak, and course progress update → tomorrow you come back.
-- **Problem with the status quo:** Textbook probability is a wall of formulas. Khan-style videos let you stay passive. The famous counterintuitive results (sum-of-7 vs sum-of-2, Monty Hall, birthday paradox, base rates) still trip students up because they were *told* the answer instead of *seeing* it.
-- **Emotional payoff:** Repeated *"wait, what?" → "ohhh"* moments. The student should feel like probability is a game they're getting good at, not a class they're enduring.
+- **Problem with the status quo:** Textbook probability is a wall of formulas. Khan-style videos let you stay passive. The famous counterintuitive results (sum-of-7 vs sum-of-2, Monty Hall, birthday paradox, base rates) still trip students up because they were _told_ the answer instead of _seeing_ it.
+- **Emotional payoff:** Repeated _"wait, what?" → "ohhh"_ moments. The student should feel like probability is a game they're getting good at, not a class they're enduring.
 - **Differentiators (vs textbook / Khan / general Brilliant):**
   - Every claim is verifiable by simulation — the learner can always check "but does that actually happen?"
   - Lessons tight enough to fit between classes or before bed.
-  - The interaction *is* the explanation — you don't watch a sample space get drawn, you tap to build it.
+  - The interaction _is_ the explanation — you don't watch a sample space get drawn, you tap to build it.
   - Visuals externalize what's invisible in your head (sample space, event, long-run ratio).
 
 ---
@@ -53,13 +53,13 @@ Maya is a 10th grader. She made an account yesterday because her teacher mention
 1. She lands on **Home**. The header shows a flame `1` (yesterday's streak), a gray "Daily goal" pill, and `Course progress: 0 / 6`.
 2. The hero card says **"Start Lesson 1 — What is probability?"**. She taps it.
 3. The **lesson player** takes over the screen. The first slot is a concept card: a die, one sentence about favorable / total. She taps "Got it."
-4. The second slot asks her to tap every face of a die. She taps 1, 2, 3, 4, 5, 6. They appear in a row. *Correct.* "Nice. 6 outcomes, all equally likely."
-5. A fill-fraction slot asks `P(even)`. She types `3 / 6`. *Correct.* Auto-reduces to `1/2`.
-6. A grid slot opens with a 6×6 of dice pairs. *"Tap every cell where the two dice sum to 7."* She taps the diagonal. Live counter ticks `6 / 36 = 1/6`. *Correct.* "Sum of 7 is the most likely sum."
-7. The payoff slot: *"Which is more likely, sum = 7 or sum = 2?"* She gets it right because she just saw the grid. *Correct.* "Exactly. 6 ways vs 1 way."
+4. The second slot asks her to tap every face of a die. She taps 1, 2, 3, 4, 5, 6. They appear in a row. _Correct._ "Nice. 6 outcomes, all equally likely."
+5. A fill-fraction slot asks `P(even)`. She types `3 / 6`. _Correct._ Auto-reduces to `1/2`.
+6. A grid slot opens with a 6×6 of dice pairs. _"Tap every cell where the two dice sum to 7."_ She taps the diagonal. Live counter ticks `6 / 36 = 1/6`. _Correct._ "Sum of 7 is the most likely sum."
+7. The payoff slot: _"Which is more likely, sum = 7 or sum = 2?"_ She gets it right because she just saw the grid. _Correct._ "Exactly. 6 ways vs 1 way."
 8. **Celebration screen.** Confetti. `+ 100 XP` (5 problem slots × 10 XP first-try + 50 lesson bonus). Streak `1 → 2` (`+1!`). Course progress bar animates `0/6 → 1/6`. A "Lesson 2 — coming soon" preview. She taps "Back to Home."
 9. The Home header now shows flame `2`, the daily-goal pill is amber, the hero card is empty for today.
-10. The bus arrives. She closes the app feeling like she just *understood something*. She'll be back tomorrow because the streak says so.
+10. The bus arrives. She closes the app feeling like she just _understood something_. She'll be back tomorrow because the streak says so.
 
 That entire flow is ~4 minutes. That session — repeated daily — is the product.
 
@@ -128,13 +128,13 @@ flowchart TD
     L5 -- "Aggregate many trials" --> L6
 ```
 
-This progression turns "probability with big numbers is hard to visualize" from an obstacle into the *premise* of the course.
+This progression turns "probability with big numbers is hard to visualize" from an obstacle into the _premise_ of the course.
 
 ---
 
 ## 6. Habit-loop philosophy
 
-The brief is explicit: *"This is not decoration. It is the difference between an app people open once and one they open every day."*
+The brief is explicit: _"This is not decoration. It is the difference between an app people open once and one they open every day."_
 
 The MVP ships the standard kit:
 
@@ -145,7 +145,7 @@ The MVP ships the standard kit:
 - **Course progress** — `X / 6 lessons` visible everywhere.
 - **Celebration screen** — every lesson ends with confetti, the XP gained, the streak update, and the next-lesson preview.
 
-**No bail-out (D55).** A learner cannot bypass a problem by guessing wrong. After 2 wrong attempts on a slot, the variant's hand-written `explanation` appears as a hint, but the **Continue** CTA stays locked until the learner produces a correct answer. They are never *trapped in the lesson* (Close X always works), but they cannot *skip the thinking*. Lesson completion is therefore a stronger mastery signal by construction.
+**No bail-out (D55).** A learner cannot bypass a problem by guessing wrong. After 2 wrong attempts on a slot, the variant's hand-written `explanation` appears as a hint, but the **Continue** CTA stays locked until the learner produces a correct answer. They are never _trapped in the lesson_ (Close X always works), but they cannot _skip the thinking_. Lesson completion is therefore a stronger mastery signal by construction.
 
 The exact rules (XP values, milestone trigger logic, celebration screen layout) live in [`spec-habit-loop`](specs/spec-habit-loop.md).
 
@@ -182,11 +182,11 @@ From the brief, every one of these must be true to pass the MVP gate:
 - **No spaced repetition, adaptive difficulty, or per-concept mastery scoring** (Phase 3).
 - ~~**No social features**~~ → **Shipped since the original cut:** follow/followers, friend search, friends-only weekly leaderboard, kudos. Comments are still out of scope. See [`spec-social.md`](specs/spec-social.md); reverses D24.
 - **No content authoring UI** — lessons are TypeScript files in the repo (D26 / D35).
-- **No payments / subscriptions / real money.** A *cosmetic-only* coin economy shipped (coins are earned in-app, never purchased — D83, with cosmetic/forgiveness sinks D79–D80); this bullet still holds for real-money transactions.
+- **No payments / subscriptions / real money.** A _cosmetic-only_ coin economy shipped (coins are earned in-app, never purchased — D83, with cosmetic/forgiveness sinks D79–D80); this bullet still holds for real-money transactions.
 - **No offline mode** (D25 — Firestore offline persistence intentionally off).
-- **No off-app push / email reminders** (D27 — still holds). An *in-app* home-screen schedule reminder shipped (D82); it only fires while the app is open, so it does not replace push.
+- **No off-app push / email reminders** (D27 — still holds). An _in-app_ home-screen schedule reminder shipped (D82); it only fires while the app is open, so it does not replace push.
 - ~~**No streak freezes / save-streak items**~~ → **Shipped:** coin-bought Streak Freeze (D79 supersedes D34).
-- **No age-gate at registration** in MVP (D48 — privacy posture documented in [`docs/privacy.md`](privacy.md) *(pending)*).
+- **No age-gate at registration** in MVP (D48 — privacy posture documented in [`docs/privacy.md`](privacy.md) _(pending)_).
 - **No dark mode** (D67 — tracked for Phase 2/3).
 - **No bail-out from problems** (D55 — Continue locks until correct).
 - **No bundle-size CI enforcement** (D64 — manual deploy check for MVP).
@@ -248,7 +248,7 @@ Each bucket below is the user-observable contract for a major feature. Implement
 3. **Check → feedback** — Tapping Check shows feedback within the §7 performance budget:
    - **Correct**: green confirmation + `feedbackCorrect` copy; CTA becomes **Continue**.
    - **Wrong**: negative confirmation + matching hint copy (`feedbackByWrong*[key]` if present, else `feedbackDefault`); CTA remains **Check**.
-4. **No bail-out** (D55) — **Continue stays locked on a problem slot until the learner produces a correct answer.** After 2 wrong attempts on the same slot, the variant's `explanation` (if authored) appears as an additional hint beneath the per-wrong feedback, but Continue still does not unlock until correctness is reached. The learner is never *trapped in the lesson* (Close X always works), but cannot *bypass a problem*.
+4. **No bail-out** (D55) — **Continue stays locked on a problem slot until the learner produces a correct answer.** After 2 wrong attempts on the same slot, the variant's `explanation` (if authored) appears as an additional hint beneath the per-wrong feedback, but Continue still does not unlock until correctness is reached. The learner is never _trapped in the lesson_ (Close X always works), but cannot _bypass a problem_.
 5. **CTA states** — The bottom CTA is disabled when the interaction is not ready to submit (empty input, no selection) and enabled the moment a valid answer can be submitted; the label toggles between Check and Continue based on state.
 6. **Slot transition** — Tapping Continue advances to the next slot with a visible transition; per-slot UI state (strikes, current input, feedback, `explanationRevealed`) resets on the new slot.
 7. **Lesson completion** — Tapping Continue on the final slot marks the lesson complete server-side and routes to the celebration screen.
@@ -270,8 +270,8 @@ Each bucket below is the user-observable contract for a major feature. Implement
    - **tap-event**: selected set equals correct set
    - **grid-event**: selected cells set equals correct cells set
    - **multiple-choice**: chosen option id equals correct option id
-4. **Grid is the rich interaction** *(brief requirement)* — A 6×6 grid renders on every supported viewport. Touch targets scale by breakpoint per §9.9: 44 px mobile, 56 px tablet, 64 px desktop. A live counter (`X / 36`) is always visible. Frame rate stays at 60 FPS during rapid tapping.
-5. **Wrong-answer feedback localized** — Only the *incorrect* selections flash rose; correct selections stay neutral / indigo. The interaction shakes once, then accepts further input (per Lesson Player AC #4 — no bail-out).
+4. **Grid is the rich interaction** _(brief requirement)_ — A 6×6 grid renders on every supported viewport. Touch targets scale by breakpoint per §9.9: 44 px mobile, 56 px tablet, 64 px desktop. A live counter (`X / 36`) is always visible. Frame rate stays at 60 FPS during rapid tapping.
+5. **Wrong-answer feedback localized** — Only the _incorrect_ selections flash rose; correct selections stay neutral / indigo. The interaction shakes once, then accepts further input (per Lesson Player AC #4 — no bail-out).
 6. **Correct-answer lock** — Once the slot is marked correct, the interaction becomes read-only — no further taps register — until the player advances to the next slot.
 7. **Slot-reset isolation** — When the player advances to a new slot, every interaction's internal state resets to its initial unselected state. No leakage between slots.
 8. **Responsive input** — Touch targets are ≥44×44 px on mobile, scaling up per breakpoint. Fill-fraction triggers the numeric keyboard on mobile. Fast tapping does not trigger pinch-zoom.
@@ -285,8 +285,8 @@ Each bucket below is the user-observable contract for a major feature. Implement
 
 > XP, streaks, milestones, and the celebration screen are shipped when all of the following are observable in the deployed app.
 
-1. **XP per correct check** — Every correct answer awards XP. First-try correct earns the most; later tries earn progressively less but always >0 (persistence reward). Wrong answers always award 0. XP never decreases. *(Exact values: `spec-habit-loop` `xpForAttempt`; rationale: D31 + D55.)*
-2. **Lesson completion bonus** — A flat bonus is added once on the transition from `in_progress` to `completed`. *(Value in spec.)*
+1. **XP per correct check** — Every correct answer awards XP. First-try correct earns the most; later tries earn progressively less but always >0 (persistence reward). Wrong answers always award 0. XP never decreases. _(Exact values: `spec-habit-loop` `xpForAttempt`; rationale: D31 + D55.)_
+2. **Lesson completion bonus** — A flat bonus is added once on the transition from `in_progress` to `completed`. _(Value in spec.)_
 3. **Streak math** — Streak = consecutive local-tz days with at least one correct check. Increments on the first correct check of a new local-tz day. Resets to 0 the first time a day is missed (no freezes, no grace — D34).
 4. **Best streak tracked** — `bestStreak` updates whenever `currentStreak` exceeds it; never decreases.
 5. **Milestones fire once, ever** — Crossing one of the streak milestone thresholds (6 thresholds spanning 3 days to 100 days) permanently records the milestone; it cannot re-fire even if the streak resets and re-crosses.
@@ -306,7 +306,7 @@ Each bucket below is the user-observable contract for a major feature. Implement
    - **Resume** an in-progress lesson (if one exists)
    - **Start** the next unlocked lesson (if no in-progress)
    - **Replay** (if all unlocked lessons are completed)
-2. **Header shows engagement state** — A sticky header displays: current streak (flame chip, visually distinguished when active vs zero), daily-goal pill (active state when the day's lesson is done), and course progress (`X / Y lessons`, where Y is the size of the *planned* course — live + locked roadmap stubs — so the denominator matches the path the user can see; D91 reverses an earlier "available-only" denominator from D86's pre-roadmap-stubs world).
+2. **Header shows engagement state** — A sticky header displays: current streak (flame chip, visually distinguished when active vs zero), daily-goal pill (active state when the day's lesson is done), and course progress (`X / Y lessons`, where Y is the size of the _planned_ course — live + locked roadmap stubs — so the denominator matches the path the user can see; D91 reverses an earlier "available-only" denominator from D86's pre-roadmap-stubs world).
 3. **Lesson list shows the full planned course** — Every lesson in the catalog (real + locked roadmap stubs, per D86 / D88 / D90) renders with: number badge, title, blurb, estimated minutes, and state (Not started / In progress / Completed / Coming soon). Layout is responsive per §9.9 (1-col mobile, 2-col tablet, 3-col desktop). The original "all 6 lessons" framing is superseded; the catalog size is now driven by `chapters.ts` + `roadmapStubs.ts`, not a hardcoded count.
 4. **Real lesson tap navigates** — Tapping a real (non-`comingSoon`) lesson card routes to `/lesson/:id`.
 5. **Locked lesson tap is blocked** — Tapping a `comingSoon: true` lesson does not navigate; a toast appears explaining it's coming soon. The card briefly indicates the rejected tap.
@@ -342,7 +342,7 @@ Each bucket below is the user-observable contract for a major feature. Implement
 1. **Feedback latency** — Tapping Check shows correct/wrong feedback in **< 100 ms** after the tap, measured on a representative mid-range mobile device (Moto G Power 2022 or iPhone SE 2020).
 2. **Interaction smoothness** — All five interactive surfaces maintain **60 FPS** during active manipulation, verified via Chrome DevTools FPS meter under sustained input (≥50 rapid taps on the grid).
 3. **Initial cold load** — First cold load of any signed-in screen reaches **first interaction in < 2 s** on a mid-range phone over a 4G connection.
-4. **Bundle budget** — First-load JS, gzipped, stays under **300 KB** including all dependencies (React, Firebase SDK, shadcn, Tailwind, app code). **Checked manually on every deploy** via the deploy checklist (see [`docs/deploy-checklist.md`](deploy-checklist.md) *(pending)*); CI enforcement is deferred (D64).
+4. **Bundle budget** — First-load JS, gzipped, stays under **300 KB** including all dependencies (React, Firebase SDK, shadcn, Tailwind, app code). **Checked manually on every deploy** via the deploy checklist (see [`docs/deploy-checklist.md`](deploy-checklist.md) _(pending)_); CI enforcement is deferred (D64).
 5. **Concurrent learners** — Two or more learners taking lessons simultaneously do not affect each other's latency (verified by spot-check during demo prep; inherits from Firestore's per-user isolation).
 6. **Lighthouse audits** — Lighthouse runs on the deployed URL report **≥ 90** for Performance, Accessibility, and Best Practices on **both the mobile and desktop runs** (per Pattern B / D63).
 7. **No layout shift in lesson player** — Slot transitions cause no cumulative layout shift (CLS ≈ 0) at every supported breakpoint; the slot body container preserves its minimum height across slot changes.
@@ -376,12 +376,12 @@ Each bucket below is the user-observable contract for a major feature. Implement
 
 > The MVP is shipped when the following are observably **absent** from the deployed app. Negative criteria protect Phase 2/3 scope and let reviewers verify "we did what we said we would, and we didn't sneak in what we said we wouldn't."
 
-1. **No AI in MVP** — No model API calls (OpenAI, Anthropic, Google, etc.) anywhere in the codebase. No LLM SDKs in `package.json`. No model API keys in `.env` or the deployed build. Verified by a [`docs/deploy-checklist.md`](deploy-checklist.md) *(pending)* `git grep` over the bundle.
+1. **No AI in MVP** — No model API calls (OpenAI, Anthropic, Google, etc.) anywhere in the codebase. No LLM SDKs in `package.json`. No model API keys in `.env` or the deployed build. Verified by a [`docs/deploy-checklist.md`](deploy-checklist.md) _(pending)_ `git grep` over the bundle.
 2. ~~**No social features**~~ — **Reversed (Phase 2):** follow/followers, friend search, friends-only weekly leaderboard, and kudos now exist in UI + Firestore (social graph under `users/{uid}` subcollections + `publicProfiles`). Comments remain absent. See [`spec-social.md`](specs/spec-social.md).
 3. **No real-money payments** — No Stripe or other payment SDK in dependencies; no pricing UI; no paywall. (The coin economy is in-app earned currency only, D83 — no real money changes hands.)
 4. **No content authoring UI** — Lessons are TypeScript files in the repo; modifying a lesson requires a git commit. No admin route exists.
 5. **No offline mode** — Firestore offline persistence is not enabled. The user is shown an "offline" banner when `navigator.onLine === false`, but their actions do not queue locally.
-6. **No off-app notifications** — No Firebase Cloud Messaging, no email service integration, no scheduled push, no streak-warning emails. (An *in-app* schedule reminder dialog exists, D82, but only renders while the app is open.)
+6. **No off-app notifications** — No Firebase Cloud Messaging, no email service integration, no scheduled push, no streak-warning emails. (An _in-app_ schedule reminder dialog exists, D82, but only renders while the app is open.)
 7. ~~**No streak freezes**~~ — **Reversed:** a coin-bought Streak Freeze auto-consumes before the reset (D79 supersedes D34). Without freezes available, streak math is still strict (miss → reset to 0).
 8. **No mastery scoring / spaced repetition** — Lesson progress is a 3-state machine (`not_started` / `in_progress` / `completed`). No per-concept mastery score; no spaced-repetition queue.
 9. **Only Lesson 1 is real** — Lessons 2–6 all have `comingSoon: true` and zero slots in their content files; the lesson player refuses to open them.
@@ -395,21 +395,21 @@ Each bucket below is the user-observable contract for a major feature. Implement
 
 These are failure modes the per-bucket ACs already cover, surfaced here so a reviewer can audit them as a set. Each row links to the AC that owns the resolution.
 
-| # | Edge case | Resolution owned by |
-|---|---|---|
-| E1 | **Network drops mid-final-Continue** — celebration write fails | Lesson Player AC #10 (non-destructive failure + retry); Habit Loop AC #8 (celebration is refresh-safe) |
-| E2 | **Two devices completing the same lesson simultaneously** | Progress AC #4 (append-only log preserves both attempts); completion is idempotent |
-| E3 | **Device clock skew / wrong system timezone** | Habit Loop AC #3, #9 (local-tz detection per D22); gap acknowledged in D22 |
-| E4 | **DST transition / traveler crossing timezones** | Same — daily-goal rollover may feel off at the boundary (acknowledged in D22) |
-| E5 | **Tab closed mid-Check** | Progress AC #4 (server still records the attempt if request reached server); AC #8 (graceful failure if it didn't) |
-| E6 | **Slow phone / 3G / older device** | Performance AC #1, #3 set the mid-range baseline; sub-baseline devices may exceed budget — acceptable per D2 persona |
-| E7 | **Lost password / account hijack** | Out of scope in MVP (PRD §8 — no password recovery). User contacts support manually |
-| E8 | **User on a plane (offline)** | Scope AC #5 (offline banner shown, no local queue) |
-| E9 | **Permanently stuck learner** (cannot solve a problem) | Lesson Player AC #4 (Close X always works, resume keeps state); consequence of D55 — accepted tradeoff |
-| E10 | **Variant pool exhaustion on 3rd+ replay** | Progress AC #3 ("when slots have ≥2 variants"); D30 / D53 — Lesson 1 ships 2 variants/slot, so 3rd replay can repeat |
-| E11 | **Registration race: Firebase Auth account created but Firestore transaction fails** | Auth AC #3 (no orphan auth user left behind — spec handles cleanup) |
-| E12 | **Browser resized mid-lesson from mobile to desktop width** | Responsive AC #2 (window resize stability — no state loss, no layout flash) |
-| E13 | **Phone rotated to landscape mid-lesson** | Responsive AC #4 (desktop layout activates, no orientation lock per D66) |
+| #   | Edge case                                                                            | Resolution owned by                                                                                                  |
+| --- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| E1  | **Network drops mid-final-Continue** — celebration write fails                       | Lesson Player AC #10 (non-destructive failure + retry); Habit Loop AC #8 (celebration is refresh-safe)               |
+| E2  | **Two devices completing the same lesson simultaneously**                            | Progress AC #4 (append-only log preserves both attempts); completion is idempotent                                   |
+| E3  | **Device clock skew / wrong system timezone**                                        | Habit Loop AC #3, #9 (local-tz detection per D22); gap acknowledged in D22                                           |
+| E4  | **DST transition / traveler crossing timezones**                                     | Same — daily-goal rollover may feel off at the boundary (acknowledged in D22)                                        |
+| E5  | **Tab closed mid-Check**                                                             | Progress AC #4 (server still records the attempt if request reached server); AC #8 (graceful failure if it didn't)   |
+| E6  | **Slow phone / 3G / older device**                                                   | Performance AC #1, #3 set the mid-range baseline; sub-baseline devices may exceed budget — acceptable per D2 persona |
+| E7  | **Lost password / account hijack**                                                   | Out of scope in MVP (PRD §8 — no password recovery). User contacts support manually                                  |
+| E8  | **User on a plane (offline)**                                                        | Scope AC #5 (offline banner shown, no local queue)                                                                   |
+| E9  | **Permanently stuck learner** (cannot solve a problem)                               | Lesson Player AC #4 (Close X always works, resume keeps state); consequence of D55 — accepted tradeoff               |
+| E10 | **Variant pool exhaustion on 3rd+ replay**                                           | Progress AC #3 ("when slots have ≥2 variants"); D30 / D53 — Lesson 1 ships 2 variants/slot, so 3rd replay can repeat |
+| E11 | **Registration race: Firebase Auth account created but Firestore transaction fails** | Auth AC #3 (no orphan auth user left behind — spec handles cleanup)                                                  |
+| E12 | **Browser resized mid-lesson from mobile to desktop width**                          | Responsive AC #2 (window resize stability — no state loss, no layout flash)                                          |
+| E13 | **Phone rotated to landscape mid-lesson**                                            | Responsive AC #4 (desktop layout activates, no orientation lock per D66)                                             |
 
 ---
 
@@ -417,16 +417,16 @@ These are failure modes the per-bucket ACs already cover, surfaced here so a rev
 
 **Specs** (implementation details, ~1 sentence per step, junior-engineer friendly):
 
-| Spec | What it owns |
-|---|---|
-| [`spec-content-model`](specs/spec-content-model.md) | `Lesson` / `Slot` / `Variant` TypeScript types and authoring workflow |
-| [`spec-auth`](specs/spec-auth.md) | Firebase Auth, registration, login, logout, profile basics |
-| [`spec-progress-persistence`](specs/spec-progress-persistence.md) | Firestore progress schema, variant selection seeding, resume / replay |
-| [`spec-lesson-player`](specs/spec-lesson-player.md) | Generic lesson player engine that renders one slot at a time |
-| [`spec-interactions`](specs/spec-interactions.md) | The 5 variant renderers (tap-outcomes, fill-fraction, tap-event, grid-event, multiple-choice) |
-| [`spec-habit-loop`](specs/spec-habit-loop.md) | XP, streaks, milestones, lesson completion celebration |
-| [`spec-course-path`](specs/spec-course-path.md) | Home screen with lesson cards |
-| [`spec-profile`](specs/spec-profile.md) | Profile screen with stats and milestones |
+| Spec                                                              | What it owns                                                                                  |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [`spec-content-model`](specs/spec-content-model.md)               | `Lesson` / `Slot` / `Variant` TypeScript types and authoring workflow                         |
+| [`spec-auth`](specs/spec-auth.md)                                 | Firebase Auth, registration, login, logout, profile basics                                    |
+| [`spec-progress-persistence`](specs/spec-progress-persistence.md) | Firestore progress schema, variant selection seeding, resume / replay                         |
+| [`spec-lesson-player`](specs/spec-lesson-player.md)               | Generic lesson player engine that renders one slot at a time                                  |
+| [`spec-interactions`](specs/spec-interactions.md)                 | The 5 variant renderers (tap-outcomes, fill-fraction, tap-event, grid-event, multiple-choice) |
+| [`spec-habit-loop`](specs/spec-habit-loop.md)                     | XP, streaks, milestones, lesson completion celebration                                        |
+| [`spec-course-path`](specs/spec-course-path.md)                   | Home screen with lesson cards                                                                 |
+| [`spec-profile`](specs/spec-profile.md)                           | Profile screen with stats and milestones                                                      |
 
 **Cross-cutting docs:**
 
@@ -434,6 +434,6 @@ These are failure modes the per-bucket ACs already cover, surfaced here so a rev
 - [`docs/ui-stack.md`](ui-stack.md) — UI stack source of truth: shadcn + Framer + selective Animbits, design tokens, breakpoint matrix, consistency rules, scaffold checklist. **Read before building any screen.**
 - [`docs/alternatives.md`](alternatives.md) — running decision history (D1–D69+). Every decision and the alternatives we rejected.
 - [`docs/build-order.md`](build-order.md) — dependency graph for implementing the 7 specs in the right order
-- [`docs/privacy.md`](privacy.md) *(pending)* — COPPA/FERPA stance for the HS audience, given the no-age-gate decision (D48)
-- [`docs/deploy-checklist.md`](deploy-checklist.md) *(pending)* — verification gates that must pass before each deploy
-- [`README.md`](../README.md) *(pending)* — getting-started brief
+- [`docs/privacy.md`](privacy.md) _(pending)_ — COPPA/FERPA stance for the HS audience, given the no-age-gate decision (D48)
+- [`docs/deploy-checklist.md`](deploy-checklist.md) _(pending)_ — verification gates that must pass before each deploy
+- [`README.md`](../README.md) _(pending)_ — getting-started brief

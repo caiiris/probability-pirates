@@ -129,7 +129,10 @@ describe('how-likely (course opener) invariants', () => {
     expect(slot?.kind).toBe('problem');
     if (slot?.kind === 'problem') {
       const variant = slot.variants[0] as GridEventVariant;
-      variant.correctCells = [[6, 6], [7, 7]];
+      variant.correctCells = [
+        [6, 6],
+        [7, 7],
+      ];
     }
     expect(() => assertLessonInvariants(broken)).toThrow(/out of bounds/);
   });

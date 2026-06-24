@@ -65,8 +65,7 @@ export function HomePage() {
   // `realLessons.every(...)`, which prematurely declared "all caught up"
   // after one lesson on the new path layout.
   const allCompleted =
-    lessons.length > 0 &&
-    lessons.every((l) => progressMap.get(l.id)?.state === 'completed');
+    lessons.length > 0 && lessons.every((l) => progressMap.get(l.id)?.state === 'completed');
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
@@ -97,9 +96,7 @@ export function HomePage() {
             title="Streak Freeze ready — protects your streak on a missed day"
           >
             <Snowflake className="w-4 h-4" aria-hidden="true" />
-            {freezes > 1 ? (
-              <span className="text-xs font-bold leading-none">{freezes}</span>
-            ) : null}
+            {freezes > 1 ? <span className="text-xs font-bold leading-none">{freezes}</span> : null}
           </span>
         ) : null}
       </div>

@@ -30,8 +30,8 @@ const GridCell = memo(function GridCell({
     isSelected && flashWrong
       ? 'bg-[color:var(--coral-soft)] text-[color:var(--coral-deep)] border-[color:var(--coral-base)]' // wrong flash
       : isSelected
-      ? 'bg-primary text-primary-foreground border-primary' // correct
-      : 'bg-card border-border text-muted-foreground hover:border-primary/40';
+        ? 'bg-primary text-primary-foreground border-primary' // correct
+        : 'bg-card border-border text-muted-foreground hover:border-primary/40';
 
   return (
     <motion.button
@@ -70,20 +70,23 @@ export function GridEvent({ variant, feedbackState, wrongTick, onChange }: Props
     }
   }, [wrongTick]); // intentional: only re-flash when a new wrong submission arrives
 
-  const toggle = useCallback((row: number, col: number) => {
-    const key = `${row},${col}`;
-    setSelectedCells((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) {
-        next.delete(key);
-      } else {
-        next.add(key);
-      }
-      const cells = [...next].map((k) => k.split(',').map(Number) as [number, number]);
-      onChange(cells.length > 0 ? { selectedCells: cells } : null);
-      return next;
-    });
-  }, [onChange]);
+  const toggle = useCallback(
+    (row: number, col: number) => {
+      const key = `${row},${col}`;
+      setSelectedCells((prev) => {
+        const next = new Set(prev);
+        if (next.has(key)) {
+          next.delete(key);
+        } else {
+          next.add(key);
+        }
+        const cells = [...next].map((k) => k.split(',').map(Number) as [number, number]);
+        onChange(cells.length > 0 ? { selectedCells: cells } : null);
+        return next;
+      });
+    },
+    [onChange],
+  );
 
   const count = selectedCells.size;
   const counterText = variant.liveCounterTemplate.replace('{count}', String(count));

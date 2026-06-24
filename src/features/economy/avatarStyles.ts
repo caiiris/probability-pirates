@@ -24,10 +24,30 @@ export const DEFAULT_AVATAR_STYLE = 'classic';
 
 export const AVATAR_STYLES: AvatarStyle[] = [
   { id: 'classic', name: 'Classic', price: 0, background: null },
-  { id: 'ocean', name: 'Ocean', price: 150, background: 'linear-gradient(135deg, #2E8FFF, #14B8A6)' },
-  { id: 'sunset', name: 'Sunset', price: 150, background: 'linear-gradient(135deg, #F59E0B, #FB5E58)' },
-  { id: 'orchid', name: 'Orchid', price: 150, background: 'linear-gradient(135deg, #6B4EFF, #FB5E58)' },
-  { id: 'forest', name: 'Forest', price: 150, background: 'linear-gradient(135deg, #22C55E, #14B8A6)' },
+  {
+    id: 'ocean',
+    name: 'Ocean',
+    price: 150,
+    background: 'linear-gradient(135deg, #2E8FFF, #14B8A6)',
+  },
+  {
+    id: 'sunset',
+    name: 'Sunset',
+    price: 150,
+    background: 'linear-gradient(135deg, #F59E0B, #FB5E58)',
+  },
+  {
+    id: 'orchid',
+    name: 'Orchid',
+    price: 150,
+    background: 'linear-gradient(135deg, #6B4EFF, #FB5E58)',
+  },
+  {
+    id: 'forest',
+    name: 'Forest',
+    price: 150,
+    background: 'linear-gradient(135deg, #22C55E, #14B8A6)',
+  },
   {
     id: 'gold',
     name: 'Captain\u2019s Gold',

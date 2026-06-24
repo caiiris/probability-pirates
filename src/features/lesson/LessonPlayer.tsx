@@ -43,10 +43,7 @@ import { ERROR_COPY } from '@/lib/errors';
 
 function ReviewBanner() {
   return (
-    <div
-      role="status"
-      className="shrink-0 border-b bg-muted/40 px-4 py-1.5 text-center"
-    >
+    <div role="status" className="shrink-0 border-b bg-muted/40 px-4 py-1.5 text-center">
       <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
         Review · retries don&apos;t affect XP or progress
       </span>
@@ -157,8 +154,7 @@ function LessonPlayerInner({
     lessonStartLoggedRef.current = true;
   }, [progressState, lesson.id, lesson.number]);
 
-  const slotIndex =
-    progressState.status === 'ready' ? progressState.data.slotIndex : 0;
+  const slotIndex = progressState.status === 'ready' ? progressState.data.slotIndex : 0;
   const slots = lesson.slots;
 
   // viewSlotIndex allows the learner to navigate back through completed slots
@@ -239,7 +235,11 @@ function LessonPlayerInner({
 
     const attemptNumber = slotState.attemptNumber;
     const xpAwarded = result.wasCorrect
-      ? attemptNumber === 1 ? 10 : attemptNumber === 2 ? 5 : 2
+      ? attemptNumber === 1
+        ? 10
+        : attemptNumber === 2
+          ? 5
+          : 2
       : 0;
 
     const saved = await recordAttempt({
@@ -286,12 +286,7 @@ function LessonPlayerInner({
     }
 
     if (profile) {
-      const habitResult = await applyAttemptOutcome(
-        uid,
-        profile,
-        attemptNumber,
-        result.wasCorrect,
-      );
+      const habitResult = await applyAttemptOutcome(uid, profile, attemptNumber, result.wasCorrect);
       if (habitResult.ok && habitResult.result.isNewStreakDay) {
         isNewStreakDayRef.current = true;
       }
@@ -361,8 +356,14 @@ function LessonPlayerInner({
         );
         const apply = (r: typeof habitResult) => {
           if (!r.ok) return false;
-          const { xpEarnedThisLesson: xp, newCurrentStreak, isNewStreakDay, newMilestones, newLessonsCompleted, newAchievements } =
-            r.result;
+          const {
+            xpEarnedThisLesson: xp,
+            newCurrentStreak,
+            isNewStreakDay,
+            newMilestones,
+            newLessonsCompleted,
+            newAchievements,
+          } = r.result;
           xpEarnedThisLesson = xp;
           finalCurrentStreak = newCurrentStreak;
           finalIsNewStreakDay = isNewStreakDay;
@@ -480,8 +481,7 @@ function LessonPlayerInner({
 
       // Right arrow: only fire when Continue would be available. Problem slots
       // require a correct answer first; review mode lets you scroll freely.
-      const continueVisible =
-        slot.kind !== 'problem' || slotState.feedbackState === 'correct';
+      const continueVisible = slot.kind !== 'problem' || slotState.feedbackState === 'correct';
       if (isReviewMode || continueVisible) {
         e.preventDefault();
         advanceRef.current();
@@ -500,8 +500,7 @@ function LessonPlayerInner({
   let explanationText: string | undefined;
 
   if (slot.kind === 'problem') {
-    const variant =
-      slot.variants.find((v) => v.id === pickedVariantId) ?? slot.variants[0];
+    const variant = slot.variants.find((v) => v.id === pickedVariantId) ?? slot.variants[0];
     feedbackCorrectText = variant.feedbackCorrect;
 
     if (slotState.feedbackState === 'wrong' && slotState.lastAnswer) {

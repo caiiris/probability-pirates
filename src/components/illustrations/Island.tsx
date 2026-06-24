@@ -32,12 +32,29 @@ export function Island({ className, palm = false }: Props) {
       <path d="M16 51 Q70 4 124 51" fill="none" stroke={SAND_LINE} strokeWidth="2" opacity="0.45" />
 
       {/* little grass tufts on the crown */}
-      <path d="M60 22 q2 -7 4 0" stroke={GRASS} strokeWidth="2.4" strokeLinecap="round" fill="none" />
-      <path d="M66 20 q2 -8 4 0" stroke={GRASS} strokeWidth="2.4" strokeLinecap="round" fill="none" />
+      <path
+        d="M60 22 q2 -7 4 0"
+        stroke={GRASS}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M66 20 q2 -8 4 0"
+        stroke={GRASS}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        fill="none"
+      />
 
       {palm ? (
         <g>
-          <path d="M98 50 C 95 32 98 24 101 18" stroke={TRUNK} strokeWidth="4" strokeLinecap="round" />
+          <path
+            d="M98 50 C 95 32 98 24 101 18"
+            stroke={TRUNK}
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
           <path d="M101 17 C 90 11 82 12 76 17 C 87 15 95 16 101 20 Z" fill={LEAF} />
           <path d="M101 17 C 112 11 120 12 126 17 C 115 15 107 16 101 20 Z" fill={LEAF_DEEP} />
           <path d="M101 16 C 98 7 101 3 106 1 C 101 7 103 13 102 19 Z" fill={LEAF} />

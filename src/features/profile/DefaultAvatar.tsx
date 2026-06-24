@@ -28,9 +28,7 @@ export function DefaultAvatar({ username, size = 96, className, styleId }: Props
       aria-label={`Avatar for ${username}`}
       role="img"
     >
-      <span
-        style={{ fontSize: size * 0.4, color: '#fff', fontWeight: 600, lineHeight: 1 }}
-      >
+      <span style={{ fontSize: size * 0.4, color: '#fff', fontWeight: 600, lineHeight: 1 }}>
         {initial}
       </span>
     </div>

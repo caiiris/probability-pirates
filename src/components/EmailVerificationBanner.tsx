@@ -30,9 +30,7 @@ export function EmailVerificationBanner() {
   return (
     <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 border-b border-amber-200 text-amber-800 text-sm">
       <MailWarning className="w-4 h-4 shrink-0" aria-hidden="true" />
-      <span className="flex-1">
-        Please verify your email address to unlock all features.
-      </span>
+      <span className="flex-1">Please verify your email address to unlock all features.</span>
       <button
         className="font-medium underline underline-offset-2 hover:text-amber-900 disabled:opacity-50 shrink-0"
         onClick={handleResend}

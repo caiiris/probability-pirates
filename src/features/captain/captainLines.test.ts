@@ -1,13 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { CAPTAIN_LINES, captainLine, dailyTipIndex, type CaptainContext } from './captainLines';
 
-const CONTEXTS: CaptainContext[] = [
-  'welcome',
-  'allCaught',
-  'courseComplete',
-  'lessonIntro',
-  'tip',
-];
+const CONTEXTS: CaptainContext[] = ['welcome', 'allCaught', 'courseComplete', 'lessonIntro', 'tip'];
 
 describe('captainLines catalog', () => {
   it('has at least one line per context', () => {

@@ -172,9 +172,7 @@ export async function searchUsers(rawQuery: string, excludeUid?: string): Promis
       limit(10),
     );
     const snap = await getDocs(qy);
-    return snap.docs
-      .map((d) => toSocialUser(d.id, d.data()))
-      .filter((u) => u.uid !== excludeUid);
+    return snap.docs.map((d) => toSocialUser(d.id, d.data())).filter((u) => u.uid !== excludeUid);
   } catch (err) {
     console.warn('[searchUsers] failed:', err);
     return [];

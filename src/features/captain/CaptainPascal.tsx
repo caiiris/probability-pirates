@@ -18,7 +18,14 @@ type Props = {
  * "Pascal lives inside the pirate world" brand together — used at the welcome,
  * the all-caught-up lull, course completion, and lesson intros.
  */
-export function CaptainPascal({ context, name, title, pick, compact = false, className = '' }: Props) {
+export function CaptainPascal({
+  context,
+  name,
+  title,
+  pick,
+  compact = false,
+  className = '',
+}: Props) {
   const line = captainLine(context, { name, title, pick });
 
   if (compact) {

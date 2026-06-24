@@ -54,6 +54,7 @@ counter on another user's document.
 ### Mirroring (Spark plan, no Cloud Functions)
 
 The projection is maintained client-side:
+
 - `registerUser` / `claimUsername` seed `publicProfiles/{uid}` in the same
   transaction as the user doc (`publicProfileSeed`).
 - `habitService` writes a `writeBatch` to both `users/{uid}` and
@@ -99,7 +100,7 @@ push, no email; the bell + dot in the header is the entire surface.
 
 **Why a private subcollection on `users/{uid}` (not `publicProfiles/{uid}`):**
 notifications are addressed personal data ("X followed you"), so they live on
-the owner-only tree. Anyone authenticated can *create* a notification in someone
+the owner-only tree. Anyone authenticated can _create_ a notification in someone
 else's inbox (which is how follows fan out without Cloud Functions), but only
 the recipient can read, mark read, or delete.
 
@@ -153,7 +154,7 @@ event is a reasonable follow-up but is not wired today.
 
 - Activity feed (a chronological feed of friends' actions). The new follow
   notification is point-to-point, not a broadcast feed.
-- Notification *types* beyond `follow` (kudos / achievements / leaderboard
+- Notification _types_ beyond `follow` (kudos / achievements / leaderboard
   movement). Extending the `type` enum + adding a row variant is mechanical when
   wanted.
 - Push or email notifications (no Cloud Functions / messaging configured).

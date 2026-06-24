@@ -72,15 +72,40 @@ function getDots(value: number): [number, number][] {
     case 1:
       return [[M, C]];
     case 2:
-      return [[L, T], [R, B]];
+      return [
+        [L, T],
+        [R, B],
+      ];
     case 3:
-      return [[L, T], [M, C], [R, B]];
+      return [
+        [L, T],
+        [M, C],
+        [R, B],
+      ];
     case 4:
-      return [[L, T], [R, T], [L, B], [R, B]];
+      return [
+        [L, T],
+        [R, T],
+        [L, B],
+        [R, B],
+      ];
     case 5:
-      return [[L, T], [R, T], [M, C], [L, B], [R, B]];
+      return [
+        [L, T],
+        [R, T],
+        [M, C],
+        [L, B],
+        [R, B],
+      ];
     case 6:
-      return [[L, T], [R, T], [L, C], [R, C], [L, B], [R, B]];
+      return [
+        [L, T],
+        [R, T],
+        [L, C],
+        [R, C],
+        [L, B],
+        [R, B],
+      ];
     default:
       return [[M, C]];
   }

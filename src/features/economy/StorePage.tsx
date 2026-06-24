@@ -64,9 +64,12 @@ export function StorePage() {
     setFreezeBusy(true);
     const res = await buyStreakFreeze(uid);
     setFreezeBusy(false);
-    if (res.ok) toast('Streak Freeze added — your streak is protected for one missed day.', { icon: '❄️' });
-    else if (res.reason === 'at-max') toast(`You can hold at most ${MAX_STREAK_FREEZES} Streak Freezes.`);
-    else if (res.reason === 'insufficient') toast('Not enough coins yet — clear a chapter or unlock an achievement.');
+    if (res.ok)
+      toast('Streak Freeze added — your streak is protected for one missed day.', { icon: '❄️' });
+    else if (res.reason === 'at-max')
+      toast(`You can hold at most ${MAX_STREAK_FREEZES} Streak Freezes.`);
+    else if (res.reason === 'insufficient')
+      toast('Not enough coins yet — clear a chapter or unlock an achievement.');
     else toast(ERROR_COPY.economy.purchase);
   }
 
@@ -116,7 +119,10 @@ export function StorePage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-8">
-      <Link to="/profile" className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'gap-1.5 -ml-2' })}>
+      <Link
+        to="/profile"
+        className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'gap-1.5 -ml-2' })}
+      >
         <ArrowLeft className="w-4 h-4" aria-hidden="true" /> Back
       </Link>
 
@@ -174,7 +180,13 @@ export function StorePage() {
                     Equipped
                   </span>
                 ) : ownedStyle ? (
-                  <Button size="sm" variant="outline" className="w-full" disabled={busy} onClick={() => onEquipStyle(style.id)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full"
+                    disabled={busy}
+                    onClick={() => onEquipStyle(style.id)}
+                  >
                     {busy ? '…' : 'Equip'}
                   </Button>
                 ) : (
@@ -213,8 +225,18 @@ export function StorePage() {
             <span className="text-xs font-medium text-muted-foreground">
               Owned: {owned} / {MAX_STREAK_FREEZES}
             </span>
-            <Button size="sm" onClick={onBuyFreeze} disabled={freezeBusy || atMax || !canAffordFreeze}>
-              {atMax ? 'Maxed out' : !canAffordFreeze ? 'Need more coins' : freezeBusy ? 'Buying…' : 'Buy'}
+            <Button
+              size="sm"
+              onClick={onBuyFreeze}
+              disabled={freezeBusy || atMax || !canAffordFreeze}
+            >
+              {atMax
+                ? 'Maxed out'
+                : !canAffordFreeze
+                  ? 'Need more coins'
+                  : freezeBusy
+                    ? 'Buying…'
+                    : 'Buy'}
             </Button>
           </div>
         </div>
@@ -258,7 +280,13 @@ export function StorePage() {
                     <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" /> Equipped
                   </span>
                 ) : owned ? (
-                  <Button size="sm" variant="outline" className="shrink-0" disabled={busy} onClick={() => onEquipFlair(flair.id)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0"
+                    disabled={busy}
+                    onClick={() => onEquipFlair(flair.id)}
+                  >
                     {busy ? '…' : flair.id === DEFAULT_FLAIR ? 'Remove' : 'Equip'}
                   </Button>
                 ) : (

@@ -52,13 +52,7 @@ export function Brandmark({
 }
 
 /** Brandmark + wordmark lockup. Use in app chrome (nav, headers). */
-export function Wordmark({
-  className,
-  markSize = 26,
-}: {
-  className?: string;
-  markSize?: number;
-}) {
+export function Wordmark({ className, markSize = 26 }: { className?: string; markSize?: number }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className ?? ''}`}>
       <Brandmark size={markSize} />

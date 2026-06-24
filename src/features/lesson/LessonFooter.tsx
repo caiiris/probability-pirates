@@ -104,7 +104,9 @@ export function LessonFooter({
             </motion.p>
             {explanationRevealed && explanationText && (
               <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">
-                <p className="text-xs font-medium uppercase tracking-wide mb-1">Still stuck? Here's the idea.</p>
+                <p className="text-xs font-medium uppercase tracking-wide mb-1">
+                  Still stuck? Here's the idea.
+                </p>
                 <p>{explanationText}</p>
               </div>
             )}
@@ -114,22 +116,12 @@ export function LessonFooter({
 
       {/* CTA button */}
       {showCheck && (
-        <Button
-          size="lg"
-          className="w-full"
-          disabled={!isReady || isSubmitting}
-          onClick={onCheck}
-        >
+        <Button size="lg" className="w-full" disabled={!isReady || isSubmitting} onClick={onCheck}>
           Check
         </Button>
       )}
       {showContinue && (
-        <Button
-          size="lg"
-          className="w-full"
-          disabled={isSubmitting}
-          onClick={onContinue}
-        >
+        <Button size="lg" className="w-full" disabled={isSubmitting} onClick={onContinue}>
           Continue
         </Button>
       )}

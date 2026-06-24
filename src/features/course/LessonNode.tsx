@@ -119,10 +119,7 @@ export function LessonNode({ lesson, progress, index, isCurrent }: Props) {
             whileTap={locked ? { x: [0, -4, 4, -4, 4, 0] } : { y: DEPTH, scale: 0.97 }}
             transition={{ duration: 0.18 }}
           >
-            <LessonGlyph
-              glyph={glyph}
-              className={isCurrent ? 'w-10 h-10' : 'w-9 h-9'}
-            />
+            <LessonGlyph glyph={glyph} className={isCurrent ? 'w-10 h-10' : 'w-9 h-9'} />
 
             {completed ? (
               <span className="absolute -right-0.5 -bottom-0.5 grid place-items-center w-6 h-6 rounded-full bg-[color:var(--success)] ring-2 ring-card">

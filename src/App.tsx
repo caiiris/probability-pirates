@@ -60,14 +60,14 @@ export function App() {
                 <EmailVerificationBanner />
                 <Suspense fallback={<RouteFallback />}>
                   <Routes>
-                  {/* Public routes */}
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/register" element={<RegisterPage />} />
+                    {/* Public routes */}
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
 
-                  {/* Half-auth route: signed in to Firebase but no username yet.
+                    {/* Half-auth route: signed in to Firebase but no username yet.
                       Not wrapped in <RequireAuth> — that would loop. The page
                       enforces its own auth-state guards. */}
-                  <Route path="/setup-username" element={<UsernameSetupPage />} />
+                    <Route path="/setup-username" element={<UsernameSetupPage />} />
 
                     {/* Protected routes — wrapped in AppShell for nav chrome */}
                     <Route

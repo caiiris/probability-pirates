@@ -7,12 +7,7 @@ import {
   deleteUser,
   sendEmailVerification,
 } from 'firebase/auth';
-import {
-  doc,
-  getDoc,
-  runTransaction,
-  serverTimestamp,
-} from 'firebase/firestore';
+import { doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
 import { publicProfileSeed } from '@/features/social/publicProfile';
@@ -107,7 +102,10 @@ export async function registerUser(params: {
     const code = (err as { code?: string }).code ?? '';
     console.error('[registerUser] Firestore transaction error:', code, err);
     if (message === 'username-taken') {
-      return { ok: false, error: { code: 'username-taken', message: ERROR_COPY.auth.usernameTaken } };
+      return {
+        ok: false,
+        error: { code: 'username-taken', message: ERROR_COPY.auth.usernameTaken },
+      };
     }
     if (code === 'permission-denied' || code.includes('permission')) {
       return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.permissionDenied } };
@@ -226,8 +224,16 @@ export async function changeUsername(params: {
   if (newLower === oldLower) {
     try {
       await Promise.all([
-        setDoc(doc(db, 'users', uid), { username: newLower, displayUsername: display }, { merge: true }),
-        setDoc(doc(db, 'publicProfiles', uid), { username: newLower, displayUsername: display }, { merge: true }),
+        setDoc(
+          doc(db, 'users', uid),
+          { username: newLower, displayUsername: display },
+          { merge: true },
+        ),
+        setDoc(
+          doc(db, 'publicProfiles', uid),
+          { username: newLower, displayUsername: display },
+          { merge: true },
+        ),
       ]);
       return { ok: true };
     } catch (err) {
@@ -259,7 +265,10 @@ export async function changeUsername(params: {
     const code = (err as { code?: string }).code ?? '';
     console.error('[changeUsername]', code, err);
     if (message === 'username-taken') {
-      return { ok: false, error: { code: 'username-taken', message: ERROR_COPY.auth.usernameTaken } };
+      return {
+        ok: false,
+        error: { code: 'username-taken', message: ERROR_COPY.auth.usernameTaken },
+      };
     }
     if (code === 'permission-denied' || code.includes('permission')) {
       return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.permissionDenied } };
@@ -398,7 +407,10 @@ export async function claimUsername(params: { username: string }): Promise<AuthR
     const code = (err as { code?: string }).code ?? '';
     console.error('[claimUsername]', code, err);
     if (message === 'username-taken') {
-      return { ok: false, error: { code: 'username-taken', message: ERROR_COPY.auth.usernameTaken } };
+      return {
+        ok: false,
+        error: { code: 'username-taken', message: ERROR_COPY.auth.usernameTaken },
+      };
     }
     if (code === 'permission-denied' || code.includes('permission')) {
       return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.permissionDenied } };

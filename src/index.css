@@ -1,11 +1,11 @@
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
-@import "@fontsource/inter/600.css";
-@import "@fontsource/inter/700.css";
-@import "@fontsource-variable/bricolage-grotesque/wght.css";
-@import "@fontsource-variable/jetbrains-mono/wght.css";
-@import "tailwindcss";
-@import "tw-animate-css";
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource-variable/bricolage-grotesque/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -38,23 +38,35 @@
      white for cards so they pop as fresh paper laid on top. Tuned to barely-
      warm rather than yellow parchment so the bg doesn't compete with content
      on grid-heavy pages (Schedule, Practice, Progress). */
-  --paper:       #FAF8F3; /* page background, barely-warm off-white */
-  --surface:     #FFFFFF; /* cards, popovers, sheets               */
-  --ink:         #211C30; /* primary text            */
-  --ink-soft:    #6B6577; /* secondary / muted text  */
-  --line:        #ECEAF1; /* borders, dividers       */
-  --line-strong: #DAD7E2; /* visible rules: path connectors, separators */
-  --fill:        #F4F3F8; /* muted/secondary fills   */
+  --paper: #faf8f3; /* page background, barely-warm off-white */
+  --surface: #ffffff; /* cards, popovers, sheets               */
+  --ink: #211c30; /* primary text            */
+  --ink-soft: #6b6577; /* secondary / muted text  */
+  --line: #eceaf1; /* borders, dividers       */
+  --line-strong: #dad7e2; /* visible rules: path connectors, separators */
+  --fill: #f4f3f8; /* muted/secondary fills   */
 
   /* brand — Pascal violet. Each accent: -soft (tint), -base, -deep (text/edge) */
-  --violet-soft: #EEE9FF;  --violet-base: #6B4EFF;  --violet-deep: #3A2A8C;
+  --violet-soft: #eee9ff;
+  --violet-base: #6b4eff;
+  --violet-deep: #3a2a8c;
 
   /* accents — color lives here and in illustrations; chrome stays calm */
-  --blue-soft:   #E4F0FF;  --blue-base:   #2E8FFF;  --blue-deep:   #1B4F99;
-  --teal-soft:   #DEF6F1;  --teal-base:   #14B8A6;  --teal-deep:   #0B6B61;
-  --green-soft:  #E3F7EA;  --green-base:  #22C55E;  --green-deep:  #15803D;
-  --amber-soft:  #FEF1DA;  --amber-base:  #F59E0B;  --amber-deep:  #B45309;
-  --coral-soft:  #FFE7E6;  --coral-base:  #FB5E58;  --coral-deep:  #B42318;
+  --blue-soft: #e4f0ff;
+  --blue-base: #2e8fff;
+  --blue-deep: #1b4f99;
+  --teal-soft: #def6f1;
+  --teal-base: #14b8a6;
+  --teal-deep: #0b6b61;
+  --green-soft: #e3f7ea;
+  --green-base: #22c55e;
+  --green-deep: #15803d;
+  --amber-soft: #fef1da;
+  --amber-base: #f59e0b;
+  --amber-deep: #b45309;
+  --coral-soft: #ffe7e6;
+  --coral-base: #fb5e58;
+  --coral-deep: #b42318;
 
   /* ---- Layer 2: Semantic tokens (shadcn contract + Pascal additions) ------
      Components reference THESE. Remap the right-hand side to retheme. */
@@ -67,8 +79,8 @@
 
   --primary: var(--violet-base);
   --primary-foreground: #ffffff;
-  --primary-soft: var(--violet-soft);   /* tinted primary surfaces        */
-  --primary-deep: var(--violet-deep);   /* chunky-button depth, pressed   */
+  --primary-soft: var(--violet-soft); /* tinted primary surfaces        */
+  --primary-deep: var(--violet-deep); /* chunky-button depth, pressed   */
 
   --secondary: var(--fill);
   --secondary-foreground: var(--ink);
@@ -213,7 +225,6 @@
     background-repeat: repeat;
     background-attachment: fixed;
   }
-
 
   /* Display face carries headings; intentional negative tracking for tight,
      confident titles. Body and UI text stay Inter. */

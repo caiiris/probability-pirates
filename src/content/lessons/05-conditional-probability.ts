@@ -40,7 +40,8 @@ export const lesson5: Lesson = {
           interactionKind: 'multiple-choice',
           prompt:
             'You pick door 1. Before anything opens, what is the chance the car is behind one of the other two doors combined?',
-          context: 'Your door has a 1 in 3 chance. The rest of the probability has to live somewhere.',
+          context:
+            'Your door has a 1 in 3 chance. The rest of the probability has to live somewhere.',
           options: [
             { id: 'third', label: '1/3' },
             { id: 'half', label: '1/2' },
@@ -48,7 +49,8 @@ export const lesson5: Lesson = {
           ],
           correctOptionId: 'twothirds',
           feedbackCorrect: 'Right. Your door holds 1/3, so the other two together hold 2/3.',
-          feedbackDefault: 'All three doors started at 1/3. How much is left for the two you did not pick?',
+          feedbackDefault:
+            'All three doors started at 1/3. How much is left for the two you did not pick?',
           feedbackByOption: {
             third: 'That is the chance for your single door. The other two together hold more.',
             half: 'It feels like 1/2, but the three doors started equal at 1/3 each, so two of them hold 2/3.',
@@ -74,7 +76,8 @@ export const lesson5: Lesson = {
             third: 'That is just your door. Two doors hold twice as much.',
             half: 'The doors started at 1/3 each, so the two you skipped hold 2/3.',
           },
-          explanation: 'Your door holds 1/3 of the probability; the remaining 2/3 sits on the other two doors.',
+          explanation:
+            'Your door holds 1/3 of the probability; the remaining 2/3 sits on the other two doors.',
         },
       ],
     },
@@ -86,7 +89,8 @@ export const lesson5: Lesson = {
         {
           id: 'doors-sim',
           interactionKind: 'monty-hall',
-          prompt: 'Play a few rounds, then run games on autopilot. Compare always switching against always staying.',
+          prompt:
+            'Play a few rounds, then run games on autopilot. Compare always switching against always staying.',
           minGames: 100,
           feedbackCorrect:
             "There it is. Switching wins about 2/3 of the time, staying about 1/3. Switching turns the host's reveal into information.",
@@ -107,7 +111,8 @@ export const lesson5: Lesson = {
         {
           id: 'switch',
           interactionKind: 'multiple-choice',
-          prompt: 'After 300 games of always switching, you won about 200. So P(win if you switch) is closest to:',
+          prompt:
+            'After 300 games of always switching, you won about 200. So P(win if you switch) is closest to:',
           context: '200 out of 300 reduces to a simple fraction.',
           options: [
             { id: 'third', label: '1/3' },
@@ -121,12 +126,14 @@ export const lesson5: Lesson = {
             third: 'That is the staying rate. Switching is the other way around.',
             half: 'It is not a coin flip. Switching wins about twice as often as staying.',
           },
-          explanation: 'Switching wins whenever your first pick was wrong, which happens 2 times in 3.',
+          explanation:
+            'Switching wins whenever your first pick was wrong, which happens 2 times in 3.',
         },
         {
           id: 'stay',
           interactionKind: 'multiple-choice',
-          prompt: 'After 300 games of always staying, you won about 100. So P(win if you stay) is closest to:',
+          prompt:
+            'After 300 games of always staying, you won about 100. So P(win if you stay) is closest to:',
           context: '100 out of 300 reduces to a simple fraction.',
           options: [
             { id: 'third', label: '1/3' },
@@ -134,7 +141,8 @@ export const lesson5: Lesson = {
             { id: 'twothirds', label: '2/3' },
           ],
           correctOptionId: 'third',
-          feedbackCorrect: 'Right. Staying wins about 1/3, only when your first pick was already the car.',
+          feedbackCorrect:
+            'Right. Staying wins about 1/3, only when your first pick was already the car.',
           feedbackDefault: '100 out of 300 reduces to a simple fraction.',
           feedbackByOption: {
             twothirds: 'That is the switching rate. Staying is the other way around.',
@@ -156,7 +164,8 @@ export const lesson5: Lesson = {
           numerator: 2,
           denominator: 3,
           feedbackCorrect: '2/3. Switching wins two times out of three.',
-          feedbackDefault: 'Switching wins when the first pick missed. How many of the three first picks miss?',
+          feedbackDefault:
+            'Switching wins when the first pick missed. How many of the three first picks miss?',
           feedbackByWrongAnswer: {
             '1/3': 'That is the staying probability. Switching is higher.',
             '1/2': 'Not a coin flip. Switching wins about twice as often as staying.',
@@ -170,7 +179,8 @@ export const lesson5: Lesson = {
           numerator: 1,
           denominator: 3,
           feedbackCorrect: '1/3. Staying only wins when your first pick was right.',
-          feedbackDefault: 'Staying wins only on a correct first guess. How many of the three first picks are right?',
+          feedbackDefault:
+            'Staying wins only on a correct first guess. How many of the three first picks are right?',
           feedbackByWrongAnswer: {
             '2/3': 'That is the switching probability.',
             '1/2': 'Staying wins only on a correct first guess, which is 1 in 3.',
@@ -183,8 +193,7 @@ export const lesson5: Lesson = {
       id: 'wrap',
       kind: 'wrap',
       title: 'Information changed the odds',
-      body:
-        "Switching wins two times out of three because the host's reveal is not random. He always opens a goat, so he hands you information, and conditional probability turns that information into better odds. You have now counted, simulated, and reasoned about conditional chance. Distributions are next.",
+      body: "Switching wins two times out of three because the host's reveal is not random. He always opens a goat, so he hands you information, and conditional probability turns that information into better odds. You have now counted, simulated, and reasoned about conditional chance. Distributions are next.",
       segueToLessonId: 'distributions',
     },
   ],

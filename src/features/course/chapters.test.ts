@@ -8,7 +8,10 @@ describe('chapter structure', () => {
   it('only references lesson ids that exist in the catalog', () => {
     for (const chapter of CHAPTERS) {
       for (const id of chapter.lessonIds) {
-        expect(catalogIds.has(id), `chapter "${chapter.id}" references unknown lesson "${id}"`).toBe(true);
+        expect(
+          catalogIds.has(id),
+          `chapter "${chapter.id}" references unknown lesson "${id}"`,
+        ).toBe(true);
       }
     }
   });

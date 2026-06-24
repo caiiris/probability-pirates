@@ -23,9 +23,7 @@ export const REMOTE_CONFIG_DEFAULTS = {
 /** How long Remote Config values are cached client-side. Per Firebase docs,
  *  fetches throttle to 5/hour in dev — we use 1 hour in prod (default) and
  *  10s during local dev so iterating on flags is fast. */
-export const REMOTE_CONFIG_MIN_FETCH_INTERVAL_MS = import.meta.env.DEV
-  ? 10_000
-  : 60 * 60 * 1000;
+export const REMOTE_CONFIG_MIN_FETCH_INTERVAL_MS = import.meta.env.DEV ? 10_000 : 60 * 60 * 1000;
 
 export function parseAvailableLessonIds(raw: string): string[] {
   try {

@@ -4,11 +4,12 @@
 
 ## Purpose
 
-Let a learner create an account with email + username + password, log in (with email *or* username), and log out. Make the current user and profile available app-wide via `useAuth()`. Establish the user's `/users/{uid}` profile doc so other features (progress, habit loop, profile screen) have somewhere to write to.
+Let a learner create an account with email + username + password, log in (with email _or_ username), and log out. Make the current user and profile available app-wide via `useAuth()`. Establish the user's `/users/{uid}` profile doc so other features (progress, habit loop, profile screen) have somewhere to write to.
 
 ## User-facing behavior
 
 ### Registration (`/register`)
+
 - Fields: email, username, password, confirm password. Single "Create Account" button.
 - Inline validation:
   - Email: standard format check.
@@ -22,6 +23,7 @@ Let a learner create an account with email + username + password, log in (with e
 - New users land with `currentStreak: 0`, `xp: 0`, no avatar.
 
 ### Login (`/login`)
+
 - Fields: email-or-username, password. Single "Sign In" button.
 - On submit:
   - If input looks like email (contains `@`) → call `signInWithEmailAndPassword(email, password)` directly.
@@ -30,44 +32,50 @@ Let a learner create an account with email + username + password, log in (with e
 - On success: route to `/`.
 
 ### Sign out
+
 - Triggered from Profile (see `spec-profile`). Calls `signOut()`, redirects to `/login`.
 
 ### Session
+
 - Firebase Auth persists sessions across reloads via IndexedDB by default. No "Remember me" toggle.
 - Routes are gated by `<RequireAuth>` (see `docs/architecture.md` §5). Unsigned users hitting a gated route are redirected to `/login`.
 
 ## Data model
 
 ### Firestore docs this spec owns
-| Path | Created when | Mutated when |
-| --- | --- | --- |
-| `/users/{uid}` | Registration | Profile edits (see `spec-profile`), XP/streak updates (see `spec-habit-loop`) |
-| `/usernames/{lowercasedUsername}` | Registration | Never (no rename in MVP) |
+
+| Path                              | Created when | Mutated when                                                                  |
+| --------------------------------- | ------------ | ----------------------------------------------------------------------------- |
+| `/users/{uid}`                    | Registration | Profile edits (see `spec-profile`), XP/streak updates (see `spec-habit-loop`) |
+| `/usernames/{lowercasedUsername}` | Registration | Never (no rename in MVP)                                                      |
 
 ### `/users/{uid}` shape (full schema)
-| field | type | default | notes |
-| --- | --- | --- | --- |
-| `username` | string | required | lowercased form, used for lookup |
-| `displayUsername` | string | required | preserves user's chosen casing |
-| `email` | string | required | mirrored from Firebase Auth |
-| `bio` | string | `''` | |
-| `avatarUrl` | string \| null | `null` | |
-| `xp` | number | `0` | |
-| `lessonsCompleted` | number | `0` | |
-| `stepsCompleted` | number | `0` | |
-| `currentStreak` | number | `0` | |
-| `bestStreak` | number | `0` | |
-| `lastActiveDate` | string \| null | `null` | `YYYY-MM-DD` |
-| `milestonesReached` | string[] | `[]` | |
-| `createdAt` | Timestamp | `serverTimestamp()` | |
+
+| field               | type           | default             | notes                            |
+| ------------------- | -------------- | ------------------- | -------------------------------- |
+| `username`          | string         | required            | lowercased form, used for lookup |
+| `displayUsername`   | string         | required            | preserves user's chosen casing   |
+| `email`             | string         | required            | mirrored from Firebase Auth      |
+| `bio`               | string         | `''`                |                                  |
+| `avatarUrl`         | string \| null | `null`              |                                  |
+| `xp`                | number         | `0`                 |                                  |
+| `lessonsCompleted`  | number         | `0`                 |                                  |
+| `stepsCompleted`    | number         | `0`                 |                                  |
+| `currentStreak`     | number         | `0`                 |                                  |
+| `bestStreak`        | number         | `0`                 |                                  |
+| `lastActiveDate`    | string \| null | `null`              | `YYYY-MM-DD`                     |
+| `milestonesReached` | string[]       | `[]`                |                                  |
+| `createdAt`         | Timestamp      | `serverTimestamp()` |                                  |
 
 ### `/usernames/{lowercasedUsername}` shape
-| field | type | notes |
-| --- | --- | --- |
-| `uid` | string | the owning user's UID |
-| `createdAt` | Timestamp | `serverTimestamp()` |
+
+| field       | type      | notes                 |
+| ----------- | --------- | --------------------- |
+| `uid`       | string    | the owning user's UID |
+| `createdAt` | Timestamp | `serverTimestamp()`   |
 
 ### Registration transaction
+
 Username uniqueness has no native Firestore constraint, so registration runs as a sequence with rollback on failure:
 
 ```mermaid
@@ -100,6 +108,7 @@ sequenceDiagram
 The pre-transaction `getDoc` is a UX optimization (catches most collisions without burning an auth account). The transaction is the authoritative check.
 
 ### Firestore security rules (this spec's slice)
+
 ```
 match /users/{uid} {
   allow read: if request.auth != null;
@@ -137,7 +146,7 @@ Other features extend the rules for their own subcollections (see those specs).
 ## Edge cases
 
 - **Registration race condition:** two users submit the same username simultaneously. Both pass the pre-check; the transaction's re-check + sentinel `create` (which fails if doc exists) catches the second; the auth account gets rolled back via `deleteUser`.
-- **Orphan auth user:** `createUserWithEmailAndPassword` succeeds but the Firestore transaction crashes (network drop). The catch block calls `deleteUser` to clean up. If `deleteUser` *also* fails, log to Sentry; the user can re-try registration only after recovering the email (acceptable corner case for MVP).
+- **Orphan auth user:** `createUserWithEmailAndPassword` succeeds but the Firestore transaction crashes (network drop). The catch block calls `deleteUser` to clean up. If `deleteUser` _also_ fails, log to Sentry; the user can re-try registration only after recovering the email (acceptable corner case for MVP).
 - **Login by username when sentinel doc exists but user doc doesn't:** treat as "Email/username or password is incorrect" — same generic error.
 - **User changes their Firebase Auth email outside the app:** the mirrored `email` in `/users/{uid}` becomes stale; login-by-username breaks until they re-register. Out of scope for MVP.
 - **Username with mixed casing:** `Pascal`, `PASCAL`, `pascal` all map to the same sentinel `/usernames/pascal`. Stored `displayUsername` preserves casing for UI.

@@ -63,7 +63,10 @@ export function PublicProfilePage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
-      <Link to="/friends" className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'gap-1.5 -ml-2' })}>
+      <Link
+        to="/friends"
+        className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'gap-1.5 -ml-2' })}
+      >
         <ArrowLeft className="w-4 h-4" aria-hidden="true" /> Back
       </Link>
 
@@ -87,7 +90,11 @@ export function PublicProfilePage() {
           meUser ? (
             <div className="flex items-center gap-2">
               <FollowButton me={meUser} myAchievements={myProfile?.achievements} target={target} />
-              <KudosButton me={meUser} myAchievements={myProfile?.achievements} targetUid={pp.uid} />
+              <KudosButton
+                me={meUser}
+                myAchievements={myProfile?.achievements}
+                targetUid={pp.uid}
+              />
             </div>
           ) : null
         }

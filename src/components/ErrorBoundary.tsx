@@ -20,14 +20,16 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.error) {
       return (
         <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8 text-center">
-          <p className="text-4xl" aria-hidden="true">😬</p>
+          <p className="text-4xl" aria-hidden="true">
+            😬
+          </p>
           <div className="space-y-2">
             <h1 className="text-xl font-semibold">{ERROR_COPY.system.boundaryTitle}</h1>
             <p className="text-sm text-muted-foreground max-w-xs">
               {ERROR_COPY.system.boundaryBody}
             </p>
           </div>
-          <Button onClick={() => window.location.href = '/'}>Back to home</Button>
+          <Button onClick={() => (window.location.href = '/')}>Back to home</Button>
         </div>
       );
     }

@@ -47,11 +47,13 @@ export const ERROR_COPY = {
     tooManyRequests: 'Too many tries just now. Wait a moment, then try again.',
     network: 'We cannot reach the network. Check your connection and try again.',
     // Operator-facing: shown when email/password sign-in is not enabled in Firebase.
-    emailAuthDisabled: 'Email sign-in is not turned on yet. Enable it in the Firebase console under Authentication.',
+    emailAuthDisabled:
+      'Email sign-in is not turned on yet. Enable it in the Firebase console under Authentication.',
     // Operator-facing: shown when Firestore rules block the write.
     permissionDenied: 'We could not reach your account data. Please try again in a moment.',
     signinCancelled: 'Sign-in was cancelled.',
-    popupBlocked: 'Your browser blocked the sign-in popup. Allow popups for this site, then try again.',
+    popupBlocked:
+      'Your browser blocked the sign-in popup. Allow popups for this site, then try again.',
     accountExistsDifferentCredential:
       'An account already uses this email. Sign in with your email and password instead.',
     notSignedIn: 'You are not signed in. Sign in and try again.',

@@ -1,11 +1,5 @@
 /** Card suit icons — hearts, diamonds, clubs, spades. */
-export function CardSuit({
-  suit,
-  className,
-}: {
-  suit: '♥' | '♦' | '♣' | '♠';
-  className?: string;
-}) {
+export function CardSuit({ suit, className }: { suit: '♥' | '♦' | '♣' | '♠'; className?: string }) {
   const isRed = suit === '♥' || suit === '♦';
   return (
     <svg
@@ -16,7 +10,18 @@ export function CardSuit({
       aria-label={suitName(suit)}
       role="img"
     >
-      <rect x="2" y="2" width="52" height="52" rx="8" fill="currentColor" fillOpacity="0.06" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.2" />
+      <rect
+        x="2"
+        y="2"
+        width="52"
+        height="52"
+        rx="8"
+        fill="currentColor"
+        fillOpacity="0.06"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeOpacity="0.2"
+      />
       <text
         x="28"
         y="37"
@@ -33,10 +38,15 @@ export function CardSuit({
 
 function suitName(suit: string) {
   switch (suit) {
-    case '♥': return 'Hearts';
-    case '♦': return 'Diamonds';
-    case '♣': return 'Clubs';
-    case '♠': return 'Spades';
-    default: return suit;
+    case '♥':
+      return 'Hearts';
+    case '♦':
+      return 'Diamonds';
+    case '♣':
+      return 'Clubs';
+    case '♠':
+      return 'Spades';
+    default:
+      return suit;
   }
 }

@@ -112,9 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // so we only branch on `needs_username` when the provider is Google.
       // This avoids a flicker during email signup's brief auth-then-create
       // window.
-      const isGoogleUser = firebaseUser.providerData.some(
-        (p) => p.providerId === 'google.com',
-      );
+      const isGoogleUser = firebaseUser.providerData.some((p) => p.providerId === 'google.com');
       const userRef = doc(db, 'users', firebaseUser.uid);
       unsubProfile = onSnapshot(
         userRef,

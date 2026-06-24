@@ -14,9 +14,7 @@ export function AppFooter() {
   return (
     <footer className="mt-8 border-t border-border/60 px-4 py-6">
       <div className="mx-auto flex max-w-3xl flex-col items-center justify-between gap-2 text-xs text-muted-foreground sm:flex-row">
-        <p>
-          © {year} Probability Pirates · Made by Iris Cai
-        </p>
+        <p>© {year} Probability Pirates · Made by Iris Cai</p>
         <button
           type="button"
           onClick={() => setFeedbackOpen(true)}

@@ -23,7 +23,16 @@ type Props = {
   onForward: () => void;
 };
 
-export function LessonHeader({ slotIndex, totalSlots, currentStreak, currentXp, canGoBack, onBack, canGoForward, onForward }: Props) {
+export function LessonHeader({
+  slotIndex,
+  totalSlots,
+  currentStreak,
+  currentXp,
+  canGoBack,
+  onBack,
+  canGoForward,
+  onForward,
+}: Props) {
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
 

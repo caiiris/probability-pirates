@@ -151,7 +151,9 @@ export function EditProfileDialog({
           </div>
 
           {error && (
-            <p className="text-sm text-destructive" role="alert">{error}</p>
+            <p className="text-sm text-destructive" role="alert">
+              {error}
+            </p>
           )}
         </div>
 

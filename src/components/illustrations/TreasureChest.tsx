@@ -51,10 +51,50 @@ export function TreasureChest({ open = false, className }: Props) {
         <circle cx="56" cy="34" r="4" fill={GOLD_LIGHT} stroke={GOLD_DEEP} strokeWidth="1.3" />
         <circle cx="48" cy="37" r="4.2" fill={GOLD_LIGHT} stroke={GOLD_DEEP} strokeWidth="1.3" />
         {/* gems */}
-        <rect x="44.5" y="20" width="7" height="7" rx="1.4" transform="rotate(45 48 23.5)" fill={RUBY} stroke="#fff" strokeWidth="0.8" />
-        <rect x="35.5" y="26" width="6" height="6" rx="1.2" transform="rotate(45 38.5 29)" fill={EMERALD} stroke="#fff" strokeWidth="0.7" />
-        <rect x="55" y="26" width="6" height="6" rx="1.2" transform="rotate(45 58 29)" fill={SAPPHIRE} stroke="#fff" strokeWidth="0.7" />
-        <rect x="46" y="30" width="5" height="5" rx="1" transform="rotate(45 48.5 32.5)" fill={AMETHYST} stroke="#fff" strokeWidth="0.7" />
+        <rect
+          x="44.5"
+          y="20"
+          width="7"
+          height="7"
+          rx="1.4"
+          transform="rotate(45 48 23.5)"
+          fill={RUBY}
+          stroke="#fff"
+          strokeWidth="0.8"
+        />
+        <rect
+          x="35.5"
+          y="26"
+          width="6"
+          height="6"
+          rx="1.2"
+          transform="rotate(45 38.5 29)"
+          fill={EMERALD}
+          stroke="#fff"
+          strokeWidth="0.7"
+        />
+        <rect
+          x="55"
+          y="26"
+          width="6"
+          height="6"
+          rx="1.2"
+          transform="rotate(45 58 29)"
+          fill={SAPPHIRE}
+          stroke="#fff"
+          strokeWidth="0.7"
+        />
+        <rect
+          x="46"
+          y="30"
+          width="5"
+          height="5"
+          rx="1"
+          transform="rotate(45 48.5 32.5)"
+          fill={AMETHYST}
+          stroke="#fff"
+          strokeWidth="0.7"
+        />
         {/* sparkle on the ruby */}
         <circle cx="46.4" cy="22" r="0.9" fill="#fff" />
       </g>
@@ -69,7 +109,16 @@ export function TreasureChest({ open = false, className }: Props) {
       <rect x="29" y="40" width="5" height="30" fill={GOLD} opacity="0.95" />
       <rect x="62" y="40" width="5" height="30" fill={GOLD} opacity="0.95" />
       {/* jeweled lock */}
-      <rect x="42" y="46" width="12" height="15" rx="2.5" fill={GOLD_LIGHT} stroke={GOLD_DEEP} strokeWidth="1.4" />
+      <rect
+        x="42"
+        y="46"
+        width="12"
+        height="15"
+        rx="2.5"
+        fill={GOLD_LIGHT}
+        stroke={GOLD_DEEP}
+        strokeWidth="1.4"
+      />
       <circle cx="48" cy="53" r="3.1" fill={RUBY} stroke={GOLD_DEEP} strokeWidth="1" />
       <rect x="47" y="54.5" width="2" height="4" rx="1" fill={GOLD_DEEP} />
 

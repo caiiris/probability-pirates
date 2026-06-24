@@ -117,10 +117,7 @@ type PascalEventMap = {
 
 export type PascalEvent = keyof PascalEventMap;
 
-export function track<E extends PascalEvent>(
-  event: E,
-  params: PascalEventMap[E],
-): void {
+export function track<E extends PascalEvent>(event: E, params: PascalEventMap[E]): void {
   void getAnalyticsSafe()
     .then((analytics) => {
       if (!analytics) return;

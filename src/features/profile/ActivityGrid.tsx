@@ -56,7 +56,9 @@ export function ActivityGrid({ activityDates }: Props) {
           {DAY_LABELS.map((label, i) => (
             <div key={label} className="h-4 flex items-center">
               {i % 2 === 1 && (
-                <span className="text-[9px] text-muted-foreground/60 w-6 leading-none">{label}</span>
+                <span className="text-[9px] text-muted-foreground/60 w-6 leading-none">
+                  {label}
+                </span>
               )}
             </div>
           ))}
@@ -80,13 +82,15 @@ export function ActivityGrid({ activityDates }: Props) {
                       isFuture
                         ? 'bg-transparent'
                         : isActive
-                        ? 'bg-primary'
-                        : isToday
-                        ? 'bg-primary/20 ring-1 ring-primary/40'
-                        : 'bg-muted'
+                          ? 'bg-primary'
+                          : isToday
+                            ? 'bg-primary/20 ring-1 ring-primary/40'
+                            : 'bg-muted'
                     }`}
                     title={isFuture ? undefined : `${dateStr}${isActive ? ' ✓ active' : ''}`}
-                    aria-label={isFuture ? undefined : `${dateStr}${isActive ? ', active' : ', no activity'}`}
+                    aria-label={
+                      isFuture ? undefined : `${dateStr}${isActive ? ', active' : ', no activity'}`
+                    }
                   />
                 );
               })}

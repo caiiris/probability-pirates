@@ -19,8 +19,7 @@ export function OceanScene({ children, calm = false }: { children: ReactNode; ca
     <div
       className="relative overflow-hidden rounded-3xl border border-[color:var(--info)]/15 shadow-soft"
       style={{
-        background:
-          'linear-gradient(180deg, #EAF5FF 0%, #CFE9FF 26%, #B3DDFF 60%, #9ED2FB 100%)',
+        background: 'linear-gradient(180deg, #EAF5FF 0%, #CFE9FF 26%, #B3DDFF 60%, #9ED2FB 100%)',
       }}
     >
       {/* sun */}
@@ -32,8 +31,18 @@ export function OceanScene({ children, calm = false }: { children: ReactNode; ca
 
       {/* drifting clouds */}
       <Cloud className="absolute left-6 top-10 w-20 opacity-90" duration={26} drift={40} />
-      <Cloud className="absolute right-10 top-24 w-14 opacity-80" duration={32} drift={-30} delay={4} />
-      <Cloud className="absolute left-1/4 top-44 w-16 opacity-75" duration={38} drift={50} delay={8} />
+      <Cloud
+        className="absolute right-10 top-24 w-14 opacity-80"
+        duration={32}
+        drift={-30}
+        delay={4}
+      />
+      <Cloud
+        className="absolute left-1/4 top-44 w-16 opacity-75"
+        duration={38}
+        drift={50}
+        delay={8}
+      />
 
       {/* seagulls */}
       <Gulls className="absolute left-1/2 top-16 -translate-x-1/2" />
@@ -45,9 +54,30 @@ export function OceanScene({ children, calm = false }: { children: ReactNode; ca
           `calm` mode (identity banners) to declutter the small card. */}
       {!calm && (
         <>
-          <SkyDie className="absolute left-[13%]" style={{ top: 10 }} accent="amber" pips={5} size={28} delay={0} />
-          <SkyDie className="absolute left-[45%]" style={{ top: 40 }} accent="violet" pips={3} size={23} delay={0.9} />
-          <SkyDie className="absolute left-[78%]" style={{ top: 12 }} accent="teal" pips={2} size={22} delay={1.6} />
+          <SkyDie
+            className="absolute left-[13%]"
+            style={{ top: 10 }}
+            accent="amber"
+            pips={5}
+            size={28}
+            delay={0}
+          />
+          <SkyDie
+            className="absolute left-[45%]"
+            style={{ top: 40 }}
+            accent="violet"
+            pips={3}
+            size={23}
+            delay={0.9}
+          />
+          <SkyDie
+            className="absolute left-[78%]"
+            style={{ top: 12 }}
+            accent="teal"
+            pips={2}
+            size={22}
+            delay={1.6}
+          />
         </>
       )}
 
@@ -59,9 +89,28 @@ export function OceanScene({ children, calm = false }: { children: ReactNode; ca
       ))}
 
       {/* foam wave bands */}
-      <WaveBand className="absolute left-0 right-0" style={{ top: '38%' }} color="#FFFFFF" opacity={0.4} duration={18} />
-      <WaveBand className="absolute left-0 right-0" style={{ top: '64%' }} color="#FFFFFF" opacity={0.32} duration={22} reverse />
-      <WaveBand className="absolute left-0 right-0" style={{ top: '86%' }} color="#FFFFFF" opacity={0.28} duration={26} />
+      <WaveBand
+        className="absolute left-0 right-0"
+        style={{ top: '38%' }}
+        color="#FFFFFF"
+        opacity={0.4}
+        duration={18}
+      />
+      <WaveBand
+        className="absolute left-0 right-0"
+        style={{ top: '64%' }}
+        color="#FFFFFF"
+        opacity={0.32}
+        duration={22}
+        reverse
+      />
+      <WaveBand
+        className="absolute left-0 right-0"
+        style={{ top: '86%' }}
+        color="#FFFFFF"
+        opacity={0.28}
+        duration={26}
+      />
 
       {/* the path itself — extra top room keeps the first chapter banner clear
           of the sky decorations (sun, clouds, gulls, flying dice) above it */}
@@ -170,7 +219,14 @@ function Gulls({ className }: { className?: string }) {
       animate={{ x: [-20, 20, -20], y: [0, -4, 0] }}
       transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
     >
-      <svg viewBox="0 0 60 20" className="w-16 text-[color:var(--ink-soft)]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <svg
+        viewBox="0 0 60 20"
+        className="w-16 text-[color:var(--ink-soft)]"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      >
         <path d="M4 10 Q9 4 14 10 Q19 4 24 10" />
         <path d="M34 13 Q38 8 42 13 Q46 8 50 13" opacity="0.7" />
       </svg>

@@ -53,15 +53,12 @@ export function HeroCard({ lessons, progressMap, displayUsername, isNewUser }: P
   const realLessons = lessons.filter((l) => !l.comingSoon);
 
   // Determine hero state
-  const inProgress = realLessons.find(
-    (l) => progressMap.get(l.id)?.state === 'in_progress',
-  );
+  const inProgress = realLessons.find((l) => progressMap.get(l.id)?.state === 'in_progress');
   // "All caught up" means the whole planned course is done — not just the
   // currently-authored lessons. Otherwise the celebration would fire after
   // one lesson on a path full of locked roadmap stubs (D91).
   const allCompleted =
-    lessons.length > 0 &&
-    lessons.every((l) => progressMap.get(l.id)?.state === 'completed');
+    lessons.length > 0 && lessons.every((l) => progressMap.get(l.id)?.state === 'completed');
   const nextUnstarted = realLessons.find((l) => !progressMap.has(l.id));
   // The first lesson a brand-new learner starts: follow the catalog rather than
   // a hardcoded id, so it tracks whatever the first playable lesson is.
@@ -154,7 +151,9 @@ function WelcomeHero({
   return (
     <div className="relative flex flex-col gap-4 pr-8">
       <CaptainPascal context="welcome" name={displayUsername} compact />
-      <Button onClick={onStart} className="w-full">Start your first lesson</Button>
+      <Button onClick={onStart} className="w-full">
+        Start your first lesson
+      </Button>
       <DismissButton onClick={onDismiss} label="Dismiss welcome" />
     </div>
   );
@@ -173,13 +172,15 @@ function ResumeHero({
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
-        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">
-          In progress
+        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">In progress</p>
+        <p className="font-semibold">
+          Lesson {lesson.number}: {lesson.title}
         </p>
-        <p className="font-semibold">Lesson {lesson.number}: {lesson.title}</p>
         <p className="text-sm text-muted-foreground mt-0.5">{slotLabel}</p>
       </div>
-      <Button onClick={onResume} className="shrink-0">Continue</Button>
+      <Button onClick={onResume} className="shrink-0">
+        Continue
+      </Button>
     </div>
   );
 }
@@ -188,12 +189,14 @@ function StartHero({ lesson, onStart }: { lesson: Lesson; onStart: () => void })
   return (
     <div className="flex items-center justify-between gap-4">
       <div>
-        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">
-          Up next
+        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Up next</p>
+        <p className="font-semibold">
+          Lesson {lesson.number}: {lesson.title}
         </p>
-        <p className="font-semibold">Lesson {lesson.number}: {lesson.title}</p>
       </div>
-      <Button onClick={onStart} className="shrink-0">Start</Button>
+      <Button onClick={onStart} className="shrink-0">
+        Start
+      </Button>
     </div>
   );
 }

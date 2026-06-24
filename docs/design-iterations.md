@@ -164,7 +164,7 @@ Tester: caiiris1011
 ### Design choices
 
 - **Two new interaction kinds, not five-kinds-only.** The three payoff moments (LLN convergence, birthday paradox, Monty Hall) are simulations, which is the PRD's whole premise ("every claim is verifiable by simulation"). Forcing them into multiple-choice would mean telling the punchline instead of showing it. Added `simulate-proportion` and `monty-hall` (now 7 kinds). `docs/ui-stack.md` already anticipated this ("custom SVG/canvas for simulations in Lesson 2+") and `spec-interactions.md` says to extend the union per new lesson. See `docs/issues.md` I028.
-- **Engagement gate, not a fake right/wrong.** A simulation has no wrong answer, so each new kind grades on *engagement*: the renderer emits a non-null answer only once the learner has run `minTrials` (200) / `minGames` (100). Check stays disabled until then, so there is no synthetic "wrong" state and the no-bail-out rule (D55) holds by construction. The `feedbackByWrongValue.incomplete` hint is therefore mostly unreachable in normal play (parallel to B045) but is kept as a safety net.
+- **Engagement gate, not a fake right/wrong.** A simulation has no wrong answer, so each new kind grades on _engagement_: the renderer emits a non-null answer only once the learner has run `minTrials` (200) / `minGames` (100). Check stays disabled until then, so there is no synthetic "wrong" state and the no-bail-out rule (D55) holds by construction. The `feedbackByWrongValue.incomplete` hint is therefore mostly unreachable in normal play (parallel to B045) but is kept as a safety net.
 - **One shared engine.** Both new renderers share `ProportionChart` (dependency-free inline SVG, no chart lib per ui-stack) and `src/lib/simulations.ts` (pure, unit-tested trial generators). The Monty Hall logic reduces to "switch wins iff the first pick missed the car," verified by a test that the switch rate lands near 2/3 over 6000 games.
 - **`simulate-proportion` is scenario-driven** (`coin`, `die-six`, `birthday`) so one renderer powers both Lesson 2 (coin/die convergence to 0.5 / 1/6) and Lesson 3 (rooms of 23 or 30 birthdays converging to ~50.7% / ~70.6%). The per-trial visual swaps per scenario; the convergence engine and chart are shared.
 - **`monty-hall` is one slot, two modes:** hand-play rounds (pick a door, host reveals a goat, switch or stay) to build intuition, plus an autopilot batch that races always-switch vs always-stay win rates toward the 2/3 and 1/3 reference lines.
@@ -268,41 +268,41 @@ Tester: caiiris1011
 
 ## Summary table
 
-| ID | Issue | Category | Severity | Status |
-| --- | --- | --- | --- | --- |
-| T1-01 | Email verification on signup | auth | high | **done** |
-| T1-02 | 3D die illustration + tap feel | interaction · visual | high | **done** |
-| T1-03 | Interactive die context for even-number problem | interaction · content | high | **done** |
-| T1-04 | Wrong-answer flash doesn't repeat | interaction | medium | **done** |
-| T1-05 | Two-dice page needs live simulation | content · interaction | high | **done** |
-| T1-06 | "Which is more likely?" needs visuals | content · visual | medium | **done** |
+| ID    | Issue                                           | Category              | Severity | Status   |
+| ----- | ----------------------------------------------- | --------------------- | -------- | -------- |
+| T1-01 | Email verification on signup                    | auth                  | high     | **done** |
+| T1-02 | 3D die illustration + tap feel                  | interaction · visual  | high     | **done** |
+| T1-03 | Interactive die context for even-number problem | interaction · content | high     | **done** |
+| T1-04 | Wrong-answer flash doesn't repeat               | interaction           | medium   | **done** |
+| T1-05 | Two-dice page needs live simulation             | content · interaction | high     | **done** |
+| T1-06 | "Which is more likely?" needs visuals           | content · visual      | medium   | **done** |
 
 ---
 
 ### 2026-06-23 — Test Session 2 immediate issues resolved (T2-01 through T2-04)
 
-| ID | Fix summary |
-| --- | --- |
-| T2-01 | `viewSlotIndex` local state in `LessonPlayerInner`; `←` chevron in `LessonHeader`; review mode shows read-only slot + "Next →" footer |
-| T2-02 | `gridReference` field on `MultipleChoiceVariant`; `ReferenceGrid` + collapsible "View grid" toggle in `MultipleChoice.tsx`; populated on both `which-more-likely` variants |
+| ID    | Fix summary                                                                                                                                                                          |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------- | ------ | -------- |
+| T2-01 | `viewSlotIndex` local state in `LessonPlayerInner`; `←` chevron in `LessonHeader`; review mode shows read-only slot + "Next →" footer                                                |
+| T2-02 | `gridReference` field on `MultipleChoiceVariant`; `ReferenceGrid` + collapsible "View grid" toggle in `MultipleChoice.tsx`; populated on both `which-more-likely` variants           |
 | T2-03 | `activityDates: string[]` added to `UserProfile` and `registerUser`; `arrayUnion(today)` written in `applyAttemptOutcome`; `ActivityGrid` 16-week heatmap component on `ProfilePage` |
-| T2-04 | `MilestonesRow` rebuilt: shows all 6 milestone thresholds (earned = amber trophy, locked = grey lock); next-target progress banner at top; section renamed "Trophies" |
-| T1-07 | Generic error messages need custom copy | ux · content | medium | **done** |
-| T1-08 | Design too plain; needs personality | visual | medium | open |
-| T1-09 | Audience expansion + engagement features | scope | low | open |
-| T2-01 | Back button in lesson player | ux · interaction | high | **done** |
-| T2-02 | "Use the grid above" reference panel | content · ux | high | **done** |
-| T2-03 | Profile activity/progress grid | visual · ux | medium | **done** |
-| T2-04 | Trophies — show all milestones, locked + earned | visual · engagement | medium | **done** |
+| T2-04 | `MilestonesRow` rebuilt: shows all 6 milestone thresholds (earned = amber trophy, locked = grey lock); next-target progress banner at top; section renamed "Trophies"                |
+| T1-07 | Generic error messages need custom copy                                                                                                                                              | ux · content        | medium | **done** |
+| T1-08 | Design too plain; needs personality                                                                                                                                                  | visual              | medium | open     |
+| T1-09 | Audience expansion + engagement features                                                                                                                                             | scope               | low    | open     |
+| T2-01 | Back button in lesson player                                                                                                                                                         | ux · interaction    | high   | **done** |
+| T2-02 | "Use the grid above" reference panel                                                                                                                                                 | content · ux        | high   | **done** |
+| T2-03 | Profile activity/progress grid                                                                                                                                                       | visual · ux         | medium | **done** |
+| T2-04 | Trophies — show all milestones, locked + earned                                                                                                                                      | visual · engagement | medium | **done** |
 
 ---
 
 ### 2026-06-23 — Test Session 3 (T3-01)
 
-| ID | Fix summary |
-| --- | --- |
+| ID    | Fix summary                                                                                                                                                                                                                                                                                                                                                   |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ---- | -------- |
 | T3-01 | Full study calendar at `/schedule`: month grid with event dots, day event list, add/check-off/delete events, upcoming strip, "Link to lesson" option. Firestore `studyEvents` subcollection with owner-only CRUD rules (deployed). AI study plan hook documented in architecture — `studyEvents` collection is the natural write target for a generated plan. |
-| T3-01 | Calendar / study scheduler | feature · ux | high | **done** |
+| T3-01 | Calendar / study scheduler                                                                                                                                                                                                                                                                                                                                    | feature · ux | high | **done** |
 
 ---
 
@@ -396,11 +396,11 @@ Triggered by owner feedback that Lesson 1 read as "fact, task, fact, task" rathe
 
 ### Lesson 1 — three-act arc
 
-| Act | Slots | Pedagogical job |
-| --- | --- | --- |
+| Act                  | Slots                                                                                                             | Pedagogical job                                                                                                                                                                                                                                                       |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 — one random thing | `hook` → `sample-space-def` → `sample-space` (tap-outcomes) → `equally-likely` → `single-outcome` (fill-fraction) | Pose the question before the formula. Introduce **outcome** and **sample space** as named building blocks, then enforce them by tapping. Surface the equally-likely assumption so Lesson 2 has a hook to break. Apply the formula on the simplest case before events. |
-| 2 — events | `event-def` → `define-event` (tap-event) → `compute-probability` (fill-fraction) → `reduce` | Define **event** as a set of outcomes, then identify and count it, then divide. Fixes the prior order tangle (computing P(even) before "event" was defined). The `reduce` slot carries the first proof beat: `{3/6} = {(3/3)/(6/3)} = {1/2}`. |
-| 3 — two dice | `two-dice-intro` → `all-sums-equal` → `grid-sum` (grid-event) → `which-more-likely` (multiple-choice) → `wrap` | Derive 6 × 6 = 36 via the multiplication principle (second proof beat, worked-example block). Plant the naive intuition ("all sums equally likely?") so the reveal lands. Existing grid + multiple-choice interactions carry the payoff. |
+| 2 — events           | `event-def` → `define-event` (tap-event) → `compute-probability` (fill-fraction) → `reduce`                       | Define **event** as a set of outcomes, then identify and count it, then divide. Fixes the prior order tangle (computing P(even) before "event" was defined). The `reduce` slot carries the first proof beat: `{3/6} = {(3/3)/(6/3)} = {1/2}`.                         |
+| 3 — two dice         | `two-dice-intro` → `all-sums-equal` → `grid-sum` (grid-event) → `which-more-likely` (multiple-choice) → `wrap`    | Derive 6 × 6 = 36 via the multiplication principle (second proof beat, worked-example block). Plant the naive intuition ("all sums equally likely?") so the reveal lands. Existing grid + multiple-choice interactions carry the payoff.                              |
 
 All copy authored in Lesson 1's existing voice under `docs/ui-directive.md` (no em dashes, sentence case, no banned vocabulary, no filler subtitles). Every problem slot keeps 2 variants for replay.
 
@@ -421,38 +421,38 @@ All copy authored in Lesson 1's existing voice under `docs/ui-directive.md` (no 
 
 ## New L3 — Counting carefully (combinatorics) — 2026-06-23
 
-Triggered by a gap surfaced during the L1 pedagogy review: the existing L3 (birthday paradox) *uses* combinatorial reasoning — "(4 × 3)/2 = 6", "23 people form 253 pairs", `P(no shared birthday) = 365/365 × 364/365 × …` — but never *teaches* it. The student is asked to take three unnamed tools (multiplication principle, combinations, complement counting) on faith. The fix: insert a dedicated combinatorics lesson before the birthday lesson. Recorded as D76.
+Triggered by a gap surfaced during the L1 pedagogy review: the existing L3 (birthday paradox) _uses_ combinatorial reasoning — "(4 × 3)/2 = 6", "23 people form 253 pairs", `P(no shared birthday) = 365/365 × 364/365 × …` — but never _teaches_ it. The student is asked to take three unnamed tools (multiplication principle, combinations, complement counting) on faith. The fix: insert a dedicated combinatorics lesson before the birthday lesson. Recorded as D76.
 
 ### Course shuffle
 
-| New # | id | What it teaches | Source |
-| --- | --- | --- | --- |
-| L1 | what-is-probability | Sample space, events, two dice | unchanged |
-| L2 | law-of-large-numbers | Why simulation works | unchanged |
-| **L3** | **counting-carefully** | **Multiplication, addition, permutations, combinations, complement** | **NEW** |
-| L4 | counting-gets-hard | Birthday paradox | was L3, `number: 4` |
-| L5 | conditional-probability | Monty Hall | was L4, `number: 5` |
-| L6 | distributions | Coming-soon stub | was L5, `number: 6` |
-| (dropped) | central-limit-theorem | Was a coming-soon stub | deleted to keep the course at 6 |
+| New #     | id                      | What it teaches                                                      | Source                          |
+| --------- | ----------------------- | -------------------------------------------------------------------- | ------------------------------- |
+| L1        | what-is-probability     | Sample space, events, two dice                                       | unchanged                       |
+| L2        | law-of-large-numbers    | Why simulation works                                                 | unchanged                       |
+| **L3**    | **counting-carefully**  | **Multiplication, addition, permutations, combinations, complement** | **NEW**                         |
+| L4        | counting-gets-hard      | Birthday paradox                                                     | was L3, `number: 4`             |
+| L5        | conditional-probability | Monty Hall                                                           | was L4, `number: 5`             |
+| L6        | distributions           | Coming-soon stub                                                     | was L5, `number: 6`             |
+| (dropped) | central-limit-theorem   | Was a coming-soon stub                                               | deleted to keep the course at 6 |
 
 ### Lesson 3 — pedagogical arc (14 slots, ~7 minutes)
 
-| Slot | Kind | Job |
-| --- | --- | --- |
-| `hook` | concept (rich) | "A 5-card hand has 2.5M outcomes. Count without listing." |
-| `multiplication-principle` | concept (rich + worked example) | m × n × … for sequential independent choices. Outfits worked through. |
-| `multiply-problem` | multiple-choice ×2 | 4 entrees × 3 desserts; license-plate prefix 26 × 10³. |
-| `addition-principle` | concept (rich + worked example) | Either-or, mutually exclusive: add not multiply. Bus or train. |
-| `add-vs-multiply` | multiple-choice ×2 | Discriminator — the most common mistake. |
-| `permutations` | concept (rich + worked example) | 3! arrangements of ABC listed. Generalize to nPk. |
-| `permute-problem` | multiple-choice ×2 | 4! race orders; 5 × 4 × 3 podiums from 5 runners. |
-| `combinations` | concept (rich + worked example) | **The proof beat the prior L3 was missing.** 12 ordered pairs / 2 = 6 unordered. nCk = `{n!/(k!(n-k)!)}`. |
-| `combine-problem` | multiple-choice ×2 | 5C3 ice-cream trios; 6C2 handshakes. |
-| `order-or-not` | concept (rich) | "Swap two items: same outcome?" rubric for ordered vs unordered. |
-| `which-is-it` | multiple-choice ×2 | Lottery ticket (unordered); basketball starting five (unordered). |
-| `complement` | concept (rich + worked example) | `P(at least 1 head in 3 flips) = 1 − {1/8} = {7/8}`. Names the trick the birthday lesson needs. |
-| `complement-problem` | fill-fraction ×2 | `P(at least one six in two rolls) = 11/36`; `P(at least one head in 4 flips) = 15/16`. |
-| `wrap` | wrap | Segue into the birthday paradox: "Twenty-three people, 253 pairs." |
+| Slot                       | Kind                            | Job                                                                                                       |
+| -------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `hook`                     | concept (rich)                  | "A 5-card hand has 2.5M outcomes. Count without listing."                                                 |
+| `multiplication-principle` | concept (rich + worked example) | m × n × … for sequential independent choices. Outfits worked through.                                     |
+| `multiply-problem`         | multiple-choice ×2              | 4 entrees × 3 desserts; license-plate prefix 26 × 10³.                                                    |
+| `addition-principle`       | concept (rich + worked example) | Either-or, mutually exclusive: add not multiply. Bus or train.                                            |
+| `add-vs-multiply`          | multiple-choice ×2              | Discriminator — the most common mistake.                                                                  |
+| `permutations`             | concept (rich + worked example) | 3! arrangements of ABC listed. Generalize to nPk.                                                         |
+| `permute-problem`          | multiple-choice ×2              | 4! race orders; 5 × 4 × 3 podiums from 5 runners.                                                         |
+| `combinations`             | concept (rich + worked example) | **The proof beat the prior L3 was missing.** 12 ordered pairs / 2 = 6 unordered. nCk = `{n!/(k!(n-k)!)}`. |
+| `combine-problem`          | multiple-choice ×2              | 5C3 ice-cream trios; 6C2 handshakes.                                                                      |
+| `order-or-not`             | concept (rich)                  | "Swap two items: same outcome?" rubric for ordered vs unordered.                                          |
+| `which-is-it`              | multiple-choice ×2              | Lottery ticket (unordered); basketball starting five (unordered).                                         |
+| `complement`               | concept (rich + worked example) | `P(at least 1 head in 3 flips) = 1 − {1/8} = {7/8}`. Names the trick the birthday lesson needs.           |
+| `complement-problem`       | fill-fraction ×2                | `P(at least one six in two rolls) = 11/36`; `P(at least one head in 4 flips) = 15/16`.                    |
+| `wrap`                     | wrap                            | Segue into the birthday paradox: "Twenty-three people, 253 pairs."                                        |
 
 All copy authored in Lesson 1's voice under `docs/ui-directive.md` (no em dashes, sentence case, no banned vocabulary, no filler subtitles). Every problem variant carries full `feedbackByOption` / `feedbackByWrongAnswer` and an `explanation`.
 
@@ -464,7 +464,7 @@ All copy authored in Lesson 1's voice under `docs/ui-directive.md` (no em dashes
 - New course-path glyph: `'tree'` in `src/features/course/LessonGlyph.tsx` (root node branching twice into four leaves — the multiplication principle's canonical visualization). `lessonVisuals.ts` maps `counting-carefully → { accent: 'green', glyph: 'tree' }`; the orphaned `central-limit-theorem` entry was removed; Distributions moved to the coral accent so its slot at L6 reads visually distinct.
 - `src/content/index.ts` rewritten to import the new L3 and drop the CLT lesson; exports stay `lesson1..lesson6`.
 - `src/features/flags/remoteFlagsConfig.ts` adds `'counting-carefully'` to the default `available_lesson_ids` so the new L3 ships playable on cold start. Remote Config template push to follow (same launch pattern as Lessons 2-4).
-- `src/content/lessons/02-law-of-large-numbers.ts` segue updated: wrap now points to `'counting-carefully'`; the "next, the counting itself becomes the wall" line was rewritten to set up the *tools* before the wall ("the counting tools that make the formula side work when the sample space is too big to list"). One forward-reference inside an L2 problem ("next lesson") was also rephrased to "in the birthday lesson coming up" so the foreshadow pays off in L4 instead of misfiring at L3.
+- `src/content/lessons/02-law-of-large-numbers.ts` segue updated: wrap now points to `'counting-carefully'`; the "next, the counting itself becomes the wall" line was rewritten to set up the _tools_ before the wall ("the counting tools that make the formula side work when the sample space is too big to list"). One forward-reference inside an L2 problem ("next lesson") was also rephrased to "in the birthday lesson coming up" so the foreshadow pays off in L4 instead of misfiring at L3.
 
 ### Tests
 
@@ -483,7 +483,7 @@ All copy authored in Lesson 1's voice under `docs/ui-directive.md` (no em dashes
 
 ## 3D coin — flip-as-signature on the tap-coin variant — 2026-06-23
 
-Tiny owner request late in the L1/L3/L4/L5 pass: *"get a 3d coin in the tap every face of this coin, in the bottom right. it just stays there. if i click on it, it flips over to show the other face."*
+Tiny owner request late in the L1/L3/L4/L5 pass: _"get a 3d coin in the tap every face of this coin, in the bottom right. it just stays there. if i click on it, it flips over to show the other face."_
 
 > **Un-mounted same-day, 2026-06-23.** Owner reviewed the live screen and called the combination confusing — a literal 3D coin in the corner next to a "tap every face of this coin" prompt that pointed at flat H/T tiles. The fix was to redesign the question itself (see "Sample-space slot — tap-faces → multiple-choice 'how large'" entry below); the 3D coin no longer has a contextual home in L1. The component file (`src/components/illustrations/Coin3D.tsx`) is preserved for future use; only the mount in `TapOutcomes.tsx` was removed.
 
@@ -501,7 +501,7 @@ The flip is the only interaction: click → spring `rotateY` between 0° and 180
 
 The frontend-design skill named three AI-default looks. For a coin, the equivalents are casino-gold, US-mint silver, and the abstract dot-and-ring. All three were rejected.
 
-- **Two-tone violet, not casino gold.** Heads is a lighter violet wash (`#B7A7FF → #4F36AB`), tails is the standard primary violet (`#8E76FF → #3A2A8C`). Both stay on the brand ramp so the coin reads as *minted for this app*, not transplanted from a Vegas asset library. The two-tone split is small but enough that the flip is legible from peripheral vision before the H / T glyph resolves — useful when the coin is in the corner and the learner is focused on the actual tap targets.
+- **Two-tone violet, not casino gold.** Heads is a lighter violet wash (`#B7A7FF → #4F36AB`), tails is the standard primary violet (`#8E76FF → #3A2A8C`). Both stay on the brand ramp so the coin reads as _minted for this app_, not transplanted from a Vegas asset library. The two-tone split is small but enough that the flip is legible from peripheral vision before the H / T glyph resolves — useful when the coin is in the corner and the learner is focused on the actual tap targets.
 - **Bricolage display H / T, not a presidential silhouette.** The same display face the rest of Pascal uses. Heavy weight, tightened tracking, soft drop-shadow → stamped-letterform feel without literal embossing.
 - **One milled inner ring, not a faux-engraved field.** The ring is the minimum signal for "coin" without filling the face with skeuomorphic noise.
 - **Floor shadow lives outside the rotating layer.** Inside, the shadow would rotate with the coin and disappear at 90°. Outside, it stays on the floor while the coin spins above it — the cheap trick that sells the 3D illusion.
@@ -516,7 +516,7 @@ The frontend-design skill named three AI-default looks. For a coin, the equivale
 ### Layout notes
 
 - The tap-coin variant of `TapOutcomes` now reserves `pb-28` (112 px) bottom padding so the corner coin can never overlap the collected-tags row on narrow viewports. The d6 variant still uses `py-6`.
-- The coin is pinned to the *interaction container's* bottom-right, not the viewport's. This is deliberate — `fixed` positioning would leave the coin floating over header/footer and other lessons; `absolute` keeps it scoped to the slot it belongs to.
+- The coin is pinned to the _interaction container's_ bottom-right, not the viewport's. This is deliberate — `fixed` positioning would leave the coin floating over header/footer and other lessons; `absolute` keeps it scoped to the slot it belongs to.
 
 ### Tests
 
@@ -532,6 +532,7 @@ No unit tests for the coin itself — it's pure presentational chrome with no bu
 ## Two-dice derivation — flashcard mode (question front → derivation back) — 2026-06-23
 
 Owner reviewed L1's `two-dice-intro` slot and flagged the existing `derivation.title` ("Why 6 × 6 = 36") as awkward — a backwards-looking restatement of arithmetic instead of a forward-looking pedagogical question. They requested two changes:
+
 1. Reframe the derivation around the **sample space of two dice** rather than the multiplication arithmetic.
 2. Make the derivation a **flippable flashcard** that starts as a question and reveals the answer on click.
 
@@ -556,20 +557,20 @@ Owner reviewed L1's `two-dice-intro` slot and flagged the existing `derivation.t
 
 ## Sample-space slot — tap-faces → multiple-choice "how large" — 2026-06-23
 
-Owner saw the live `coin` variant of the `sample-space` slot in L1 and flagged it as confusing: *"this is confusing. just ask how large is the sample space, or type in the sample space."* Three things were colliding on screen:
+Owner saw the live `coin` variant of the `sample-space` slot in L1 and flagged it as confusing: _"this is confusing. just ask how large is the sample space, or type in the sample space."_ Three things were colliding on screen:
 
 - The instruction said "tap every face of this coin" but pointed at two flat H/T tiles, not a coin.
-- The decorative 3D coin in the bottom-right (just shipped earlier in the session) was *also* a tappable coin, with a different role.
+- The decorative 3D coin in the bottom-right (just shipped earlier in the session) was _also_ a tappable coin, with a different role.
 - For a 2-outcome sample space, "tap each face once to list every outcome" is barely an interaction — the learner clicks twice and submits, with little to learn.
 
 ### Fix
 
 Converted the `sample-space` problem slot from `tap-outcomes` to `multiple-choice`. Both variants now ask the same kind of question with concrete numeric answers:
 
-| Variant | Question | Correct |
-| --- | --- | --- |
-| `d6` | "Roll one fair die. How large is the sample space?" | 6 |
-| `coin` | "Flip one fair coin. How large is the sample space?" | 2 |
+| Variant | Question                                             | Correct |
+| ------- | ---------------------------------------------------- | ------- |
+| `d6`    | "Roll one fair die. How large is the sample space?"  | 6       |
+| `coin`  | "Flip one fair coin. How large is the sample space?" | 2       |
 
 Each variant has four numeric options with targeted wrong-answer feedback (e.g. for the coin: 1 → "a coin can land more than one way", 4 → "that is two coins", 6 → "that is for a die"), and an `explanation` that names the sample space as a set ({1, 2, 3, 4, 5, 6} for d6; {H, T} for coin) so the "list it" pedagogy is preserved verbally even though the interaction itself no longer requires it.
 
@@ -589,7 +590,7 @@ Each variant has four numeric options with targeted wrong-answer feedback (e.g. 
 
 ## Path progress count + locked-lesson stale-progress polish — 2026-06-24
 
-Owner spotted two cosmetic warts on the live path: *"right now path and 1/1 done look a little odd. anything better we can say while still encoding progress? also right now two dice is randomly in the middle, can we lock it and delete the progress on it"*. Decision recorded as **D91**.
+Owner spotted two cosmetic warts on the live path: _"right now path and 1/1 done look a little odd. anything better we can say while still encoding progress? also right now two dice is randomly in the middle, can we lock it and delete the progress on it"_. Decision recorded as **D91**.
 
 ### What looked wrong
 
@@ -598,9 +599,9 @@ Owner spotted two cosmetic warts on the live path: *"right now path and 1/1 done
 
 ### Three fixes
 
-1. **Course-progress denominator now counts the whole planned course** (live + locked stubs), not just non-coming-soon lessons. Header reads "1 / 42 lessons" instead of "1 / 1 done" — honest scope, with the locked nodes on the path itself communicating "more is coming." `courseProgress(lessons, progressMap)` rewritten: `total = lessons.length`, `completed` only counts lessons that *have* authored slots and are completed (so a stale completed-state on a now-blank stub never inflates the count).
+1. **Course-progress denominator now counts the whole planned course** (live + locked stubs), not just non-coming-soon lessons. Header reads "1 / 42 lessons" instead of "1 / 1 done" — honest scope, with the locked nodes on the path itself communicating "more is coming." `courseProgress(lessons, progressMap)` rewritten: `total = lessons.length`, `completed` only counts lessons that _have_ authored slots and are completed (so a stale completed-state on a now-blank stub never inflates the count).
 2. **Header copy** shifted from "{n} / {n} done" to "{n} / {n} lessons." Drops the implication of finality. The Profile `StatsGrid` already labels its row "Course," so no copy change there.
-3. **`allCompleted` everywhere** — `HomePage`, `HeroCard`, `CelebrationScreen.courseTotal`, `PublicProfilePage` — now requires the *full* catalog to be done before the "all caught up" / course-complete celebration fires. Pre-fix this fired on the first lesson because `realLessons.every(...)` is trivially satisfied with one lesson.
+3. **`allCompleted` everywhere** — `HomePage`, `HeroCard`, `CelebrationScreen.courseTotal`, `PublicProfilePage` — now requires the _full_ catalog to be done before the "all caught up" / course-complete celebration fires. Pre-fix this fired on the first lesson because `realLessons.every(...)` is trivially satisfied with one lesson.
 
 ### Stale-progress fixes (the `two-dice` issue)
 
@@ -619,6 +620,7 @@ The prune criterion is `slots.length === 0` (truly contentless), not `comingSoon
 ### Tests
 
 `recommendations.test.ts` updated:
+
 - `'counts only available (non-coming-soon) lessons as the total'` → `'counts the full planned course as the total (live + locked stubs)'`.
 - `'returns 1/1 after completing the only available lesson'` → `'after completing the one real lesson, returns 1/2 (not 1/1)'`.
 - New: `'ignores stale progress on lessons that are blank stubs (no slots)'` exercises the guard in `courseProgress`.
@@ -630,18 +632,18 @@ The prune criterion is `slots.length === 0` (truly contentless), not `comingSoon
 
 A close re-read of the diff caught two issues `npm run verify` didn't:
 
-1. **Hook ordering in `HomePage`.** The `useRef` + `useEffect` for the prune were initially placed *after* the `if (auth.status === 'loading' …) return <HomePageSkeleton />` early return — a Rules of Hooks violation that would have surfaced as a "hook count changed between renders" warning the moment `progressState` flipped from `loading` to `ready`. Moved both hooks above the early return; the effect's body still no-ops via `if (progressState.status !== 'ready') return;` so behavior is identical, but React's hook list stays stable across renders. Sentinel comment added so the next reader doesn't move them back down.
+1. **Hook ordering in `HomePage`.** The `useRef` + `useEffect` for the prune were initially placed _after_ the `if (auth.status === 'loading' …) return <HomePageSkeleton />` early return — a Rules of Hooks violation that would have surfaced as a "hook count changed between renders" warning the moment `progressState` flipped from `loading` to `ready`. Moved both hooks above the early return; the effect's body still no-ops via `if (progressState.status !== 'ready') return;` so behavior is identical, but React's hook list stays stable across renders. Sentinel comment added so the next reader doesn't move them back down.
 2. **Course-Cleared achievement could fire on lesson 1.** `LessonPlayer.tsx:114` was computing `courseTotal = useLessons().filter((l) => !l.comingSoon).length` and passing it into `applyLessonCompletion → newAchievementsFor`, which awards `course-cleared` when `lessonsCompleted >= courseTotal`. With the catalog at one playable lesson, that threshold was trivially satisfied on the first completion. Fix: same `useLessons().length` change as the other course-total sites — now requires the full planned course, matching the celebration-screen + hero-card semantics. (Existing achievements awarded under the broken threshold stay awarded — `award()` is idempotent and never revokes; the audit note in D91 documents the trade.)
 
 ---
 
 ## Curriculum: scope to classical probability ending on Expected Value — 2026-06-24
 
-Owner pushed back on the tail of the roadmap: *"i think random variables and expected value and whatnot are not classic probability, no? more statistics."* Half-right — academically those topics live in the *probability* course (Pitman, Ross), but in the **AP / HS taxonomy** that the persona (D2) actually meets, the line moves: AP Stats is where RVs, EV, binomial, normal, and CLT go; "probability" effectively ends at conditional probability + Bayes. Given the persona, the HS line is the right one to draw — with one carve-out. Decision recorded as **D90**.
+Owner pushed back on the tail of the roadmap: _"i think random variables and expected value and whatnot are not classic probability, no? more statistics."_ Half-right — academically those topics live in the _probability_ course (Pitman, Ross), but in the **AP / HS taxonomy** that the persona (D2) actually meets, the line moves: AP Stats is where RVs, EV, binomial, normal, and CLT go; "probability" effectively ends at conditional probability + Bayes. Given the persona, the HS line is the right one to draw — with one carve-out. Decision recorded as **D90**.
 
 ### What changed
 
-- **Reshaped Unit 7** from "Random variables and expected value" (7 lessons) into **"Expected Value"** (5 lessons): `expected-value-intuition` → `computing-expected-value` → **`fair-games`** (new) → `practice-expected-value` (retitled to "Practice: gambles and insurance") → `review-expected-value` (renamed from `review-random-variables`). Chapter id `random-variables` → `expected-value`, subtitle *"When you bet on a probability, what payoff do you expect?"*
+- **Reshaped Unit 7** from "Random variables and expected value" (7 lessons) into **"Expected Value"** (5 lessons): `expected-value-intuition` → `computing-expected-value` → **`fair-games`** (new) → `practice-expected-value` (retitled to "Practice: gambles and insurance") → `review-expected-value` (renamed from `review-random-variables`). Chapter id `random-variables` → `expected-value`, subtitle _"When you bet on a probability, what payoff do you expect?"_
 - **Dropped the entire old Unit 8** ("Famous Distributions"): `binomial-distribution`, `normal-distribution`, `central-limit-theorem`, `monte-carlo`, `capstone-problem-set` — gone from the path entirely.
 - **Dropped from Unit 7**: the formal `random-variable` abstraction, `distributions-intro`, and `variance-spread`.
 - **Updated comments** in `roadmapStubs.ts` and `chapters.ts` to spell out the scope decision so the next reader sees the rationale, not just an empty file.
@@ -666,22 +668,22 @@ Owner explicitly chose not to add a "Statistics (course 2)" locked-stub chapter 
 
 ## Curriculum: collapse "Likelihood" + "Sample Spaces" → "Defining Probability" — 2026-06-24
 
-Owner reviewed the path after the `how-likely` opener landed and pushed back on the top of the curriculum: *"i think which is more likely and the probability scale can be removed. then, we can probably combine sections 2 and 3."* The opener already builds comparative-likelihood intuition (tap a die's faces, see which roll is more likely) and states the 0..1 scale in its rigorous-definition beat, so two of the planned Unit 1 lessons would have re-taught what `how-likely` just taught. Decision recorded as **D89** (also resolves the open rename suggestion in D88's gloss — "likelihood" being a distinct technical term in statistics).
+Owner reviewed the path after the `how-likely` opener landed and pushed back on the top of the curriculum: _"i think which is more likely and the probability scale can be removed. then, we can probably combine sections 2 and 3."_ The opener already builds comparative-likelihood intuition (tap a die's faces, see which roll is more likely) and states the 0..1 scale in its rigorous-definition beat, so two of the planned Unit 1 lessons would have re-taught what `how-likely` just taught. Decision recorded as **D89** (also resolves the open rename suggestion in D88's gloss — "likelihood" being a distinct technical term in statistics).
 
 ### What changed
 
 - **Dropped from `roadmapStubs.ts`:** `likelihood-compare` ("Which is more likely?"), `probability-scale` ("The probability scale"), `review-likelihood`. The third was dropped because the merge collapses two thin reviews into one (`review-sample-spaces`, retitled "Defining probability review").
-- **Merged in `chapters.ts`:** the old "Likelihood" and "Sample Spaces" chapters became one chapter with id `defining-probability`, title "Defining Probability", subtitle *"From the long-run feeling to the favorable-over-total formula."* Lesson order in the merged unit: `long-run-frequency` → `sample-space` → `equally-likely-outcomes` → `practice-single-events` → `review-sample-spaces`. Subsequent chapters renumbered down by one (now 8 unit chapters total under the "Start Here" lead, vs. 9 before).
+- **Merged in `chapters.ts`:** the old "Likelihood" and "Sample Spaces" chapters became one chapter with id `defining-probability`, title "Defining Probability", subtitle _"From the long-run feeling to the favorable-over-total formula."_ Lesson order in the merged unit: `long-run-frequency` → `sample-space` → `equally-likely-outcomes` → `practice-single-events` → `review-sample-spaces`. Subsequent chapters renumbered down by one (now 8 unit chapters total under the "Start Here" lead, vs. 9 before).
 - **Two small wiring fixes:** `how-likely`'s wrap had `segueToLessonId: 'likelihood-compare'`, now `'long-run-frequency'`. `chapters.test.ts` updated to assert `groups[1].chapter.id === 'defining-probability'` and that `long-run-frequency` is its first lesson.
 - **Doc updates:** `curriculum-roadmap.md` § 3 now lists 8 units; `roadmapStubs.ts` header doc-comment notes the merge; D88's open rename suggestion is closed by linking to D89.
 
 ### Why "Defining Probability" (and not just keep "Sample Spaces")
 
-The merged unit's job changed: it now opens with the long-run intuition lesson and lands on the favorable-over-total formula. That's the *definition* arc, not just the listing technique. A fresh chapter id makes the merge explicit; lesson ids (`sample-space`, `review-sample-spaces`) stay stable so any future progress data and Remote Config refer to the same things.
+The merged unit's job changed: it now opens with the long-run intuition lesson and lands on the favorable-over-total formula. That's the _definition_ arc, not just the listing technique. A fresh chapter id makes the merge explicit; lesson ids (`sample-space`, `review-sample-spaces`) stay stable so any future progress data and Remote Config refer to the same things.
 
 ### What stayed
 
-- `long-run-frequency` survives — it's the *other* definition of probability (frequentist), and it's the bridge to L2's Law of Large Numbers material later. `how-likely` only counts equally-likely outcomes; it does not teach the long-run interpretation.
+- `long-run-frequency` survives — it's the _other_ definition of probability (frequentist), and it's the bridge to L2's Law of Large Numbers material later. `how-likely` only counts equally-likely outcomes; it does not teach the long-run interpretation.
 - All eight downstream units are unchanged in content, just renumbered.
 
 ### Verification
@@ -692,7 +694,7 @@ The merged unit's job changed: it now opens with the long-run intuition lesson a
 
 ## Curriculum skeleton — full roadmap scaffolded as locked stubs — 2026-06-24
 
-Owner asked to "refactor the pages (the lessons)" toward the fuller probability sequence from [`curriculum-roadmap.md`](curriculum-roadmap.md): *"feel free to leave further lessons blank. lock them. don't change any content for now, but names/stuff are good."* Decision recorded as **D86**.
+Owner asked to "refactor the pages (the lessons)" toward the fuller probability sequence from [`curriculum-roadmap.md`](curriculum-roadmap.md): _"feel free to leave further lessons blank. lock them. don't change any content for now, but names/stuff are good."_ Decision recorded as **D86**.
 
 ### What shipped
 
@@ -710,11 +712,11 @@ Audited every consumer that walks the lesson catalog:
 - `CelebrationScreen` computes `nextLesson` as `lessons[index+1]` and `courseTotal` as the count of non-coming-soon lessons; both resolve exactly as before (the stub at index 6 is the same `distributions` stub that was there pre-change), and it already handles a coming-soon "next lesson."
 - `lessonVisuals.getLessonVisual` has a deterministic by-index fallback for unknown ids — new nodes get sensible glyph/accent, no crash.
 - `SchedulePage`'s "link a lesson" picker filters `!comingSoon`, so it still lists only the five live lessons.
-- A blank lesson is double-locked: `comingSoon: true` *and* `useLessons`' empty-slots safety net.
+- A blank lesson is double-locked: `comingSoon: true` _and_ `useLessons`' empty-slots safety net.
 
 ### Two regressions the refactor would have caused — both fixed
 
-1. **Trophy reward.** `CoursePath` marked the *last* chapter's checkpoint as the 250-coin "course complete" trophy. Appending nine all-locked chapters would have demoted the live final chapter to a 100-coin chest and parked the trophy behind unreachable content. Fixed: the trophy chapter is now "the last chapter that still has a playable lesson" (`trophyGroupIdx` in `CoursePath.tsx`). For today's state this reproduces the old behavior exactly (trophy on "Going Deeper"); it migrates forward automatically as units are authored. Trade-off: the trophy now sits mid-path with locked previews below — acceptable and self-correcting.
+1. **Trophy reward.** `CoursePath` marked the _last_ chapter's checkpoint as the 250-coin "course complete" trophy. Appending nine all-locked chapters would have demoted the live final chapter to a 100-coin chest and parked the trophy behind unreachable content. Fixed: the trophy chapter is now "the last chapter that still has a playable lesson" (`trophyGroupIdx` in `CoursePath.tsx`). For today's state this reproduces the old behavior exactly (trophy on "Going Deeper"); it migrates forward automatically as units are authored. Trade-off: the trophy now sits mid-path with locked previews below — acceptable and self-correcting.
 2. **"0/0" banner.** A unit with no playable lessons showed a meaningless "0/0" in `ChapterBanner`. Fixed to render a "Soon" lock chip when a chapter has zero available lessons. (Per-chapter `Checkpoint`s already rendered their correct locked state for all-stub units — no change needed.)
 
 ### Tests
@@ -731,7 +733,7 @@ Fill the stub's `slots`, then add its id to `available_lesson_ids` (the local de
 
 ## Review mode — let the learner redo questions (sandboxed, no consequences) — 2026-06-23
 
-After the flashcard work landed, owner exercised review mode (the read-only walkthrough that the home-screen "Review a lesson" CTA + the back-arrow on completed slots both route into) and pushed back: *"in review mode, it should still allow you to redo the question. you just don't gain xp and it also doesn't penalize or reward you or block anything."*
+After the flashcard work landed, owner exercised review mode (the read-only walkthrough that the home-screen "Review a lesson" CTA + the back-arrow on completed slots both route into) and pushed back: _"in review mode, it should still allow you to redo the question. you just don't gain xp and it also doesn't penalize or reward you or block anything."_
 
 ### Old behavior
 
@@ -741,11 +743,11 @@ Review mode was a strict read-only walkthrough:
 - `feedbackState` was forced to `'idle'`, so the regular check / wrong / correct UI never lit up.
 - The regular `LessonFooter` (with Check / Continue) was swapped out for a `ReviewFooter` that only had a Next button + an italic "Reviewing — your progress is unchanged" line.
 
-The net effect: the learner could *see* every slot they'd already done, but couldn't try anything again. That defeated the most useful part of revisiting a lesson.
+The net effect: the learner could _see_ every slot they'd already done, but couldn't try anything again. That defeated the most useful part of revisiting a lesson.
 
 ### New behavior
 
-Review mode is now a *sandboxed retry*: full interaction, full feedback, zero persistence.
+Review mode is now a _sandboxed retry_: full interaction, full feedback, zero persistence.
 
 - Inputs flow normally: `onChange`, variant pick, etc. drive the same `currentAnswer` / `useSlotState` machinery as a fresh attempt.
 - Check + Continue use review-only handlers (`handleCheckReview` / `handleContinueReview`) that compute feedback via the existing pure `checkAnswer` and dispatch CORRECT/WRONG to the local reducer — but never call `recordAttempt`, `recordVariantSelection`, `applyAttemptOutcome`, `markLessonCompleted`, `applySlotAdvance`, or `advanceSlot`. No analytics either (review attempts shouldn't pollute `attempt_checked` series).
@@ -753,7 +755,7 @@ Review mode is now a *sandboxed retry*: full interaction, full feedback, zero pe
 - The footer is the regular `LessonFooter` again; the "review" affordance moves to a thin banner under the header reading `Review · retries don't affect XP or progress`. That keeps the read-only-stats promise visible without stealing the Check button.
 - Variant pick is doubly safe: `handleVariantPicked` early-returns whenever `isReview` is true (in addition to the pre-existing "selectedVariantIds already has it" guard). There's no path from review mode to a Firestore write.
 
-Mid-lesson back-navigation review (`viewSlotIndex < slotIndex` while `?mode=review` is *not* set) gets the same treatment — those are also "I've already done this and want to try it again", and the same handlers apply.
+Mid-lesson back-navigation review (`viewSlotIndex < slotIndex` while `?mode=review` is _not_ set) gets the same treatment — those are also "I've already done this and want to try it again", and the same handlers apply.
 
 ### Trade-offs
 
@@ -780,7 +782,7 @@ Mid-lesson back-navigation review (`viewSlotIndex < slotIndex` while `?mode=revi
 
 ## Theorem callouts + bookmarked derivation pages — 2026-06-23
 
-Triggered by an owner note immediately after the new L3 landed: *"we should have a slide introducing each new theorem. eg. multiplication principle should have a theorem. and we should have a practice problem for it."* Scope was widened in the same conversation to *"everywhere a named rule appears, but not derivations — for derivations, we should have a dedicated derivations page, formatted a bit like bookmarked pages in a notebook."* Recorded as D77.
+Triggered by an owner note immediately after the new L3 landed: _"we should have a slide introducing each new theorem. eg. multiplication principle should have a theorem. and we should have a practice problem for it."_ Scope was widened in the same conversation to _"everywhere a named rule appears, but not derivations — for derivations, we should have a dedicated derivations page, formatted a bit like bookmarked pages in a notebook."_ Recorded as D77.
 
 ### Pedagogical intent
 
@@ -808,18 +810,18 @@ Both elements are wrapped in `<aside aria-label="…">` so screen readers announ
 
 ### Where it landed (this pass)
 
-| Lesson | Slot | What changed |
-| --- | --- | --- |
-| L1 | `equally-likely` | Added theorem ("Equally-likely outcomes"); dropped redundant `example` (the formula now lives in the theorem statement). |
-| L1 | `reduce` | Converted `example` ("Why 3/6 = 1/2") → `derivation`. Pre-existing rendering bug fixed: `{(3/3)/(6/3)}` was unparseable by the `{a/b}` regex (multiple slashes); rewrote that step as plain prose. |
-| L1 | `two-dice-intro` | Converted `example` ("Why 6 × 6 = 36") → `derivation`. |
-| L3 | `multiplication-principle` | Added theorem; kept the closet-outfits worked example. |
-| L3 | `addition-principle` | Added theorem; kept the bus-or-train example. |
-| L3 | `permutations` | Added theorem (n! and nPk forms); kept the A/B/C arrangements example. |
-| L3 | `combinations` | Added theorem; converted `example` ("Why divide by k!") → `derivation` and expanded it to a 5-step proof with a sanity-check at the end. |
-| L3 | `complement` | Added theorem ("Complement rule"); kept the at-least-one-head example. |
-| L4 | new slot `birthday-derivation` (inserted between `birthday-sim` and `how-many-people`) | New concept slot whose payload is a `derivation` showing `P(no shared) = 365/365 × 364/365 × … × 343/365 ≈ 0.493 → P(match) ≈ 0.507`. References the multiplication principle and complement rule from L3 by name. |
-| L5 | `intro` | Promoted to enriched shape: title, body paragraph, plus a theorem callout for the conditional-probability formula `P(A | B) = {P(A and B) / P(B)}`. |
+| Lesson | Slot                                                                                   | What changed                                                                                                                                                                                                       |
+| ------ | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------- |
+| L1     | `equally-likely`                                                                       | Added theorem ("Equally-likely outcomes"); dropped redundant `example` (the formula now lives in the theorem statement).                                                                                           |
+| L1     | `reduce`                                                                               | Converted `example` ("Why 3/6 = 1/2") → `derivation`. Pre-existing rendering bug fixed: `{(3/3)/(6/3)}` was unparseable by the `{a/b}` regex (multiple slashes); rewrote that step as plain prose.                 |
+| L1     | `two-dice-intro`                                                                       | Converted `example` ("Why 6 × 6 = 36") → `derivation`.                                                                                                                                                             |
+| L3     | `multiplication-principle`                                                             | Added theorem; kept the closet-outfits worked example.                                                                                                                                                             |
+| L3     | `addition-principle`                                                                   | Added theorem; kept the bus-or-train example.                                                                                                                                                                      |
+| L3     | `permutations`                                                                         | Added theorem (n! and nPk forms); kept the A/B/C arrangements example.                                                                                                                                             |
+| L3     | `combinations`                                                                         | Added theorem; converted `example` ("Why divide by k!") → `derivation` and expanded it to a 5-step proof with a sanity-check at the end.                                                                           |
+| L3     | `complement`                                                                           | Added theorem ("Complement rule"); kept the at-least-one-head example.                                                                                                                                             |
+| L4     | new slot `birthday-derivation` (inserted between `birthday-sim` and `how-many-people`) | New concept slot whose payload is a `derivation` showing `P(no shared) = 365/365 × 364/365 × … × 343/365 ≈ 0.493 → P(match) ≈ 0.507`. References the multiplication principle and complement rule from L3 by name. |
+| L5     | `intro`                                                                                | Promoted to enriched shape: title, body paragraph, plus a theorem callout for the conditional-probability formula `P(A                                                                                             | B) = {P(A and B) / P(B)}`. |
 
 ### Tests
 
@@ -876,7 +878,7 @@ gentle-ramp **course opener** at the front of the path.
   big-and-human then landing on the humble die was an owner call; the
   one-die-vs-two-dice contrast is the lesson (one die: counting trivial, all
   equal; two dice: rolls equal, totals not). The tap-and-count even question is
-  placed *before* the definition (you can tap to discover favorable/total), which
+  placed _before_ the definition (you can tap to discover favorable/total), which
   the definition then names.
 - **Rigorous definition of probability (owner request).** A `definition` concept
   beat after the one-die tap states it precisely: probability is favorable / total
@@ -888,9 +890,9 @@ gentle-ramp **course opener** at the front of the path.
   probability; "likely" stays as casual English. (Open suggestion to the owner:
   rename the Unit 1 "Likelihood" chapter accordingly.)
 - **Count derived after the grid, by cases (owner fix).** An earlier draft put a
-  "6 × 6 = 36" concept page *before* the grid, which smuggles in the multiplication
+  "6 × 6 = 36" concept page _before_ the grid, which smuggles in the multiplication
   principle (its own later lesson) before it is taught. Now the 36 count comes
-  *after* the grid, as the `count-the-rolls` derivation flashcard, built by
+  _after_ the grid, as the `count-the-rolls` derivation flashcard, built by
   enumeration: "first die shows 1, the second has 6 options; first die shows 2, 6
   options; … six cases of 6, so 6+6+6+6+6+6 = 36." No named theorem, no "sample
   space" term (Unit 2). Rule: show the idea concretely, name the tool in its own
@@ -927,7 +929,7 @@ gentle-ramp **course opener** at the front of the path.
   (e.g. "ways to roll even" / "ways in total"), so the favorable-over-total idea
   is legible while typing. Validated in `assertLessonInvariants`.
 - **In-interaction teaching note (`afterNote`).** Optional `BaseVariant.afterNote`
-  renders a caption *inside* the interaction (below its content) once the answer
+  renders a caption _inside_ the interaction (below its content) once the answer
   is correct, distinct from the footer feedback. Rendered by `tap-outcomes` and
   `fill-fraction`. Used so the one-die tap reveals "There are six ways to roll a
   six-sided die" under the faces, and the first fraction reveals "This fraction
@@ -987,31 +989,31 @@ authoring the rest of Unit 3 (`two-coins`, `two-dice`, `tree-diagrams`,
 
 ### 2026-06-23 — Immediate issues resolved (T1-01 through T1-06)
 
-| ID | Fix summary |
-| --- | --- |
-| T1-01 | `sendEmailVerification` called in `registerUser`; `EmailVerificationBanner` added app-wide |
-| T1-02 | `Die` redesigned as isometric SVG cube; `TapOutcomes` buttons enlarged + physical box-shadow + spring press |
-| T1-03 | `DieContext` widget added to `FillFraction` for `showDieContext` variants; tappable d6 faces with live count |
+| ID    | Fix summary                                                                                                      |
+| ----- | ---------------------------------------------------------------------------------------------------------------- |
+| T1-01 | `sendEmailVerification` called in `registerUser`; `EmailVerificationBanner` added app-wide                       |
+| T1-02 | `Die` redesigned as isometric SVG cube; `TapOutcomes` buttons enlarged + physical box-shadow + spring press      |
+| T1-03 | `DieContext` widget added to `FillFraction` for `showDieContext` variants; tappable d6 faces with live count     |
 | T1-04 | `wrongTick` counter in `useSlotState`; threaded to `LessonFooter` (animation key) and `GridEvent` (flash effect) |
-| T1-05 | `DiceSimulator` component in `GridEvent` — "Roll the dice!" button with tumbling animation + sum display |
-| T1-06 | `MultipleChoiceVariant` extended with `context` + option `subtext`; both dice-sum variants updated |
+| T1-05 | `DiceSimulator` component in `GridEvent` — "Roll the dice!" button with tumbling animation + sum display         |
+| T1-06 | `MultipleChoiceVariant` extended with `context` + option `subtext`; both dice-sum variants updated               |
 
 ### 2026-06-23 — Economy, forgiveness, cosmetics, branding & schedule UX
 
 > A batch of engagement + identity features that extended (and in one case reversed) the original Phase 1 scope. Per-decision rationale: alternatives **D79–D83** (the coin economy is D83 — D78 was taken by the flashcard-derivation work); non-goal reconciliation in [`prd.md`](prd.md) §8 / §9.10 and [`spec-habit-loop.md`](specs/spec-habit-loop.md). All grounded in learning science — coins are cosmetic-only to avoid the over-justification effect, the freeze softens punishing streaks (self-determination), and Captain Pascal's tips reinforce spacing / retrieval / learning-from-errors.
 
-| Decision | Feature | Key files |
-| --- | --- | --- |
-| **D83** | **Coin economy** — earned only from chests (100), trophy (250), achievements (25); spent only on cosmetics + freeze. Idempotent Firestore transactions; `coins` / `claimedChests` on `users/{uid}`. | `lib/coins.ts`, `economy/coinService.ts`, `economy/CoinChip.tsx`, `course/Checkpoint.tsx` |
-| **D79** | **Streak Freeze** (supersedes D34) — 200 coins, hold ≤2, auto-consumed in `nextStreak()` before reset; snowflake chip + toast. | `lib/streak.ts`, `habit/habitService.ts`, `economy/coinService.ts`, `course/HomePage.tsx` |
-| **D80** | **Avatar styles + profile flair** — cosmetic, bought once (private `ownedAvatarStyles`/`ownedFlair`), equipped value mirrored to `publicProfiles`. | `economy/avatarStyles.ts`, `economy/profileFlair.ts`, `economy/FlairBadge.tsx`, `profile/DefaultAvatar.tsx`, `economy/StorePage.tsx` |
-| **D81** | **"Probability Pirates" + Captain Pascal** — public brand + mascot; internal package/namespace stays `pascal`. Captain's Log tip card + lesson-intro cameo. | `components/Brandmark.tsx`, `illustrations/CaptainMascot.tsx`, `captain/*`, auth pages, `index.html` |
-| **D82** | **In-app schedule reminder + event detail** — today-scoped reminder dialog (once/day, `localStorage` dismissal); tappable event detail resolving linked lesson + full notes. | `schedule/reminderRules.ts`, `schedule/ScheduleReminder.tsx`, `schedule/scheduleService.ts`, `schedule/SchedulePage.tsx` |
-| **D84** | **Progress nav section (locked stub)** — nav entry with lock badge → read-only `/progress` placeholder previewing future AI-assisted insights; deferred under D23. | `components/AppShell.tsx`, `features/progress/ProgressPage.tsx`, `App.tsx` |
-| **D85** | **Practice nav section (locked stub)** — Alcumus-style adaptive practice with LLM-generated, correctness-vetted problems; lock-badged "Arriving Friday" → read-only `/practice` placeholder. Full engine deferred (reopens D23). | `components/AppShell.tsx`, `features/practice/PracticePage.tsx`, `App.tsx` |
+| Decision | Feature                                                                                                                                                                                                                          | Key files                                                                                                                            |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **D83**  | **Coin economy** — earned only from chests (100), trophy (250), achievements (25); spent only on cosmetics + freeze. Idempotent Firestore transactions; `coins` / `claimedChests` on `users/{uid}`.                              | `lib/coins.ts`, `economy/coinService.ts`, `economy/CoinChip.tsx`, `course/Checkpoint.tsx`                                            |
+| **D79**  | **Streak Freeze** (supersedes D34) — 200 coins, hold ≤2, auto-consumed in `nextStreak()` before reset; snowflake chip + toast.                                                                                                   | `lib/streak.ts`, `habit/habitService.ts`, `economy/coinService.ts`, `course/HomePage.tsx`                                            |
+| **D80**  | **Avatar styles + profile flair** — cosmetic, bought once (private `ownedAvatarStyles`/`ownedFlair`), equipped value mirrored to `publicProfiles`.                                                                               | `economy/avatarStyles.ts`, `economy/profileFlair.ts`, `economy/FlairBadge.tsx`, `profile/DefaultAvatar.tsx`, `economy/StorePage.tsx` |
+| **D81**  | **"Probability Pirates" + Captain Pascal** — public brand + mascot; internal package/namespace stays `pascal`. Captain's Log tip card + lesson-intro cameo.                                                                      | `components/Brandmark.tsx`, `illustrations/CaptainMascot.tsx`, `captain/*`, auth pages, `index.html`                                 |
+| **D82**  | **In-app schedule reminder + event detail** — today-scoped reminder dialog (once/day, `localStorage` dismissal); tappable event detail resolving linked lesson + full notes.                                                     | `schedule/reminderRules.ts`, `schedule/ScheduleReminder.tsx`, `schedule/scheduleService.ts`, `schedule/SchedulePage.tsx`             |
+| **D84**  | **Progress nav section (locked stub)** — nav entry with lock badge → read-only `/progress` placeholder previewing future AI-assisted insights; deferred under D23.                                                               | `components/AppShell.tsx`, `features/progress/ProgressPage.tsx`, `App.tsx`                                                           |
+| **D85**  | **Practice nav section (locked stub)** — Alcumus-style adaptive practice with LLM-generated, correctness-vetted problems; lock-badged "Arriving Friday" → read-only `/practice` placeholder. Full engine deferred (reopens D23). | `components/AppShell.tsx`, `features/practice/PracticePage.tsx`, `App.tsx`                                                           |
 
-| Area | Notes |
-| --- | --- |
+| Area           | Notes                                                                                                                                                                                  |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Security rules | `users/{uid}` allowlist extended with `coins`, `claimedChests`, `streakFreezes`, `avatarStyle`, `ownedAvatarStyles`, `profileFlair`, `ownedFlair`; public mirror fields stay PII-free. |
-| Content | Removed the "Reducing the fraction" concept slot from Lesson 1 (per request); tests updated (7 → 6 concept slots). |
-| Tests | New pure-logic suites: `coins`, `avatarStyles`, `profileFlair`, `reminderRules`, plus streak-freeze cases in `streak.test.ts`. Full `npm run test` + `build` green (162 tests). |
+| Content        | Removed the "Reducing the fraction" concept slot from Lesson 1 (per request); tests updated (7 → 6 concept slots).                                                                     |
+| Tests          | New pure-logic suites: `coins`, `avatarStyles`, `profileFlair`, `reminderRules`, plus streak-freeze cases in `streak.test.ts`. Full `npm run test` + `build` green (162 tests).        |

@@ -72,7 +72,9 @@ export function UsernameSetupPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
           <Brandmark size={44} />
-          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight">Probability Pirates</h1>
+          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight">
+            Probability Pirates
+          </h1>
           <p className="text-muted-foreground mt-1 text-sm">One last step.</p>
         </div>
 
@@ -80,7 +82,8 @@ export function UsernameSetupPage() {
           <CardHeader className="pb-2">
             <h2 className="text-lg font-semibold">Pick a username</h2>
             <p className="text-sm text-muted-foreground">
-              This is how you'll show up across Probability Pirates. You can change it later in your profile.
+              This is how you'll show up across Probability Pirates. You can change it later in your
+              profile.
             </p>
           </CardHeader>
           <CardContent>

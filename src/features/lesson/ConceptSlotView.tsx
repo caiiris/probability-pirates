@@ -28,9 +28,7 @@ export function ConceptSlotView({ slot }: Props) {
       <div className="min-h-full flex flex-col">
         <div className="my-auto flex flex-col items-center gap-8 px-4 py-8">
           <IllustrationBlock kind={slot.illustration.kind} />
-          <p className="text-xl font-medium text-center leading-relaxed max-w-sm">
-            {slot.prompt}
-          </p>
+          <p className="text-xl font-medium text-center leading-relaxed max-w-sm">{slot.prompt}</p>
         </div>
       </div>
     );
@@ -44,91 +42,94 @@ export function ConceptSlotView({ slot }: Props) {
   return (
     <div className="min-h-full flex flex-col">
       <div className="my-auto px-4 py-8 space-y-6 max-w-prose mx-auto w-full">
-      <div className="flex justify-center">
-        <IllustrationBlock kind={slot.illustration.kind} />
-      </div>
+        <div className="flex justify-center">
+          <IllustrationBlock kind={slot.illustration.kind} />
+        </div>
 
-      {slot.title && (
-        <h2 className="font-display text-2xl tracking-tight leading-tight text-foreground text-center">
-          {slot.title}
-        </h2>
-      )}
+        {slot.title && (
+          <h2 className="font-display text-2xl tracking-tight leading-tight text-foreground text-center">
+            {slot.title}
+          </h2>
+        )}
 
-      {slot.prompt && (
-        <p className="text-lg font-medium leading-relaxed text-foreground text-center text-balance">
-          {slot.prompt}
-        </p>
-      )}
+        {slot.prompt && (
+          <p className="text-lg font-medium leading-relaxed text-foreground text-center text-balance">
+            {slot.prompt}
+          </p>
+        )}
 
-      {slot.quote && (
-        <figure className="relative rounded-xl border bg-muted/30 px-5 pt-5 pb-4">
-          <span
-            aria-hidden="true"
-            className="absolute -top-3 left-4 font-display text-5xl leading-none text-primary/30 select-none"
-          >
-            &ldquo;
-          </span>
-          <blockquote className="text-[1.05rem] italic leading-relaxed text-foreground text-center text-balance">
-            {slot.quote.text}
-          </blockquote>
-          {slot.quote.attribution && (
-            <figcaption className="mt-2 text-xs font-medium uppercase tracking-wide text-muted-foreground text-center">
-              {slot.quote.attribution}
-            </figcaption>
-          )}
-        </figure>
-      )}
-
-      {slot.theorem && (
-        <aside
-          aria-label={slot.theorem.name ? `Theorem: ${slot.theorem.name}` : 'Theorem'}
-          className="rounded-xl border border-t-4 border-t-primary bg-primary-soft/50 px-4 py-3.5 space-y-1.5"
-        >
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-deep">
-            {slot.theorem.name ? (
-              <>
-                Theorem <span aria-hidden="true" className="opacity-60">·</span>{' '}
-                {slot.theorem.name}
-              </>
-            ) : (
-              'Theorem'
+        {slot.quote && (
+          <figure className="relative rounded-xl border bg-muted/30 px-5 pt-5 pb-4">
+            <span
+              aria-hidden="true"
+              className="absolute -top-3 left-4 font-display text-5xl leading-none text-primary/30 select-none"
+            >
+              &ldquo;
+            </span>
+            <blockquote className="text-[1.05rem] italic leading-relaxed text-foreground text-center text-balance">
+              {slot.quote.text}
+            </blockquote>
+            {slot.quote.attribution && (
+              <figcaption className="mt-2 text-xs font-medium uppercase tracking-wide text-muted-foreground text-center">
+                {slot.quote.attribution}
+              </figcaption>
             )}
-          </p>
-          <p className="text-[0.95rem] leading-relaxed text-foreground">
-            {renderInlineMath(slot.theorem.statement)}
-          </p>
-        </aside>
-      )}
+          </figure>
+        )}
 
-      {slot.body && slot.body.length > 0 && (
-        <div className="space-y-3 text-[0.95rem] leading-relaxed text-muted-foreground">
-          {slot.body.map((para, i) => (
-            <p key={i}>{renderInlineMath(para)}</p>
-          ))}
-        </div>
-      )}
-
-      {slot.example && (
-        <div className="rounded-xl border bg-muted/30 px-4 py-4 space-y-2 text-left">
-          {slot.example.title && (
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {slot.example.title}
+        {slot.theorem && (
+          <aside
+            aria-label={slot.theorem.name ? `Theorem: ${slot.theorem.name}` : 'Theorem'}
+            className="rounded-xl border border-t-4 border-t-primary bg-primary-soft/50 px-4 py-3.5 space-y-1.5"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-deep">
+              {slot.theorem.name ? (
+                <>
+                  Theorem{' '}
+                  <span aria-hidden="true" className="opacity-60">
+                    ·
+                  </span>{' '}
+                  {slot.theorem.name}
+                </>
+              ) : (
+                'Theorem'
+              )}
             </p>
-          )}
-          <ol className="space-y-1.5 text-[0.95rem] font-mono leading-relaxed text-foreground">
-            {slot.example.steps.map((step, i) => (
-              <li key={i} className="flex gap-3">
-                <span className="text-muted-foreground/60 select-none w-5 shrink-0">
-                  {i + 1}.
-                </span>
-                <span className="flex-1">{renderInlineMath(step)}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
+            <p className="text-[0.95rem] leading-relaxed text-foreground">
+              {renderInlineMath(slot.theorem.statement)}
+            </p>
+          </aside>
+        )}
 
-      {slot.derivation && <DerivationCard derivation={slot.derivation} />}
+        {slot.body && slot.body.length > 0 && (
+          <div className="space-y-3 text-[0.95rem] leading-relaxed text-muted-foreground">
+            {slot.body.map((para, i) => (
+              <p key={i}>{renderInlineMath(para)}</p>
+            ))}
+          </div>
+        )}
+
+        {slot.example && (
+          <div className="rounded-xl border bg-muted/30 px-4 py-4 space-y-2 text-left">
+            {slot.example.title && (
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {slot.example.title}
+              </p>
+            )}
+            <ol className="space-y-1.5 text-[0.95rem] font-mono leading-relaxed text-foreground">
+              {slot.example.steps.map((step, i) => (
+                <li key={i} className="flex gap-3">
+                  <span className="text-muted-foreground/60 select-none w-5 shrink-0">
+                    {i + 1}.
+                  </span>
+                  <span className="flex-1">{renderInlineMath(step)}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {slot.derivation && <DerivationCard derivation={slot.derivation} />}
       </div>
     </div>
   );

@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { subscribeToMonthEvents } from './scheduleService';
 import type { StudyEvent } from './scheduleService';
 
-type State =
-  | { status: 'loading' }
-  | { status: 'ready'; data: StudyEvent[] };
+type State = { status: 'loading' } | { status: 'ready'; data: StudyEvent[] };
 
 /**
  * Real-time subscription to study events for the given YYYY-MM month.

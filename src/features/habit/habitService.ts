@@ -57,9 +57,7 @@ export async function applyAttemptOutcome(
 
     // Gap is measured against the PREVIOUS active day, before we overwrite
     // lastActiveDate with today — so 'welcome-back' rewards spaced returns.
-    const gapDays = streakResult.isNewStreakDay
-      ? daysBetween(profile.lastActiveDate, today)
-      : 0;
+    const gapDays = streakResult.isNewStreakDay ? daysBetween(profile.lastActiveDate, today) : 0;
     const newAchievements = newAchievementsFor(profile.achievements, { gapDays });
 
     // Weekly XP: increment within the same ISO week, reset on a new week.

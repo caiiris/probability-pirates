@@ -57,8 +57,8 @@ export function Leaderboard({ myUid }: { myUid: string }) {
         <div className="flex items-center gap-3 rounded-2xl border border-[color:var(--info)]/25 bg-[color:var(--info)]/5 px-4 py-3 text-sm text-muted-foreground">
           <CompassRose className="w-10 shrink-0" />
           <span>
-            Follow other learners to start the leaderboard. XP resets every
-            Monday, so everyone gets a fresh start.
+            Follow other learners to start the leaderboard. XP resets every Monday, so everyone gets
+            a fresh start.
           </span>
         </div>
       )}
@@ -87,15 +87,12 @@ export function Leaderboard({ myUid }: { myUid: string }) {
                 <p className="text-xs text-muted-foreground truncate">@{e.username}</p>
               </div>
               <span className="num text-sm font-semibold shrink-0">
-                {e.weeklyXp.toLocaleString()} <span className="text-xs text-muted-foreground">XP</span>
+                {e.weeklyXp.toLocaleString()}{' '}
+                <span className="text-xs text-muted-foreground">XP</span>
               </span>
             </div>
           );
-          return (
-            <li key={e.uid}>
-              {e.isMe ? row : <Link to={`/u/${e.username}`}>{row}</Link>}
-            </li>
-          );
+          return <li key={e.uid}>{e.isMe ? row : <Link to={`/u/${e.username}`}>{row}</Link>}</li>;
         })}
       </ol>
     </div>

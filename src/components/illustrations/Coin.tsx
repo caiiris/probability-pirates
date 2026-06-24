@@ -9,8 +9,24 @@ export function Coin({ side, className }: { side?: 'H' | 'T'; className?: string
       aria-label={side ? (side === 'H' ? 'Heads' : 'Tails') : 'Coin'}
       role="img"
     >
-      <circle cx="28" cy="28" r="24" fill="currentColor" opacity="0.08" stroke="currentColor" strokeWidth="2" />
-      <circle cx="28" cy="28" r="18" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.3" />
+      <circle
+        cx="28"
+        cy="28"
+        r="24"
+        fill="currentColor"
+        opacity="0.08"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <circle
+        cx="28"
+        cy="28"
+        r="18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        opacity="0.3"
+      />
       {side && (
         <text
           x="28"

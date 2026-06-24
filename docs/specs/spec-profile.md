@@ -11,11 +11,13 @@ Give the learner a small but real sense of identity (avatar, bio) and lifetime a
 ## User-facing behavior
 
 ### Header
+
 - Sticky app shell navigation (Home / Profile) — same as `spec-course-path`. Bottom nav on mobile; shadcn `Sidebar` block on tablet+ per D63 / D71.
 - Top of the page: large avatar (96px on mobile, 128px on tablet+), centered, with `displayUsername` below it and `bio` below that.
 - Empty bio → muted "Tap Edit to add a bio."
 
 ### Stats grid (responsive — 2-col mobile, 3-col tablet+)
+
 - `Total XP`
 - `Lessons completed`
 - `Steps completed`
@@ -25,10 +27,12 @@ Give the learner a small but real sense of identity (avatar, bio) and lifetime a
 - Each stat in a small shadcn `Card`. Number large (text-3xl), label small (text-sm muted) below.
 
 ### Milestones row
+
 - Horizontal scroll row of earned milestone trophies, each a small card with the trophy SVG + milestone title.
 - Empty state (no milestones): a muted card "Keep going — your first trophy is 3 days away."
 
 ### Edit Profile (modal)
+
 - Opened by a shadcn `Button` "Edit Profile" below the header.
 - Modal (shadcn `Dialog`) with one field for MVP:
   - **Bio:** shadcn `Textarea`, 150 char max, char counter.
@@ -36,16 +40,19 @@ Give the learner a small but real sense of identity (avatar, bio) and lifetime a
 - **Avatar upload omitted for MVP** (D72 / I026). Do not render "Change photo" or file picker until Storage is enabled. Full avatar flow (file picker, upload, preview) ships when I026 is closed; see original spec bullets in git history or `spec-profile` post-Storage.
 
 ### Log out
+
 - shadcn `Button variant="destructive"` at the very bottom, full-width, with a confirm dialog ("Log out?").
 - On confirm: `signOutUser()` → redirect to `/login`.
 
 ## Data model
 
 This spec mutates `/users/{uid}` (bio, avatarUrl) and writes to Firebase Storage. It reads:
+
 - `useAuth().profile` (live `/users/{uid}` doc).
 - `useAllLessonProgress(uid)` for the course-progress stat (or denormalized `lessonsCompleted`).
 
 ### Firebase Storage rules (this spec's slice)
+
 ```
 match /avatars/{filename} {
   allow read: if request.auth != null;

@@ -14,8 +14,8 @@ immediate feedback + a worked solution, and have the difficulty track their
 ability so they're always working at the edge of competence. Alcumus is the
 north star: pick a topic, keep solving, the system adapts.
 
-The product promise is **two things at once**: *unlimited* (so a learner never
-runs out of reps) and *trustworthy* (so the app never teaches a wrong answer).
+The product promise is **two things at once**: _unlimited_ (so a learner never
+runs out of reps) and _trustworthy_ (so the app never teaches a wrong answer).
 Those two goals are in tension — unlimited pushes toward generation, trustworthy
 pushes toward control. The whole architecture below exists to satisfy both.
 
@@ -29,7 +29,7 @@ pushes toward control. The whole architecture below exists to satisfy both.
   practical.
 - **Immediate feedback + worked solutions (learning from errors).** A correct,
   fully worked solution shown right after an attempt is one of the highest-leverage
-  learning events — which is exactly why a *wrong* solution is so damaging, and why
+  learning events — which is exactly why a _wrong_ solution is so damaging, and why
   correctness vetting is non-negotiable.
 - **Autonomy (SDT).** The learner chooses the topic and keeps control of pace.
 
@@ -40,14 +40,14 @@ hands out a wrong answer key actively miseducates and destroys trust. Every othe
 design choice yields to this one.
 
 Corollary — **the answer must come from code, not from an LLM.** The subject (HS
-probability / combinatorics) is *computable*: answers are exact rationals or small
+probability / combinatorics) is _computable_: answers are exact rationals or small
 integers that a deterministic program can compute and verify. So the source of
 truth for any answer is a solver, never a language model. LLMs are used (if at all)
-to author *problems* and *prose*, never to be the final arbiter of *correctness*.
+to author _problems_ and _prose_, never to be the final arbiter of _correctness_.
 
 > **Why not LLM-verifies-LLM as the gate?** Two models share training data and
 > failure modes — they will confidently agree on the same wrong answer (correlated
-> errors). An LLM verifier is a useful cheap *pre-filter*, but it is never the
+> errors). An LLM verifier is a useful cheap _pre-filter_, but it is never the
 > correctness gate.
 >
 > **Why not Lean / formal proof?** Wrong tool for a computable numeric domain. Lean
@@ -58,12 +58,13 @@ to author *problems* and *prose*, never to be the final arbiter of *correctness*
 
 ## Architecture: two tracks
 
-### Track 1 — Parameterized generators (correct *by construction*) — **the Friday MVP**
+### Track 1 — Parameterized generators (correct _by construction_) — **the Friday MVP**
 
 A **template** is a hand-/LLM-authored problem family with code that computes its
 own answer. Example: "two fair dice, P(sum = k)" with `k` a parameter.
 
 A template (`src/features/practice/templates/*.ts`) declares:
+
 - `id`, `topic`, a difficulty rating (or a function of params → rating).
 - `sample(rng) → params` — draws a valid parameter set.
 - `render(params) → { prompt, choices? }` — the problem statement (reuses the
@@ -72,7 +73,7 @@ A template (`src/features/practice/templates/*.ts`) declares:
   (bigint numerator/denominator) or integer. **This is the source of truth.**
 - `explain(params) → DerivationSteps` — the worked solution, built from the same
   computed quantities (reuses the D77 `derivation` shape).
-- *(optional)* `simulate(params, trials) → estimate` — a Monte-Carlo estimator used
+- _(optional)_ `simulate(params, trials) → estimate` — a Monte-Carlo estimator used
   only to vet the template (see below).
 
 **Why this is correct by construction:** at runtime we `sample → render → solve`.
@@ -80,6 +81,7 @@ No LLM is in the answer path, so every generated instance is exactly right. "Unl
 comes from the parameter space; "correct" comes from `solve()` being plain code.
 
 **Template vetting (build-time, once per template):**
+
 - Unit test: for ≥1,000 sampled param sets, assert `solve()` agrees with
   `simulate()` within a Monte-Carlo tolerance (`|p̂ − p| < 5·√(p(1−p)/n)` and exact
   cases enumerated where the sample space is small). This catches a buggy `solve()`.
@@ -98,7 +100,7 @@ For variety beyond what templates express, an LLM generates one-off problems
 before being added to the bank:
 
 1. **Structured output.** The model returns `{ prompt, answer, solution, and an
-   executable solver snippet }` in a strict schema.
+executable solver snippet }` in a strict schema.
 2. **Independent code verification (the gate).** Run the solver snippet in a sandbox
    **and** an independent reference computation (exact enumeration / rational
    arithmetic) **and** a Monte-Carlo cross-check. All must agree on `answer` within
@@ -129,7 +131,7 @@ Only candidates passing **1–5** (and sampled into 6) are written to the vetted
 ## Data model
 
 - **Track 1** needs no problem storage — instances are generated from code templates
-  on device. Only the *attempt outcome* feeds adaptive state.
+  on device. Only the _attempt outcome_ feeds adaptive state.
 - **Track 2** vetted bank: `practiceProblems/{problemId}` (public-read, no client
   writes; populated only by the offline pipeline) with `topic`, `rating`, `prompt`,
   `choices?`, `answer`, `solution`, `provenance` (template id or generation batch +
@@ -178,7 +180,7 @@ Only candidates passing **1–5** (and sampled into 6) are written to the vetted
 - `practiceProblems` is read-only to clients; only the offline pipeline (privileged)
   writes it. No client path can inject an unvetted problem.
 - No model API keys in the client build (preserves the D23 §9.10 "no AI in bundle"
-  property for the *shipped app* even after the offline pipeline exists). Keys live
+  property for the _shipped app_ even after the offline pipeline exists). Keys live
   only in the offline tooling environment.
 
 ## Acceptance criteria

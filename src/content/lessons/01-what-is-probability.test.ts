@@ -34,9 +34,7 @@ describe('lesson1 invariants', () => {
         expect(slot.body && slot.body.length).toBeGreaterThan(0);
         // D77: every enriched teach beat has at least one structured artifact:
         // a named theorem, a worked example, or a derivation.
-        expect(
-          Boolean(slot.theorem || slot.example || slot.derivation),
-        ).toBe(true);
+        expect(Boolean(slot.theorem || slot.example || slot.derivation)).toBe(true);
       }
     }
   });
@@ -126,7 +124,10 @@ describe('lesson1 invariants', () => {
     expect(slot?.kind).toBe('problem');
     if (slot?.kind === 'problem') {
       const variant = slot.variants[0] as GridEventVariant;
-      variant.correctCells = [[6, 6], [7, 7]];
+      variant.correctCells = [
+        [6, 6],
+        [7, 7],
+      ];
     }
 
     expect(() => assertLessonInvariants(broken)).toThrow(/out of bounds/);
@@ -140,7 +141,9 @@ describe('course catalog', () => {
     // The single playable lesson carries content; every locked stub is empty.
     expect(playable[0].slots.length).toBeGreaterThan(0);
     expect(
-      lessons.filter((l) => l.id !== 'how-likely').every((l) => l.comingSoon && l.slots.length === 0),
+      lessons
+        .filter((l) => l.id !== 'how-likely')
+        .every((l) => l.comingSoon && l.slots.length === 0),
     ).toBe(true);
   });
 
@@ -153,8 +156,6 @@ describe('course catalog', () => {
     const ids = lessons.map((l) => l.id);
     expect(new Set(ids).size).toBe(ids.length);
     // Numbering stays sequential down the whole catalog so "Lesson N" is monotonic.
-    expect(lessons.map((l) => l.number)).toEqual(
-      lessons.map((_, i) => i + 1),
-    );
+    expect(lessons.map((l) => l.number)).toEqual(lessons.map((_, i) => i + 1));
   });
 });

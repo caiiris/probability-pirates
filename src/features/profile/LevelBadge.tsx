@@ -42,9 +42,7 @@ export function RankPanel({ xp }: { xp: number }) {
           <p className="font-display text-lg font-bold leading-none tracking-tight">
             {info.rank.name}
           </p>
-          <p className="text-xs font-medium text-muted-foreground">
-            Lv {info.level}
-          </p>
+          <p className="text-xs font-medium text-muted-foreground">Lv {info.level}</p>
         </div>
 
         {/* Progress to next level — soft → saturated gradient so it doesn't read
@@ -61,7 +59,8 @@ export function RankPanel({ xp }: { xp: number }) {
         <p className="num mt-1.5 text-xs text-muted-foreground">
           {info.xpIntoLevel.toLocaleString()} / {info.xpForLevel.toLocaleString()} XP
           <span className="text-muted-foreground/70">
-            {' '}· {info.xpToNext.toLocaleString()} to Level {info.level + 1}
+            {' '}
+            · {info.xpToNext.toLocaleString()} to Level {info.level + 1}
           </span>
         </p>
       </div>

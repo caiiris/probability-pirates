@@ -31,11 +31,12 @@ export function TapOutcomes({ variant, feedbackState, onChange }: Props) {
     });
   }
 
-  const outcomes = variant.source === 'd6'
-    ? ['1', '2', '3', '4', '5', '6']
-    : variant.source === 'coin'
-    ? ['H', 'T']
-    : variant.expectedOutcomes;
+  const outcomes =
+    variant.source === 'd6'
+      ? ['1', '2', '3', '4', '5', '6']
+      : variant.source === 'coin'
+        ? ['H', 'T']
+        : variant.expectedOutcomes;
 
   return (
     <div className="flex flex-col items-center gap-8 px-4 py-6">
@@ -56,9 +57,10 @@ export function TapOutcomes({ variant, feedbackState, onChange }: Props) {
                 transition-colors select-none touch-manipulation
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                 ${isDie ? 'w-16 h-16 md:w-20 md:h-20 p-1' : 'w-14 h-14 md:w-16 md:h-16'}
-                ${isCollected
-                  ? 'bg-primary/15 ring-2 ring-primary'
-                  : 'bg-card ring-1 ring-border hover:ring-primary/50'
+                ${
+                  isCollected
+                    ? 'bg-primary/15 ring-2 ring-primary'
+                    : 'bg-card ring-1 ring-border hover:ring-primary/50'
                 }
                 ${locked ? 'cursor-default opacity-70' : 'cursor-pointer'}
               `}

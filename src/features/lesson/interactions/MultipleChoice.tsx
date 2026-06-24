@@ -63,10 +63,12 @@ export function MultipleChoice({ variant, feedbackState, onChange }: Props) {
                 highlightCells={grid.highlightCells ?? []}
               />
               {grid.label && (
-                <p className="text-xs text-muted-foreground font-medium text-center">{grid.label}</p>
+                <p className="text-xs text-muted-foreground font-medium text-center">
+                  {grid.label}
+                </p>
               )}
               <p className="text-xs text-muted-foreground tabular-nums">
-                {(grid.highlightCells?.length ?? 0)} / {grid.rows * grid.cols} cells
+                {grid.highlightCells?.length ?? 0} / {grid.rows * grid.cols} cells
               </p>
             </HintDisclosure>
           )}
@@ -96,9 +98,10 @@ export function MultipleChoice({ variant, feedbackState, onChange }: Props) {
               className={`
                 w-full px-5 py-4 rounded-xl border-2 text-left
                 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
-                ${isSelected
-                  ? 'border-primary bg-primary/10'
-                  : 'border-border bg-card hover:border-primary/40'
+                ${
+                  isSelected
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border bg-card hover:border-primary/40'
                 }
                 ${locked ? 'cursor-default' : 'cursor-pointer'}
               `}
@@ -110,11 +113,15 @@ export function MultipleChoice({ variant, feedbackState, onChange }: Props) {
               whileTap={locked ? {} : { scale: 0.98 }}
               transition={MOTION.pop}
             >
-              <span className={`font-medium text-base block ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+              <span
+                className={`font-medium text-base block ${isSelected ? 'text-primary' : 'text-foreground'}`}
+              >
                 {option.label}
               </span>
               {option.subtext && (
-                <span className={`text-xs mt-0.5 block ${isSelected ? 'text-primary/70' : 'text-muted-foreground'}`}>
+                <span
+                  className={`text-xs mt-0.5 block ${isSelected ? 'text-primary/70' : 'text-muted-foreground'}`}
+                >
                   {option.subtext}
                 </span>
               )}

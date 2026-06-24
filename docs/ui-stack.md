@@ -8,13 +8,13 @@
 
 ## Stack at a glance
 
-| Layer | Tool | Use for |
-| --- | --- | --- |
-| **Component library** | [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS | Buttons, cards, inputs, progress, badges, avatars, dialogs, toasts, bottom nav |
-| **Lesson motion** | Framer Motion | Step transitions, correct/wrong feedback, celebration screen animations |
-| **Optional polish** | [Animbits](https://www.animbits.dev/) (selective) | Confetti, count-up, tap feedback — only where it clearly beats a short Framer snippet |
-| **Icons** | Lucide React (shadcn default) | Nav, streak flame, lock, check, close |
-| **Type** | Bricolage Grotesque (display) · Inter (body) · JetBrains Mono (data), all via `@fontsource` | Headings · UI copy · numerals |
+| Layer                 | Tool                                                                                        | Use for                                                                               |
+| --------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **Component library** | [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS                                           | Buttons, cards, inputs, progress, badges, avatars, dialogs, toasts, bottom nav        |
+| **Lesson motion**     | Framer Motion                                                                               | Step transitions, correct/wrong feedback, celebration screen animations               |
+| **Optional polish**   | [Animbits](https://www.animbits.dev/) (selective)                                           | Confetti, count-up, tap feedback — only where it clearly beats a short Framer snippet |
+| **Icons**             | Lucide React (shadcn default)                                                               | Nav, streak flame, lock, check, close                                                 |
+| **Type**              | Bricolage Grotesque (display) · Inter (body) · JetBrains Mono (data), all via `@fontsource` | Headings · UI copy · numerals                                                         |
 
 **Do not add:** a second component library (MUI, Chakra), a third animation library, or ad-hoc CSS-in-JS beyond Tailwind utilities.
 
@@ -38,19 +38,19 @@
 >   (`bg-primary`, `bg-teal-soft`, `text-coral-deep`, `shadow-soft`, …) and the
 >   font roles (`font-display`, `font-sans`, `font-mono`).
 
-| Token | Hex | Usage |
-| --- | --- | --- |
-| `--primary` | `#6B4EFF` | CTAs, active nav, grid cell highlight, links (Pascal violet) |
-| `--primary-soft` / `--primary-deep` | `#EEE9FF` / `#3A2A8C` | Tinted primary surfaces / chunky-button depth, pressed |
-| `--success` / correct | `#22C55E` | Correct feedback, completed badge |
-| `--destructive` / wrong | `#FB5E58` | Wrong feedback flash (use sparingly — shake first) |
-| `--streak` | `#F59E0B` | Flame icon, daily goal done, milestone trophies |
-| `--info` | `#2E8FFF` | Informational accents, neutral highlights |
-| `--background` | `#FAFAFC` | Page background (warm, faintly plum-tinted) |
-| `--foreground` | `#211C30` | Body text, headings (warm plum-charcoal) |
+| Token                               | Hex                   | Usage                                                        |
+| ----------------------------------- | --------------------- | ------------------------------------------------------------ |
+| `--primary`                         | `#6B4EFF`             | CTAs, active nav, grid cell highlight, links (Pascal violet) |
+| `--primary-soft` / `--primary-deep` | `#EEE9FF` / `#3A2A8C` | Tinted primary surfaces / chunky-button depth, pressed       |
+| `--success` / correct               | `#22C55E`             | Correct feedback, completed badge                            |
+| `--destructive` / wrong             | `#FB5E58`             | Wrong feedback flash (use sparingly — shake first)           |
+| `--streak`                          | `#F59E0B`             | Flame icon, daily goal done, milestone trophies              |
+| `--info`                            | `#2E8FFF`             | Informational accents, neutral highlights                    |
+| `--background`                      | `#FAFAFC`             | Page background (warm, faintly plum-tinted)                  |
+| `--foreground`                      | `#211C30`             | Body text, headings (warm plum-charcoal)                     |
 
 **Color discipline:** chrome stays calm (primary + neutrals + semantic). The
-full accent ramp is for *playful* surfaces — illustrations, lesson nodes, tags —
+full accent ramp is for _playful_ surfaces — illustrations, lesson nodes, tags —
 so the app reads colorful (Brilliant-like) without rainbow chrome.
 
 `--radius` is `0.75rem` (rounder, friendlier). `--btn-depth` (`4px`) is the
@@ -110,12 +110,12 @@ export const MOTION = {
 
 Animbits is a shadcn-ecosystem registry for interactive UI primitives ([animbits.dev](https://www.animbits.dev/)). Use it **selectively**:
 
-| OK to use Animbits | Use Framer instead |
-| --- | --- |
-| Confetti on lesson complete | Slot transitions |
-| XP count-up number animation | Correct/wrong feedback |
-| Optional tap sparkle on grid cell (if registry piece fits) | Progress bar fill |
-| | Bottom nav, cards, forms |
+| OK to use Animbits                                         | Use Framer instead       |
+| ---------------------------------------------------------- | ------------------------ |
+| Confetti on lesson complete                                | Slot transitions         |
+| XP count-up number animation                               | Correct/wrong feedback   |
+| Optional tap sparkle on grid cell (if registry piece fits) | Progress bar fill        |
+|                                                            | Bottom nav, cards, forms |
 
 **Cap:** at most **2–3 Animbits components** in the whole MVP. If a Framer snippet is <30 lines, prefer Framer.
 
@@ -146,14 +146,14 @@ Dice, coins, cards, grids: hand-rolled SVG in `src/components/illustrations/`. G
 
 ## Screen → component map
 
-| Screen | Primary shadcn components | Motion |
-| --- | --- | --- |
-| Login / Register | `Card`, `Input`, `Label`, `Button` | Form error shake (Framer) |
-| Home / course path | `Card`, `Badge`, `Progress`, `Button` | Hero card fade-in |
-| Lesson player | `Button`, `Progress` | Slot slide, feedback animations |
-| Celebration | `Card`, `Badge`, `Progress` | Confetti (Animbits or Framer), XP count-up |
-| Profile | `Avatar`, `Card`, `Badge`, `Separator` | Stats count-up optional |
-| Leave-lesson confirm | `Dialog` | — |
+| Screen               | Primary shadcn components              | Motion                                     |
+| -------------------- | -------------------------------------- | ------------------------------------------ |
+| Login / Register     | `Card`, `Input`, `Label`, `Button`     | Form error shake (Framer)                  |
+| Home / course path   | `Card`, `Badge`, `Progress`, `Button`  | Hero card fade-in                          |
+| Lesson player        | `Button`, `Progress`                   | Slot slide, feedback animations            |
+| Celebration          | `Card`, `Badge`, `Progress`            | Confetti (Animbits or Framer), XP count-up |
+| Profile              | `Avatar`, `Card`, `Badge`, `Separator` | Stats count-up optional                    |
+| Leave-lesson confirm | `Dialog`                               | —                                          |
 
 ---
 

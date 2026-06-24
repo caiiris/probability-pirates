@@ -26,13 +26,11 @@ export function KudosButton({ me, myAchievements, targetUid }: Props) {
 
   useEffect(() => {
     let active = true;
-    Promise.all([hasGivenKudos(me.uid, targetUid), getKudosCount(targetUid)]).then(
-      ([g, c]) => {
-        if (!active) return;
-        setGiven(g);
-        setCount(c);
-      },
-    );
+    Promise.all([hasGivenKudos(me.uid, targetUid), getKudosCount(targetUid)]).then(([g, c]) => {
+      if (!active) return;
+      setGiven(g);
+      setCount(c);
+    });
     return () => {
       active = false;
     };

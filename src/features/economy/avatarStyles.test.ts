@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  AVATAR_STYLES,
-  DEFAULT_AVATAR_STYLE,
-  getAvatarStyle,
-  isAvatarStyle,
-} from './avatarStyles';
+import { AVATAR_STYLES, DEFAULT_AVATAR_STYLE, getAvatarStyle, isAvatarStyle } from './avatarStyles';
 
 describe('avatar style catalog', () => {
   it('includes a free default that everyone owns', () => {

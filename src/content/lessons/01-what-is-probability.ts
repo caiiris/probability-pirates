@@ -42,7 +42,7 @@ export const lesson1: Lesson = {
       prompt: 'Roll a fair die once. What is the chance you get a 4?',
       body: [
         'Most people answer "one in six" without thinking. The interesting question is why that answer is right, and what to do when the question is harder than this one.',
-        "Probability is a way of counting. Over the next few minutes you will build the count for yourself, and then watch it predict something that should feel surprising.",
+        'Probability is a way of counting. Over the next few minutes you will build the count for yourself, and then watch it predict something that should feel surprising.',
       ],
     },
 
@@ -51,7 +51,8 @@ export const lesson1: Lesson = {
       kind: 'concept',
       illustration: { kind: 'die' },
       title: 'Outcomes and the sample space',
-      prompt: 'An outcome is one thing that could happen. The sample space is the set of every outcome.',
+      prompt:
+        'An outcome is one thing that could happen. The sample space is the set of every outcome.',
       body: [
         'For a single roll of a fair die, the sample space is the set {1, 2, 3, 4, 5, 6}. Six outcomes, nothing else.',
         'When the sample space is small, the most useful thing you can do is list it.',
@@ -82,7 +83,8 @@ export const lesson1: Lesson = {
             '2': 'Two is the sample space of a coin. A die has more faces.',
             '12': 'Twelve would be two dice. This is one roll of one die.',
           },
-          explanation: 'Each face is one outcome and they are all distinct, so the sample space has 6 outcomes.',
+          explanation:
+            'Each face is one outcome and they are all distinct, so the sample space has 6 outcomes.',
         },
         {
           id: 'coin',
@@ -103,7 +105,8 @@ export const lesson1: Lesson = {
             '4': 'Four is two coins (HH, HT, TH, TT). This is one flip of one coin.',
             '6': 'Six is for a die. A coin has fewer sides.',
           },
-          explanation: 'Heads and tails are the only two outcomes, so the sample space has 2 outcomes.',
+          explanation:
+            'Heads and tails are the only two outcomes, so the sample space has 2 outcomes.',
         },
       ],
     },
@@ -140,7 +143,8 @@ export const lesson1: Lesson = {
           feedbackCorrect: 'One favorable face out of six.',
           feedbackDefault: 'Exactly one face is a 3. The sample space has six faces.',
           feedbackByWrongAnswer: {
-            '1/3': 'Only one face is a 3, not two. The denominator is the total number of outcomes: 6.',
+            '1/3':
+              'Only one face is a 3, not two. The denominator is the total number of outcomes: 6.',
             '3/6': 'There is only one 3 on the die, not three. The numerator is 1.',
             '1/1': 'A 3 is one outcome out of six, not the whole sample space.',
           },
@@ -168,7 +172,8 @@ export const lesson1: Lesson = {
       kind: 'concept',
       illustration: { kind: 'die' },
       title: 'An event is a set of outcomes',
-      prompt: 'An event is a question about the outcome, answered as "yes, this counts" or "no, it does not".',
+      prompt:
+        'An event is a question about the outcome, answered as "yes, this counts" or "no, it does not".',
       body: [
         '"Rolled an even number" is an event. It groups the outcomes 2, 4, and 6 together: each of them counts as a yes; the rest count as no.',
         'To find the probability of an event, list which outcomes belong to it, count them, and divide by the size of the sample space.',
@@ -183,7 +188,8 @@ export const lesson1: Lesson = {
         {
           id: 'evens-d6',
           interactionKind: 'tap-event',
-          prompt: 'The sample space is {1, 2, 3, 4, 5, 6}. Tap every outcome in the event "rolled an even number".',
+          prompt:
+            'The sample space is {1, 2, 3, 4, 5, 6}. Tap every outcome in the event "rolled an even number".',
           sampleSpace: ['1', '2', '3', '4', '5', '6'],
           correctOutcomes: ['2', '4', '6'],
           feedbackCorrect: 'Three outcomes belong to the event "even".',
@@ -197,7 +203,8 @@ export const lesson1: Lesson = {
         {
           id: 'red-cards',
           interactionKind: 'tap-event',
-          prompt: 'From one draw, the sample space is {♥, ♦, ♣, ♠}. Tap every outcome in the event "drew a red suit".',
+          prompt:
+            'From one draw, the sample space is {♥, ♦, ♣, ♠}. Tap every outcome in the event "drew a red suit".',
           sampleSpace: ['♥', '♦', '♣', '♠'],
           correctOutcomes: ['♥', '♦'],
           feedbackCorrect: 'Two outcomes belong to the event "red". Hearts and diamonds.',
@@ -218,14 +225,17 @@ export const lesson1: Lesson = {
         {
           id: 'even-d6',
           interactionKind: 'fill-fraction',
-          prompt: 'You just picked the three even faces. What is P(even) on a fair die? Enter numerator / denominator.',
+          prompt:
+            'You just picked the three even faces. What is P(even) on a fair die? Enter numerator / denominator.',
           numerator: 3,
           denominator: 6,
           showDieContext: true,
           feedbackCorrect: 'Three favorable faces out of six.',
-          feedbackDefault: 'Count the favorable outcomes, then divide by the total in the sample space.',
+          feedbackDefault:
+            'Count the favorable outcomes, then divide by the total in the sample space.',
           feedbackByWrongAnswer: {
-            '1/6': 'That is one face out of six, but the event "even" contains three faces: 2, 4, and 6.',
+            '1/6':
+              'That is one face out of six, but the event "even" contains three faces: 2, 4, and 6.',
             '2/6': 'Close on the numerator. There are three even faces, not two.',
             '6/6': 'That would mean every roll is even, which is not true.',
           },
@@ -291,7 +301,8 @@ export const lesson1: Lesson = {
         {
           id: 'sum-seven',
           interactionKind: 'grid-event',
-          prompt: 'On this 6 by 6 grid of ordered pairs, tap every cell where the two dice sum to 7.',
+          prompt:
+            'On this 6 by 6 grid of ordered pairs, tap every cell where the two dice sum to 7.',
           rows: 6,
           cols: 6,
           correctCells: SUM_TO_SEVEN_CELLS,
@@ -299,7 +310,8 @@ export const lesson1: Lesson = {
           simulationEnabled: true,
           feedbackCorrect:
             '6 pairs out of 36. So P(sum = 7) = 6/36, which reduces to 1/6. Sum of 7 is the most likely sum.',
-          feedbackDefault: 'Look for the diagonal where the first die goes up as the second die goes down.',
+          feedbackDefault:
+            'Look for the diagonal where the first die goes up as the second die goes down.',
           hint: {
             highlightCells: SUM_TO_THREE_CELLS,
             label:
@@ -309,7 +321,8 @@ export const lesson1: Lesson = {
         {
           id: 'sum-six',
           interactionKind: 'grid-event',
-          prompt: 'On this 6 by 6 grid of ordered pairs, tap every cell where the two dice sum to 6.',
+          prompt:
+            'On this 6 by 6 grid of ordered pairs, tap every cell where the two dice sum to 6.',
           rows: 6,
           cols: 6,
           correctCells: SUM_TO_SIX_CELLS,
@@ -384,8 +397,7 @@ export const lesson1: Lesson = {
       id: 'wrap',
       kind: 'wrap',
       title: 'You counted your first probabilities',
-      body:
-        'When outcomes are equally likely, probability is just counting. For small cases you can list the sample space; for bigger cases the multiplication principle does the listing for you. Next: what happens when there are too many outcomes to count, and the count itself has to be estimated.',
+      body: 'When outcomes are equally likely, probability is just counting. For small cases you can list the sample space; for bigger cases the multiplication principle does the listing for you. Next: what happens when there are too many outcomes to count, and the count itself has to be estimated.',
       segueToLessonId: 'law-of-large-numbers',
     },
   ],

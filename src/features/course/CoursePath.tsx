@@ -66,92 +66,87 @@ export function CoursePath({ lessons, progressMap, currentLessonId, uid, claimed
 
   return (
     <OceanScene>
-    <div className="mx-auto max-w-md flex flex-col gap-3">
-      {groups.map(({ chapter, lessons: chapterLessons }, groupIdx) => {
-        const isFinalChapter = groupIdx === trophyGroupIdx;
-        const availableLessons = chapterLessons.filter((l) => !l.comingSoon);
-        const chapterComplete =
-          availableLessons.length > 0 &&
-          availableLessons.every((l) => progressMap.get(l.id)?.state === 'completed');
-        const lastFrac = frac(chapterLessons.length - 1);
-        const chapterAccentBase = ACCENTS[chapter.accent].base;
+      <div className="mx-auto max-w-md flex flex-col gap-3">
+        {groups.map(({ chapter, lessons: chapterLessons }, groupIdx) => {
+          const isFinalChapter = groupIdx === trophyGroupIdx;
+          const availableLessons = chapterLessons.filter((l) => !l.comingSoon);
+          const chapterComplete =
+            availableLessons.length > 0 &&
+            availableLessons.every((l) => progressMap.get(l.id)?.state === 'completed');
+          const lastFrac = frac(chapterLessons.length - 1);
+          const chapterAccentBase = ACCENTS[chapter.accent].base;
 
-        return (
-        <section
-          key={chapter.id}
-          aria-label={`Chapter ${chapter.number}: ${chapter.title}`}
-        >
-          <ChapterBanner chapter={chapter} lessons={chapterLessons} progressMap={progressMap} />
-          <ol className="mt-6 flex flex-col">
-            {chapterLessons.map((lesson, j) => {
-              const prev = j > 0 ? chapterLessons[j - 1] : null;
-              const prevDone = prev
-                ? progressMap.get(prev.id)?.state === 'completed'
-                : false;
-              const prevIdx = prev ? (globalIndex.get(prev.id) ?? j - 1) : 0;
-              const prevAccent = prev
-                ? ACCENTS[getLessonVisual(prev.id, prevIdx).accent].base
-                : null;
+          return (
+            <section key={chapter.id} aria-label={`Chapter ${chapter.number}: ${chapter.title}`}>
+              <ChapterBanner chapter={chapter} lessons={chapterLessons} progressMap={progressMap} />
+              <ol className="mt-6 flex flex-col">
+                {chapterLessons.map((lesson, j) => {
+                  const prev = j > 0 ? chapterLessons[j - 1] : null;
+                  const prevDone = prev ? progressMap.get(prev.id)?.state === 'completed' : false;
+                  const prevIdx = prev ? (globalIndex.get(prev.id) ?? j - 1) : 0;
+                  const prevAccent = prev
+                    ? ACCENTS[getLessonVisual(prev.id, prevIdx).accent].base
+                    : null;
 
-              return (
-                <Fragment key={lesson.id}>
-                  {j > 0 ? (
-                    <CurveConnector
-                      fromFrac={frac(j - 1)}
-                      toFrac={frac(j)}
-                      done={prevDone}
-                      color={prevAccent}
-                      die={dieForBoundary(prevIdx)}
-                    />
-                  ) : null}
-                  <li className="w-full">
-                    <div
-                      className="-translate-x-1/2"
-                      style={{ marginInlineStart: `${frac(j) * 100}%`, width: NODE_W }}
-                    >
-                      <LessonNode
-                        lesson={lesson}
-                        progress={progressMap.get(lesson.id)}
-                        index={globalIndex.get(lesson.id) ?? j}
-                        isCurrent={lesson.id === currentLessonId}
-                        uid={uid}
-                      />
-                    </div>
-                  </li>
-                </Fragment>
-              );
-            })}
+                  return (
+                    <Fragment key={lesson.id}>
+                      {j > 0 ? (
+                        <CurveConnector
+                          fromFrac={frac(j - 1)}
+                          toFrac={frac(j)}
+                          done={prevDone}
+                          color={prevAccent}
+                          die={dieForBoundary(prevIdx)}
+                        />
+                      ) : null}
+                      <li className="w-full">
+                        <div
+                          className="-translate-x-1/2"
+                          style={{ marginInlineStart: `${frac(j) * 100}%`, width: NODE_W }}
+                        >
+                          <LessonNode
+                            lesson={lesson}
+                            progress={progressMap.get(lesson.id)}
+                            index={globalIndex.get(lesson.id) ?? j}
+                            isCurrent={lesson.id === currentLessonId}
+                            uid={uid}
+                          />
+                        </div>
+                      </li>
+                    </Fragment>
+                  );
+                })}
 
-            {/* Checkpoint reward at the end of the chapter */}
-            <CurveConnector
-              fromFrac={lastFrac}
-              toFrac={0.5}
-              done={chapterComplete}
-              color={chapterAccentBase}
-              die={null}
-            />
-            <li className="w-full">
-              <div
-                className="-translate-x-1/2"
-                style={{ marginInlineStart: '50%', width: isFinalChapter ? 300 : 200 }}
-              >
-                <Checkpoint
-                  variant={isFinalChapter ? 'treasure' : 'chest'}
-                  title={chapter.title}
-                  accent={chapter.accent}
-                  complete={chapterComplete}
-                  chestId={chapter.id}
-                  reward={chestReward(isFinalChapter)}
-                  claimed={claimedChests.includes(chapter.id)}
-                  uid={uid}
+                {/* Checkpoint reward at the end of the chapter */}
+                <CurveConnector
+                  fromFrac={lastFrac}
+                  toFrac={0.5}
+                  done={chapterComplete}
+                  color={chapterAccentBase}
+                  die={null}
                 />
-              </div>
-            </li>
-          </ol>
-        </section>
-        );
-      })}
-    </div>
+                <li className="w-full">
+                  <div
+                    className="-translate-x-1/2"
+                    style={{ marginInlineStart: '50%', width: isFinalChapter ? 300 : 200 }}
+                  >
+                    <Checkpoint
+                      variant={isFinalChapter ? 'treasure' : 'chest'}
+                      title={chapter.title}
+                      accent={chapter.accent}
+                      complete={chapterComplete}
+                      chestId={chapter.id}
+                      reward={chestReward(isFinalChapter)}
+                      claimed={claimedChests.includes(chapter.id)}
+                      uid={uid}
+                    />
+                  </div>
+                </li>
+              </ol>
+            </section>
+          );
+        })}
+      </div>
     </OceanScene>
   );
 }
@@ -203,7 +198,12 @@ function CurveConnector({
               the "long pen stroke" feel. */}
           <defs>
             <filter id={inkId} x="-5%" y="-20%" width="110%" height="140%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="1" seed={Math.round(x1 + x2)} />
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.45"
+                numOctaves="1"
+                seed={Math.round(x1 + x2)}
+              />
               <feDisplacementMap in="SourceGraphic" scale="0.6" />
             </filter>
           </defs>

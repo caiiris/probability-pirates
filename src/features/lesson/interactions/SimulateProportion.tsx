@@ -25,7 +25,12 @@ type ScenarioMeta = {
 const SCENARIOS: Record<SimulateProportionVariant['scenario'], ScenarioMeta> = {
   coin: { noun: 'flip', nounPlural: 'flips', successLabel: 'heads', steps: [1, 10, 50] },
   'die-six': { noun: 'roll', nounPlural: 'rolls', successLabel: 'sixes', steps: [1, 10, 50] },
-  birthday: { noun: 'room', nounPlural: 'rooms', successLabel: 'with a match', steps: [1, 25, 100] },
+  birthday: {
+    noun: 'room',
+    nounPlural: 'rooms',
+    successLabel: 'with a match',
+    steps: [1, 25, 100],
+  },
 };
 
 /** Keeps a bounded, evenly-spaced view of the proportion history so the chart stays cheap. */
@@ -114,7 +119,10 @@ export function SimulateProportion({ variant, feedbackState, onChange }: Props) 
           references={[{ y: variant.targetProbability, label: variant.targetLabel }]}
         />
         <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-          <span className="inline-block w-4 border-t-2 border-dashed border-foreground/60" aria-hidden="true" />
+          <span
+            className="inline-block w-4 border-t-2 border-dashed border-foreground/60"
+            aria-hidden="true"
+          />
           {variant.targetLabel}
         </p>
       </div>
@@ -158,7 +166,11 @@ export function SimulateProportion({ variant, feedbackState, onChange }: Props) 
 
 function LastTrialVisual({ last, trials }: { last: LastTrial | null; trials: number }) {
   if (!last) {
-    return <div className="h-14 flex items-center text-sm text-muted-foreground">Press a button to start.</div>;
+    return (
+      <div className="h-14 flex items-center text-sm text-muted-foreground">
+        Press a button to start.
+      </div>
+    );
   }
 
   if (last.kind === 'coin') {

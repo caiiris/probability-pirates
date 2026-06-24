@@ -25,11 +25,36 @@ type Props = {
 
 const PIP_LAYOUT: Record<number, Array<[number, number]>> = {
   1: [[12, 12]],
-  2: [[7, 7], [17, 17]],
-  3: [[7, 7], [12, 12], [17, 17]],
-  4: [[7, 7], [17, 7], [7, 17], [17, 17]],
-  5: [[7, 7], [17, 7], [12, 12], [7, 17], [17, 17]],
-  6: [[7, 6], [17, 6], [7, 12], [17, 12], [7, 18], [17, 18]],
+  2: [
+    [7, 7],
+    [17, 17],
+  ],
+  3: [
+    [7, 7],
+    [12, 12],
+    [17, 17],
+  ],
+  4: [
+    [7, 7],
+    [17, 7],
+    [7, 17],
+    [17, 17],
+  ],
+  5: [
+    [7, 7],
+    [17, 7],
+    [12, 12],
+    [7, 17],
+    [17, 17],
+  ],
+  6: [
+    [7, 6],
+    [17, 6],
+    [7, 12],
+    [17, 12],
+    [7, 18],
+    [17, 18],
+  ],
 };
 
 export function FlyingDie({ accent, pips = 5, size = 34, delay = 0, variant = 'flying' }: Props) {
@@ -78,7 +103,12 @@ export function FlyingDie({ accent, pips = 5, size = 34, delay = 0, variant = 'f
           />
           <motion.span
             className="absolute rounded-full border border-white/70"
-            style={{ width: size * 0.11, height: size * 0.11, right: size * 0.16, top: size * 0.18 }}
+            style={{
+              width: size * 0.11,
+              height: size * 0.11,
+              right: size * 0.16,
+              top: size * 0.18,
+            }}
             animate={{ y: [2, -size * 0.45], opacity: [0, 0.8, 0] }}
             transition={{ duration: 2.4, repeat: Infinity, ease: 'easeOut', delay: delay + 1.1 }}
           />
@@ -91,7 +121,11 @@ export function FlyingDie({ accent, pips = 5, size = 34, delay = 0, variant = 'f
           animate={{ scale: [0.4, 1, 0.4], opacity: [0.4, 1, 0.4], rotate: [0, 30, 0] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: delay + 0.3 }}
         >
-          <svg viewBox="0 0 24 24" fill="currentColor" style={{ filter: `drop-shadow(0 0 2px ${c.base})` }}>
+          <svg
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            style={{ filter: `drop-shadow(0 0 2px ${c.base})` }}
+          >
             <path d="M12 2c.6 4.7 1.5 5.6 6 6-4.5.4-5.4 1.3-6 6-.6-4.7-1.5-5.6-6-6 4.5-.4 5.4-1.3 6-6Z" />
           </svg>
         </motion.span>
@@ -120,7 +154,16 @@ export function FlyingDie({ accent, pips = 5, size = 34, delay = 0, variant = 'f
           </>
         )}
         {/* die body */}
-        <rect x="4" y="4" width="16" height="16" rx="4.5" fill="#FFFFFF" stroke={c.deep} strokeWidth="1.4" />
+        <rect
+          x="4"
+          y="4"
+          width="16"
+          height="16"
+          rx="4.5"
+          fill="#FFFFFF"
+          stroke={c.deep}
+          strokeWidth="1.4"
+        />
         {dots.map(([cx, cy], i) => (
           <circle key={i} cx={cx} cy={cy} r="1.5" fill={c.base} />
         ))}

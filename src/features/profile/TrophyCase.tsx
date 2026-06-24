@@ -1,10 +1,5 @@
 import { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ACHIEVEMENTS } from '@/lib/achievements';
 import { MILESTONE_THRESHOLDS, MILESTONE_TITLES } from '@/lib/milestones';
 import type { MilestoneId } from '@/lib/milestones';
@@ -99,9 +94,7 @@ export function TrophyCase({ milestonesReached, currentStreak, achievements }: P
                   {selected.title}
                 </DialogTitle>
               </DialogHeader>
-              <p className="text-center text-sm text-muted-foreground">
-                {selected.description}
-              </p>
+              <p className="text-center text-sm text-muted-foreground">{selected.description}</p>
               <p
                 className={`text-center text-xs font-semibold ${
                   selected.earned ? 'text-[color:var(--success)]' : 'text-muted-foreground'
@@ -149,7 +142,13 @@ function Shelf({
             className="flex flex-col items-center gap-1.5 rounded-xl pb-1 pt-2 text-center focus-visible:outline-none"
             aria-label={`${item.title}${item.earned ? ', earned' : ', locked'}. ${item.description}`}
           >
-            <Medallion emblem={item.emblem} tone={item.tone} earned={item.earned} badge={item.badge} size={58} />
+            <Medallion
+              emblem={item.emblem}
+              tone={item.tone}
+              earned={item.earned}
+              badge={item.badge}
+              size={58}
+            />
             <span
               className={`text-[11px] font-semibold leading-tight ${
                 item.earned ? 'text-foreground' : 'text-muted-foreground/70'

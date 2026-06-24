@@ -107,7 +107,10 @@ export function ProportionChart({ series, references = [], className }: Props) {
             strokeLinejoin="round"
             strokeLinecap="round"
             points={s.points
-              .map((p, idx) => `${xAt(idx, s.points.length === 1 ? maxCount : s.points.length)},${yAt(p)}`)
+              .map(
+                (p, idx) =>
+                  `${xAt(idx, s.points.length === 1 ? maxCount : s.points.length)},${yAt(p)}`,
+              )
               .join(' ')}
           />
         ),

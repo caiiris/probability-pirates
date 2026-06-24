@@ -15,11 +15,23 @@ const EMBLEMS: Record<EmblemName, React.ReactNode> = {
   gem: (
     <g>
       <path d="M6 4h12l3 5-9 12L3 9z" fill="currentColor" />
-      <path d="M3 9h18M9 4 7 9l5 12 5-12-2-5" fill="none" stroke="#ffffff" strokeWidth="1" opacity="0.5" />
+      <path
+        d="M3 9h18M9 4 7 9l5 12 5-12-2-5"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="1"
+        opacity="0.5"
+      />
     </g>
   ),
   rebound: (
-    <g fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M5 13a7 7 0 1 1 7 7" />
       <path d="M12 21l-4-3 4-3" />
     </g>
@@ -41,15 +53,17 @@ const EMBLEMS: Record<EmblemName, React.ReactNode> = {
   cap: (
     <g>
       <path d="M12 4 2 9l10 5 10-5z" fill="currentColor" />
-      <path d="M6 12v4c0 1.3 2.7 2.4 6 2.4s6-1.1 6-2.4v-4" fill="none" stroke="currentColor" strokeWidth="2" />
+      <path
+        d="M6 12v4c0 1.3 2.7 2.4 6 2.4s6-1.1 6-2.4v-4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
       <path d="M22 9v5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </g>
   ),
   crown: (
-    <path
-      d="M4 8l3.2 3.2L12 5l4.8 6.2L20 8v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"
-      fill="currentColor"
-    />
+    <path d="M4 8l3.2 3.2L12 5l4.8 6.2L20 8v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" fill="currentColor" />
   ),
   link: (
     <g fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">

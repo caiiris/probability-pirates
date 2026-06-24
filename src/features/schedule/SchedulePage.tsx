@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Plus, Trash2, BookOpen, Check, Clock, CalendarDays, ChevronRight as ChevronRightSm } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Trash2,
+  BookOpen,
+  Check,
+  Clock,
+  CalendarDays,
+  ChevronRight as ChevronRightSm,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,11 +29,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useLessons } from '@/features/flags/useLessons';
 import type { Lesson } from '@/content/types';
 import { useStudyEvents } from './useStudyEvents';
-import {
-  addStudyEvent,
-  deleteStudyEvent,
-  toggleStudyEvent,
-} from './scheduleService';
+import { addStudyEvent, deleteStudyEvent, toggleStudyEvent } from './scheduleService';
 import type { StudyEvent } from './scheduleService';
 import {
   EVENT_TYPES,
@@ -55,10 +61,20 @@ function yearMonthOf(d: Date): string {
 }
 
 const MONTH_NAMES = [
-  'January','February','March','April','May','June',
-  'July','August','September','October','November','December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
-const DAY_ABBR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 /** All calendar cells for a given month (may include leading/trailing days from adjacent months). */
 function calendarCells(year: number, month: number): Date[] {
@@ -189,11 +205,12 @@ function MonthCalendar({
                 text-sm font-medium transition-colors select-none touch-manipulation
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
                 ${textColor}
-                ${isSelected
-                  ? 'bg-primary'
-                  : isToday
-                    ? 'ring-2 ring-[color:var(--coral-deep)]/70'
-                    : 'hover:bg-muted'
+                ${
+                  isSelected
+                    ? 'bg-primary'
+                    : isToday
+                      ? 'ring-2 ring-[color:var(--coral-deep)]/70'
+                      : 'hover:bg-muted'
                 }
               `}
             >
@@ -205,9 +222,7 @@ function MonthCalendar({
                       key={t}
                       className="w-1.5 h-1.5 rounded-full"
                       style={{
-                        backgroundColor: isSelected
-                          ? 'currentColor'
-                          : EVENT_TYPE_META[t].dotColor,
+                        backgroundColor: isSelected ? 'currentColor' : EVENT_TYPE_META[t].dotColor,
                         opacity: isSelected ? 0.85 : 1,
                       }}
                     />
@@ -302,9 +317,7 @@ function DayEventList({
                 // Subtle left-edge accent in the event-type color. Tests in
                 // particular need to read at a glance vs casual study sessions.
                 style={
-                  event.completed
-                    ? undefined
-                    : { boxShadow: `inset 3px 0 0 ${meta.dotColor}` }
+                  event.completed ? undefined : { boxShadow: `inset 3px 0 0 ${meta.dotColor}` }
                 }
               >
                 {/* Checkbox */}
@@ -313,9 +326,10 @@ function DayEventList({
                   onClick={() => handleToggle(event)}
                   aria-label={event.completed ? 'Mark incomplete' : 'Mark complete'}
                   className={`mt-0.5 w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors
-                    ${event.completed
-                      ? 'border-[color:var(--success)] bg-[color:var(--success)] text-white'
-                      : 'border-muted-foreground/40 hover:border-primary'
+                    ${
+                      event.completed
+                        ? 'border-[color:var(--success)] bg-[color:var(--success)] text-white'
+                        : 'border-muted-foreground/40 hover:border-primary'
                     }`}
                 >
                   {event.completed && <Check className="w-3 h-3" />}
@@ -342,7 +356,9 @@ function DayEventList({
                       </span>
                     )}
                   </div>
-                  <p className={`text-sm font-medium leading-snug mt-1 group-hover:text-primary transition-colors ${event.completed ? 'line-through text-muted-foreground' : ''}`}>
+                  <p
+                    className={`text-sm font-medium leading-snug mt-1 group-hover:text-primary transition-colors ${event.completed ? 'line-through text-muted-foreground' : ''}`}
+                  >
                     {event.title}
                   </p>
                   {/* At-a-glance hints; full lesson title + notes live in the detail dialog */}
@@ -478,9 +494,10 @@ function AddEventDialog({
                     onClick={() => setEventType(t)}
                     aria-pressed={active}
                     className={`flex flex-col items-center gap-1 rounded-lg border px-2 py-2 text-[11px] font-medium transition-colors
-                      ${active
-                        ? `${meta.badgeClass} border-current`
-                        : 'border-border text-muted-foreground hover:bg-muted/60'
+                      ${
+                        active
+                          ? `${meta.badgeClass} border-current`
+                          : 'border-border text-muted-foreground hover:bg-muted/60'
                       }`}
                   >
                     <Icon className="w-4 h-4" aria-hidden="true" />
@@ -492,7 +509,9 @@ function AddEventDialog({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium" htmlFor="event-title">Title</label>
+            <label className="text-sm font-medium" htmlFor="event-title">
+              Title
+            </label>
             <Input
               id="event-title"
               placeholder={titlePlaceholder(eventType)}
@@ -506,7 +525,9 @@ function AddEventDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium" htmlFor="event-date">Date</label>
+              <label className="text-sm font-medium" htmlFor="event-date">
+                Date
+              </label>
               <Input
                 id="event-date"
                 type="date"
@@ -538,9 +559,13 @@ function AddEventDialog({
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="">None</option>
-              {lessons.filter((l) => !l.comingSoon).map((l) => (
-                <option key={l.id} value={l.id}>Lesson {l.number}: {l.title}</option>
-              ))}
+              {lessons
+                .filter((l) => !l.comingSoon)
+                .map((l) => (
+                  <option key={l.id} value={l.id}>
+                    Lesson {l.number}: {l.title}
+                  </option>
+                ))}
             </select>
           </div>
 
@@ -560,7 +585,9 @@ function AddEventDialog({
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
           <Button onClick={handleSave} disabled={!title.trim() || saving}>
             {saving ? 'Saving…' : 'Save'}
           </Button>
@@ -572,10 +599,14 @@ function AddEventDialog({
 
 function titlePlaceholder(type: EventType): string {
   switch (type) {
-    case 'test':     return 'e.g. AP Statistics midterm';
-    case 'homework': return 'e.g. Chapter 4 problem set';
-    case 'study':    return 'e.g. Review probability basics';
-    case 'other':    return 'What\'s on your mind?';
+    case 'test':
+      return 'e.g. AP Statistics midterm';
+    case 'homework':
+      return 'e.g. Chapter 4 problem set';
+    case 'study':
+      return 'e.g. Review probability basics';
+    case 'other':
+      return "What's on your mind?";
   }
 }
 
@@ -605,9 +636,7 @@ function EventDetailDialog({
 
   const meta = EVENT_TYPE_META[event.eventType];
   const TypeIcon = meta.icon;
-  const linkedLesson = event.lessonId
-    ? lessons.find((l) => l.id === event.lessonId)
-    : undefined;
+  const linkedLesson = event.lessonId ? lessons.find((l) => l.id === event.lessonId) : undefined;
 
   async function handleToggle() {
     if (!event) return;
@@ -713,12 +742,7 @@ function EventDetailDialog({
         </div>
 
         <DialogFooter className="gap-2">
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={busy}
-            className="gap-1.5"
-          >
+          <Button variant="destructive" onClick={handleDelete} disabled={busy} className="gap-1.5">
             <Trash2 className="w-4 h-4" />
             Delete
           </Button>
@@ -744,9 +768,7 @@ function EventDetailDialog({
 
 function UpcomingStrip({ events }: { events: StudyEvent[] }) {
   const today = todayString();
-  const upcoming = events
-    .filter((e) => !e.completed && e.date >= today)
-    .slice(0, 5);
+  const upcoming = events.filter((e) => !e.completed && e.date >= today).slice(0, 5);
 
   if (upcoming.length === 0) return null;
 
@@ -765,15 +787,22 @@ function UpcomingStrip({ events }: { events: StudyEvent[] }) {
             <li key={e.id} className="flex items-center gap-3 rounded-lg bg-muted/40 px-3 py-2">
               <span
                 className="grid place-items-center w-7 h-7 rounded-md shrink-0"
-                style={{ backgroundColor: `color-mix(in srgb, ${meta.dotColor} 14%, transparent)`, color: meta.dotColor }}
+                style={{
+                  backgroundColor: `color-mix(in srgb, ${meta.dotColor} 14%, transparent)`,
+                  color: meta.dotColor,
+                }}
                 aria-hidden="true"
               >
                 <Icon className="w-3.5 h-3.5" />
               </span>
-              <span className="text-xs font-semibold text-muted-foreground w-12 shrink-0">{label}</span>
+              <span className="text-xs font-semibold text-muted-foreground w-12 shrink-0">
+                {label}
+              </span>
               <span className="text-sm truncate flex-1">{e.title}</span>
               {e.time && (
-                <span className="text-[11px] text-muted-foreground shrink-0">{formatTime(e.time)}</span>
+                <span className="text-[11px] text-muted-foreground shrink-0">
+                  {formatTime(e.time)}
+                </span>
               )}
             </li>
           );
@@ -838,62 +867,62 @@ export function SchedulePage() {
 
   return (
     <div className="min-h-full bg-white">
-    <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-bold tracking-tight">Schedule</h1>
-        {uid && (
-          <Button size="sm" onClick={() => setAddOpen(true)} className="gap-1.5 shrink-0">
-            <Plus className="w-4 h-4" />
-            Add
-          </Button>
+      <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-display text-2xl font-bold tracking-tight">Schedule</h1>
+          {uid && (
+            <Button size="sm" onClick={() => setAddOpen(true)} className="gap-1.5 shrink-0">
+              <Plus className="w-4 h-4" />
+              Add
+            </Button>
+          )}
+        </div>
+
+        {loading ? (
+          <ScheduleSkeleton />
+        ) : (
+          <>
+            {/* Calendar */}
+            <MonthCalendar
+              year={viewDate.getFullYear()}
+              month={viewDate.getMonth()}
+              selected={selectedDate}
+              eventsByDate={eventsByDate}
+              onSelect={setSelectedDate}
+              onPrev={prevMonth}
+              onNext={nextMonth}
+            />
+
+            {/* Day events */}
+            <DayEventList
+              uid={uid}
+              date={selectedDate}
+              events={selectedEvents}
+              onAdd={() => setAddOpen(true)}
+              onOpenDetail={setDetailEvent}
+            />
+
+            {/* Upcoming strip */}
+            <UpcomingStrip events={events} />
+          </>
         )}
+
+        {/* Add dialog */}
+        <AddEventDialog
+          open={addOpen}
+          defaultDate={selectedDate}
+          uid={uid}
+          onOpenChange={setAddOpen}
+        />
+
+        {/* Detail dialog */}
+        <EventDetailDialog
+          event={detailEvent}
+          uid={uid}
+          lessons={lessons}
+          onOpenChange={(open) => !open && setDetailEvent(null)}
+        />
       </div>
-
-      {loading ? (
-        <ScheduleSkeleton />
-      ) : (
-        <>
-          {/* Calendar */}
-          <MonthCalendar
-            year={viewDate.getFullYear()}
-            month={viewDate.getMonth()}
-            selected={selectedDate}
-            eventsByDate={eventsByDate}
-            onSelect={setSelectedDate}
-            onPrev={prevMonth}
-            onNext={nextMonth}
-          />
-
-          {/* Day events */}
-          <DayEventList
-            uid={uid}
-            date={selectedDate}
-            events={selectedEvents}
-            onAdd={() => setAddOpen(true)}
-            onOpenDetail={setDetailEvent}
-          />
-
-          {/* Upcoming strip */}
-          <UpcomingStrip events={events} />
-        </>
-      )}
-
-      {/* Add dialog */}
-      <AddEventDialog
-        open={addOpen}
-        defaultDate={selectedDate}
-        uid={uid}
-        onOpenChange={setAddOpen}
-      />
-
-      {/* Detail dialog */}
-      <EventDetailDialog
-        event={detailEvent}
-        uid={uid}
-        lessons={lessons}
-        onOpenChange={(open) => !open && setDetailEvent(null)}
-      />
-    </div>
     </div>
   );
 }

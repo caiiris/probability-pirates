@@ -12,7 +12,13 @@ import { subscribeToMonthEvents } from './scheduleService';
 import { useStudyEvents } from './useStudyEvents';
 
 const sampleEvents: StudyEvent[] = [
-  { id: 'e1', title: 'Review probability basics', date: '2026-06-10', eventType: 'study', completed: false },
+  {
+    id: 'e1',
+    title: 'Review probability basics',
+    date: '2026-06-10',
+    eventType: 'study',
+    completed: false,
+  },
   { id: 'e2', title: 'Practice quiz', date: '2026-06-12', eventType: 'test', completed: true },
 ];
 

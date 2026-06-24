@@ -75,7 +75,13 @@ export const CHAPTERS: Chapter[] = [
     title: 'Events',
     subtitle: 'Events are sets of outcomes.',
     accent: 'green',
-    lessonIds: ['event-as-set', 'p-event-by-counting', 'complement-rule', 'practice-events', 'review-events'],
+    lessonIds: [
+      'event-as-set',
+      'p-event-by-counting',
+      'complement-rule',
+      'practice-events',
+      'review-events',
+    ],
   },
   {
     id: 'counting-techniques',

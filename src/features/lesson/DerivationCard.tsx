@@ -89,9 +89,7 @@ function QuestionFace({ question }: { question: string }) {
       <p className="font-display text-lg md:text-xl font-semibold tracking-tight text-foreground text-center leading-snug max-w-[28ch]">
         {renderInlineMath(question)}
       </p>
-      <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground/70">
-        Tap to reveal
-      </p>
+      <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground/70">Tap to reveal</p>
     </aside>
   );
 }
@@ -111,9 +109,7 @@ function DerivationFace({ derivation }: { derivation: DerivationData }) {
       <ol className="space-y-1.5 text-[0.95rem] font-mono leading-relaxed text-foreground">
         {derivation.steps.map((step, i) => (
           <li key={i} className="flex gap-3">
-            <span className="text-muted-foreground/60 select-none w-5 shrink-0">
-              {i + 1}.
-            </span>
+            <span className="text-muted-foreground/60 select-none w-5 shrink-0">{i + 1}.</span>
             <span className="flex-1">{renderInlineMath(step)}</span>
           </li>
         ))}

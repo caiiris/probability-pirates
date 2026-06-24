@@ -161,10 +161,7 @@ export async function markNotificationRead(uid: string, notifId: string): Promis
 }
 
 /** Mark every unread notification read (used on opening the inbox). */
-export async function markAllNotificationsRead(
-  uid: string,
-  items: Notification[],
-): Promise<void> {
+export async function markAllNotificationsRead(uid: string, items: Notification[]): Promise<void> {
   const unread = items.filter((n) => !n.read);
   if (unread.length === 0) return;
   try {

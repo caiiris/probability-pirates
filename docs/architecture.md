@@ -117,6 +117,7 @@ brilliant-clone/
 ```
 
 ### Naming conventions
+
 - React components: `PascalCase.tsx` (e.g. `LessonPlayer.tsx`).
 - Hooks: `useCamelCase.ts` (e.g. `useAuth.ts`).
 - Services (pure functions or thin Firebase wrappers): `camelCaseService.ts`.
@@ -124,15 +125,16 @@ brilliant-clone/
 - Constants files: `camelCase.ts` (e.g. `xp.ts`).
 
 ### Where things go
-| Kind of code | Goes in |
-| --- | --- |
-| A page (route target) | `src/features/<feature>/<Name>Page.tsx` |
-| A piece of a page (used in one feature) | `src/features/<feature>/` |
-| A piece used by 2+ features | `src/components/` |
-| A shadcn component | `src/components/ui/` (managed by CLI) |
-| A custom SVG illustration | `src/components/illustrations/` |
-| A Firebase service wrapper | `src/features/<feature>/<feature>Service.ts` |
-| A pure helper (no Firebase) | `src/lib/<name>.ts` |
+
+| Kind of code                            | Goes in                                      |
+| --------------------------------------- | -------------------------------------------- |
+| A page (route target)                   | `src/features/<feature>/<Name>Page.tsx`      |
+| A piece of a page (used in one feature) | `src/features/<feature>/`                    |
+| A piece used by 2+ features             | `src/components/`                            |
+| A shadcn component                      | `src/components/ui/` (managed by CLI)        |
+| A custom SVG illustration               | `src/components/illustrations/`              |
+| A Firebase service wrapper              | `src/features/<feature>/<feature>Service.ts` |
+| A pure helper (no Firebase)             | `src/lib/<name>.ts`                          |
 
 ---
 
@@ -148,6 +150,7 @@ brilliant-clone/
 - Server state IS the source of truth. Firestore's real-time listeners ARE the cache. We do not duplicate state into React Query / SWR for MVP.
 
 ### When this would break
+
 - If we add more than ~5 simultaneous Firestore listeners per page, switch to TanStack Query for deduping.
 - If we add Phase 2 AI features that need optimistic UI mutations, revisit.
 
@@ -158,16 +161,19 @@ brilliant-clone/
 **Decision:** **One Firebase project for MVP** (dev = prod), with the Firebase emulator suite for local testing. See `docs/alternatives.md` D42.
 
 ### Local development
+
 - `.env.local` (gitignored) holds Firebase web SDK config + `VITE_USE_EMULATOR=true`.
 - `npm run dev` starts Vite. If `VITE_USE_EMULATOR=true`, `src/lib/firebase.ts` connects to the emulator suite on `localhost:8080` (Firestore), `:9099` (Auth), `:9199` (Storage).
 - `firebase emulators:start --import=./firebase/seed --export-on-exit=./firebase/seed` runs the emulators; seed data lives gitignored.
 
 ### Production
+
 - One Firebase project, configured via Vercel project environment variables (`VITE_FIREBASE_*`).
 - Deploys go through Vercel preview branches; merging to `main` deploys to production.
 - Firestore rules and indexes are deployed manually via `firebase deploy --only firestore` until we wire up an action. (Phase 3 candidate.)
 
 ### Remote Config (lesson availability)
+
 - A single STRING parameter `available_lesson_ids` (JSON array) controls which lessons render as playable vs `Coming soon`. Default: `["what-is-probability"]` (matches what ships in `src/content/lessons/01-*.ts`).
 - Clients fetch in `src/features/flags/RemoteFlagsProvider.tsx` via `fetchAndActivate`. Cache window: 10 s in dev, 1 h in prod.
 - Hard safety net in `useLessons()`: a lesson with `slots.length === 0` is ALWAYS `comingSoon`, regardless of Remote Config — flipping a contentless lesson live is impossible.
@@ -175,6 +181,7 @@ brilliant-clone/
 - See `docs/issues.md` I027 for the full operator playbook.
 
 ### `.env.example` (committed)
+
 ```
 VITE_FIREBASE_API_KEY=
 VITE_FIREBASE_AUTH_DOMAIN=
@@ -187,6 +194,7 @@ VITE_SENTRY_DSN=
 ```
 
 ### Risk
+
 - Single-project means a buggy dev write can pollute "prod" data. Mitigation: every developer runs against the emulator by default; only Vercel uses the real project.
 
 ---
@@ -195,14 +203,14 @@ VITE_SENTRY_DSN=
 
 React Router v6. Route table:
 
-| Path | Component | Auth required |
-| --- | --- | --- |
-| `/` | `HomePage` (course path) | yes |
-| `/login` | `LoginPage` | no (redirect to `/` if signed in) |
-| `/register` | `RegisterPage` | no (redirect to `/` if signed in) |
-| `/lesson/:lessonId` | `LessonPlayer` | yes |
-| `/profile` | `ProfilePage` | yes |
-| `*` | 404 → redirect to `/` | n/a |
+| Path                | Component                | Auth required                     |
+| ------------------- | ------------------------ | --------------------------------- |
+| `/`                 | `HomePage` (course path) | yes                               |
+| `/login`            | `LoginPage`              | no (redirect to `/` if signed in) |
+| `/register`         | `RegisterPage`           | no (redirect to `/` if signed in) |
+| `/lesson/:lessonId` | `LessonPlayer`           | yes                               |
+| `/profile`          | `ProfilePage`            | yes                               |
+| `*`                 | 404 → redirect to `/`    | n/a                               |
 
 Auth gating: a single `<RequireAuth>` wrapper inside `App.tsx` redirects unsigned users to `/login`.
 
@@ -211,19 +219,23 @@ Auth gating: a single `<RequireAuth>` wrapper inside `App.tsx` redirects unsigne
 ## 6. Error handling
 
 ### Client-side errors
+
 - **Sentry** (`@sentry/react`) initialized in `main.tsx` when `VITE_SENTRY_DSN` is set. Catches uncaught errors and unhandled promise rejections.
 - **React error boundary** at `<App>` root renders a generic "Something broke. Tap to reload." card. Logs to Sentry.
 
 ### Firestore write failures
+
 - Every service write returns `Promise<{ ok: true } | { ok: false; error: string }>`.
 - Lesson player shows an inline toast on persistence failure ("Couldn't save your answer — check your connection. Will retry.").
 - One automatic retry with 500ms backoff before surfacing the error.
 
 ### Network offline
+
 - We do **not** enable Firestore offline persistence in MVP (see alternatives D25).
 - A simple `navigator.onLine` check shows a banner "You're offline — your answers will not save." while offline.
 
 ### Validation errors
+
 - Form-level validation (registration password, etc.) renders inline below the field. No toasts for validation.
 
 ---
@@ -231,15 +243,18 @@ Auth gating: a single `<RequireAuth>` wrapper inside `App.tsx` redirects unsigne
 ## 7. Observability
 
 ### Production
+
 - **Sentry** for client errors (free tier ample for MVP).
 - **Firebase console** for Firestore read/write counts, Auth signups, Storage usage. Set a budget alert at $20/mo on Firebase.
 - **Vercel analytics** (free tier) for basic traffic + Core Web Vitals.
 
 ### Development
+
 - `console.error` is acceptable. Sentry is off (no DSN in `.env.local`).
 - `npm run audit-feedback` prints the hand-written-hint backlog.
 
 ### Out of scope for MVP
+
 - Custom analytics events (Phase 2).
 - Distributed tracing.
 - Server-side logging (we have no server).
@@ -249,11 +264,13 @@ Auth gating: a single `<RequireAuth>` wrapper inside `App.tsx` redirects unsigne
 ## 8. Performance budget
 
 Per PRD §7:
+
 - **Interactive < 2s** on a mid-range phone over 4G.
 - **Feedback < 100ms** after a Check tap.
 - **60 FPS** during grid taps.
 
 ### How we hit it
+
 - Vite code-splits per route automatically. Lesson content is one bundle (small — JSON-ish data).
 - Firebase JS SDK is heavy (~150KB gz). Loaded eagerly because every page needs auth state.
 - `@fontsource/inter` for self-hosted Inter; preload one weight (400) eagerly, defer the rest.
@@ -261,6 +278,7 @@ Per PRD §7:
 - Lighthouse mobile target ≥ 90 for Performance, Accessibility, Best Practices.
 
 ### Bundle size budget
+
 - **Eager (entry) first-load JS: soft target ≤ 350 KB gz.** Updated 2026-06-23
   (was a hard 300 KB; owner relaxed it). The real gate is load performance, not
   the raw number: keep Lighthouse mobile Performance ≥ 90 and TTI healthy.
@@ -273,13 +291,13 @@ Per PRD §7:
 
 ## 9. Testing strategy
 
-| Level | Tool | What it covers |
-| --- | --- | --- |
-| Unit | Vitest | Pure functions (`hash`, `streak`, `xp`, `selectVariant`, `assertLessonInvariants`). |
-| Content | Vitest | Every lesson passes `assertLessonInvariants`. |
-| Integration | Firebase emulator + Vitest | Security rules: a user can read their own progress, not another's. |
-| E2E | (not in MVP) | Phase 3 candidate — Playwright. |
-| Manual | Real phone | The brief's 5 scenarios, run against the deployed URL before declaring done. |
+| Level       | Tool                       | What it covers                                                                      |
+| ----------- | -------------------------- | ----------------------------------------------------------------------------------- |
+| Unit        | Vitest                     | Pure functions (`hash`, `streak`, `xp`, `selectVariant`, `assertLessonInvariants`). |
+| Content     | Vitest                     | Every lesson passes `assertLessonInvariants`.                                       |
+| Integration | Firebase emulator + Vitest | Security rules: a user can read their own progress, not another's.                  |
+| E2E         | (not in MVP)               | Phase 3 candidate — Playwright.                                                     |
+| Manual      | Real phone                 | The brief's 5 scenarios, run against the deployed URL before declaring done.        |
 
 CI runs `typecheck + lint + format:check + test` on every push (see `.github/workflows/ci.yml`).
 
@@ -301,7 +319,9 @@ CI runs `typecheck + lint + format:check + test` on every push (see `.github/wor
 > The point of these rules is to make agents (and humans) **fail loudly instead of silently**. If you find yourself reaching for a workaround that violates one of these, stop and log it in `docs/issues.md` instead.
 
 ### 12.1 No silent catches
+
 Every `try`/`catch` must do **one of**:
+
 1. Rethrow (`throw e`),
 2. Return a discriminated-union error (`{ ok: false, error: ... }`),
 3. Surface a user-visible signal (toast via `sonner`, inline error, error boundary fallback), AND log to Sentry.
@@ -309,7 +329,9 @@ Every `try`/`catch` must do **one of**:
 A bare `catch (e) {}` or a `catch (e) { console.log(e) }` is **prohibited**. ESLint should fail on empty catch blocks (`no-empty` with `allowEmptyCatch: false`). If the third option is used, the log call is not optional.
 
 ### 12.2 No infinite or unbounded retries
+
 Every retry loop has:
+
 - A **maximum attempt count** (default: 1 retry on Firestore writes per architecture §6).
 - A **backoff strategy** (default: 500ms fixed; use exponential only when justified).
 - A **terminal user-visible failure** when the cap is hit ("Couldn't save. Tap to retry.").
@@ -317,6 +339,7 @@ Every retry loop has:
 `while (true)` is prohibited in any code that calls Firebase, fetch, or any IO. Use `for (let i = 0; i < MAX; i++)` with explicit bounds.
 
 ### 12.3 Loading, empty, error, and ready are four states — never collapse them
+
 Hooks that return data must use a discriminated status:
 
 ```ts
@@ -330,7 +353,9 @@ type LoadState<T> =
 `data === undefined` is **not** an acceptable substitute for the loading state. `data === []` is **not** the empty state by default — the hook must decide. UI must render distinct affordances for each state (skeleton, error card, empty card, real content).
 
 ### 12.4 Stop and ask on ambiguity
+
 If a spec leaves a real ambiguity (two valid interpretations both consistent with the text), **stop**.
+
 1. Open `docs/issues.md`.
 2. Add an entry under "Open" with `Type: ambiguity`, citing the spec line.
 3. Propose your best-guess answer with reasoning.
@@ -339,7 +364,9 @@ If a spec leaves a real ambiguity (two valid interpretations both consistent wit
 Do **not** pick one silently. Do **not** "leave it for later" without a logged issue.
 
 ### 12.5 No ad-hoc design or product decisions
+
 Before inventing anything (a copy string, a color, an animation duration, a defaulting rule), check in order:
+
 1. The relevant spec.
 2. `docs/ui-stack.md`.
 3. `docs/alternatives.md` (search by keyword — it's the running decision log).
@@ -347,9 +374,10 @@ Before inventing anything (a copy string, a color, an animation duration, a defa
 
 If the answer isn't there, that's a `needs-decision` issue. Log it in `docs/issues.md`, propose, and ask. Decisions that ship without being logged are technical debt; they always come back.
 
-If you *do* need to pick a small visual default to keep moving (e.g. one of two icon names), log it as a `Closed — ad-hoc-decision` entry in the issues doc the same day. This keeps drift auditable.
+If you _do_ need to pick a small visual default to keep moving (e.g. one of two icon names), log it as a `Closed — ad-hoc-decision` entry in the issues doc the same day. This keeps drift auditable.
 
 ### 12.6 TODO placeholders are loud, not invisible
+
 Hand-written feedback strings the user will author themselves are wrapped with the `FEEDBACK_TODO()` helper from `src/content/types.ts`:
 
 ```ts
@@ -363,21 +391,26 @@ The helper renders as `[TODO] <note>` so a placeholder shipping to a real user i
 Implementer rule: **do not invent feedback copy**. If a variant needs feedback you don't have, use `FEEDBACK_TODO()` and move on. Authoring is the user's job.
 
 ### 12.7 Surface failures; do not swallow types
-- `as any` is prohibited without an `// eslint-disable-next-line` comment that explains *why* the type system can't express the case.
+
+- `as any` is prohibited without an `// eslint-disable-next-line` comment that explains _why_ the type system can't express the case.
 - `as unknown as Foo` is prohibited entirely — that pattern always hides a real bug.
 - A failed `assertLessonInvariants` throws in dev; logs to Sentry in prod. Do not catch this.
 - Form validation errors render inline, not as toasts (architecture §6.4). Persistence errors render as toasts. Do not mix.
 
 ### 12.8 Read the issues doc before starting a task; append as you go
+
 First action on any task: read `docs/issues.md` for open items in the area you're touching. Last action on any task: review your own work and log anything you noticed that wasn't worth fixing inline.
 
 If your task closes an issue, move it from "Open" to "Closed" with a one-line resolution.
 
 ### 12.9 Each spec ships independently — do not pre-build downstream pieces
+
 `docs/build-order.md` defines the dependency graph. Do not start a spec before its dependencies are shipped (per the graph). Do not "drop in" code from a future spec because it'd be convenient. If a downstream piece is needed earlier than the order allows, that's an issue to log, not a license to reorder silently.
 
 ### 12.10 Tests are part of "done"
+
 A spec is not complete until:
+
 - Its "Test plan" scenarios execute (unit tests for pure functions; emulator tests for security rules; manual evidence for UI flows).
 - `npm run verify` (typecheck + lint + tests) passes.
 - The spec's edge cases are handled in code, not deferred.
@@ -385,6 +418,7 @@ A spec is not complete until:
 Shipping a spec without its tests creates I-numbered debt before the spec is even merged.
 
 ### 12.11 Follow `docs/ui-directive.md` for every shipped string and visual choice
+
 `docs/ui-directive.md` is the source of truth for voice and visual judgment. It overrides any conflicting guidance elsewhere.
 
 **Scope:** the directive's hard rules apply to **every string that ships to a learner** (UI copy, error messages, lesson content, button labels, empty states, toasts, accessible labels) and to **every visual choice** (layout, color, typography, motion).
@@ -392,6 +426,7 @@ Shipping a spec without its tests creates I-numbered debt before the spec is eve
 **Scope clarification:** internal docs (spec narrative, architecture prose, alternatives log) are not retroactively rewritten for em-dash or vocabulary compliance — but new internal-doc writing should follow the directive's voice so the tone stays consistent.
 
 **Before shipping any UI or copy change, self-audit against the directive:**
+
 1. No em dashes. Anywhere in shipped strings.
 2. No banned vocabulary (elevate, seamless, leverage, unlock, empower, effortless, supercharge, harness, streamline, cutting-edge, game-changing, revolutionize, dive in, the power of, etc.).
 3. No emoji in headings or as bullets unless explicitly brand-approved.

@@ -17,9 +17,7 @@ export function ChapterBanner({ chapter, lessons, progressMap }: Props) {
   const c = ACCENTS[chapter.accent];
   const available = lessons.filter((l) => !l.comingSoon);
   const total = available.length;
-  const done = available.filter(
-    (l) => progressMap.get(l.id)?.state === 'completed',
-  ).length;
+  const done = available.filter((l) => progressMap.get(l.id)?.state === 'completed').length;
   const complete = total > 0 && done === total;
   // A unit with no playable lessons yet is a locked roadmap preview — show a
   // "Soon" chip instead of a meaningless "0/0" count.
@@ -28,7 +26,10 @@ export function ChapterBanner({ chapter, lessons, progressMap }: Props) {
   return (
     <div
       className="flex items-center gap-3.5 rounded-2xl border p-4 shadow-soft backdrop-blur-sm"
-      style={{ background: `color-mix(in srgb, ${c.soft} 88%, #ffffff)`, borderColor: `${c.base}40` }}
+      style={{
+        background: `color-mix(in srgb, ${c.soft} 88%, #ffffff)`,
+        borderColor: `${c.base}40`,
+      }}
     >
       <div
         className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-lg font-bold text-white"
@@ -39,10 +40,7 @@ export function ChapterBanner({ chapter, lessons, progressMap }: Props) {
       </div>
 
       <div className="min-w-0 flex-1">
-        <p
-          className="text-[11px] font-bold uppercase tracking-wide"
-          style={{ color: c.deep }}
-        >
+        <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: c.deep }}>
           Chapter {chapter.number}
         </p>
         <h2 className="font-display text-base font-bold leading-tight tracking-tight">

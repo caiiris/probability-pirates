@@ -106,7 +106,14 @@ const gridEvent: Variant = {
   prompt: '',
   rows: 6,
   cols: 6,
-  correctCells: [[1, 6], [2, 5], [3, 4], [4, 3], [5, 2], [6, 1]],
+  correctCells: [
+    [1, 6],
+    [2, 5],
+    [3, 4],
+    [4, 3],
+    [5, 2],
+    [6, 1],
+  ],
   liveCounterTemplate: '{count} / 36',
   feedbackCorrect: '',
   feedbackDefault: '',
@@ -114,17 +121,35 @@ const gridEvent: Variant = {
 
 describe('checkAnswer: grid-event', () => {
   it('correct for exact cells', () => {
-    const cells: Array<[number, number]> = [[1, 6], [2, 5], [3, 4], [4, 3], [5, 2], [6, 1]];
+    const cells: Array<[number, number]> = [
+      [1, 6],
+      [2, 5],
+      [3, 4],
+      [4, 3],
+      [5, 2],
+      [6, 1],
+    ];
     expect(checkAnswer(gridEvent, { selectedCells: cells }).wasCorrect).toBe(true);
   });
   it('wrong for extra cell', () => {
-    const cells: Array<[number, number]> = [[1, 6], [2, 5], [3, 4], [4, 3], [5, 2], [6, 1], [1, 1]];
+    const cells: Array<[number, number]> = [
+      [1, 6],
+      [2, 5],
+      [3, 4],
+      [4, 3],
+      [5, 2],
+      [6, 1],
+      [1, 1],
+    ];
     const r = checkAnswer(gridEvent, { selectedCells: cells });
     expect(r.wasCorrect).toBe(false);
     if (!r.wasCorrect) expect(r.matchedWrongKey).toBe('1,1');
   });
   it('wrong for missing cell', () => {
-    const cells: Array<[number, number]> = [[1, 6], [2, 5]];
+    const cells: Array<[number, number]> = [
+      [1, 6],
+      [2, 5],
+    ];
     expect(checkAnswer(gridEvent, { selectedCells: cells }).wasCorrect).toBe(false);
   });
 });
@@ -136,7 +161,10 @@ const multipleChoice: Variant = {
   id: 'test',
   interactionKind: 'multiple-choice',
   prompt: '',
-  options: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
+  options: [
+    { id: 'a', label: 'A' },
+    { id: 'b', label: 'B' },
+  ],
   correctOptionId: 'a',
   feedbackByOption: { b: 'Wrong' },
   feedbackCorrect: '',

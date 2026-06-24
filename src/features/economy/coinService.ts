@@ -71,7 +71,11 @@ export async function buyStreakFreeze(uid: string): Promise<BuyStreakFreezeResul
     });
     return outcome === 'ok' ? { ok: true } : { ok: false, reason: outcome };
   } catch (err) {
-    return { ok: false, reason: 'error', error: err instanceof Error ? err.message : ERROR_COPY.economy.purchase };
+    return {
+      ok: false,
+      reason: 'error',
+      error: err instanceof Error ? err.message : ERROR_COPY.economy.purchase,
+    };
   }
 }
 
@@ -94,7 +98,9 @@ export async function buyAvatarStyle(
     const outcome = await runTransaction(db, async (tx) => {
       const snap = await tx.get(userRef);
       const coins: number = (snap.data()?.coins as number) ?? 0;
-      const owned: string[] = (snap.data()?.ownedAvatarStyles as string[]) ?? [DEFAULT_AVATAR_STYLE];
+      const owned: string[] = (snap.data()?.ownedAvatarStyles as string[]) ?? [
+        DEFAULT_AVATAR_STYLE,
+      ];
       if (owned.includes(styleId)) return 'owned' as const;
       if (coins < price) return 'insufficient' as const;
       tx.update(userRef, {
@@ -105,7 +111,11 @@ export async function buyAvatarStyle(
     });
     return outcome === 'ok' ? { ok: true } : { ok: false, reason: outcome };
   } catch (err) {
-    return { ok: false, reason: 'error', error: err instanceof Error ? err.message : ERROR_COPY.economy.purchase };
+    return {
+      ok: false,
+      reason: 'error',
+      error: err instanceof Error ? err.message : ERROR_COPY.economy.purchase,
+    };
   }
 }
 
@@ -153,7 +163,11 @@ export async function buyProfileFlair(
     });
     return outcome === 'ok' ? { ok: true } : { ok: false, reason: outcome };
   } catch (err) {
-    return { ok: false, reason: 'error', error: err instanceof Error ? err.message : ERROR_COPY.economy.purchase };
+    return {
+      ok: false,
+      reason: 'error',
+      error: err instanceof Error ? err.message : ERROR_COPY.economy.purchase,
+    };
   }
 }
 

@@ -100,7 +100,7 @@ describe('lesson3 (counting-carefully) invariants', () => {
     }
   });
 
-  it("segues into the birthday lesson", () => {
+  it('segues into the birthday lesson', () => {
     const wrap = lesson3.slots.find((s) => s.kind === 'wrap');
     expect(wrap?.kind).toBe('wrap');
     if (wrap?.kind === 'wrap') {

@@ -16,54 +16,58 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 
 ## Section index
 
-| Section | Topic | Entries |
-|---|---|---|
-| A | Product & Pedagogy | D1–D8, D55, D56, D69, D70, D73, D75, D76, D77, D78, D84, D85, D86, D88, D89, D90, D91 |
-| B | Stack | D9–D12 |
-| C | Data & Persistence | D13–D16 |
-| D | Auth & Identity | D17–D18 |
-| E | Visual & Motion | D19–D21, D67, D87 |
-| F | Streaks & Engagement | D22 |
-| G | Scope Exclusions | D23–D27 |
-| H | Motivation & Habit Loop | D28–D35, D79, D80, D82, D83 |
-| I | UI Stack | D36–D37, D68 |
-| J | Project Structure & Tooling | D38–D48, D64, D74, D81 |
-| K | PRD Acceptance Criteria Style | D49–D54, D57–D62 |
-| L | Platform & Responsive | D63, D65, D66 |
+| Section | Topic                         | Entries                                                                               |
+| ------- | ----------------------------- | ------------------------------------------------------------------------------------- |
+| A       | Product & Pedagogy            | D1–D8, D55, D56, D69, D70, D73, D75, D76, D77, D78, D84, D85, D86, D88, D89, D90, D91 |
+| B       | Stack                         | D9–D12                                                                                |
+| C       | Data & Persistence            | D13–D16                                                                               |
+| D       | Auth & Identity               | D17–D18                                                                               |
+| E       | Visual & Motion               | D19–D21, D67, D87                                                                     |
+| F       | Streaks & Engagement          | D22                                                                                   |
+| G       | Scope Exclusions              | D23–D27                                                                               |
+| H       | Motivation & Habit Loop       | D28–D35, D79, D80, D82, D83                                                           |
+| I       | UI Stack                      | D36–D37, D68                                                                          |
+| J       | Project Structure & Tooling   | D38–D48, D64, D74, D81                                                                |
+| K       | PRD Acceptance Criteria Style | D49–D54, D57–D62                                                                      |
+| L       | Platform & Responsive         | D63, D65, D66                                                                         |
 
 ---
 
 ## A. Product & Pedagogy
 
 ### D1 — Subject
+
 - **Status:** resolved
 - **Chose:** Probability
 - **Considered:** Algebra (slope, balancing equations), Geometry (Pythagorean theorem, angles), Logic puzzles
 - **Gaps / risks:**
   - Probability assumes the learner already grasps fractions and basic counting — a shakier-than-expected persona could trip on the very first concept ("favorable / total")
   - Probability has class-anxiety associations for some HS students
-  - Less *tangible* than geometry — no spatial intuition to lean on for free; we have to construct the intuition entirely with visuals
+  - Less _tangible_ than geometry — no spatial intuition to lean on for free; we have to construct the intuition entirely with visuals
 
 ### D2 — Persona
+
 - **Status:** resolved
 - **Chose:** High school student learning probability for the first time (algebra background, no calculus)
 - **Considered:** Curious adult (poker/investing/news), Intro college / AP Stats student, Test prep (SAT/GRE)
 - **Gaps / risks:**
-  - HS students rarely *choose* learning apps voluntarily — distribution/marketing is a real challenge later (out of scope for Phase 1, but real)
+  - HS students rarely _choose_ learning apps voluntarily — distribution/marketing is a real challenge later (out of scope for Phase 1, but real)
   - The test-prep persona would have more urgency and a clearer "done" state
   - Tone calibration is delicate: must be friendly without being childish
   - HS students vary wildly in math background — designing for "any HS student" is harder than designing for AP-specific
 
 ### D3 — MVP lesson choice
+
 - **Status:** resolved
-- **Chose:** Lesson 1 — *"What is probability?"* (sample space + counting + 6×6 grid payoff)
+- **Chose:** Lesson 1 — _"What is probability?"_ (sample space + counting + 6×6 grid payoff)
 - **Considered:** Lesson 2 (Law of Large Numbers — more visceral hook), Lesson 4 (Monty Hall — maximum wow factor)
 - **Gaps / risks:**
   - Less viral than Monty Hall — the demo might be less memorable for graders / first-look reviewers
   - Doesn't yet show the simulation capability that becomes the spine of the course in Lesson 2+
-  - The grid is tap-based, not drag-based — less *tactile* than a slider with a live chart
+  - The grid is tap-based, not drag-based — less _tactile_ than a slider with a live chart
 
 ### D4 — Rich interaction (beyond multiple choice)
+
 - **Status:** resolved
 - **Chose:** Two-dice **6×6 grid** for compound events; learner taps cells matching an event, live counter shows `X / 36`
 - **Considered:** Single-die only (too thin), draggable spinner (more visual but conceptually mismatched with "counting outcomes")
@@ -73,15 +77,17 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - "Wrong cells flash red" could feel punitive on mobile if a learner is poking around exploratively — need to tune so it's a gentle nudge, not a reprimand
 
 ### D5 — Lesson length
+
 - **Status:** resolved
 - **Chose:** 9 steps, target ~4 minutes
 - **Considered:** 6 steps (faster but loses the counterintuitive payoff setup)
 - **Gaps / risks:**
   - 9 steps = more hand-authored copy to write
   - If pacing isn't tight, can drift past 5 min and lose the "before bed" promise
-  - No data yet on whether 9 is *actually* the right number — instinct, not validated
+  - No data yet on whether 9 is _actually_ the right number — instinct, not validated
 
 ### D6 — Course spine (6 lessons, 5 locked stubs)
+
 - **Status:** resolved
 - **Chose:** Show all 6 lessons in the course path; only Lesson 1 is real, Lessons 2–6 are visible-but-locked with title + blurb
 - **Considered:** Hide future lessons entirely; build two real lessons in MVP
@@ -91,6 +97,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - We're committing publicly to a course shape we might want to revise after user feedback
 
 ### D7 — Wrong-answer handling
+
 - **Status:** resolved
 - **Chose:** ~~2 strikes then full hand-written explanation appears and Continue unlocks — learner is never trapped~~ **Updated 2026-06-23 (superseded by D55):** 2 strikes show the variant's `explanation` as a hint alongside per-wrong feedback. **Continue stays locked until the learner produces a correct answer.** No bail-out, ever.
 - **Considered:** Infinite retries (frustrating), single attempt then move on (no learning loop), adaptive limits
@@ -101,8 +108,9 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D55 (current rule), D31 (XP curve updated as a consequence)
 
 ### D8 — Feedback authoring strategy
+
 - **Status:** resolved
-- **Chose:** `feedbackByWrongValue` / `feedbackByWrongAnswer` maps per step in the content model — one hint per *anticipated* wrong answer, plus a `feedbackDefault` for the rest
+- **Chose:** `feedbackByWrongValue` / `feedbackByWrongAnswer` maps per step in the content model — one hint per _anticipated_ wrong answer, plus a `feedbackDefault` for the rest
 - **Considered:** Single "Not quite, try again" default (too generic), AI-generated specific hints (Phase 2 territory, forbidden in Phase 1)
 - **Gaps / risks:**
   - Authoring burden is significant — every step needs us to brainstorm common wrong answers
@@ -111,8 +119,9 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D69 (`feedbackByCell` per-cell extension to the grid renderer)
 
 ### D55 — Progressive hint model (no bail-out)
+
 - **Status:** resolved (supersedes D7's unlock behavior; triggered the D31 XP curve update)
-- **Chose:** **Continue is locked until the learner produces a correct answer on every problem slot.** After 2 wrong attempts on the same slot, the variant's `explanation` field (new, optional, on `BaseVariant`) is shown as an additional hint beneath the per-wrong feedback. The learner is never trapped *in the lesson* (they can always close and resume), but they cannot *bypass a problem*.
+- **Chose:** **Continue is locked until the learner produces a correct answer on every problem slot.** After 2 wrong attempts on the same slot, the variant's `explanation` field (new, optional, on `BaseVariant`) is shown as an additional hint beneath the per-wrong feedback. The learner is never trapped _in the lesson_ (they can always close and resume), but they cannot _bypass a problem_.
 - **Considered:**
   - **Original D7 model** — explanation appears and Continue unlocks. Rejected because the unlock incentivizes cognitive offloading (learner learns to guess wrong twice to skip).
   - **Strict — no explanation at all** — per-wrong feedback is the only help. Rejected because it risks rage-quit on hard problems.
@@ -127,6 +136,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D7 (original superseded rule), D31 (XP curve consequence)
 
 ### D56 — Exploration vs commit in interactions
+
 - **Status:** resolved
 - **Chose:** **Keep the 2-step build-then-check model** with no separate exploration mode. Every tap during the build phase is reversible with no feedback; Check is the explicit commit. Add per-kind UX affordance copy ("Tap to mark. Tap again to unmark.") so first-time learners see the build-as-exploration distinction. (Option E + D from the design exploration.)
 - **Considered:**
@@ -142,6 +152,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Dismissible hint stored in `localStorage` means a learner who logs in on a second device sees the hint again — acceptable, but worth noting
 
 ### D69 — `feedbackByCell` extension to `GridEventVariant`
+
 - **Status:** resolved
 - **Chose:** Add an optional `feedbackByCell?: Record<string, string>` map to `GridEventVariant` (keyed by `"row,col"`, 1-indexed). When a learner taps a wrong cell, the renderer prefers the per-cell hint over the variant's `feedbackDefault`. This is a targeted extension of D8's authoring pattern for the grid kind only — the other four interaction kinds keep `feedbackByWrong*` as their lookup.
 - **Considered:**
@@ -154,6 +165,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Extension is grid-only; if we add another grid-like kind in Phase 2 (e.g. tree-event), we'll need to decide whether to copy the pattern or generalize it.
 
 ### D70 — Empty-Home first-session welcome card
+
 - **Status:** resolved (2026-06-23, addresses I008)
 - **Chose:** When a brand-new user (no `lessonProgress` docs **and** `profile.stepsCompleted === 0`) lands on Home, the hero card renders as `"Welcome, {displayUsername}. Let's begin."` with a Start CTA pointing at Lesson 1. As soon as the learner advances any slot, the condition flips false and the hero reverts to the standard Start/Resume/All-caught-up logic from `spec-course-path`. No client-side state, no localStorage flag — the welcome moment is derived from server data, which keeps it consistent across devices and reload.
 - **Considered:**
@@ -165,6 +177,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - This is the only personalized greeting in the product; no further "Hey {username}" sprinkled elsewhere.
 
 ### D73 — Two simulation interaction kinds for Lessons 2-4 (`simulate-proportion`, `monty-hall`)
+
 - **Status:** resolved (2026-06-23, addresses I028)
 - **Chose:** Extend the `InteractionKind` union from five to seven, adding `simulate-proportion` and `monty-hall`, to carry the three simulation payoffs in Lessons 2-4 (law-of-large-numbers convergence, birthday paradox, Monty Hall). `simulate-proportion` is scenario-driven (`coin` / `die-six` / `birthday`) and plots a running proportion converging to a theoretical reference line; `monty-hall` is one slot with hand-played rounds plus an autopilot batch racing switch vs stay toward 2/3 and 1/3. Both **grade on engagement**: the renderer emits a non-null answer only once `minTrials` / `minGames` is reached, so Check stays disabled until the learner has run the simulation. They share `ProportionChart` (inline SVG, no chart library) and `src/lib/simulations.ts` (pure, unit-tested generators). Two illustrations (`Door`, `Calendar`) and two `IllustrationRef.kind` values (`'doors'`, `'calendar'`) were added.
 - **Considered:**
@@ -180,6 +193,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D8 (per-wrong feedback authoring), D55 (no bail-out — preserved by the engagement gate), D64 (bundle budget), D74 (copy authorship for these lessons)
 
 ### D75 — Enriched concept slot (title + body + worked example) instead of a one-liner
+
 - **Status:** resolved (2026-06-23, Lesson 1 pedagogy pass)
 - **Chose:** Extend `ConceptSlot` with three optional fields — `title` (short heading), `body` (paragraph array), and `example` (`{ title?, steps[] }`) — and rewrite Lesson 1 as a three-act arc (one random thing → events → two dice) that uses richer concept beats to scaffold vocabulary and carry short proof walkthroughs. The legacy thin shape (only `prompt` + `illustration`) still renders the previous centered one-liner, so Lessons 2-4 stay visually intact until each is converted on its own pass. Worked-example steps support a minimal `{a/b}` template that renders via a tiny CSS-only `<Fraction>` component for the stacked textbook look. Lesson 1 is now ~14 slots and ~7 minutes; the 4-minute target is no longer the cap (owner-approved).
 - **Considered:**
@@ -195,6 +209,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D8 (per-wrong feedback authoring; concept slots have no per-key feedback), D43 (Lessons 2-6 visible-but-locked at MVP — pattern still holds; this pass only enriches L1), D55 (no bail-out — concept slots remain non-gating "Got it" advances), D64 (bundle budget — `<Fraction>` adds ~0.2 KB; no library added), D74 (agent-authored copy exception)
 
 ### D76 — Insert a combinatorics lesson as L3; drop the CLT stub to keep the course at 6
+
 - **Status:** resolved (2026-06-23, addresses the L3 "uses combinatorics but never teaches it" gap surfaced during the L1 pedagogy redesign)
 - **Chose:** Insert a new **L3 "Counting carefully"** between L2 (LLN) and the current birthday lesson, teaching four counting tools: multiplication principle (deeper than L1's single application), addition principle (short, one beat), permutations and combinations (with the proof beat that nCk = ordered/k!), and complement counting (the trick that drives the birthday paradox). Renumber the existing L3 → L4 (counting-gets-hard / birthday), L4 → L5 (conditional-probability / Monty Hall), L5 → L6 (distributions, still coming-soon). **Drop the L6 CLT stub** so the course stays at 6 lessons. A new `'tree'` glyph is added to `LessonGlyph` for the L3 course-path node (the multiplication principle's canonical visualization).
 - **Considered:**
@@ -210,6 +225,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D43 (Lessons 2-6 visible-but-locked at MVP), D73 (the simulation interactions L4 still uses), D75 (enriched concept slot — the new L3 is its second user), I015 (coming-soon stubs).
 
 ### D77 — Named-theorem callout and bookmarked-derivation page as separate concept-slot affordances
+
 - **Status:** resolved (2026-06-23, theorem + derivation pass across L1/L3/L4/L5)
 - **Chose:** Add two optional fields to `ConceptSlot` (D75) and render them as two visually distinct elements:
   - **`theorem: { name?, statement }`** — a bordered, primary-tinted callout with a violet left rule and a small uppercase eyebrow ("THEOREM · _name_"). Used wherever a named rule appears: L1's equally-likely formula, L3's five counting principles, L5's conditional-probability rule. The statement is the formal version; intuition stays in `body` paragraphs and applied numbers stay in `example`.
@@ -227,6 +243,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D75 (enriched concept slot — D77 extends it without changing its contract), D76 (the new L3 — D77 lands the textbook-style theorem statements its principles needed), D31 (design system tone — the callout/page pattern is restrained on purpose), D64 (bundle budget — D77 adds zero new dependencies), D78 (flashcard upgrade for derivations).
 
 ### D78 — Flashcard mode for derivations (question front, derivation back)
+
 - **Status:** resolved (2026-06-23, owner-requested for L1 `two-dice-intro`)
 - **Chose:** Add a single optional field, `derivation.question?: string`, to the existing D77 derivation type. When present, `DerivationCard` (new component at `src/features/lesson/DerivationCard.tsx`) renders the page as a 3D-flippable flashcard: front face shows the question with a violet "QUESTION" tab and a small "Tap to reveal" hint; back face is the existing amber-tabbed derivation page. The flip uses the same CSS-3D pattern as `Coin3D` (rotateY spring + two `backface-hidden` faces). When `question` is absent, the card renders as before — fully visible, no flip — so all existing derivations (L1 reduce was deleted in the same pass; L3 combinations; L4 birthday) keep their static behavior with zero content changes.
 - **Considered:**
@@ -241,11 +258,12 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D77 (derivation field — D78 extends it with the optional question), Coin3D entry in `design-iterations.md` (same CSS-3D flip pattern), D75 (enriched concept slot lineage).
 
 ### D84 — Progress section shipped as a locked stub (future AI insights)
+
 - **Status:** open (placeholder shipped; the feature itself is deferred)
 - **Chose:** Add a **"Progress" entry to the primary nav now**, rendered with a lock badge + "Soon" tag, routing to a read-only `/progress` placeholder (`features/progress/ProgressPage.tsx`) that previews what's coming (strengths & gaps, smart review, AI-assisted insights). No data fetching, no writes. The eventual feature will read real attempt/streak data — and likely use AI — to summarize how a learner is actually doing.
 - **Considered:**
   - **Hide it entirely until built.** Rejected: surfacing a locked entry sets the expectation and reserves the IA slot, and is cheap. (Same playbook as D6's visible-but-locked lesson stubs and D43.)
-  - **A toast / disabled item that doesn't navigate.** Rejected: a real placeholder page can explain *what's coming* and reads as intentional rather than broken.
+  - **A toast / disabled item that doesn't navigate.** Rejected: a real placeholder page can explain _what's coming_ and reads as intentional rather than broken.
   - **Build a basic non-AI progress dashboard now** (charts off existing XP/streak/lesson data). Deferred, not rejected — viable as an interim step, but the owner's intent is an AI-assisted read of real performance (D23 governs the AI timing), so we stubbed rather than half-built.
 - **Gaps / risks:**
   - A locked nav item can frustrate if it lingers — it should ship real or be removed before launch, not sit locked forever.
@@ -254,33 +272,35 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D23 (no AI in MVP — gates the real feature), D6 / D43 (visible-but-locked stub precedent), D71 (the `Sidebar` nav this entry lives in).
 
 ### D85 — Practice section (Alcumus-style, LLM-generated) shipped as a locked stub
+
 - **Status:** open (placeholder shipped; full feature targeted for the Friday update)
 - **Chose:** Add a **"Practice" entry to the primary nav now**, lock-badged → a read-only `/practice` placeholder (`features/practice/PracticePage.tsx`) that previews the planned feature: an [AoPS **Alcumus**](https://artofproblemsolving.com/alcumus)-style adaptive problem set where an **LLM generates effectively unlimited problems + worked solutions**, each **vetted for correctness before it reaches the learner**, with difficulty that adapts as they solve. Same locked-stub pattern as D84 (Progress).
 - **Considered:**
-  - **A fixed, hand-authored problem bank (no LLM).** Rejected as the *destination* — the whole point of the owner's idea is *unlimited* fresh practice, which a static bank can't give. (A small curated bank may still seed/anchor generation — open design question.)
-  - **Generate problems live with no correctness gate.** Rejected hard: an LLM that ships a wrong answer key actively miseducates. Correctness vetting (e.g. programmatic/symbolic check, solver cross-validation, or a verifier model) is a *gating requirement*, not a nice-to-have — this is the central risk of the feature.
+  - **A fixed, hand-authored problem bank (no LLM).** Rejected as the _destination_ — the whole point of the owner's idea is _unlimited_ fresh practice, which a static bank can't give. (A small curated bank may still seed/anchor generation — open design question.)
+  - **Generate problems live with no correctness gate.** Rejected hard: an LLM that ships a wrong answer key actively miseducates. Correctness vetting (e.g. programmatic/symbolic check, solver cross-validation, or a verifier model) is a _gating requirement_, not a nice-to-have — this is the central risk of the feature.
   - **Hide the tab until Friday.** Rejected: surfacing the locked entry now sets expectations and reserves the IA slot (consistent with D6 / D43 / D84). The "Arriving Friday" badge communicates the timeline.
 - **Gaps / risks:**
-  - **Correctness is the hard part.** Generation is easy; *guaranteeing* the problem is well-posed and the solution is right is the engineering challenge. Needs a concrete vetting pipeline before launch — unvetted output must never reach a learner.
+  - **Correctness is the hard part.** Generation is easy; _guaranteeing_ the problem is well-posed and the solution is right is the engineering challenge. Needs a concrete vetting pipeline before launch — unvetted output must never reach a learner.
   - Inherits **D23** (no AI in MVP): this is the first deliberately AI-dependent learning feature, so it also forces the AI-scope/cost/safety conversation D23 deferred (model choice, latency, cost per problem, prompt-injection/jailbreak surface, age-appropriate content).
   - Generation latency/cost vs. the "instant next problem" feel — likely needs pre-generation/caching of a vetted problem queue rather than per-tap synchronous calls.
-  - Friday is an aggressive target for a feature whose correctness bar is this high; the locked stub de-risks the *nav/IA* commitment even if the engine slips.
-- **Design:** full architecture in [`spec-practice.md`](specs/spec-practice.md). Headline: the answer always comes from **code, not an LLM** (the domain is computable). Track 1 = parameterized generators correct *by construction* (the Friday MVP); Track 2 = offline LLM-generated bank gated by *independent code verification* (Monte-Carlo + exact solver agreement), with LLM-verifies-LLM only as a pre-filter. Lean rejected for the numeric core.
+  - Friday is an aggressive target for a feature whose correctness bar is this high; the locked stub de-risks the _nav/IA_ commitment even if the engine slips.
+- **Design:** full architecture in [`spec-practice.md`](specs/spec-practice.md). Headline: the answer always comes from **code, not an LLM** (the domain is computable). Track 1 = parameterized generators correct _by construction_ (the Friday MVP); Track 2 = offline LLM-generated bank gated by _independent code verification_ (Monte-Carlo + exact solver agreement), with LLM-verifies-LLM only as a pre-filter. Lean rejected for the numeric core.
 - **See also:** D84 (Progress — same locked-stub precedent), D23 (no AI in MVP — this is the feature that reopens it), D29 / D30 / D33 (existing slot/variant + deterministic-seed model the generated problems would plug into), D6 / D43 (visible-but-locked stubs), [`spec-practice.md`](specs/spec-practice.md).
 
 ### D86 — Full probability curriculum scaffolded as locked stubs (9 units, ~51 lessons)
+
 - **Status:** open (skeleton shipped; content authored incrementally)
-- **Chose:** Lay out the entire forward-looking curriculum from [`curriculum-roadmap.md`](curriculum-roadmap.md) — 9 units, ~51 lessons — as **blank, locked lesson stubs** that render on the course path *below* the live content. Mechanics:
+- **Chose:** Lay out the entire forward-looking curriculum from [`curriculum-roadmap.md`](curriculum-roadmap.md) — 9 units, ~51 lessons — as **blank, locked lesson stubs** that render on the course path _below_ the live content. Mechanics:
   - Stubs live in one file (`src/content/lessons/roadmapStubs.ts`) as `Lesson`s with a real `title`/`blurb` but `slots: []` and `comingSoon: true`. They are appended after the six authored lessons in `src/content/index.ts`, numbered 7…57 so "Lesson N" stays monotonic down the path.
   - Grouping into the 9 named units is done in `src/features/course/chapters.ts` (the existing chapter/"world" mechanism), keeping the three live chapters untouched and adding nine more.
   - **No shipped lesson content was edited** — only the catalog array, the chapter map, one test, and two small course-path guards (below).
 - **Considered:**
-  - **Integrate the stubs *among* the live lessons at their natural unit positions** (e.g. put the dense "What is probability?" inside the new "Sample Spaces" unit next to a "The sample space" stub). Rejected for now: it would reorder the catalog array, and `nextRecommendedLesson` picks the first non-coming-soon lesson *by array order* — so a new learner could be sent to a different starting lesson. Keeping the live five first preserves "Start here" exactly. The roadmap's split/migration of dense lessons is deferred (see roadmap §7).
+  - **Integrate the stubs _among_ the live lessons at their natural unit positions** (e.g. put the dense "What is probability?" inside the new "Sample Spaces" unit next to a "The sample space" stub). Rejected for now: it would reorder the catalog array, and `nextRecommendedLesson` picks the first non-coming-soon lesson _by array order_ — so a new learner could be sent to a different starting lesson. Keeping the live five first preserves "Start here" exactly. The roadmap's split/migration of dense lessons is deferred (see roadmap §7).
   - **One file per stub** (the existing `NN-name.ts` convention). Rejected: ~51 near-identical 6-line files is noise; a single `roadmapStubs.ts` with a `stub()` helper is easier to scan and maintain, and clearly separates "authored content" from "skeleton."
   - **Only render unit headers, not individual lesson stubs.** Rejected: the owner explicitly wanted the full ~40-lesson skeleton visible as a roadmap preview.
-  - **Gate stubs purely via Remote Config** (`available_lesson_ids`). Belt-and-suspenders instead: stubs are `comingSoon: true` *and* contentless, and `useLessons` already force-locks any empty-slots lesson regardless of the flag. A stub can't be accidentally turned on until it actually has content.
+  - **Gate stubs purely via Remote Config** (`available_lesson_ids`). Belt-and-suspenders instead: stubs are `comingSoon: true` _and_ contentless, and `useLessons` already force-locks any empty-slots lesson regardless of the flag. A stub can't be accidentally turned on until it actually has content.
 - **Gaps / risks:**
-  - **Trophy placement.** `CoursePath` previously marked the *last* chapter's checkpoint as the course-complete trophy. Appending nine all-locked chapters would have (a) demoted the live final chapter's reward from the 250-coin trophy to a 100-coin chest and (b) parked the trophy behind unreachable content. Fixed by computing the trophy chapter as the **last chapter that still has a playable lesson** (`CoursePath.tsx`), which reproduces today's behavior exactly and migrates the trophy forward as units go live. Trade-off: the "Course complete" trophy now sits mid-path with locked previews below it — acceptable, and self-corrects as content ships.
+  - **Trophy placement.** `CoursePath` previously marked the _last_ chapter's checkpoint as the course-complete trophy. Appending nine all-locked chapters would have (a) demoted the live final chapter's reward from the 250-coin trophy to a 100-coin chest and (b) parked the trophy behind unreachable content. Fixed by computing the trophy chapter as the **last chapter that still has a playable lesson** (`CoursePath.tsx`), which reproduces today's behavior exactly and migrates the trophy forward as units go live. Trade-off: the "Course complete" trophy now sits mid-path with locked previews below it — acceptable, and self-corrects as content ships.
   - **Empty-unit chrome.** A unit with no playable lessons would have shown a meaningless "0/0" in its `ChapterBanner`. Fixed to render a "Soon" lock chip when a chapter has zero available lessons. Per-chapter `Checkpoint`s for all-stub units already render their correct locked ("Clear … to unlock") state — no change needed there.
   - **Long path.** Twelve chapters / ~57 nodes is a lot to scroll. Acceptable for a roadmap preview; if it becomes heavy, a future collapse-locked-units affordance is the natural follow-up.
   - **Numbering churn on split.** When a dense live lesson is eventually split into its unit's stubs, lesson `number`s shift. `number` is display-only (no logic depends on it), so this is cosmetic, but the catalog test pins monotonic numbering to catch accidental gaps.
@@ -288,13 +308,14 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D6 / D43 / D84 / D85 (visible-but-locked stub precedent), D76 (course renumbering), D77 / D78 (the theorem/derivation/flashcard content shapes these stubs will use), [`curriculum-roadmap.md`](curriculum-roadmap.md).
 
 ### D88 — Collapse to the 9-unit plan; ship the `how-likely` course opener, lock the rest
+
 - **Status:** resolved (on the `two-dice-demo` branch; `main` unchanged)
-- **Amends:** D86. D86 appended the roadmap stubs *below* the live six-lesson spine, so the same material showed twice (a dense lesson and a granular locked stub). D88 makes the course path read as one coherent 9-unit plan led by a single polished opener, under a tonight deadline.
+- **Amends:** D86. D86 appended the roadmap stubs _below_ the live six-lesson spine, so the same material showed twice (a dense lesson and a granular locked stub). D88 makes the course path read as one coherent 9-unit plan led by a single polished opener, under a tonight deadline.
 - **Chose:**
   - The live catalog (`src/content/index.ts`) is the `how-likely` opener followed by the 9-unit roadmap as locked stubs. `how-likely` is the one authored, playable lesson; every other unit lesson (including the `two-dice` stub, reserved for the future Unit 3 compound lesson) stays blank and locked. Numbers are assigned by array position (1…N) so display order is always monotonic regardless of stub ordering.
   - `how-likely` (`src/content/lessons/how-likely.ts`) is a **gentle-ramp course opener** carved/extended from Lesson 1's two-dice act. Arc: **welcome + a pull-quote** (Oscar Wilde, via a new optional `ConceptSlot.quote` field + `ConceptSlotView` treatment) → **the famous hard questions** (lottery, soulmate, shared birthday) → **tap one die's faces** (`tap-outcomes`) → a **tap-to-count even-number question** (`fill-fraction`, inputs annotated favorable/total) → **define probability** rigorously → **apply it** to P(rolling a 3) → **Captain Pascal's commit-once challenge** (fair game? he wins on 7, you win on 2) → the signature 6×6 grid → derive the 36-roll count by cases → wrap. Opens big-and-human, then lands on the humble die (owner call); the one-die-vs-two-dice contrast is the lesson (one die: counting trivial, all equal; two dice: rolls equal, totals not). The tap-to-count question is placed before the definition (you can tap to discover favorable/total; the definition then names it). It sits in a lead **"Start Here"** chapter ahead of Unit 1. This **revives the `tap-outcomes` interaction** (unused since Lesson 1 went multiple-choice) and adds three small, reusable extensions: **`ProblemSlot.commitOnce`** (a no-retry prediction/challenge that unlocks Continue right or wrong, a deliberate exception to the no-bail-out gate D55, via a new `allowContinueOnWrong` footer prop), **`ProblemSlot.challenge`** (a Captain Pascal "Challenge question" banner), and **`FillFractionVariant.numeratorLabel`/`denominatorLabel`** (annotated fraction inputs).
   - **Rigorous definition of probability, up front (owner request).** A `definition` beat after the one-die tap states it precisely as a named `theorem` ("Probability", `{k/N}`) with a plain gloss: favorable / total when outcomes are equally likely, a number from 0 (never / rare) to 1 (always / common). **Terminology:** the defined quantity is **probability**, not "likelihood" — in statistics "likelihood" is a distinct technical term (the likelihood function), so naming the concept "likelihood" is imprecise; "likely" stays as casual English. (Resolved by **D89**: the "Likelihood" chapter was merged into Sample Spaces and renamed "Defining Probability".)
-  - **Introduction order (owner review):** the 36 count is derived *after* the grid, by **enumeration / cases** ("first die 1 → 6 rolls, first die 2 → 6 rolls, …, six cases of 6 = 36"), not via a named multiplication-principle theorem and not using the term "sample space" — both are deferred to their own later lessons. An earlier draft put a "6 × 6 = 36" multiplication page *before* the grid; removed. The rule: show the idea concretely, name the tool in its own lesson. The one principled exception is the course's core object, **probability** itself, which is fair to define in the opener (vs deferring tools/techniques).
+  - **Introduction order (owner review):** the 36 count is derived _after_ the grid, by **enumeration / cases** ("first die 1 → 6 rolls, first die 2 → 6 rolls, …, six cases of 6 = 36"), not via a named multiplication-principle theorem and not using the term "sample space" — both are deferred to their own later lessons. An earlier draft put a "6 × 6 = 36" multiplication page _before_ the grid; removed. The rule: show the idea concretely, name the tool in its own lesson. The one principled exception is the course's core object, **probability** itself, which is fair to define in the opener (vs deferring tools/techniques).
   - The old three-chapter spine (`foundations` / `counting` / `deeper`) was removed from `chapters.ts`; chapters are now "Start Here" (1) + the nine units (2–10).
   - Lock the rest by narrowing the bundled Remote Config default to `['how-likely']`, plus a **defaults-as-floor** change in `RemoteFlagsProvider` (below).
   - **Non-destructive:** the five dense lessons (`lesson1`–`lesson5`) and the `distributions` stub are kept imported and re-exported from `content/index.ts` as the content reservoir for the later Unit 2-4 / 5 / 7 splits; their files and per-file tests are untouched. `main` still holds the prior arrangement.
@@ -311,13 +332,15 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D86 (the skeleton this amends), D77 / D78 (derivation + flashcard shapes), the `tap-outcomes` removal in `design-iterations.md` ("Sample-space slot"), [`curriculum-roadmap.md`](curriculum-roadmap.md) (the split mapping deferred here).
 
 ### D89 — Merge "Likelihood" + "Sample Spaces" into "Defining Probability"; drop two lessons covered by `how-likely`
+
 - **Status:** resolved
 - **Amends:** D86 (curriculum skeleton) and D88 (the 9-unit collapse + the `how-likely` opener). Resolves D88's open suggestion to rename the "Likelihood" chapter on terminology grounds.
-- **Chose:** Collapse the original Unit 1 ("Likelihood") and Unit 2 ("Sample Spaces") into a single new **"Defining Probability"** unit (chapter id `defining-probability`, subtitle *"From the long-run feeling to the favorable-over-total formula"*). Within that merged unit, drop two lessons:
+- **Chose:** Collapse the original Unit 1 ("Likelihood") and Unit 2 ("Sample Spaces") into a single new **"Defining Probability"** unit (chapter id `defining-probability`, subtitle _"From the long-run feeling to the favorable-over-total formula"_). Within that merged unit, drop two lessons:
   - `likelihood-compare` ("Which is more likely?") — `how-likely` already builds comparative-likelihood intuition by tapping a die's faces and asking which roll is more likely than another.
   - `probability-scale` ("The probability scale") — `how-likely`'s rigorous definition of probability already states the 0..1 scale ("a number from 0 (never / rare) to 1 (always / common)"); a separate slider lesson would re-teach that.
 
   The merged unit keeps `long-run-frequency` (intuition lead-in), `sample-space`, `equally-likely-outcomes`, `practice-single-events`, and `review-sample-spaces` (the unit's single Level Review; the old `review-likelihood` was dropped to avoid two reviews back-to-back).
+
 - **Wiring fixes that fell out of the merge:**
   - `how-likely`'s wrap `segueToLessonId: 'likelihood-compare'` → `'long-run-frequency'`.
   - `chapters.test.ts` updated to assert the new `groups[1].chapter.id === 'defining-probability'` and that `long-run-frequency` is its first lesson.
@@ -325,8 +348,8 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **Considered:**
   - **Drop only the two lessons; keep two thin units.** Rejected: a 2-lesson "Likelihood" unit (`long-run-frequency` + `review-likelihood`) reads as filler next to the much richer Sample Spaces unit, especially with `how-likely` already covering comparative likelihood and the 0..1 scale.
   - **Rename "Likelihood" to "Defining Probability" and keep both units.** Rejected for the same reason: still two thin units doing one job; the merge is the substance and the rename was D88's open suggestion.
-  - **Keep the chapter id `sample-spaces` (just rename title).** Rejected: the unit's character changes (it now opens with the long-run lesson and is the home of the *definition*, not just the listing technique). A fresh id (`defining-probability`) makes the merge explicit in the codebase and keeps the `sample-space` lesson id distinct from the chapter id.
-  - **Drop `long-run-frequency` too.** Rejected: the long-run idea is the *other* definition of probability (frequentist), and it's the bridge to L2's Law of Large Numbers material later. `how-likely` doesn't teach it — it only counts equally-likely outcomes. The unit needs both definitions.
+  - **Keep the chapter id `sample-spaces` (just rename title).** Rejected: the unit's character changes (it now opens with the long-run lesson and is the home of the _definition_, not just the listing technique). A fresh id (`defining-probability`) makes the merge explicit in the codebase and keeps the `sample-space` lesson id distinct from the chapter id.
+  - **Drop `long-run-frequency` too.** Rejected: the long-run idea is the _other_ definition of probability (frequentist), and it's the bridge to L2's Law of Large Numbers material later. `how-likely` doesn't teach it — it only counts equally-likely outcomes. The unit needs both definitions.
 - **Gaps / risks:**
   - **Subtle pedagogy:** "Defining Probability" now contains a frequentist intuition (`long-run-frequency`) followed by a classical definition (`equally-likely-outcomes`), without explicitly naming the two interpretations. That's intentional for the cold-open arc, but the eventual prose for `equally-likely-outcomes` should briefly acknowledge "this is one of two ways to define probability, and we'll see they agree" so the unit doesn't read as inconsistent.
   - **Single review covers a slightly larger surface.** `review-sample-spaces` now has to mix in the long-run-frequency idea. Acceptable, and the renamed copy ("Defining probability review") signals it.
@@ -334,9 +357,10 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D88 (the 9-unit plan this amends), [`curriculum-roadmap.md`](curriculum-roadmap.md) (now reflects 8 units), `roadmapStubs.ts` header comment.
 
 ### D90 — Scope as classical probability ending on Expected Value; drop the statistics-track Unit 8 ("Famous Distributions") and trim Unit 7 to EV
+
 - **Status:** resolved
 - **Amends:** D86 / D88 / D89 (curriculum scope decisions). Final unit count is **7** (under the "Start Here" lead chapter).
-- **Trigger:** owner pushback — *"i think random variables and expected value and whatnot are not classic probability, no? more statistics."* Half-right: in academic math (Pitman, Ross) random variables, EV, variance, CLT, and the named distributions all live in the *probability* course. But in the **AP / high-school taxonomy** that the persona (D2) actually meets, the line moves: AP Stats covers RVs, EV, binomial, normal, and CLT, and HS "probability" effectively ends at conditional probability + Bayes. Given the persona, the HS line is the right one to draw — with one carve-out.
+- **Trigger:** owner pushback — _"i think random variables and expected value and whatnot are not classic probability, no? more statistics."_ Half-right: in academic math (Pitman, Ross) random variables, EV, variance, CLT, and the named distributions all live in the _probability_ course. But in the **AP / high-school taxonomy** that the persona (D2) actually meets, the line moves: AP Stats covers RVs, EV, binomial, normal, and CLT, and HS "probability" effectively ends at conditional probability + Bayes. Given the persona, the HS line is the right one to draw — with one carve-out.
 - **Chose:**
   - **Keep Expected Value** as the closing unit. EV is a genuine probability capstone — every probability textbook ends here, and Brilliant's own probability path ends on EV. Pedagogically it's the natural payoff of "given a probability of X, what payoff do you expect?"
   - **Drop the formal "random variable" abstraction.** An HS course can teach EV without ever invoking "an RV is a function Ω → ℝ." Skipping the abstraction lets the unit lead with payoffs, not formalism, and removes a stand-alone lesson that would have been pure vocabulary.
@@ -345,8 +369,8 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - **Reshape Unit 7** from 7 lessons → 5: `expected-value-intuition` → `computing-expected-value` → **`fair-games`** (new — when E(X) = 0 the bet is break-even) → `practice-expected-value` (retitled to "Practice: gambles and insurance") → `review-expected-value` (renamed from `review-random-variables`, since the unit is no longer about RVs). Chapter id renamed `random-variables` → `expected-value`.
   - **Delete the dropped stubs from the path entirely** (per owner — no "Statistics course-2" placeholder yet). The roadmap doc records that they belong to a future track but the path itself stays focused.
 - **Considered:**
-  - **Drop EV too — end on Conditional Probability.** Rejected: EV is universally treated as the probability capstone in the relevant textbooks (Pitman, Ross) and in Brilliant's own probability path. Conditional probability is the *deepest* idea, but EV is the *most useful* — and the "given P(X), what payoff do you expect?" framing is the natural closer for an HS-targeted course.
-  - **Keep binomial in probability** (it pairs naturally with combinations). Rejected: binomial *as a named distribution* belongs with sampling and the normal approximation. The combinations work itself stays — it's already in Unit 4. A future stats course would build on Unit 4 to introduce the binomial.
+  - **Drop EV too — end on Conditional Probability.** Rejected: EV is universally treated as the probability capstone in the relevant textbooks (Pitman, Ross) and in Brilliant's own probability path. Conditional probability is the _deepest_ idea, but EV is the _most useful_ — and the "given P(X), what payoff do you expect?" framing is the natural closer for an HS-targeted course.
+  - **Keep binomial in probability** (it pairs naturally with combinations). Rejected: binomial _as a named distribution_ belongs with sampling and the normal approximation. The combinations work itself stays — it's already in Unit 4. A future stats course would build on Unit 4 to introduce the binomial.
   - **Add a "Statistics (course 2)" locked-stub chapter at the bottom of the path** as a "next course" preview. Rejected (owner): keeps the IA tight and avoids advertising scope we don't yet plan to author.
   - **Keep `review-random-variables` id and just retitle.** Rejected: the lesson is unauthored, so renaming the id is purely cosmetic with zero cascade (no Remote Config flag, no progress data, no reference from any other file). `review-expected-value` matches the unit it lives in.
 - **Gaps / risks:**
@@ -356,26 +380,27 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - **The roadmap doc kept the 8-unit framing under D89; this brings it to 7.** Updated `curriculum-roadmap.md` § 3 with a short "out of scope" callout naming the dropped material, so a future stats track has a starting point.
 - **See also:** D88 (the 9-unit plan), D89 (the previous merge), [`curriculum-roadmap.md`](curriculum-roadmap.md) (now reflects 7 units + an "Out of scope" note for the statistics track).
 
-### D91 — Course progress counts the *whole planned course*; locked stubs render with no progress; stale Firestore docs are pruned
+### D91 — Course progress counts the _whole planned course_; locked stubs render with no progress; stale Firestore docs are pruned
+
 - **Status:** resolved
-- **Trigger:** owner observed two cosmetic warts on the live path: *"right now path and 1/1 done look a little odd. anything better we can say while still encoding progress?"* — the home header read "1 / 1 done" once `how-likely` was finished, implying course completion while the path obviously continued; and *"two dice is randomly in the middle, can we lock it and delete the progress on it"* — the `two-dice` lesson was a locked stub on this branch but rendered with a green completed-check from a stale Firestore progress doc left over from an earlier authoring branch.
+- **Trigger:** owner observed two cosmetic warts on the live path: _"right now path and 1/1 done look a little odd. anything better we can say while still encoding progress?"_ — the home header read "1 / 1 done" once `how-likely` was finished, implying course completion while the path obviously continued; and _"two dice is randomly in the middle, can we lock it and delete the progress on it"_ — the `two-dice` lesson was a locked stub on this branch but rendered with a green completed-check from a stale Firestore progress doc left over from an earlier authoring branch.
 - **Chose:** three small, complementary changes:
   - **Course-progress denominator now counts the whole planned course** (live + locked stubs), not just non-coming-soon lessons. The header reads "1 / 42 lessons" instead of "1 / 1 done" — honestly encoding the user's share of the planned curriculum, with the locked nodes on the path itself communicating "more is coming." `courseProgress(lessons, progressMap)` was rewritten: `total = lessons.length`, `completed = lessons that have authored slots and are completed` (so a stale completed-state on a now-blank stub never inflates the count). Reverses the older `total = real.length` rationale (which assumed unavailable lessons were a fluke; they are now an intentional roadmap preview).
   - **Header copy** in `HomePage` shifted from `{n} / {n} done` to `{n} / {n} lessons`. Drops the implication of finality. Profile's `StatsGrid` already labels its row "Course" and shows `1 / 42`, so no copy change there.
-  - **`allCompleted` everywhere now requires the *full* catalog to be done.** Pre-D91 the celebration / "all caught up" hero fired on completing the single authored lesson because `realLessons.every(...)` is trivially satisfied with one lesson. Updated in `HomePage`, `HeroCard`, `CelebrationScreen.courseTotal`, `PublicProfilePage`, and `LessonPlayer.courseTotal` (which feeds the **'course-cleared' achievement** in `lib/achievements.ts` — without this fix the achievement would have been awarded on the very first lesson, since `lessonsCompleted >= courseTotal` trivially holds when `courseTotal === 1`). The CaptainsLog daily tip already covers the "you've done what's available, more coming" case for the home screen.
+  - **`allCompleted` everywhere now requires the _full_ catalog to be done.** Pre-D91 the celebration / "all caught up" hero fired on completing the single authored lesson because `realLessons.every(...)` is trivially satisfied with one lesson. Updated in `HomePage`, `HeroCard`, `CelebrationScreen.courseTotal`, `PublicProfilePage`, and `LessonPlayer.courseTotal` (which feeds the **'course-cleared' achievement** in `lib/achievements.ts` — without this fix the achievement would have been awarded on the very first lesson, since `lessonsCompleted >= courseTotal` trivially holds when `courseTotal === 1`). The CaptainsLog daily tip already covers the "you've done what's available, more coming" case for the home screen.
   - **Stale-progress fixes (the `two-dice` issue):**
     - **Visual guard in `LessonNode`:** when `lesson.comingSoon` is true, the component now treats `progress.state` as `undefined` regardless of what Firestore says. A coming-soon lesson always renders as locked — no green check, no "Completed · tap to review" meta, no in-progress label. Defensive: handles any future re-locked lesson, not just `two-dice`.
     - **Data fix via `pruneStaleProgress`:** new helper in `progressService.ts` that batches deletes for a given list of `lessonProgress` ids. A one-shot `useEffect` in `HomePage` runs it with the ids of lessons that exist in the user's progress map but have empty `slots` in the catalog. Idempotent (`prunedRef` keeps a per-session set so a Firestore snapshot re-emit after the delete doesn't refire), best-effort (errors logged, never thrown). Single-id case takes the `deleteDoc` fast path; multi-id case batches.
 - **Considered:**
   - **Hide the count entirely when only one lesson is authored.** Rejected: the user wanted progress encoded, not hidden, and "1 / 42 lessons" is honest scope-setting (the locked nodes on the path back this up).
   - **Keep `total = real.length` and just hide the hero.** Rejected: the underlying mismatch (denominator says one thing, path shows another) would still leak into Profile and Public Profile.
-  - **Filter stale entries client-side without an actual delete.** Rejected: the owner's ask was to *delete* the progress, not just hide it. The filter (visual guard in `LessonNode`) handles the immediate render; the delete makes the cleanup durable.
+  - **Filter stale entries client-side without an actual delete.** Rejected: the owner's ask was to _delete_ the progress, not just hide it. The filter (visual guard in `LessonNode`) handles the immediate render; the delete makes the cleanup durable.
   - **Run the prune from the auth provider on login** instead of from `HomePage`. Rejected: `HomePage` is where both the lessons hook and the progress subscription already live, so the effect lands naturally; running it from auth would require duplicating both subscriptions.
   - **Mark lessons that have a stale progress doc with a special "archived" flag** (so review is still possible). Rejected: the stub literally has no slots, so review would crash. Wiping the progress is the right move.
 - **Gaps / risks:**
   - **`profile.lessonsCompleted`** (a separate Firestore counter on `users/{uid}`) can still be off-by-one if a lesson was completed and then re-locked, since `lessonsCompleted` is a server-side `increment`. Not addressed here — out of scope for the cosmetic fix the owner asked for. The Profile UI uses `Math.min(profile.lessonsCompleted, courseTotal)` which clamps it visually; the Firestore field stays slightly higher than reality until the user does enough new lessons to "catch up."
   - **Pre-existing achievements stay awarded.** A user who hit the `course-cleared` achievement on the broken pre-D91 threshold (when `courseTotal` was 1 and finishing `how-likely` was enough) keeps the achievement on their profile — `award()` is idempotent and never revokes. New users won't earn it until they actually complete the full 42-lesson course. Acceptable: revoking an achievement would feel worse than the (rare) early-bird false positive.
-  - **Prune semantics are catalog-driven.** A lesson going coming-soon via Remote Config (with content still in `slots`) will *not* prune the user's progress, because the criterion is `slots.length === 0` (i.e., truly contentless), not `comingSoon`. That's the intended distinction: a temporarily-flagged-off lesson is still "real," and its progress should resume if the lesson is flipped back on.
+  - **Prune semantics are catalog-driven.** A lesson going coming-soon via Remote Config (with content still in `slots`) will _not_ prune the user's progress, because the criterion is `slots.length === 0` (i.e., truly contentless), not `comingSoon`. That's the intended distinction: a temporarily-flagged-off lesson is still "real," and its progress should resume if the lesson is flipped back on.
   - **No prune for `stepAttempts` or `users/{uid}/...` counters.** Same reason as the `lessonsCompleted` carve-out: out of scope for this pass. Could be added later if attempt history feels stale on Profile.
   - **The denominator can shrink over time.** If a future authoring pass deletes a stub (e.g., D90 dropped 8), the planned count drops. A user mid-course would see "5 / 42 → 5 / 34" between sessions. Acceptable: the path itself is the visible truth, and the count tracks it.
 - **Tests:** `recommendations.test.ts` updated:
@@ -391,6 +416,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 ## B. Stack
 
 ### D9 — Frontend framework
+
 - **Status:** resolved
 - **Chose:** Vite + React 18 + TypeScript
 - **Considered:** Next.js 14 (App Router), Remix, plain CRA
@@ -400,6 +426,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Manual setup for some things Next.js gives free (file-based routing, image optimization, route prefetching)
 
 ### D10 — Backend / data
+
 - **Status:** resolved
 - **Chose:** Firebase — Auth, Firestore, Storage
 - **Considered:** Supabase (Postgres + Auth), Convex, Clerk + Convex, NextAuth + SQLite/Prisma + Railway
@@ -411,6 +438,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - No server-side functions until we add Firebase Functions (cold-start latency a future consideration)
 
 ### D11 — Routing
+
 - **Status:** resolved
 - **Chose:** React Router v6
 - **Considered:** TanStack Router, manual hash routing
@@ -419,6 +447,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - React Router data APIs are still relatively new; we'll keep usage minimal for MVP
 
 ### D12 — Hosting
+
 - **Status:** resolved
 - **Chose:** Vercel (static SPA)
 - **Considered:** Netlify, Firebase Hosting, Cloudflare Pages
@@ -431,6 +460,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 ## C. Data & Persistence
 
 ### D13 — Content model storage
+
 - **Status:** resolved
 - **Chose:** Lessons live as **TypeScript files in the repo** (typed `Lesson` objects), bundled with the client
 - **Considered:** Lessons in Firestore (enables a future authoring UI), Headless CMS (Sanity, Contentful)
@@ -441,15 +471,17 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Trade win: zero DB reads on the critical path → easy <2s load target; type-checked content; version-controlled
 
 ### D14 — Progress persistence model
+
 - **Status:** resolved
 - **Chose:** Two-doc pattern — `/users/{uid}/lessonProgress/{lessonId}` for current state, `/users/{uid}/stepAttempts/{autoId}` as an **append-only** log of every check
 - **Considered:** Single `lessonProgress` doc only (no history), summary stats only (correct/total per lesson)
 - **Gaps / risks:**
   - More writes per user — Firestore writes are cheap but not free
   - More data to delete if a user requests account deletion (Phase 3 / compliance concern)
-  - Trade win: free Phase 3 seed data for spaced repetition; verifiable "did the learner *actually* finish" trail
+  - Trade win: free Phase 3 seed data for spaced repetition; verifiable "did the learner _actually_ finish" trail
 
 ### D15 — Mastery model
+
 - **Status:** resolved
 - **Chose:** 3-state machine per lesson — `not_started`, `in_progress`, `completed`
 - **Considered:** Per-concept mastery score (0–100%), spaced repetition intervals (FSRS-style)
@@ -459,6 +491,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Will likely be replaced/augmented in Phase 3 by a richer score that the `stepAttempts` log can feed
 
 ### D16 — Username uniqueness pattern
+
 - **Status:** resolved (renames enabled 2026-06-24 — see amendment below)
 - **Chose:** Sentinel doc per username — `/usernames/{lowercased}` containing `{ uid }`, created in the same `runTransaction` that writes `/users/{uid}`
 - **Considered:** Firestore extension for unique fields (heavyweight), Cloud Function trigger (latency)
@@ -478,6 +511,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 ## D. Auth & Identity
 
 ### D17 — Auth providers
+
 - **Status:** resolved
 - **Chose:** Email + username + password only via Firebase Auth
 - **Considered:** Add Google sign-in (one toggle in Firebase Auth + a button)
@@ -488,6 +522,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Cheap to add later — flag for revisit if Phase 2 measures show signup drop-off
 
 ### D18 — Login mechanism
+
 - **Status:** resolved
 - **Chose:** Accept email **or** username + password. If input isn't email-shaped, look up `/usernames/{lowercased}` → fetch `/users/{uid}.email` → call `signInWithEmailAndPassword` with that email
 - **Considered:** Email only (simpler)
@@ -501,16 +536,18 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 ## E. Visual & Motion
 
 ### D19 — Color palette
+
 - **Status:** resolved
 - **Chose:** Indigo `#4F46E5` primary, emerald `#10B981` correct, rose `#F43F5E` wrong, amber `#F59E0B` streak/flame, near-white `#FAFAFA` bg, near-black `#0F172A` text
 - **Considered:** Teal primary (more "math/science"), coral primary (warmer)
 - **Gaps / risks:**
-  - Indigo is *safe* but very common (Linear, every modern SaaS) — may not feel distinctive
+  - Indigo is _safe_ but very common (Linear, every modern SaaS) — may not feel distinctive
   - Rose for wrong is gentler than hard red but some users might miss the cue
   - No dark mode in MVP — phone-at-night users will get a bright screen
 - **See also:** D67 (dark mode deferred but tracked)
 
 ### D20 — Typography
+
 - **Status:** resolved
 - **Chose:** Inter for all UI (body, prompts, headings), 16px minimum body, 22–32px for prompts
 - **Considered:** Aktiv Grotesk (paid — Brilliant's font), Geist, system font stack
@@ -519,6 +556,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Extra ~50KB on first load for the font files (acceptable, but a perf cost)
 
 ### D21 — Form factor
+
 - **Status:** resolved
 - **Chose:** PWA-friendly responsive web app, mobile-first, no native packaging
 - **Considered:** React Native, Capacitor wrap (App Store from same React codebase)
@@ -530,6 +568,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - "PWA-friendly" means the app loads and works in a PWA context but ships no PWA features in MVP (no manifest, no service worker, no offline). Phase 2 candidate; until then PRD §1 reads "web app (PWA-friendly)" rather than committing to PWA features.
 
 ### D67 — Dark mode (`prefers-color-scheme`) deferred but tracked
+
 - **Status:** **open — Phase 2/3 candidate, intentionally tracked**
 - **Chose:** **No dark mode in Phase 1.** App ships light-mode only; no `prefers-color-scheme` media query handling. Acknowledged as a Phase 2/3 enhancement worth revisiting (user flagged it as interesting; HS students on phones at night is a real use case for the persona).
 - **Considered:**
@@ -544,11 +583,12 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D19 (color palette source; dark variants will need to be defined here)
 
 ### D87 — "Probability Pirates" course-path scene: sky dice, fish dice, a sailing fleet, and a lavish final treasure chest
+
 - **Status:** resolved (shipped + deployed 2026-06-24)
 - **Chose:** Lean the home course path fully into the **Probability Pirates** theme (D81) so the ocean backdrop reads coherently now that the curriculum spans many chapters (D86). Concretely, in `OceanScene.tsx` / `CoursePath.tsx` / `FlyingDie.tsx` / `Checkpoint.tsx`:
-  - **Two flavours of the magical d6, placed by element.** A single `FlyingDie` component takes a `variant`: `flying` (winged + sparkle, bobs up) lives in the **sky**; `swimming` (fins + forked tail + rising bubbles, wiggles) is a **fish die** that lives in the **sea**. Both keep the colored glow aura. Exposed as `FishDie` for call sites. Rationale: a winged die floating *in the water* (or a ship floating *in the clouds*) "doesn't make sense" — match each motif to its medium.
+  - **Two flavours of the magical d6, placed by element.** A single `FlyingDie` component takes a `variant`: `flying` (winged + sparkle, bobs up) lives in the **sky**; `swimming` (fins + forked tail + rising bubbles, wiggles) is a **fish die** that lives in the **sea**. Both keep the colored glow aura. Exposed as `FishDie` for call sites. Rationale: a winged die floating _in the water_ (or a ship floating _in the clouds_) "doesn't make sense" — match each motif to its medium.
   - **Sky band that clears the banners.** The path gets extra top padding (`pt-24`) so the sky decorations (sun, clouds, gulls, three flying dice spread at 13/45/78%) sit in a clear band **above the first `ChapterBanner`** rather than being occluded by it.
-  - **Dice further down live *in the path column*, not the margins.** A couple of route dice (keyed on the prev lesson's global index, every 4th boundary from #5) render as **flying** instead of swimming, so airborne dice appear partway down the voyage too. Earlier attempt parked them in the `OceanScene` side gutters; rejected because those gutters collapse to ~0 on narrow/split-screen widths and the path then hides them.
+  - **Dice further down live _in the path column_, not the margins.** A couple of route dice (keyed on the prev lesson's global index, every 4th boundary from #5) render as **flying** instead of swimming, so airborne dice appear partway down the voyage too. Earlier attempt parked them in the `OceanScene` side gutters; rejected because those gutters collapse to ~0 on narrow/split-screen widths and the path then hides them.
   - **A sailing fleet, kept in the sea.** Three `PirateShip`s distributed down the voyage (≈34/58/82% height), pinned to the side margins (behind the path so they never cross the lesson islands), each tracing a slow figure-eight (horizontal sway at 2× the vertical loop) over ~22–26s. Replaces the previous single ship.
   - **Lavish final treasure chest replaces the trophy.** The final checkpoint variant is renamed `trophy` → `treasure`; `TrophyLand` → `TreasureLand` now plants a big, ornate `TreasureChest` (wood + gold bands, jeweled lock, overflowing coins/gems, warm radial glow) on the landfall island, sized up (`max-w-[280px]`, chest at 64% width). Copy changed to a pirate payoff: locked "X marks the spot" / "Finish every lesson to claim the buried treasure"; complete "Treasure unearthed! Course complete!" with the existing 250-coin (`TROPHY_REWARD`, D83) claim flow and confetti. The chest stays flung open once claimed.
 - **Considered:**
@@ -565,6 +605,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 ## F. Streaks & Engagement
 
 ### D22 — Streak timezone
+
 - **Status:** resolved
 - **Chose:** Auto-detect from the browser via `Intl.DateTimeFormat().resolvedOptions().timeZone`; store `lastActiveDate` as `YYYY-MM-DD` in that timezone. **Detection happens per session, not persisted** (so a traveler picks up their new local-tz boundary automatically the next time they open the app)
 - **Considered:** Explicit timezone selector in Profile, UTC-only, persist-tz-at-registration
@@ -580,6 +621,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 ## G. Scope Exclusions (each is a decision)
 
 ### D23 — No AI features in MVP
+
 - **Status:** resolved (gate from the brief)
 - **Chose:** Zero AI in Phase 1 — no model calls, no generated content, no chatbot tutor, no AI grading
 - **Considered:** Sneaking in an AI-generated hint here or there
@@ -589,6 +631,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Phase 2 (Friday) is where AI lands; this is a sequencing choice, not a permanent one
 
 ### D24 — No social features
+
 - **Status:** resolved
 - **Chose:** Solo experience — no follow/followers, no comments, no leaderboards, no friends
 - **Considered:** Friend leaderboards (known engagement lever), public profiles
@@ -598,6 +641,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Avatars + bios are in scope as personal-identity touches, but no graph
 
 ### D25 — No offline / local persistence
+
 - **Status:** resolved
 - **Chose:** Server-side persistence only; no localStorage fallback, no Firestore offline mode toggle
 - **Considered:** Local-first with Firestore offline persistence (one config flag)
@@ -607,6 +651,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Cheap to revisit — the Firestore SDK has offline persistence built in; we can opt in later
 
 ### D26 — No content authoring UI
+
 - **Status:** resolved
 - **Chose:** Lessons authored by writing TypeScript files in the repo
 - **Considered:** Admin CMS for non-developers
@@ -616,6 +661,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Will become a real bottleneck if we ever want a content team
 
 ### D27 — No push / email reminders
+
 - **Status:** resolved
 - **Chose:** No push notifications, no email digest, no streak-warning emails in MVP
 - **Considered:** Daily streak reminder email, browser push
@@ -629,34 +675,38 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 ## H. Motivation & Habit Loop
 
 ### D28 — Motivation system scope
+
 - **Status:** resolved
 - **Chose:** **Standard** — streaks + best streak + daily goal + XP + streak milestones (3/7/14/30/60/100) + lifetime stats + lesson completion celebration with confetti, XP count-up, streak update, milestone card, course progress, next-lesson recommendation
 - **Considered:** Light (streaks + celebration only), Heavy (+ trophies/badges + daily challenges)
 - **Gaps / risks:**
   - More to build → real schedule pressure against the Wednesday gate
   - XP without leaderboards is a weaker hook than Duolingo's social XP — solo XP can feel hollow without comparison
-  - Milestone celebrations only trigger on the *next* lesson completion, not the moment the streak hits the threshold — slight delay, but keeps the celebration in one consolidated screen
+  - Milestone celebrations only trigger on the _next_ lesson completion, not the moment the streak hits the threshold — slight delay, but keeps the celebration in one consolidated screen
   - No "comeback" mechanic — a learner who broke a long streak gets no special encouragement (Phase 3 candidate)
 
 ### D29 — Question bank pattern
+
 - **Status:** resolved
 - **Chose:** **Slot/variant model** — each lesson is a sequence of slots; problem slots carry a pool of 1+ variants; one variant is materialized per slot per attempt
 - **Considered:** Fixed steps (no bank, every learner sees the same content always), per-step pools (smaller granularity than per-slot), random per-render with no seeding
 - **Gaps / risks:**
-  - The author must reason about both *slot shape* (interaction kind) and *variant content* (specific parameters) — slightly more conceptual overhead than "just a step"
+  - The author must reason about both _slot shape_ (interaction kind) and _variant content_ (specific parameters) — slightly more conceptual overhead than "just a step"
   - Variants in a slot share an interaction kind — can't mix a grid question and a fill-fraction question in the same slot (good for renderer simplicity; minor authoring constraint)
   - Type guards needed to enforce that all variants in a slot match the slot's `interactionKind` (runtime + unit test, not just type system)
 
 ### D30 — Variants per slot in MVP Lesson 1
+
 - **Status:** resolved
 - **Chose:** **2 variants per problem slot** for the shipped Lesson 1
 - **Considered:** Structure-only (1 variant), 3+ variants for real practice depth
 - **Gaps / risks:**
-  - 2 variants means a second-pass replay is fresh, but a *third* pass shows variant A again — pattern detectable
+  - 2 variants means a second-pass replay is fresh, but a _third_ pass shows variant A again — pattern detectable
   - Authoring cost ~doubles for problem slots (concept and wrap slots are unaffected since they're fixed)
   - Cheap to extend later — just append a variant object literal
 
 ### D31 — XP awarding rule
+
 - **Status:** resolved
 - **Chose:** ~~10 XP first-try correct / 5 XP second-try correct / 2 XP unlocked-after-2-strikes / +50 XP lesson completion bonus. XP never decreases.~~ **Updated 2026-06-23 (consequence of D55):** 10 XP first-try correct / 5 XP second-try correct / **2 XP for third-try-or-later correct (persistence reward)** / 0 XP for any wrong attempt / +50 XP lesson completion bonus. XP never decreases. The third bucket no longer rewards "unlocked-without-getting-it-right" (D55 removed that case); it now rewards "got it eventually after struggling."
 - **Considered:** Flat XP regardless of attempts (no incentive to try hard), XP decaying steeply per attempt (punishing), no XP at all (lighter), no XP for 3rd+ attempts (rejected: would punish persistence under the no-bail-out rule)
@@ -668,8 +718,9 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D55 (pedagogy decision that drove this update), D7 (original wrong-answer model that the old XP curve was built for)
 
 ### D32 — Streak milestones
+
 - **Status:** resolved
-- **Chose:** Celebrate at `{3, 7, 14, 30, 60, 100}` days; each milestone triggers once (tracked in `milestonesReached`); celebration happens on the *next* lesson completion after the threshold is crossed
+- **Chose:** Celebrate at `{3, 7, 14, 30, 60, 100}` days; each milestone triggers once (tracked in `milestonesReached`); celebration happens on the _next_ lesson completion after the threshold is crossed
 - **Considered:** Famous-only `{7, 30}`, dense `{1, 2, 3, 5, 7, 10, 14, 21, 30, ...}`, Duolingo-style every-10 forever
 - **Gaps / risks:**
   - 6 milestones might be too dense at the start (3 → 7 is fast) and too sparse later (60 → 100 is a long gap)
@@ -677,6 +728,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - 100 days is the ceiling for MVP — beyond that there are no further milestones until we add them
 
 ### D33 — Variant selection seeding
+
 - **Status:** resolved
 - **Chose:** Deterministic selection via `hash(userId + lessonId + attemptId + slotId) mod variants.length`, persisted to `selectedVariantIds` on first slot-visit
 - **Considered:** Pure random per render (breaks resume), random + persist (works but no deterministic replay debugging), round-robin (skips personalization potential later)
@@ -686,9 +738,10 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Future per-user balancing (e.g. "this learner always sees the easier variant") is not free with this approach — would need additional logic
 
 ### D34 — No streak freeze / save mechanism
+
 - **Status:** ~~resolved~~ **superseded by D79 (2026-06-23)** — we shipped a streak freeze after all.
 - **Chose (original):** Miss a day → `currentStreak` resets to 0. No freeze, no save, no buy-back.
-- **Reversal:** D79 adds a coin-bought Streak Freeze that auto-consumes on a missed day *before* the reset fires. The "rigid streaks can feel punishing and drive churn" risk below is exactly what drove the reversal, and the "easy to add later — add a counter and consume one before reset" note was effectively the implementation plan we followed (`streakFreezes` on `users/{uid}`, consumed in `nextStreak()`).
+- **Reversal:** D79 adds a coin-bought Streak Freeze that auto-consumes on a missed day _before_ the reset fires. The "rigid streaks can feel punishing and drive churn" risk below is exactly what drove the reversal, and the "easy to add later — add a counter and consume one before reset" note was effectively the implementation plan we followed (`streakFreezes` on `users/{uid}`, consumed in `nextStreak()`).
 - **Considered:** Duolingo-style streak freeze (cosmetic or paid), grace period of one missed day
 - **Gaps / risks:**
   - Real-world life gets in the way; rigid streaks can feel punishing and drive churn
@@ -696,25 +749,28 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Easy to add later — just add a `streakFreezesAvailable` counter and consume one before reset
 
 ### D35 — Authoring workflow
+
 - **Status:** resolved
 - **Chose:** One TypeScript file per lesson under `src/content/lessons/`. Variants for a slot live inline with the slot. Adding a hint = small edit to a single variant. Adding a variant = appending an object literal. Type system enforces presence of `feedbackCorrect` and `feedbackDefault`.
 - **Considered:** Separate `questions.json` files per slot, a YAML/MDX content format, a small admin CMS
 - **Gaps / risks:**
   - Lesson files can grow long with multiple slots × multiple variants — could exceed several hundred lines
   - No syntax highlighting for hand-written feedback as it's just TypeScript strings
-  - No preview of how a variant *looks* without running the app — author needs a dev mode "lesson preview" page
+  - No preview of how a variant _looks_ without running the app — author needs a dev mode "lesson preview" page
   - Files-in-repo means lesson updates require a git push and Vercel deploy
 
 ### D83 — Coin economy (cosmetic-only soft currency)
+
 - **Status:** resolved
-- **Chose:** A soft currency, **coins**, earned *only* from genuine accomplishment — checkpoint chests (`CHEST_REWARD` = 100), the trophy checkpoint (`TROPHY_REWARD` = 250), and each achievement earned (`COINS_PER_ACHIEVEMENT` = 25) — and spendable *only* on non-pedagogical items (Streak Freeze D79, cosmetics D80). No coins for raw XP/correctness, no purchasable learning advantages, no real money. Balance lives on the private `users/{uid}` doc; all awards/spends are idempotent Firestore transactions (`claimedChests` guards double-claim).
+- **Chose:** A soft currency, **coins**, earned _only_ from genuine accomplishment — checkpoint chests (`CHEST_REWARD` = 100), the trophy checkpoint (`TROPHY_REWARD` = 250), and each achievement earned (`COINS_PER_ACHIEVEMENT` = 25) — and spendable _only_ on non-pedagogical items (Streak Freeze D79, cosmetics D80). No coins for raw XP/correctness, no purchasable learning advantages, no real money. Balance lives on the private `users/{uid}` doc; all awards/spends are idempotent Firestore transactions (`claimedChests` guards double-claim).
 - **Considered:** XP-as-currency (conflates the progress signal with a spending balance), pay-for-hints / skip-a-step (rejected — directly undermines learning), real-money IAP (out of scope and risky for a minor-heavy persona)
 - **Gaps / risks:**
-  - **Over-justification effect** — extrinsic rewards can crowd out intrinsic motivation. Mitigated by keeping coins strictly cosmetic + forgiveness, and by tying *earning* to real milestones rather than rote activity.
+  - **Over-justification effect** — extrinsic rewards can crowd out intrinsic motivation. Mitigated by keeping coins strictly cosmetic + forgiveness, and by tying _earning_ to real milestones rather than rote activity.
   - Economy is unbalanced against real data — reward/price numbers are intuition, tunable later.
   - Coins are client-awarded (no Cloud Functions); the transaction guards prevent double-claims but a determined client could still probe rules. Acceptable for MVP (cosmetic stakes only).
 
 ### D79 — Streak Freeze as a forgiveness mechanic (supersedes D34)
+
 - **Status:** resolved
 - **Chose:** A coin-bought **Streak Freeze** (`STREAK_FREEZE_COST` = 200, hold up to `MAX_STREAK_FREEZES` = 2). On a missed day, `nextStreak()` auto-consumes one freeze per missed day to preserve the streak instead of resetting to 0; surfaced with a toast on the next session and a snowflake chip on Home. Reverses D34.
 - **Considered:** A free automatic grace day (no agency, no coin sink), a real-money freeze (rejected with monetization), unlimited freezes (defeats the point of a streak)
@@ -724,20 +780,22 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Self-determination framing: keeps streaks from feeling punishing (autonomy/relatedness) without trivializing them. Logic is pure + unit-tested in `streak.ts`.
 
 ### D80 — Cosmetic identity items: avatar styles + profile flair
+
 - **Status:** resolved
-- **Chose:** Two cosmetic coin sinks that double as social-identity signals. **Avatar styles** = background/ring treatments for `DefaultAvatar` (`classic` free + default; paid ~150; `gold` 300 with a ring). **Profile flair** = a titled gradient badge under the display name (`none` free; 150–400). Both are bought once (`ownedAvatarStyles` / `ownedFlair`, private on `users/{uid}`), and the *equipped* value is mirrored to `publicProfiles/{uid}` (`avatarStyle` / `profileFlair`) so others see it — PII-free, consistent with the existing public-profile mirroring pattern.
+- **Chose:** Two cosmetic coin sinks that double as social-identity signals. **Avatar styles** = background/ring treatments for `DefaultAvatar` (`classic` free + default; paid ~150; `gold` 300 with a ring). **Profile flair** = a titled gradient badge under the display name (`none` free; 150–400). Both are bought once (`ownedAvatarStyles` / `ownedFlair`, private on `users/{uid}`), and the _equipped_ value is mirrored to `publicProfiles/{uid}` (`avatarStyle` / `profileFlair`) so others see it — PII-free, consistent with the existing public-profile mirroring pattern.
 - **Considered:** Avatar **image upload** (blocked by D72 — Firebase Storage deferred), unlock-by-XP only (no coin sink), purely private cosmetics (weaker — the social visibility is the motivational point)
 - **Gaps / risks:**
   - Catalogs are hand-curated pure data (`avatarStyles.ts` / `profileFlair.ts`, unit-tested); adding items is an append.
-  - `equip` is a non-transactional batch write to two docs — acceptable since the *purchase* is the guarded step and equip is idempotent/cosmetic.
+  - `equip` is a non-transactional batch write to two docs — acceptable since the _purchase_ is the guarded step and equip is idempotent/cosmetic.
   - Public mirror can drift if a batch write half-fails; self-heals on next equip.
 
 ### D82 — In-app schedule reminder + event detail (distinct from push/email D27)
+
 - **Status:** resolved
-- **Chose:** A **home-screen reminder dialog** that surfaces *today's* unfinished schedule events, at most once per day (dismissal persisted in `localStorage` per `uid`+date). The query is scoped to a single day, so past days drop off automatically — satisfying "if the day has passed, remove" without a cleanup job. Plus a **tappable event detail dialog** that resolves a linked `lessonId` to its name + deep-links into the lesson, and shows full notes (the day-list row only previews them).
+- **Chose:** A **home-screen reminder dialog** that surfaces _today's_ unfinished schedule events, at most once per day (dismissal persisted in `localStorage` per `uid`+date). The query is scoped to a single day, so past days drop off automatically — satisfying "if the day has passed, remove" without a cleanup job. Plus a **tappable event detail dialog** that resolves a linked `lessonId` to its name + deep-links into the lesson, and shows full notes (the day-list row only previews them).
 - **Considered:** Push / email reminders (still **excluded** — see D27; this is in-app only, no FCM/email), nag-on-every-visit (annoying), a persistent inline banner (less noticeable than a modal)
 - **Gaps / risks:**
-  - In-app only — it can nudge a learner who *opened the app*, but cannot pull them back the way push would. **D27 still stands** for off-app re-engagement.
+  - In-app only — it can nudge a learner who _opened the app_, but cannot pull them back the way push would. **D27 still stands** for off-app re-engagement.
   - `localStorage` dismissal is best-effort (private mode / cleared storage re-shows the popup — harmless).
   - Decision logic (`pendingToday`, dismissal) is pure + unit-tested in `reminderRules.ts`.
 
@@ -746,6 +804,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 ## I. UI Stack
 
 ### D36 — Component library foundation
+
 - **Status:** resolved
 - **Chose:** [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS for all app chrome — buttons, cards, inputs, progress, badges, avatars, dialogs, toasts. Components copied into the repo via CLI, themed once with PRD color tokens as CSS variables.
 - **Considered:** Headless UI + custom Tailwind (more boilerplate), MUI/Chakra (heavier, harder to match Brilliant aesthetic), Radix primitives directly (shadcn is already Radix + Tailwind)
@@ -756,6 +815,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Tied to Tailwind v4/v3 migration path as shadcn evolves
 
 ### D37 — Animation layer (Framer + selective Animbits)
+
 - **Status:** resolved
 - **Chose:** Framer Motion as the primary animation layer for lesson player (slot transitions, correct/wrong feedback, tap states). [Animbits](https://www.animbits.dev/) used selectively (max 2–3 components) for celebration-screen polish only — confetti, XP count-up. Install via `npx shadcn add @animbits/<component>`.
 - **Considered:** Framer only (no Animbits), Animbits for all interactions (inconsistent with shadcn motion feel), CSS animations only (harder to coordinate sequences), React Spring
@@ -766,6 +826,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - If Animbits confetti doesn't fit, fall back to a short Framer particle snippet — no hard dependency
 
 ### D68 — Impeccable as future UI tooling (deferred, tracked)
+
 - **Status:** **open — Phase 2 candidate, intentionally tracked**
 - **Chose:** **Do not adopt [Impeccable](https://impeccable.style/designing/) for the Phase 1 MVP.** Continue with the current UI workflow: shadcn/ui scaffolded by hand, Framer Motion + selective Animbits for motion, all rules in [`docs/ui-stack.md`](ui-stack.md). Revisit Impeccable after the MVP first iteration ships, ideally as part of the Phase 2 brand/polish pass.
 - **Considered:**
@@ -786,6 +847,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 ## J. Project Structure & Tooling
 
 ### D38 — Product name
+
 - **Status:** resolved
 - **Chose:** **Pascal** (after Blaise Pascal, co-founder of probability theory)
 - **Considered:** Generic working names ("brilliant-clone"), subject-themed names (Dicey, Roll, Bayes), placeholder until launch
@@ -796,15 +858,17 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D81 (public brand is now "Probability Pirates"; "Pascal" survives as the internal identifier + motif)
 
 ### D81 — Brand identity: "Probability Pirates" + Captain Pascal (extends D38)
+
 - **Status:** resolved
 - **Chose:** The **user-facing product name is "Probability Pirates"** with a friendly guide mascot, **Captain Pascal**. The **internal npm package, code namespace, analytics event prefix, and the Pascal's-Triangle motif stay `pascal`** — only the surfaced brand changed (wordmark, auth pages, `<title>`, mascot illustration + contextual lines, the "Captain's Log" daily-tip card, and a lesson-intro cameo).
-- **Considered:** Keep plain "Pascal" (accurate but academic — less inviting for the HS persona), a *full* rename including the package + analytics (churns imports and breaks analytics continuity for no user benefit)
+- **Considered:** Keep plain "Pascal" (accurate but academic — less inviting for the HS persona), a _full_ rename including the package + analytics (churns imports and breaks analytics continuity for no user benefit)
 - **Gaps / risks:**
   - Dual naming (public "Probability Pirates" vs internal `pascal`) can confuse new contributors — this entry + the package-name comment are the disambiguation.
   - Mascot copy must stay grounded in real learning science (the Captain's tips reinforce spacing, retrieval, learning-from-errors), not become gimmicky filler.
-  - D38 still governs the *internal* identifier; this entry governs the *public* brand.
+  - D38 still governs the _internal_ identifier; this entry governs the _public_ brand.
 
 ### D39 — Spec structure (PRD vs detailed specs)
+
 - **Status:** resolved
 - **Chose:** Slim high-level PRD + one detailed spec per major feature under `docs/specs/spec-*.md`. Each spec implementation detail is one sentence appropriate for a junior engineer.
 - **Considered:** Single monolithic PRD with every detail inline, no specs at all
@@ -814,6 +878,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - More files to keep in sync as we make build-time decisions
 
 ### D40 — Linting + formatting + CI gate
+
 - **Status:** resolved
 - **Chose:** ESLint flat config (typescript-eslint) + Prettier + EditorConfig; CI runs `typecheck && lint && format:check && test && audit-feedback` on every push / PR
 - **Considered:** Biome (all-in-one, faster), no CI for MVP (relying on local discipline), Husky pre-commit hooks
@@ -823,6 +888,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - `audit-feedback` is a custom script — not standard; new contributors won't know what it does without reading `scripts/audit-feedback.ts`
 
 ### D41 — Sentry as the only error tracker
+
 - **Status:** resolved
 - **Chose:** Sentry for client-side error tracking, React Error Boundary at the route level, inline toasts for persistence failures
 - **Considered:** Firebase Crashlytics (Firebase-native), no error tracking for MVP, console-only
@@ -832,6 +898,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Sentry SDK adds ~50KB gzip — acceptable but real
 
 ### D42 — One Firebase project + local emulator strategy
+
 - **Status:** resolved
 - **Chose:** One shared Firebase project for MVP. Local development uses the Firebase emulator suite (no real reads/writes during dev). Production data goes straight to the shared project.
 - **Considered:** Separate dev/staging/prod Firebase projects (cleaner but ~3× setup), production-only (no emulator — every dev test hits real DB)
@@ -842,6 +909,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Phase 2 candidate: split into dev/prod projects before adding paying users or partner accounts
 
 ### D43 — Lesson stub policy
+
 - **Status:** resolved
 - **Chose:** Lessons 2–6 ship as one-file stubs with title, blurb, `comingSoon: true` flag, and zero slots; lesson player refuses to start them; course path shows them as locked
 - **Considered:** Hide future lessons entirely until built, ship stubs with placeholder lorem-ipsum content
@@ -851,8 +919,9 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Tappable-but-locked lessons might frustrate exploratory learners who tap to peek
 
 ### D44 — Documentation in `docs/`, not in code comments
+
 - **Status:** resolved
-- **Chose:** All architectural decisions, specs, and rationale live in `docs/*.md`. Code comments only explain non-obvious *implementation* trade-offs (per agent code-style rules), not design motivation.
+- **Chose:** All architectural decisions, specs, and rationale live in `docs/*.md`. Code comments only explain non-obvious _implementation_ trade-offs (per agent code-style rules), not design motivation.
 - **Considered:** JSDoc-heavy code with design rationale inline, README-only documentation, Notion/external wiki
 - **Gaps / risks:**
   - Devs reading only code might not discover the spec — onboarding requires reading `docs/` first
@@ -860,6 +929,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Cross-linking between specs is manual
 
 ### D45 — `docs/architecture.md` as the cross-cutting source of truth
+
 - **Status:** resolved
 - **Chose:** A single architecture doc covers state management, directory layout, environment strategy, routing, error handling, observability, performance budget, and testing — all things multiple specs reference
 - **Considered:** Inline these concerns into each spec individually (duplication risk), skip architecture doc entirely for MVP
@@ -868,6 +938,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Heavy single file (~290 lines) — devs may not read it cover-to-cover before working on a feature
 
 ### D46 — Skill policy in `~/.cursor/skills/`
+
 - **Status:** resolved
 - **Chose:** Superpowers (14 skills) installed with `disable-model-invocation: true` — they activate only when explicitly named. Vercel React Best Practices left ambient — auto-activates on React work.
 - **Considered:** Auto-activate all Superpowers (heavy context every chat), install Superpowers per-project under `.cursor/skills/` (no sharing across projects), don't install at all
@@ -877,6 +948,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Vercel skill auto-firing on any React work could pull React/Next.js-flavored advice into Vite-specific contexts (mostly fine; Vite is React)
 
 ### D47 — Brainstorming-first workflow for new docs
+
 - **Status:** resolved
 - **Chose:** Use the `brainstorming` skill explicitly when authoring new design artifacts (e.g. alternatives log, PRD). Skip the skill for routine doc edits or pure-extraction tasks (e.g. moving an already-drafted log into the repo).
 - **Considered:** Always invoke brainstorming, never invoke brainstorming, invoke for every doc regardless of size
@@ -885,6 +957,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - The skill's HARD-GATE wants approval before any artifact is written — for pure extraction this slows us down without value
 
 ### D48 — Age gate at registration
+
 - **Status:** resolved
 - **Chose:** **No age-gate checkbox at registration in MVP.** Registration captures email, username, and password only. The `/users/{uid}` doc does not store an `ageGate13` field, and the security rule does not require one.
 - **Considered:** "I am at least 13 years old" self-attestation checkbox (originally in `spec-auth.md`); hard age verification via ID upload (heavy, out of scope); blocking under-18 users entirely (cuts a chunk of the HS persona)
@@ -896,6 +969,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - If we ever do a real launch (App Store, public marketing), an age gate becomes a hard requirement, not a soft one
 
 ### D64 — Bundle-size CI enforcement deferred
+
 - **Status:** resolved (with follow-up)
 - **Amended 2026-06-23 (owner):** the hard 300 KB ceiling is relaxed to a **soft
   ≤ 350 KB gz target on the eager (entry) chunk**, with **load performance as the
@@ -914,6 +988,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - **Follow-up:** add `bundlewatch` (or equivalent) to CI in Phase 2 polish pass; track in `docs/deploy-checklist.md` (pending)
 
 ### D74 — Agent-authored lesson copy for Lessons 2-4 (scoped exception to §12.6)
+
 - **Status:** resolved (2026-06-23, addresses I029)
 - **Chose:** For the Lessons 2-4 build, the agent authored all learner-facing strings (prompts, `feedbackCorrect`, `feedbackDefault`, per-wrong hints, and `explanation`) directly, in Lesson 1's voice and under `docs/ui-directive.md`, rather than leaving `FEEDBACK_TODO()` placeholders. This is a **one-time, owner-approved exception** to architecture §12.6 ("do not invent feedback copy"), granted because the owner asked for finished lessons. `explanation` is populated on every variant, so these lessons do not carry the I001 gap.
 - **Considered:**
@@ -931,8 +1006,9 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 > Captured during the AC walkthrough that produces `docs/prd.md`. Each entry locks in how PRD-level AC bullets are written so future feature ACs follow the same pattern.
 
 ### D49 — AC grain: validation rules
+
 - **Status:** resolved
-- **Chose:** One PRD-level AC bullet per *category* of validation ("client-side validation rejects invalid inputs and shows a specific message per failure mode"). The spec's test plan enumerates per-rule cases.
+- **Chose:** One PRD-level AC bullet per _category_ of validation ("client-side validation rejects invalid inputs and shows a specific message per failure mode"). The spec's test plan enumerates per-rule cases.
 - **Considered:** One bullet per validation rule (~5 bullets in Auth alone), one umbrella bullet with no enumeration at all
 - **Gaps / risks:**
   - A PRD reader who wants to know exactly which rules fire (email format vs username regex vs password length) has to open `spec-auth.md`
@@ -940,15 +1016,17 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Trade win: PRD stays scannable; reviewers can read the contract in one screen
 
 ### D50 — AC copy enshrinement
+
 - **Status:** resolved
-- **Chose:** PRD ACs describe error messages by *intent* ("a single generic message — never reveals whether the identifier exists"), not exact strings. The spec owns the wording.
+- **Chose:** PRD ACs describe error messages by _intent_ ("a single generic message — never reveals whether the identifier exists"), not exact strings. The spec owns the wording.
 - **Considered:** Enshrining exact strings in the PRD (e.g. "Email/username or password is incorrect."), which would make the PRD the canonical copy source
 - **Gaps / risks:**
   - Copywriting changes don't force a PRD update — good for velocity, but means a casual PRD reader doesn't see the actual user-visible string
   - Two sources of truth (PRD + spec) for the same constraint; reviewer must trust the spec for the final string
-  - For UX-critical phrases (security messages especially), small copy changes can change *meaning*; spec owners must be careful
+  - For UX-critical phrases (security messages especially), small copy changes can change _meaning_; spec owners must be careful
 
 ### D51 — Double-submit protection as PRD-level AC
+
 - **Status:** resolved
 - **Chose:** Include a dedicated AC bullet for "form is disabled during in-flight request" on Auth, and presumably any later forms (Profile edit, etc.). It's a real failure mode worth contracting on at PRD level.
 - **Considered:** Leave it implicit; assume any framework's loading state will give it to us for free; only call it out in the spec
@@ -958,6 +1036,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - If we ship many forms, this pattern should appear in `docs/ui-stack.md` as a UI convention so individual specs don't re-derive it
 
 ### D52 — Cross-device sync latency contract
+
 - **Status:** resolved
 - **Chose:** AC for cross-device sync says "within one refresh" without committing to a specific latency number (e.g. "<2s via Firestore listeners")
 - **Considered:** Hard latency promise ("Firestore listeners propagate within 2s"), lazy-only ("changes show on next reload, no real-time")
@@ -967,8 +1046,9 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - The spec's test plan can be more concrete (emulator + manual cross-device verification)
 
 ### D53 — Replay variant freshness wording
+
 - **Status:** resolved
-- **Chose:** AC #3 (Progress) says "produces a *different mix* of variants when slots have ≥2 variants" without an explicit probability number
+- **Chose:** AC #3 (Progress) says "produces a _different mix_ of variants when slots have ≥2 variants" without an explicit probability number
 - **Considered:** Spell out the probability ("~94% chance at least one slot differs in MVP Lesson 1"); require strictly-guaranteed-different (would need a different selection algorithm that tracks history)
 - **Gaps / risks:**
   - A learner who happens to draw the same variants on replay might feel cheated — possible in MVP since only 2 variants per problem slot
@@ -976,11 +1056,12 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Once Lesson 2+ ships with 3+ variants per slot, the probability of an identical-mix replay drops to near-zero — the AC will naturally tighten in practice without re-wording
 
 ### D54 — Server-side abuse cap (rule + naming)
+
 - **Status:** resolved
 - **Chose:** A server-side Firestore security rule rejects any `stepAttempt` create whose `attemptNumber` exceeds **10** on a single slot in one sitting. The rule is named **"abuse cap"** in PRD AC §9.2 #6 and in `spec-progress-persistence.md`. The cap is silent — the UI never surfaces it for legitimate use.
 - **Considered:**
   - **No cap** — trust the client to retry sensibly. Rejected: a runaway client (or hostile script) could write thousands of attempts before billing notices.
-  - **Higher cap of 25** — less likely to false-positive on a genuinely struggling learner. Rejected for MVP: under D55 the learner *must* eventually answer correctly, so the realistic distribution of attempts/slot is heavily skewed toward ≤5; 10 leaves wide headroom while keeping the cap meaningful.
+  - **Higher cap of 25** — less likely to false-positive on a genuinely struggling learner. Rejected for MVP: under D55 the learner _must_ eventually answer correctly, so the realistic distribution of attempts/slot is heavily skewed toward ≤5; 10 leaves wide headroom while keeping the cap meaningful.
   - **Soft client-only throttle** — visible to the user, defeats the protection against a buggy/hostile client.
   - **Alternative naming: "stuck-client cap"** — friendlier framing but less honest about the threat model.
   - **No label at all** — rule exists, isn't named. Rejected: makes cross-doc references awkward ("the >10 thing").
@@ -991,8 +1072,9 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Cap is per-create-call, not per-window — a determined client could close and reopen the lesson to reset; acceptable for MVP since `attemptId` regeneration on resume is mostly continuous within a single session.
 
 ### D57 — Numeric magnitudes in PRD AC
+
 - **Status:** resolved
-- **Chose:** PRD-level AC bullets describe the *shape* of numeric mechanics, not their *magnitudes*. Specific values (XP values `10 / 5 / 2 / +50`, milestone thresholds `{3,7,14,30,60,100}`, attempt cap `10`, etc.) live in the spec and `docs/alternatives.md` decision entries.
+- **Chose:** PRD-level AC bullets describe the _shape_ of numeric mechanics, not their _magnitudes_. Specific values (XP values `10 / 5 / 2 / +50`, milestone thresholds `{3,7,14,30,60,100}`, attempt cap `10`, etc.) live in the spec and `docs/alternatives.md` decision entries.
 - **Considered:** Enshrine the magnitudes in PRD ACs (more concrete contract, easier to verify, but tightens the PRD to every tuning pass); omit numeric AC bullets entirely (loses the shape-level contract)
 - **Gaps / risks:**
   - A PRD reader wanting to know "how much XP for first-try?" must follow the link to spec/D31 — one extra hop
@@ -1000,15 +1082,17 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - When we tune values in Phase 2, only the spec + alternatives entry need updating — no PRD churn
 
 ### D58 — Visual tokens in PRD AC
+
 - **Status:** resolved
-- **Chose:** PRD AC bullets describe state *intent* ("visually distinguished when active vs zero") rather than specific tokens ("amber when active, gray when zero"). `docs/ui-stack.md` owns the actual color/typography tokens.
-- **Considered:** Enshrine the color names in PRD AC (more concrete but couples PRD to design churn); make no claim about the visual distinction at all (loses the contract that there *is* a distinction)
+- **Chose:** PRD AC bullets describe state _intent_ ("visually distinguished when active vs zero") rather than specific tokens ("amber when active, gray when zero"). `docs/ui-stack.md` owns the actual color/typography tokens.
+- **Considered:** Enshrine the color names in PRD AC (more concrete but couples PRD to design churn); make no claim about the visual distinction at all (loses the contract that there _is_ a distinction)
 - **Gaps / risks:**
   - A reviewer reading the PRD doesn't see what the active state looks like without opening `ui-stack.md`
   - "Visually distinguished" is satisfiable by many treatments (color, weight, icon) — gives implementers freedom but loses precision
   - Color tokens are already named in PRD §4 (UI Direction) as a high-level palette commitment; the duplication-avoidance argument applies
 
 ### D59 — Daily goal rollover semantics in AC
+
 - **Status:** resolved
 - **Chose:** AC #9 (Habit Loop) explicitly says the daily-goal pill rolls over at **local midnight in the learner's detected timezone (per D22)** — not "nightly" or "every 24 hours."
 - **Considered:** "Resets nightly" (vague — could mean a server-side cron at UTC midnight), "every 24 hours after last completion" (sliding window, would feel buggy), UTC-only (would break for non-UTC learners)
@@ -1018,26 +1102,29 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - "Detected timezone" puts trust in `Intl.DateTimeFormat().resolvedOptions().timeZone`; broken on devices with misconfigured system clocks (rare)
 
 ### D60 — Replay UX granularity in PRD AC
+
 - **Status:** resolved
 - **Chose:** AC #8 (Course Path) says "a Replay affordance" — the existence of the path is the contract; the UX mechanism (button vs dialog vs slide-up sheet) is owned by `spec-course-path`.
 - **Considered:** Require an explicit confirmation dialog in the AC ("Replay opens a confirm dialog"); skip the Replay AC entirely (let the spec own it); require a one-tap replay with no confirmation
 - **Gaps / risks:**
   - A spec author could implement a one-tap replay (no confirmation) and satisfy the AC, even though the spec's edge-case section currently calls for a confirmation dialog — minor drift risk
   - If user testing reveals confirmation friction, the spec can change without a PRD update
-  - PRD doesn't lock in *when* replay variant reshuffling happens — that's covered by Progress AC #3
+  - PRD doesn't lock in _when_ replay variant reshuffling happens — that's covered by Progress AC #3
 
 ### D61 — Validation magnitudes vs tuning magnitudes in PRD AC
+
 - **Status:** resolved
 - **Chose:** **Two postures toward numbers in PRD AC bullets, by kind:**
   - **Validation magnitudes** (user-facing constraints that appear in error messages or limit user input): enshrined as concrete numbers in the AC. Examples: username 3–20 chars, password ≥6 chars, bio ≤150 chars, avatar ≤2 MB, abuse cap = 10 attempts/slot.
   - **Tuning magnitudes** (mechanic values the learner doesn't see numerically): shape-level in PRD, magnitudes in spec. Examples: XP curve (`10/5/2/+50`), milestone thresholds (`{3,7,14,30,60,100}`), performance budgets (`<100ms`, `<2s`, `60 FPS`).
 - **Considered:** All magnitudes in spec only (extends D57 universally — PRD reader has to dig for every number); all magnitudes in PRD AC (concrete contract but tightens PRD to every tuning pass).
 - **Gaps / risks:**
-  - The boundary is fuzzy in edge cases — is the abuse cap of 10 a *validation* (security/quota boundary, user could hit it) or a *tuning* (defense against runaway clients)? We currently treat it as validation because it's a hard server-side rejection.
+  - The boundary is fuzzy in edge cases — is the abuse cap of 10 a _validation_ (security/quota boundary, user could hit it) or a _tuning_ (defense against runaway clients)? We currently treat it as validation because it's a hard server-side rejection.
   - Performance budgets (`<100ms`, `<2s`) are arguably user-facing ("feedback should feel instant") but expressed as numbers a learner never sees; D57 treats them as tuning. Slight inconsistency with the "user sees the number" heuristic.
   - Future AC reviewers must apply this rule consistently; ambiguity will resurface. Default rule of thumb: **if the user sees the number in a UI string or in their own actions hitting the limit, it's validation → PRD AC concrete.**
 
 ### D62 — "One-refresh contract" consolidation
+
 - **Status:** resolved (PRD assembly pass, 2026-06-23)
 - **Chose:** **Keep per-feature** with cross-references. Three ACs restate the one-refresh contract independently: Progress AC #2 (cross-device sync), Course Path AC #10 (Home updates after completion), Profile AC #10 (stats update after completion). The latter two explicitly cite "same one-refresh contract as Progress AC #2" so the canonical source is Progress AC #2.
 - **Considered:** Promote to a single cross-cutting AC under §9.8 Performance; create a new "Data Freshness" bucket (would be 1-AC-thick — over-cutting); never consolidate (accept the duplication without cross-refs).
@@ -1051,6 +1138,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 ## L. Platform & Responsive
 
 ### D63 — Desktop strategy: truly responsive (Pattern B)
+
 - **Status:** resolved
 - **Chose:** **Pattern B — truly responsive design with per-breakpoint layouts.** Every screen reflows for mobile (≤640px), tablet (`md:` 768px+), and desktop (`lg:` 1024px+). Tailwind responsive prefixes throughout. Bottom nav on mobile transitions to sidebar on `md:`. Home lesson list goes 1-col → 2-col → 3-col grid. Profile stats grid 2-col → 3-col. Lesson player capped at `max-w-2xl` and centered on wide viewports. Interaction touch targets scale up (44px → 56px → 64px). Both mobile and desktop are first-class.
 - **Considered:**
@@ -1066,6 +1154,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 - **See also:** D65 (verification scope), D66 (orientation policy that falls out of Pattern B)
 
 ### D65 — Pattern B verification scope
+
 - **Status:** resolved
 - **Chose:** **Qualitative layout-shift verification on resize**; **320px minimum supported viewport width**; **measurement via Lighthouse + Chrome DevTools (no custom CLS-on-resize tooling)**.
 - **Considered:**
@@ -1078,6 +1167,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Resize regressions can ship between Lighthouse audits — depend on dev discipline to verify resize manually
 
 ### D66 — Orientation: graceful degradation, no force-lock
+
 - **Status:** resolved
 - **Chose:** **No orientation lock.** Phone landscape automatically activates the `md:` (tablet) layout since the viewport now meets that breakpoint. No third "landscape phone" layout is designed; no JavaScript or `<meta>` is used to force portrait.
 - **Considered:**
@@ -1089,6 +1179,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Could add a more refined landscape adjustment later if user testing flags it
 
 ### D71 — Tablet+ navigation uses the shadcn `Sidebar` block
+
 - **Status:** resolved (2026-06-23, addresses I016)
 - **Chose:** At `md:` and above, navigation chrome is the **shadcn `Sidebar` block** (installed via `npx shadcn add sidebar`). Collapsible, mobile-aware out of the box. Bottom nav is preserved at mobile widths; the sidebar replaces it at `md:` per D63. Hidden entirely on `/lesson/:id` and `/celebration/:id` at every breakpoint (lesson/celebration are immersive).
 - **Considered:**
@@ -1098,6 +1189,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Only two nav items in MVP (Home, Profile), so the sidebar will feel sparse on desktop. Acceptable; do not pad it with link sections that don't exist.
 
 ### D72 — Firebase Storage deferred (Spark plan; avatar upload out of MVP scope for now)
+
 - **Status:** resolved (2026-06-23, addresses I026)
 - **Chose:** **Do not enable Cloud Storage on the Firebase project for MVP.** Cloud Storage requires the Blaze (pay-as-you-go) plan; the project stays on Spark. Avatar upload is **out of scope until Storage is enabled.** Profile shows `DefaultAvatar` (colored circle + initial) for all users. Bio edit, stats, milestones, and log out ship normally. `avatarUrl` on `/users/{uid}` stays `null`.
 - **Considered:**
@@ -1126,5 +1218,6 @@ This document is updated whenever:
 4. **We hit a Phase boundary** (Phase 2 Friday, Phase 3 Sunday) — sweep the doc, mark which gaps are now resolved, retired, or escalated.
 
 Cross-link conventions:
+
 - Use `**See also:** D## (one-line label)` at the bottom of an entry to point forward/sideways to related entries.
 - When entry A supersedes entry B, strike through the superseded text in B with an `**Updated YYYY-MM-DD (superseded by D##):**` note, and have A name B in its own status line.

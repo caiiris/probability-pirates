@@ -78,9 +78,7 @@ export function AppHeader() {
           <div className="min-w-0 flex-1">
             {/* Labels (rank + remaining) only where there's room. */}
             <div className="mb-1 hidden items-baseline justify-between gap-2 sm:flex">
-              <span className="truncate text-xs font-semibold leading-none">
-                {level.rank.name}
-              </span>
+              <span className="truncate text-xs font-semibold leading-none">{level.rank.name}</span>
               <span className="num shrink-0 text-[10px] font-medium leading-none text-muted-foreground">
                 {level.xpToNext} XP to Lv {level.level + 1}
               </span>

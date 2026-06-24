@@ -1,8 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import {
-  fetchAndActivate,
-  getString,
-} from 'firebase/remote-config';
+import { fetchAndActivate, getString } from 'firebase/remote-config';
 import { getRemoteConfigSafe } from '@/lib/firebase';
 import {
   REMOTE_CONFIG_DEFAULTS,
@@ -18,9 +15,7 @@ type RemoteFlags = {
 };
 
 const DEFAULT_FLAGS: RemoteFlags = {
-  availableLessonIds: new Set(
-    parseAvailableLessonIds(REMOTE_CONFIG_DEFAULTS.available_lesson_ids),
-  ),
+  availableLessonIds: new Set(parseAvailableLessonIds(REMOTE_CONFIG_DEFAULTS.available_lesson_ids)),
   ready: false,
 };
 
@@ -62,11 +57,7 @@ export function RemoteFlagsProvider({ children }: { children: React.ReactNode })
     };
   }, []);
 
-  return (
-    <RemoteFlagsContext.Provider value={flags}>
-      {children}
-    </RemoteFlagsContext.Provider>
-  );
+  return <RemoteFlagsContext.Provider value={flags}>{children}</RemoteFlagsContext.Provider>;
 }
 
 export function useRemoteFlags(): RemoteFlags {
@@ -77,8 +68,5 @@ export function useRemoteFlags(): RemoteFlags {
  *  (or via the bundled defaults during cold start). */
 export function useIsLessonAvailable(lessonId: string): boolean {
   const { availableLessonIds } = useRemoteFlags();
-  return useMemo(
-    () => availableLessonIds.has(lessonId),
-    [availableLessonIds, lessonId],
-  );
+  return useMemo(() => availableLessonIds.has(lessonId), [availableLessonIds, lessonId]);
 }

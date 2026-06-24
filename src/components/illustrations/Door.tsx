@@ -33,18 +33,62 @@ export function Door({
       aria-label={ariaLabel}
     >
       {/* Frame */}
-      <rect x="2" y="2" width="56" height="92" rx="4" fill="#d8d0ca" stroke="#b8b0a4" strokeWidth="2" />
+      <rect
+        x="2"
+        y="2"
+        width="56"
+        height="92"
+        rx="4"
+        fill="#d8d0ca"
+        stroke="#b8b0a4"
+        strokeWidth="2"
+      />
 
       {state === 'closed' ? (
         <>
           {/* Door panel */}
-          <rect x="7" y="7" width="46" height="82" rx="3" fill="#faf8f5" stroke="#c8c0b8" strokeWidth="1.5" />
-          <rect x="13" y="14" width="34" height="30" rx="2" fill="none" stroke="#cfc7bf" strokeWidth="1.5" />
-          <rect x="13" y="50" width="34" height="32" rx="2" fill="none" stroke="#cfc7bf" strokeWidth="1.5" />
+          <rect
+            x="7"
+            y="7"
+            width="46"
+            height="82"
+            rx="3"
+            fill="#faf8f5"
+            stroke="#c8c0b8"
+            strokeWidth="1.5"
+          />
+          <rect
+            x="13"
+            y="14"
+            width="34"
+            height="30"
+            rx="2"
+            fill="none"
+            stroke="#cfc7bf"
+            strokeWidth="1.5"
+          />
+          <rect
+            x="13"
+            y="50"
+            width="34"
+            height="32"
+            rx="2"
+            fill="none"
+            stroke="#cfc7bf"
+            strokeWidth="1.5"
+          />
           {/* Handle */}
           <circle cx="44" cy="48" r="2.4" fill="#9a9088" />
           {label && (
-            <text x="30" y="11.5" textAnchor="middle" fontSize="8" fontWeight="700" fill="#6b6258" fontFamily="system-ui, sans-serif">
+            <text
+              x="30"
+              y="11.5"
+              textAnchor="middle"
+              fontSize="8"
+              fontWeight="700"
+              fill="#6b6258"
+              fontFamily="system-ui, sans-serif"
+            >
               {label}
             </text>
           )}
@@ -77,7 +121,13 @@ function Car() {
 function Goat() {
   // Minimal goat: body, head, horn, legs.
   return (
-    <g transform="translate(13 40)" stroke="#e7e2da" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <g
+      transform="translate(13 40)"
+      stroke="#e7e2da"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <ellipse cx="16" cy="14" rx="13" ry="8" fill="#cfc7bf" />
       <path d="M27 9 L34 4 L33 13 Z" fill="#cfc7bf" />
       <path d="M33 6 Q37 2 36 -2" fill="none" />

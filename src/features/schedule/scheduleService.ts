@@ -20,7 +20,7 @@ import { eventTypeOf, type EventType } from './eventTypes';
 export type StudyEvent = {
   id: string;
   title: string;
-  date: string;        // YYYY-MM-DD
+  date: string; // YYYY-MM-DD
   /** Closed enum, see ./eventTypes. Legacy events without this field are
    *  normalized to 'study' at read time via eventTypeOf(). */
   eventType: EventType;
@@ -95,7 +95,7 @@ export function subscribeToMonthEvents(
   const [y, m] = yearMonth.split('-').map(Number);
   // Cover from last week of previous month to first week of next month
   const start = new Date(y, m - 2, 22); // a bit before the month start
-  const end = new Date(y, m, 8);        // a bit after the month end
+  const end = new Date(y, m, 8); // a bit after the month end
 
   const startStr = toDateString(start);
   const endStr = toDateString(end);

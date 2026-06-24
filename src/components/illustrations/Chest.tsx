@@ -50,7 +50,16 @@ export function Chest({ open = false, className }: Props) {
       <rect x="43" y="37" width="4" height="17" fill={GOLD_DEEP} opacity="0.6" />
 
       {/* lock */}
-      <rect x="27.5" y="35.5" width="9" height="10" rx="2" fill={GOLD_LIGHT} stroke={GOLD_DEEP} strokeWidth="1.2" />
+      <rect
+        x="27.5"
+        y="35.5"
+        width="9"
+        height="10"
+        rx="2"
+        fill={GOLD_LIGHT}
+        stroke={GOLD_DEEP}
+        strokeWidth="1.2"
+      />
       <circle cx="32" cy="39.5" r="1.4" fill={GOLD_DEEP} />
       <rect x="31.2" y="40" width="1.6" height="3.6" rx="0.8" fill={GOLD_DEEP} />
 
@@ -62,10 +71,7 @@ export function Chest({ open = false, className }: Props) {
           transition: 'transform .4s cubic-bezier(.34,1.56,.64,1)',
         }}
       >
-        <path
-          d="M12 31 v-5 a20 13 0 0 1 40 0 v5 z"
-          fill={GOLD}
-        />
+        <path d="M12 31 v-5 a20 13 0 0 1 40 0 v5 z" fill={GOLD} />
         <path
           d="M12 31 v-5 a20 13 0 0 1 40 0 v5"
           fill="none"

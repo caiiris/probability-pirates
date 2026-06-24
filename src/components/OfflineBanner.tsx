@@ -5,8 +5,12 @@ export function OfflineBanner() {
   const [offline, setOffline] = useState(() => !navigator.onLine);
 
   useEffect(() => {
-    function handleOffline() { setOffline(true); }
-    function handleOnline() { setOffline(false); }
+    function handleOffline() {
+      setOffline(true);
+    }
+    function handleOnline() {
+      setOffline(false);
+    }
     window.addEventListener('offline', handleOffline);
     window.addEventListener('online', handleOnline);
     return () => {

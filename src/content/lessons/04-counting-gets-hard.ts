@@ -56,7 +56,8 @@ export const lesson4: Lesson = {
           ],
           correctOptionId: '10',
           feedbackCorrect: 'Yes. Ten pairs from five players.',
-          feedbackDefault: 'Each player pairs with four others, but each pair gets counted twice that way.',
+          feedbackDefault:
+            'Each player pairs with four others, but each pair gets counted twice that way.',
           feedbackByOption: {
             '5': 'Each player pairs with four others, so there are more than five pairs.',
             '20': 'That counts each pair twice, as AB and BA. Halve it.',
@@ -81,7 +82,8 @@ export const lesson4: Lesson = {
         {
           id: 'five-card-hand',
           interactionKind: 'multiple-choice',
-          prompt: 'Why do we switch from listing outcomes to a counting formula for a five-card hand?',
+          prompt:
+            'Why do we switch from listing outcomes to a counting formula for a five-card hand?',
           options: [
             { id: 'millions', label: 'There are millions of hands, far too many to list' },
             { id: 'order', label: 'Because the cards have no order' },
@@ -91,8 +93,10 @@ export const lesson4: Lesson = {
           feedbackCorrect: 'Right. With millions of hands, you need a formula, not a list.',
           feedbackDefault: 'The issue is how many outcomes there are.',
           feedbackByOption: {
-            order: 'Order changes whether you multiply or divide, but the real problem is the sheer count.',
-            random: 'Shuffling sets the probabilities, but the count of hands is what makes listing impossible.',
+            order:
+              'Order changes whether you multiply or divide, but the real problem is the sheer count.',
+            random:
+              'Shuffling sets the probabilities, but the count of hands is what makes listing impossible.',
           },
           explanation:
             'Counting by listing collapses when the number of outcomes is enormous. Combinatorics gives the count without writing every case out.',
@@ -107,11 +111,13 @@ export const lesson4: Lesson = {
             { id: 'random', label: 'Because the draw is random' },
           ],
           correctOptionId: 'millions',
-          feedbackCorrect: 'Yes. The count is astronomical, so you compute it instead of listing it.',
+          feedbackCorrect:
+            'Yes. The count is astronomical, so you compute it instead of listing it.',
           feedbackDefault: 'The problem is the number of tickets.',
           feedbackByOption: {
             order: 'Whether numbers repeat changes the formula, but the count is the real wall.',
-            random: 'Randomness sets the odds, but it is the count of tickets that defeats listing.',
+            random:
+              'Randomness sets the odds, but it is the count of tickets that defeats listing.',
           },
           explanation:
             'When outcomes number in the millions, enumeration is impossible. A combinatorial formula gives the count directly.',
@@ -152,8 +158,7 @@ export const lesson4: Lesson = {
         {
           id: 'room-30',
           interactionKind: 'simulate-proportion',
-          prompt:
-            'Now use rooms of 30 people. Watch the share of rooms with a shared birthday.',
+          prompt: 'Now use rooms of 30 people. Watch the share of rooms with a shared birthday.',
           scenario: 'birthday',
           roomSize: 30,
           targetProbability: 0.706,
@@ -212,11 +217,13 @@ export const lesson4: Lesson = {
             { id: '366', label: '366' },
           ],
           correctOptionId: '23',
-          feedbackCorrect: 'Yes. Just 23. The pairs, not the people, drive it: 23 people make 253 pairs.',
+          feedbackCorrect:
+            'Yes. Just 23. The pairs, not the people, drive it: 23 people make 253 pairs.',
           feedbackDefault: 'It is much smaller than half of 365.',
           feedbackByOption: {
             '57': 'Fifty-seven gives about 99%. You cross 50% earlier than that.',
-            '183': 'That is about half of 365, the common wrong guess. The real answer is far smaller.',
+            '183':
+              'That is about half of 365, the common wrong guess. The real answer is far smaller.',
             '366': 'That many guarantees a match, but you cross 50% long before then.',
           },
           explanation:
@@ -250,8 +257,7 @@ export const lesson4: Lesson = {
       id: 'wrap',
       kind: 'wrap',
       title: 'Counting hit a wall',
-      body:
-        'Small sample spaces you can draw. Large ones you cannot, so you count with formulas or estimate by simulation. The birthday problem cracked open once you counted pairs instead of people and counted the complement. Next, the most famous puzzle in probability, where one new fact flips the odds: Monty Hall.',
+      body: 'Small sample spaces you can draw. Large ones you cannot, so you count with formulas or estimate by simulation. The birthday problem cracked open once you counted pairs instead of people and counted the complement. Next, the most famous puzzle in probability, where one new fact flips the odds: Monty Hall.',
       segueToLessonId: 'conditional-probability',
     },
   ],

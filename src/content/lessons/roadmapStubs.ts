@@ -47,11 +47,33 @@ function stub(
 // likelihood and probability-by-counting on a 0..1 scale, so they were
 // redundant. `review-likelihood` was merged into `review-sample-spaces`.
 const unit1: Lesson[] = [
-  stub(1, 'long-run-frequency', 'The long-run idea', "Probability as the share you'd see if you repeated forever."),
+  stub(
+    1,
+    'long-run-frequency',
+    'The long-run idea',
+    "Probability as the share you'd see if you repeated forever.",
+  ),
   stub(2, 'sample-space', 'The sample space', 'List every outcome of a single experiment.'),
-  stub(3, 'equally-likely-outcomes', 'Equally likely outcomes', 'When every outcome has the same chance, counting is everything.'),
-  stub(4, 'practice-single-events', 'Practice: single events', 'Sharpen the favorable-over-total move.', 3),
-  stub(5, 'review-sample-spaces', 'Defining probability review', 'Mixed practice on listing and counting outcomes.', 5),
+  stub(
+    3,
+    'equally-likely-outcomes',
+    'Equally likely outcomes',
+    'When every outcome has the same chance, counting is everything.',
+  ),
+  stub(
+    4,
+    'practice-single-events',
+    'Practice: single events',
+    'Sharpen the favorable-over-total move.',
+    3,
+  ),
+  stub(
+    5,
+    'review-sample-spaces',
+    'Defining probability review',
+    'Mixed practice on listing and counting outcomes.',
+    5,
+  ),
 ];
 
 // Unit 2 — Compound experiments (counting outcomes).
@@ -60,51 +82,164 @@ const unit1: Lesson[] = [
 const unit2: Lesson[] = [
   stub(6, 'two-coins', 'Two coins', 'Combine two experiments and watch the outcomes multiply.'),
   stub(7, 'two-dice', 'Two dice', 'The 6×6 grid and the sums it hides.'),
-  stub(8, 'tree-diagrams', 'Tree diagrams', 'Draw branching choices to count them without missing any.'),
-  stub(9, 'multiplication-principle', 'The multiplication principle', 'Why independent choices multiply.'),
-  stub(10, 'practice-counting-outcomes', 'Practice: counting outcomes', 'Count compound outcomes with confidence.', 3),
-  stub(11, 'review-compound', 'Compound experiments review', 'Mixed practice on combining experiments.', 5),
+  stub(
+    8,
+    'tree-diagrams',
+    'Tree diagrams',
+    'Draw branching choices to count them without missing any.',
+  ),
+  stub(
+    9,
+    'multiplication-principle',
+    'The multiplication principle',
+    'Why independent choices multiply.',
+  ),
+  stub(
+    10,
+    'practice-counting-outcomes',
+    'Practice: counting outcomes',
+    'Count compound outcomes with confidence.',
+    3,
+  ),
+  stub(
+    11,
+    'review-compound',
+    'Compound experiments review',
+    'Mixed practice on combining experiments.',
+    5,
+  ),
 ];
 
 // Unit 3 — Events
 const unit3: Lesson[] = [
-  stub(12, 'event-as-set', 'An event is a set', 'Events are subsets of the sample space, not single outcomes.'),
-  stub(13, 'p-event-by-counting', 'P(event) by counting', 'Apply favorable-over-total to whole events.'),
-  stub(14, 'complement-rule', 'The complement rule', 'When counting the opposite is the faster path.'),
+  stub(
+    12,
+    'event-as-set',
+    'An event is a set',
+    'Events are subsets of the sample space, not single outcomes.',
+  ),
+  stub(
+    13,
+    'p-event-by-counting',
+    'P(event) by counting',
+    'Apply favorable-over-total to whole events.',
+  ),
+  stub(
+    14,
+    'complement-rule',
+    'The complement rule',
+    'When counting the opposite is the faster path.',
+  ),
   stub(15, 'practice-events', 'Practice: events', 'Events on dice and cards.', 3),
   stub(16, 'review-events', 'Events review', 'Mixed practice on events and complements.', 5),
 ];
 
 // Unit 4 — Counting techniques
 const unit4: Lesson[] = [
-  stub(17, 'addition-principle', 'The addition principle', "Add the ways when choices don't overlap."),
-  stub(18, 'inclusion-exclusion', 'Inclusion and exclusion', 'Fix double-counting when choices overlap.'),
+  stub(
+    17,
+    'addition-principle',
+    'The addition principle',
+    "Add the ways when choices don't overlap.",
+  ),
+  stub(
+    18,
+    'inclusion-exclusion',
+    'Inclusion and exclusion',
+    'Fix double-counting when choices overlap.',
+  ),
   stub(19, 'permutations', 'Permutations', 'Count arrangements where order matters.'),
   stub(20, 'combinations', 'Combinations', "Count selections where order doesn't matter."),
-  stub(21, 'divide-by-k-factorial', 'Why divide by k!', 'The derivation behind the combinations formula.'),
-  stub(22, 'practice-counting-techniques', 'Practice: counting techniques', 'Permutations and combinations word problems.', 3),
-  stub(23, 'review-counting-techniques', 'Counting techniques review', 'Mixed practice on advanced counting.', 5),
+  stub(
+    21,
+    'divide-by-k-factorial',
+    'Why divide by k!',
+    'The derivation behind the combinations formula.',
+  ),
+  stub(
+    22,
+    'practice-counting-techniques',
+    'Practice: counting techniques',
+    'Permutations and combinations word problems.',
+    3,
+  ),
+  stub(
+    23,
+    'review-counting-techniques',
+    'Counting techniques review',
+    'Mixed practice on advanced counting.',
+    5,
+  ),
 ];
 
 // Unit 5 — Probabilities of multiple events
 const unit5: Lesson[] = [
-  stub(24, 'independent-events', 'Independent events', "Multiply probabilities when events don't affect each other."),
-  stub(25, 'mutually-exclusive', 'Mutually exclusive events', "Add probabilities when events can't both happen."),
+  stub(
+    24,
+    'independent-events',
+    'Independent events',
+    "Multiply probabilities when events don't affect each other.",
+  ),
+  stub(
+    25,
+    'mutually-exclusive',
+    'Mutually exclusive events',
+    "Add probabilities when events can't both happen.",
+  ),
   stub(26, 'at-least-one', 'At least one', "Use the complement to handle 'at least one' cleanly."),
-  stub(27, 'birthday-paradox', 'The birthday paradox', 'A surprising collision that counting explains.'),
-  stub(28, 'practice-multi-event', 'Practice: multiple events', 'Multi-step compound probability.', 3),
-  stub(29, 'review-combining', 'Combining probabilities review', 'Mixed practice on multi-event probability.', 5),
+  stub(
+    27,
+    'birthday-paradox',
+    'The birthday paradox',
+    'A surprising collision that counting explains.',
+  ),
+  stub(
+    28,
+    'practice-multi-event',
+    'Practice: multiple events',
+    'Multi-step compound probability.',
+    3,
+  ),
+  stub(
+    29,
+    'review-combining',
+    'Combining probabilities review',
+    'Mixed practice on multi-event probability.',
+    5,
+  ),
 ];
 
 // Unit 6 — Conditional probability
 const unit6: Lesson[] = [
-  stub(30, 'conditional-intuition', 'Given that X happened', 'How new information reshapes the sample space.'),
+  stub(
+    30,
+    'conditional-intuition',
+    'Given that X happened',
+    'How new information reshapes the sample space.',
+  ),
   stub(31, 'conditional-formula', 'The conditional formula', 'P(A given B), made precise.'),
-  stub(32, 'independence-revisited', 'Independence revisited', 'When conditioning changes nothing.'),
+  stub(
+    32,
+    'independence-revisited',
+    'Independence revisited',
+    'When conditioning changes nothing.',
+  ),
   stub(33, 'bayes-theorem', "Bayes' theorem", 'Flip a conditional probability around.'),
   stub(34, 'monty-hall', 'Monty Hall', 'The switch-or-stay puzzle, settled by simulation.'),
-  stub(35, 'practice-conditional', 'Practice: conditional probability', 'Trees and Bayes problems.', 3),
-  stub(36, 'review-conditional', 'Conditional probability review', 'Mixed practice on conditioning.', 5),
+  stub(
+    35,
+    'practice-conditional',
+    'Practice: conditional probability',
+    'Trees and Bayes problems.',
+    3,
+  ),
+  stub(
+    36,
+    'review-conditional',
+    'Conditional probability review',
+    'Mixed practice on conditioning.',
+    5,
+  ),
 ];
 
 // Unit 7 — Expected Value (the probability capstone). D90 narrowed this from
@@ -116,11 +251,33 @@ const unit6: Lesson[] = [
 // and real-world gambles/insurance — the natural payoff of "given a
 // probability, what payoff do you expect?"
 const unit7: Lesson[] = [
-  stub(37, 'expected-value-intuition', 'Expected value', 'The long-run average payoff of a chance event.'),
-  stub(38, 'computing-expected-value', 'Computing E(X)', 'Weighted sums on dice, spinners, and cards.'),
+  stub(
+    37,
+    'expected-value-intuition',
+    'Expected value',
+    'The long-run average payoff of a chance event.',
+  ),
+  stub(
+    38,
+    'computing-expected-value',
+    'Computing E(X)',
+    'Weighted sums on dice, spinners, and cards.',
+  ),
   stub(39, 'fair-games', 'Fair games', 'When is a bet fair? E(X) = 0 says break-even.'),
-  stub(40, 'practice-expected-value', 'Practice: gambles and insurance', 'Lotteries, casinos, and insurance, settled by expected value.', 3),
-  stub(41, 'review-expected-value', 'Expected value review', 'Mixed practice on expected value.', 5),
+  stub(
+    40,
+    'practice-expected-value',
+    'Practice: gambles and insurance',
+    'Lotteries, casinos, and insurance, settled by expected value.',
+    3,
+  ),
+  stub(
+    41,
+    'review-expected-value',
+    'Expected value review',
+    'Mixed practice on expected value.',
+    5,
+  ),
 ];
 
 export const roadmapStubLessons: Lesson[] = [

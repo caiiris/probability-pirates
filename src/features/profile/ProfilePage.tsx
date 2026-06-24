@@ -87,11 +87,7 @@ export function ProfilePage() {
       <Separator />
 
       {/* Log out */}
-      <Button
-        variant="destructive"
-        className="w-full"
-        onClick={() => setLogoutOpen(true)}
-      >
+      <Button variant="destructive" className="w-full" onClick={() => setLogoutOpen(true)}>
         Log out
       </Button>
 
@@ -111,9 +107,7 @@ export function ProfilePage() {
           <DialogHeader>
             <DialogTitle>Log out?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            You can sign back in any time.
-          </p>
+          <p className="text-sm text-muted-foreground">You can sign back in any time.</p>
           <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={() => setLogoutOpen(false)}>
               Cancel

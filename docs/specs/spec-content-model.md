@@ -28,38 +28,51 @@ export type Lesson = {
 export type Slot = ConceptSlot | WrapSlot | ProblemSlot;
 
 export type ConceptSlot = {
-  id: string; kind: 'concept';
-  prompt: string;                     // lede sentence (required)
+  id: string;
+  kind: 'concept';
+  prompt: string; // lede sentence (required)
   illustration: IllustrationRef;
-  title?: string;                     // D75 — short heading / term being introduced
-  body?: string[];                    // D75 — supporting paragraphs (the "teach")
-  example?: {                         // D75 — optional short worked example / derivation
+  title?: string; // D75 — short heading / term being introduced
+  body?: string[]; // D75 — supporting paragraphs (the "teach")
+  example?: {
+    // D75 — optional short worked example / derivation
     title?: string;
-    steps: string[];                  // ordered short lines; `{a/b}` segments render as stacked fractions
+    steps: string[]; // ordered short lines; `{a/b}` segments render as stacked fractions
   };
 };
 
 export type WrapSlot = {
-  id: string; kind: 'wrap';
-  title: string; body: string;
+  id: string;
+  kind: 'wrap';
+  title: string;
+  body: string;
   segueToLessonId?: string;
 };
 
 export type ProblemSlot = {
-  id: string; kind: 'problem';
+  id: string;
+  kind: 'problem';
   interactionKind: InteractionKind;
   variants: [Variant, ...Variant[]];
 };
 
 export type InteractionKind =
-  | 'tap-outcomes' | 'fill-fraction' | 'tap-event'
-  | 'grid-event' | 'multiple-choice'
-  | 'simulate-proportion' | 'monty-hall'; // D73 — simulation kinds for Lessons 2-4
+  | 'tap-outcomes'
+  | 'fill-fraction'
+  | 'tap-event'
+  | 'grid-event'
+  | 'multiple-choice'
+  | 'simulate-proportion'
+  | 'monty-hall'; // D73 — simulation kinds for Lessons 2-4
 
 export type Variant =
-  | TapOutcomesVariant | FillFractionVariant | TapEventVariant
-  | GridEventVariant | MultipleChoiceVariant
-  | SimulateProportionVariant | MontyHallVariant;
+  | TapOutcomesVariant
+  | FillFractionVariant
+  | TapEventVariant
+  | GridEventVariant
+  | MultipleChoiceVariant
+  | SimulateProportionVariant
+  | MontyHallVariant;
 
 type BaseVariant = {
   id: string;
@@ -84,7 +97,8 @@ export type TapOutcomesVariant = BaseVariant & {
 
 export type FillFractionVariant = BaseVariant & {
   interactionKind: 'fill-fraction';
-  numerator: number; denominator: number;
+  numerator: number;
+  denominator: number;
   feedbackByWrongAnswer?: Record<string, string>;
 };
 
@@ -97,7 +111,8 @@ export type TapEventVariant = BaseVariant & {
 
 export type GridEventVariant = BaseVariant & {
   interactionKind: 'grid-event';
-  rows: number; cols: number;
+  rows: number;
+  cols: number;
   correctCells: Array<[number, number]>;
   liveCounterTemplate: string;
   /** Optional per-cell hint keyed by `"row,col"` strings (D69). Falls back to `feedbackDefault`. */
@@ -120,10 +135,10 @@ export type MultipleChoiceVariant = BaseVariant & {
 export type SimulateProportionVariant = BaseVariant & {
   interactionKind: 'simulate-proportion';
   scenario: 'coin' | 'die-six' | 'birthday'; // drives the per-trial visual + generator
-  targetProbability: number;  // 0..1, drawn as the reference line
-  targetLabel: string;        // e.g. "True P(heads) = 50%"
-  minTrials: number;          // engagement gate before Continue unlocks
-  roomSize?: number;          // people per room for the birthday scenario
+  targetProbability: number; // 0..1, drawn as the reference line
+  targetLabel: string; // e.g. "True P(heads) = 50%"
+  minTrials: number; // engagement gate before Continue unlocks
+  roomSize?: number; // people per room for the birthday scenario
   feedbackByWrongValue?: Record<string, string>; // keyed by 'incomplete'
 };
 

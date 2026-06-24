@@ -1,9 +1,5 @@
 import { lessons } from '../src/content/index';
-import {
-  isFeedbackTodo,
-  type ProblemSlot,
-  type Variant,
-} from '../src/content/types';
+import { isFeedbackTodo, type ProblemSlot, type Variant } from '../src/content/types';
 
 type FeedbackField =
   | 'feedbackByWrongValue'
@@ -29,12 +25,7 @@ const FEEDBACK_FIELDS_BY_KIND: Record<
   'monty-hall': [{ field: 'feedbackByWrongValue', requirement: 'optional' }],
 };
 
-const BASE_STRING_FIELDS = [
-  'prompt',
-  'feedbackCorrect',
-  'feedbackDefault',
-  'explanation',
-] as const;
+const BASE_STRING_FIELDS = ['prompt', 'feedbackCorrect', 'feedbackDefault', 'explanation'] as const;
 
 function getVariantFeedbackRecord(
   variant: Variant,
@@ -52,17 +43,11 @@ function getVariantFeedbackRecord(
         ? variant.feedbackByWrongAnswer
         : undefined;
     case 'feedbackByWrongOutcome':
-      return variant.interactionKind === 'tap-event'
-        ? variant.feedbackByWrongOutcome
-        : undefined;
+      return variant.interactionKind === 'tap-event' ? variant.feedbackByWrongOutcome : undefined;
     case 'feedbackByOption':
-      return variant.interactionKind === 'multiple-choice'
-        ? variant.feedbackByOption
-        : undefined;
+      return variant.interactionKind === 'multiple-choice' ? variant.feedbackByOption : undefined;
     case 'feedbackByCell':
-      return variant.interactionKind === 'grid-event'
-        ? variant.feedbackByCell
-        : undefined;
+      return variant.interactionKind === 'grid-event' ? variant.feedbackByCell : undefined;
     default:
       return undefined;
   }
@@ -74,11 +59,7 @@ type Finding = {
   detail: string;
 };
 
-function auditVariant(
-  lessonId: string,
-  slot: ProblemSlot,
-  variant: Variant,
-): Finding[] {
+function auditVariant(lessonId: string, slot: ProblemSlot, variant: Variant): Finding[] {
   const findings: Finding[] = [];
   const path = `${lessonId}/${slot.id}/${variant.id}`;
 
@@ -93,9 +74,7 @@ function auditVariant(
     }
   }
 
-  for (const { field, requirement } of FEEDBACK_FIELDS_BY_KIND[
-    variant.interactionKind
-  ]) {
+  for (const { field, requirement } of FEEDBACK_FIELDS_BY_KIND[variant.interactionKind]) {
     const record = getVariantFeedbackRecord(variant, field);
     const isMissing = !record || Object.keys(record).length === 0;
 
@@ -195,9 +174,7 @@ function main(): void {
   // Currently exits 0 to keep dev unblocked while content is in flux.
   // See docs/issues.md I007 — flip to process.exit(totalBlocking > 0 ? 1 : 0) before launch.
   if (totalBlocking > 0) {
-    console.log(
-      `${totalBlocking} blocking item(s) above. Will fail CI once I007 is closed.`,
-    );
+    console.log(`${totalBlocking} blocking item(s) above. Will fail CI once I007 is closed.`);
   }
   process.exit(0);
 }

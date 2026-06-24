@@ -27,17 +27,9 @@ export function Trophy({ className }: { className?: string }) {
       {/* Stem */}
       <path d="M24 32v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       {/* Base */}
-      <path
-        d="M16 38h16"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
+      <path d="M16 38h16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
       {/* Star accent */}
-      <path
-        d="M24 12l1.5 3h3l-2.5 2 1 3-3-2-3 2 1-3-2.5-2h3z"
-        fill="currentColor"
-      />
+      <path d="M24 12l1.5 3h3l-2.5 2 1 3-3-2-3 2 1-3-2.5-2h3z" fill="currentColor" />
     </svg>
   );
 }

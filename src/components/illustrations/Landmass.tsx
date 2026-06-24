@@ -29,9 +29,22 @@ export function Landmass({ className }: Props) {
       <ellipse cx="120" cy="98" rx="96" ry="16" fill={SAND} />
       {/* grass mound */}
       <path d="M34 98 Q120 36 206 98 Z" fill={GRASS} />
-      <path d="M34 98 Q120 36 206 98" fill="none" stroke={GRASS_DEEP} strokeWidth="2.5" opacity="0.4" />
+      <path
+        d="M34 98 Q120 36 206 98"
+        fill="none"
+        stroke={GRASS_DEEP}
+        strokeWidth="2.5"
+        opacity="0.4"
+      />
       {/* grass highlight */}
-      <path d="M70 86 Q120 54 170 86" fill="none" stroke="#5BD587" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+      <path
+        d="M70 86 Q120 54 170 86"
+        fill="none"
+        stroke="#5BD587"
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
 
       {/* left palm */}
       <g>
@@ -42,7 +55,12 @@ export function Landmass({ className }: Props) {
       </g>
       {/* right palm */}
       <g>
-        <path d="M192 96 C 197 76 194 64 190 56" stroke={TRUNK} strokeWidth="5" strokeLinecap="round" />
+        <path
+          d="M192 96 C 197 76 194 64 190 56"
+          stroke={TRUNK}
+          strokeWidth="5"
+          strokeLinecap="round"
+        />
         <path d="M190 54 C 204 47 214 49 220 57 C 206 52 196 53 189 59 Z" fill={LEAF_DEEP} />
         <path d="M190 54 C 186 40 189 32 196 27 C 188 37 190 48 191 60 Z" fill={LEAF} />
         <path d="M190 54 C 176 48 166 50 159 58 C 174 53 184 54 191 60 Z" fill={LEAF_DEEP} />

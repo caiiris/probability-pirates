@@ -62,7 +62,12 @@ export function ProfileBody({
       <OceanScene calm>
         <div className="flex flex-col items-center gap-3 py-3 text-center">
           <div className="rounded-full bg-card/70 p-1 shadow-soft backdrop-blur-sm">
-            <DefaultAvatar username={displayUsername} size={92} className="md:!w-28 md:!h-28" styleId={avatarStyleId} />
+            <DefaultAvatar
+              username={displayUsername}
+              size={92}
+              className="md:!w-28 md:!h-28"
+              styleId={avatarStyleId}
+            />
           </div>
           <div>
             <h1 className="font-display text-2xl font-bold tracking-tight truncate max-w-xs">
@@ -111,11 +116,7 @@ export function ProfileBody({
 
       {/* Trophies — the page's hero collection. Elevation + chest icon carry
           the weight; no tinted background so it stays clean. */}
-      <Section
-        elevated
-        title="Treasure shelf"
-        icon={<Chest open className="h-6 w-6" />}
-      >
+      <Section elevated title="Treasure shelf" icon={<Chest open className="h-6 w-6" />}>
         <TrophyCase
           milestonesReached={milestonesReached}
           currentStreak={currentStreak}
@@ -146,9 +147,7 @@ function Section({
 }) {
   return (
     <section
-      className={`rounded-2xl border p-4 sm:p-5 ${
-        elevated ? 'shadow-soft' : 'border-border/70'
-      }`}
+      className={`rounded-2xl border p-4 sm:p-5 ${elevated ? 'shadow-soft' : 'border-border/70'}`}
       style={{ background: tint ?? 'var(--card)' }}
     >
       <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-bold tracking-tight">

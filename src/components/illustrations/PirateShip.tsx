@@ -32,10 +32,7 @@ export function PirateShip({ className, style }: Props) {
       <path d="M49.5 20 C 60 26 60 40 49.5 46" stroke={SAIL_SHADE} strokeWidth="1.5" fill="none" />
 
       {/* hull */}
-      <path
-        d="M16 52 h64 l-7 16 a6 6 0 0 1 -5 3 H28 a6 6 0 0 1 -5 -3 Z"
-        fill={HULL}
-      />
+      <path d="M16 52 h64 l-7 16 a6 6 0 0 1 -5 3 H28 a6 6 0 0 1 -5 -3 Z" fill={HULL} />
       <rect x="16" y="52" width="64" height="6" rx="3" fill={HULL_DEEP} />
       {/* portholes */}
       <circle cx="34" cy="62" r="2.2" fill={SAIL} />

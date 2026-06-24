@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getFollowers, getFollowing, type SocialUser } from './socialService';
 import { UserListItem } from './UserListItem';
@@ -32,8 +27,7 @@ export function FollowListDialog({ uid, mode, open, onOpenChange }: Props) {
     };
   }, [open, uid, mode]);
 
-  const emptyText =
-    mode === 'followers' ? 'No followers yet.' : 'Not following anyone yet.';
+  const emptyText = mode === 'followers' ? 'No followers yet.' : 'Not following anyone yet.';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -43,9 +37,7 @@ export function FollowListDialog({ uid, mode, open, onOpenChange }: Props) {
         </DialogHeader>
         <div className="space-y-1 max-h-80 overflow-y-auto">
           {users === null ? (
-            Array.from({ length: 3 }, (_, i) => (
-              <Skeleton key={i} className="h-12 rounded-lg" />
-            ))
+            Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-12 rounded-lg" />)
           ) : users.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-6">{emptyText}</p>
           ) : (

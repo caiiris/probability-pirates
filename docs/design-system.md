@@ -19,10 +19,10 @@ The brief was "colorful and fun like Brilliant / Khan / Duolingo." The existing
 are not actually in conflict once you locate the color correctly:
 
 - **D1 — Color lives in content, chrome stays calm.** Saturated brand color
-  appears in *illustrations, lesson nodes, glyphs, stat icons, and celebration*.
+  appears in _illustrations, lesson nodes, glyphs, stat icons, and celebration_.
   The surrounding UI (backgrounds, cards, text, nav) stays near-neutral. This is
   exactly how Brilliant reads "playful" without looking like a toy.
-  - *Rejected:* painting the whole UI in gradients/rainbow accents (reads as a
+  - _Rejected:_ painting the whole UI in gradients/rainbow accents (reads as a
     generated template; fatigues fast; fights the directive).
 - **D2 — "Playful but disciplined," with headroom.** Owner chose this over both
   "maximal/toy" and "corporate/flat." Everything is built on tokens so the dial
@@ -37,15 +37,15 @@ are not actually in conflict once you locate the color correctly:
   `--ring`, sidebar accent, and the avatar/confetti seed.
 - **D4 — Six-stop accent ramp** (`violet, blue, teal, green, amber, coral`), each
   with `-soft / -base / -deep`. Lessons, glyphs, and path nodes cycle through it so
-  the journey feels varied without being random — color is *assigned*, not
+  the journey feels varied without being random — color is _assigned_, not
   decorative (`src/features/course/lessonVisuals.ts`).
 - **D5 — Warm, plum-tinted neutrals**, not pure gray and not cream
   (`--paper #FAFAFC`, `--ink #211C30`). Pure gray reads clinical; cream reads
   "notebook skin." The faint plum ties neutrals to the violet brand.
 - **D6 — Semantic color has fixed meaning:** green = success/done, amber = streak,
-  blue = info, coral = destructive/wrong. Components reference the *meaning* token
+  blue = info, coral = destructive/wrong. Components reference the _meaning_ token
   (`--success`), never a raw hue, so meaning stays consistent across screens.
-  - *Known tradeoff:* the activity heatmap uses violet (brand presence) while
+  - _Known tradeoff:_ the activity heatmap uses violet (brand presence) while
     "done" elsewhere is green. Left intentionally — the heatmap is brand texture,
     not a success signal. Revisit if it confuses testers.
 
@@ -57,12 +57,12 @@ are not actually in conflict once you locate the color correctly:
     "Inter everywhere" (the #1 AI-app tell).
   - **Inter** (`--font-sans`) for body/UI — neutral, legible at small sizes.
   - **JetBrains Mono** (`--font-mono`, `.num` helper) for numerals — XP, streaks,
-    fractions, stats read as *data*, not prose. This is a signature, not decoration.
-  - *Rejected:* a single typeface (cheap but generic); a script/rounded display
+    fractions, stats read as _data_, not prose. This is a signature, not decoration.
+  - _Rejected:_ a single typeface (cheap but generic); a script/rounded display
     font (too toy).
 - **D8 — Display face applied via global `h1–h3`.** Ensures every real heading is
   branded.
-  - *Known tradeoff:* a few small uppercase "eyebrow" labels are also `h2/h3` and
+  - _Known tradeoff:_ a few small uppercase "eyebrow" labels are also `h2/h3` and
     inherit the display face. Acceptable today (Bricolage holds up at small caps);
     if it ever looks off, scope those specific labels back to `font-sans` rather
     than dropping the global rule.
@@ -77,7 +77,7 @@ are not actually in conflict once you locate the color correctly:
 - **D11 — Motion is purposeful and reduced-motion-safe.** Press/spring feedback on
   interactive objects; `MotionConfig reducedMotion="user"` + a global
   `prefers-reduced-motion` CSS block. No ambient/idle animation on static chrome.
-  - *Watch item:* the current path node has an infinite "start here" bounce
+  - _Watch item:_ the current path node has an infinite "start here" bounce
     (Duolingo-style). Intentional affordance, but it is the most attention-seeking
     element on the home screen — first candidate to soften if it grates.
 
@@ -87,7 +87,8 @@ The primary `Button` variant has a solid bottom edge (`--btn-depth: 4px` in
 `--primary-deep`) that compresses on `:active`, so pressing feels physical. This is
 the "fun clickable" request, expressed once at the component level so it applies
 everywhere instead of being re-styled per screen.
-- *Rejected:* gradient/glow buttons (generic); applying the depth to every variant
+
+- _Rejected:_ gradient/glow buttons (generic); applying the depth to every variant
   (dilutes the primary action — only the main CTA gets the chunk).
 
 ## 5. Brand & navigation metaphor
@@ -110,15 +111,15 @@ everywhere instead of being re-styled per screen.
   with the disc on top and the lesson title centered beneath it. This is the
   game-quest / "islands" feel without a full map rework. Amplitude is kept
   moderate so centered labels never clip at the track edges.
-  - *Implementation note:* nodes are positioned with `marginInlineStart: <frac>%`
-    + `-translate-x-1/2` (percentage margins are relative to track width), so the
-    weave is fully responsive with **no JS measurement**. Connectors are SVGs that
-    span the full width on a normalized 0–100 x-axis (`preserveAspectRatio="none"`,
-    `vectorEffect="non-scaling-stroke"`), so curve endpoints line up with node
-    centers at any width while the stroke stays crisp.
-  - *Traveled vs. untraveled:* completed segments draw a solid accent-colored
+  - _Implementation note:_ nodes are positioned with `marginInlineStart: <frac>%`
+    - `-translate-x-1/2` (percentage margins are relative to track width), so the
+      weave is fully responsive with **no JS measurement**. Connectors are SVGs that
+      span the full width on a normalized 0–100 x-axis (`preserveAspectRatio="none"`,
+      `vectorEffect="non-scaling-stroke"`), so curve endpoints line up with node
+      centers at any width while the stroke stays crisp.
+  - _Traveled vs. untraveled:_ completed segments draw a solid accent-colored
     curve; upcoming segments are a faint dotted neutral line.
-  - *Rejected:* measuring node positions with a ResizeObserver to draw one global
+  - _Rejected:_ measuring node positions with a ResizeObserver to draw one global
     SVG (works, but adds a measure-then-paint flash and more code for no visual gain).
 - **D21 — Decorative path doodles** (`PathSticker`): sparse sparkle/clover/comet/
   star/die that bob gently and **boing on tap but do nothing functional**. They
@@ -150,16 +151,16 @@ everywhere instead of being re-styled per screen.
   (`FlyingDie`) — winged d6s with a colored glow and twinkle that drift and tumble
   on tap. Chapter banners gained a shadow + near-white tint so they read as
   signposts on the water.
-  - *Scope/discipline:* this themed treatment is **confined to the home course
+  - _Scope/discipline:_ this themed treatment is **confined to the home course
     path**. The lesson player, profile, schedule, and auth stay calm — color and
     whimsy live in the "world," not in working chrome. All pieces are new,
     self-contained files wrapping the existing path, so the theme can be dialed
     back or removed without unpicking the path logic.
-  - *Tunables:* `OceanScene` ambient counts/durations, `FlyingDie` size/drift,
+  - _Tunables:_ `OceanScene` ambient counts/durations, `FlyingDie` size/drift,
     `Island` palm frequency (`index % 3` in `LessonNode`), sea gradient stops.
-  - *Replaced:* `PathSticker` (sparkle/clover doodles) is superseded by `FlyingDie`
+  - _Replaced:_ `PathSticker` (sparkle/clover doodles) is superseded by `FlyingDie`
     on the path; the file is left in place as a reusable doodle primitive.
-  - *Refinements (owner feedback):* islands enlarged & bolder (palm on every other
+  - _Refinements (owner feedback):_ islands enlarged & bolder (palm on every other
     node); the **final chapter ends in landfall** — a wide `Landmass` (beach +
     grass + palms) with the trophy planted on it, so finishing the course literally
     lands you ashore; the **ship now sails a slow loop** around the ocean (with a
@@ -179,9 +180,9 @@ everywhere instead of being re-styled per screen.
   medallion + how to earn it). The profile stays **one page** but is reorganized
   into clear **carded sections** (Stats / Activity / Trophy shelf) with display
   headers; stat tiles flattened to sit inside the section cards.
-  - *Decisions (owner):* medallion system over bespoke-per-badge; grid over
+  - _Decisions (owner):_ medallion system over bespoke-per-badge; grid over
     gallery; one page over split routes.
-  - *Deferred:* a **customizable showcase shelf** (pin top 3, Khan-style) — needs a
+  - _Deferred:_ a **customizable showcase shelf** (pin top 3, Khan-style) — needs a
     `showcase` profile field + editor, so it's a follow-up. `MilestonesRow` is now
     superseded by `TrophyCase` (left in place).
 - **Still deferred:** an optional zoomed-out map view of all chapters; profile
@@ -218,7 +219,7 @@ Ran the design skill's skeptical/"remove one thing" review on the finished overh
 
 1. **Two competing CTAs on home.** The `HeroCard` ("Up next…") and the path's
    current node both acted as the primary action — violating "one primary focus per
-   screen." `HeroCard` is now shown *only* for the two states the path can't express
+   screen." `HeroCard` is now shown _only_ for the two states the path can't express
    (first-time welcome, all-caught-up). For the normal returning case the path's
    current node is the single focus. (`HomePage.tsx`)
 2. **Dangling token reference.** The path connector referenced
@@ -270,7 +271,7 @@ and replaying a finished lesson silently un-finished it.
 
 ## 9. Shell cohesion & first impression — 2026-06-23
 
-UX-polish pass to make the app *feel* shipped: tie every screen together and make
+UX-polish pass to make the app _feel_ shipped: tie every screen together and make
 the first screen on-brand.
 
 - **D30 — Persistent app bar.** New `AppHeader` renders on every chromed route
@@ -303,7 +304,7 @@ Polish pass on the core learning surface so each tap feels rewarding.
 
 - **D34 — Segmented step progress.** `LessonHeader` replaced the thin continuous
   `Progress` bar (which was `slotIndex / totalSlots` and so never reached 100% on
-  the final step) with one pip per slot. Completed *and* the current step fill, so
+  the final step) with one pip per slot. Completed _and_ the current step fill, so
   the bar is full on the last step and the count of remaining pips tells the
   learner how far is left. Each pip fills with a 0.3s `scaleX` spring.
   (`LessonHeader.tsx`)
@@ -350,7 +351,7 @@ Cohesion + empty/loading-state polish so the whole app feels shipped.
 ## 12. XP progression / levels & ranks — 2026-06-24
 
 XP previously only fed the leaderboard — no progression payoff. Coins are the
-*spendable* currency, so XP's job is now *status/progression*.
+_spendable_ currency, so XP's job is now _status/progression_.
 
 - **D42 — Pirate ranks from XP (client-derived).** New pure `lib/levels.ts` maps
   total XP → a level (advancing L→L+1 costs `50 + 50*L` XP, ~one lesson for the
@@ -419,7 +420,7 @@ From the full-app UI audit. Two issues fixed; the rest queued.
 ## 15. UI audit — small fixes — 2026-06-24
 
 - **D47 — Notification badge: primary, not coral.** The unread dot was initially
-  coral (`--coral-base`), which is the *destructive/wrong-answer* color elsewhere
+  coral (`--coral-base`), which is the _destructive/wrong-answer_ color elsewhere
   in the app. A follow is positive news, so the badge now uses `bg-primary` to
   avoid the semantic mismatch and to stop the chrome's one pop of color from
   reading as an error. (`features/notifications/NotificationBell.tsx`)
@@ -459,7 +460,7 @@ From the full-app UI audit. Two issues fixed; the rest queued.
   (`features/notifications/NotificationBell.tsx`)
 - **D53 — Trading Post item identity.** Item cards (avatar styles, flair rows)
   gained a subtle warm parchment tint (`color-mix(in srgb, var(--amber-soft)
-  35%, var(--card))`) and a `hover:-translate-y-0.5` tactile lift, so the wares
+35%, var(--card))`) and a `hover:-translate-y-0.5` tactile lift, so the wares
   feel laid out on a shop table — without literal wood-grain or texture work.
   Equipped items pop back to plain card with a violet ring so the active state
   still stands out. (`features/economy/StorePage.tsx`)
@@ -481,16 +482,16 @@ defaults. Three coordinated passes addressed the loudest tells.
   - Home: `Your path → Path`.
   - Friends: `Your Crew → Friends`; `Find explorers → Find learners`;
     `The weekly voyage → Weekly leaderboard`; empty-search `No explorers found
-    → No learners found`.
+→ No learners found`.
   - Leaderboard empty state: cut "Recruit a crew to start your voyage" for
     plain "Follow other learners to start the leaderboard."
   - Store: `Forgiveness → Streak Freeze` (single-item section, plain name);
     `Profile flair → Flair` (shorter).
-  Stripping the possessive ("Your") + the thesaurus is the most direct
-  anti-AI-default copy move.
-  (`features/profile/ProfileBody.tsx`, `features/course/HomePage.tsx`,
-  `features/social/SocialPage.tsx`, `features/social/Leaderboard.tsx`,
-  `features/economy/StorePage.tsx`)
+    Stripping the possessive ("Your") + the thesaurus is the most direct
+    anti-AI-default copy move.
+    (`features/profile/ProfileBody.tsx`, `features/course/HomePage.tsx`,
+    `features/social/SocialPage.tsx`, `features/social/Leaderboard.tsx`,
+    `features/economy/StorePage.tsx`)
 - **D55 — Opt-in elevation: one hero per page, the rest recede.** Every card
   in the app wore the same `rounded-2xl border bg-card p-4 shadow-soft` shell,
   so there was no visual hierarchy — four cards on Profile all weighed
@@ -514,10 +515,10 @@ defaults. Three coordinated passes addressed the loudest tells.
     chip, lesson header XP/streak chips, home freeze count, leaderboard rank
     badges (single digit), celebration streak chip, chapter banner number disc,
     medallion stack badge, store price label.
-  The chrome now reads as friendly; real comparative data still gets the
-  treatment it earns. (`components/AppHeader.tsx`,
-  `features/profile/LevelBadge.tsx`, `features/economy/CoinChip.tsx`,
-  `features/lesson/LessonHeader.tsx`, `features/course/HomePage.tsx`,
-  `features/social/Leaderboard.tsx`, `features/habit/CelebrationScreen.tsx`,
-  `features/course/ChapterBanner.tsx`, `features/profile/Medallion.tsx`,
-  `features/economy/StorePage.tsx`)
+    The chrome now reads as friendly; real comparative data still gets the
+    treatment it earns. (`components/AppHeader.tsx`,
+    `features/profile/LevelBadge.tsx`, `features/economy/CoinChip.tsx`,
+    `features/lesson/LessonHeader.tsx`, `features/course/HomePage.tsx`,
+    `features/social/Leaderboard.tsx`, `features/habit/CelebrationScreen.tsx`,
+    `features/course/ChapterBanner.tsx`, `features/profile/Medallion.tsx`,
+    `features/economy/StorePage.tsx`)

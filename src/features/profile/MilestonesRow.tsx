@@ -11,9 +11,7 @@ type Props = {
 export function MilestonesRow({ milestonesReached, currentStreak }: Props) {
   const reached = new Set(milestonesReached ?? []);
 
-  const nextUnearned = MILESTONE_THRESHOLDS.find(
-    (t) => !reached.has(`streak-${t}`),
-  );
+  const nextUnearned = MILESTONE_THRESHOLDS.find((t) => !reached.has(`streak-${t}`));
 
   return (
     <div className="space-y-3">
@@ -47,9 +45,10 @@ export function MilestonesRow({ milestonesReached, currentStreak }: Props) {
             <div
               key={id}
               className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-colors
-                ${isEarned
-                  ? 'bg-amber-50 border-amber-200 text-amber-800'
-                  : 'bg-muted/40 border-border text-muted-foreground'
+                ${
+                  isEarned
+                    ? 'bg-amber-50 border-amber-200 text-amber-800'
+                    : 'bg-muted/40 border-border text-muted-foreground'
                 }`}
               aria-label={`${MILESTONE_TITLES[id]}${isEarned ? ', earned' : ', locked'}`}
             >
@@ -61,7 +60,9 @@ export function MilestonesRow({ milestonesReached, currentStreak }: Props) {
               <span className="text-xs font-semibold text-center leading-snug">
                 {MILESTONE_TITLES[id]}
               </span>
-              <span className={`text-[10px] font-medium ${isEarned ? 'text-amber-600' : 'text-muted-foreground/60'}`}>
+              <span
+                className={`text-[10px] font-medium ${isEarned ? 'text-amber-600' : 'text-muted-foreground/60'}`}
+              >
                 {threshold}-day streak
               </span>
             </div>

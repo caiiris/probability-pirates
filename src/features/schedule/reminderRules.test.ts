@@ -23,8 +23,8 @@ describe('pendingToday', () => {
     const events = [
       ev({ id: 'a', date: today }),
       ev({ id: 'b', date: today, completed: true }), // done -> excluded
-      ev({ id: 'c', date: '2026-06-22' }),           // past -> excluded
-      ev({ id: 'd', date: '2026-06-24' }),           // future -> excluded
+      ev({ id: 'c', date: '2026-06-22' }), // past -> excluded
+      ev({ id: 'd', date: '2026-06-24' }), // future -> excluded
     ];
     expect(pendingToday(events, today).map((e) => e.id)).toEqual(['a']);
   });

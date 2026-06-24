@@ -4,7 +4,7 @@ A mobile-first, **learn-by-doing probability app** for high-school students.
 Each lesson is a short sequence of interactive steps — tap a die's faces, fill a
 fraction, mark cells on a 6×6 grid, run a simulation — with instant, hand-written
 feedback on every answer. No AI, no videos, no walls of text: the interaction
-*is* the explanation.
+_is_ the explanation.
 
 **Live:** https://brilliant-clone-102a7.web.app
 
@@ -34,14 +34,14 @@ npx firebase-tools emulators:start   # Auth :9099, Firestore :8080, UI :4000
 
 ## Scripts
 
-| Command | Does |
-|---|---|
-| `npm run dev` | Vite dev server |
-| `npm run build` | Type-check (`tsc -b`) + production build to `dist/` |
-| `npm run verify` | `typecheck` + `lint` + `test` (the pre-commit gate) |
-| `npm run test` / `test:watch` | Vitest |
-| `npm run audit-feedback` | Reports lessons missing hand-written feedback copy |
-| `npm run format` / `format:check` | Prettier |
+| Command                           | Does                                                |
+| --------------------------------- | --------------------------------------------------- |
+| `npm run dev`                     | Vite dev server                                     |
+| `npm run build`                   | Type-check (`tsc -b`) + production build to `dist/` |
+| `npm run verify`                  | `typecheck` + `lint` + `test` (the pre-commit gate) |
+| `npm run test` / `test:watch`     | Vitest                                              |
+| `npm run audit-feedback`          | Reports lessons missing hand-written feedback copy  |
+| `npm run format` / `format:check` | Prettier                                            |
 
 ## Deploy
 
@@ -65,16 +65,16 @@ carry one or more `Variant`s per interaction kind. See
 
 ## Documentation
 
-| Doc | What |
-|---|---|
-| [`docs/prd.md`](docs/prd.md) | Product requirements + acceptance criteria |
-| [`docs/architecture.md`](docs/architecture.md) | State, routing, errors, perf budget |
-| [`docs/ui-stack.md`](docs/ui-stack.md) | UI stack, design tokens, breakpoints, a11y |
-| [`docs/build-order.md`](docs/build-order.md) | Spec dependency graph |
-| [`docs/alternatives.md`](docs/alternatives.md) | Decision history (D1–D77+) |
-| [`docs/issues.md`](docs/issues.md) | Open issues / known gaps |
-| [`docs/deploy-checklist.md`](docs/deploy-checklist.md) | Pre-deploy verification gates |
-| [`docs/privacy.md`](docs/privacy.md) | Data collection + privacy stance |
+| Doc                                                    | What                                       |
+| ------------------------------------------------------ | ------------------------------------------ |
+| [`docs/prd.md`](docs/prd.md)                           | Product requirements + acceptance criteria |
+| [`docs/architecture.md`](docs/architecture.md)         | State, routing, errors, perf budget        |
+| [`docs/ui-stack.md`](docs/ui-stack.md)                 | UI stack, design tokens, breakpoints, a11y |
+| [`docs/build-order.md`](docs/build-order.md)           | Spec dependency graph                      |
+| [`docs/alternatives.md`](docs/alternatives.md)         | Decision history (D1–D77+)                 |
+| [`docs/issues.md`](docs/issues.md)                     | Open issues / known gaps                   |
+| [`docs/deploy-checklist.md`](docs/deploy-checklist.md) | Pre-deploy verification gates              |
+| [`docs/privacy.md`](docs/privacy.md)                   | Data collection + privacy stance           |
 
 ## License
 

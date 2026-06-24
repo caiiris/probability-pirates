@@ -4,28 +4,32 @@
 
 ## Purpose
 
-Make finishing a lesson feel satisfying and make coming back tomorrow obvious. Implement the brief's mandate: *"streaks, milestones, and a sense of daily progress... the difference between an app people open once and one they open every day."*
+Make finishing a lesson feel satisfying and make coming back tomorrow obvious. Implement the brief's mandate: _"streaks, milestones, and a sense of daily progress... the difference between an app people open once and one they open every day."_
 
 ## User-facing behavior
 
 ### XP
+
 - Every problem slot awards XP on Check. The number depends on attempt count and outcome.
 - XP is displayed in real time inside the lesson player (small chip near the streak flame) — increments visibly after each correct slot.
 - Lifetime XP is shown on Profile.
 
 ### Streak
-- "Streak" = consecutive calendar days with at least one *correct* check.
+
+- "Streak" = consecutive calendar days with at least one _correct_ check.
 - Streak increments on the first correct check of a new local-tz day.
 - Missing a day → streak resets to 0 (no freezes in MVP).
 - Best streak is updated when current exceeds it.
 
 ### Daily goal
+
 - Shown in the Home header as a pill: "Complete a lesson today" (gray) → "Done for today" (amber).
-- Flips on the *first lesson completion* of the day (not first correct check). Rolls over at local midnight in the learner's detected timezone (per `docs/alternatives.md` D22 / D59).
+- Flips on the _first lesson completion_ of the day (not first correct check). Rolls over at local midnight in the learner's detected timezone (per `docs/alternatives.md` D22 / D59).
 
 ### Milestones
+
 - Crossing `{3, 7, 14, 30, 60, 100}` consecutive days unlocks a milestone. Each fires once ever (tracked in `milestonesReached`).
-- The milestone celebration appears on the *next lesson completion* after the streak crosses the threshold — bundled into the celebration screen.
+- The milestone celebration appears on the _next lesson completion_ after the streak crosses the threshold — bundled into the celebration screen.
 - Milestone titles (the streak chip carries the day count; the title carries the sentiment):
   - `streak-3` → "Warming up"
   - `streak-7` → "On a roll"
@@ -35,6 +39,7 @@ Make finishing a lesson feel satisfying and make coming back tomorrow obvious. I
   - `streak-100` → "Inevitable"
 
 ### Lesson completion celebration screen (`/celebration/:lessonId`)
+
 Full-screen takeover after the wrap slot's Continue. Layout, top to bottom:
 
 1. **Confetti burst** (Animbits component or Framer fallback).
@@ -50,23 +55,24 @@ Full-screen takeover after the wrap slot's Continue. Layout, top to bottom:
 
 This spec mutates `/users/{uid}`. The fields are owned by `spec-auth` (initialized at registration) and `spec-progress-persistence` (the `attemptId` is the seed for variant selection — irrelevant here).
 
-| field on `/users/{uid}` | mutation rule |
-| --- | --- |
-| `xp` | `xp + xpAwarded` on every recorded attempt |
-| `lessonsCompleted` | `+1` on the transition `state: in_progress → completed` |
-| `stepsCompleted` | `+1` on every slot where the learner advances (per D55, advancement requires a correct answer; no "unlocked" path) |
-| `currentStreak` | see streak rule below |
-| `bestStreak` | `max(bestStreak, currentStreak)` |
-| `lastActiveDate` | set to today's local-tz date string on every correct check |
-| `milestonesReached` | append the new milestone id when reached |
+| field on `/users/{uid}` | mutation rule                                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `xp`                    | `xp + xpAwarded` on every recorded attempt                                                                         |
+| `lessonsCompleted`      | `+1` on the transition `state: in_progress → completed`                                                            |
+| `stepsCompleted`        | `+1` on every slot where the learner advances (per D55, advancement requires a correct answer; no "unlocked" path) |
+| `currentStreak`         | see streak rule below                                                                                              |
+| `bestStreak`            | `max(bestStreak, currentStreak)`                                                                                   |
+| `lastActiveDate`        | set to today's local-tz date string on every correct check                                                         |
+| `milestonesReached`     | append the new milestone id when reached                                                                           |
 
 ### XP rule (`src/lib/xp.ts`)
+
 ```ts
 export function xpForAttempt(attemptNumber: number, wasCorrect: boolean): number {
-  if (!wasCorrect) return 0;            // per D55, learner cannot advance without correct; wrong = 0
-  if (attemptNumber === 1) return 10;   // first-try correct: full reward
-  if (attemptNumber === 2) return 5;    // second-try correct: half reward
-  return 2;                              // third-try correct or later: persistence reward
+  if (!wasCorrect) return 0; // per D55, learner cannot advance without correct; wrong = 0
+  if (attemptNumber === 1) return 10; // first-try correct: full reward
+  if (attemptNumber === 2) return 5; // second-try correct: half reward
+  return 2; // third-try correct or later: persistence reward
 }
 
 export const LESSON_COMPLETION_BONUS = 50;
@@ -75,13 +81,14 @@ export const LESSON_COMPLETION_BONUS = 50;
 XP never decreases. Wrong answers always award 0 (no advancement without correctness). Lesson bonus is added once, on the transition to `'completed'`. Decision rationale: `docs/alternatives.md` D31 (with D55 update).
 
 ### Streak rule (`src/lib/streak.ts`)
+
 ```ts
 // Pure function over (lastActiveDate, todayLocalDate) → next streak state
 export function nextStreak(input: {
   currentStreak: number;
   bestStreak: number;
-  lastActiveDate: string | null;  // 'YYYY-MM-DD'
-  todayLocalDate: string;          // 'YYYY-MM-DD'
+  lastActiveDate: string | null; // 'YYYY-MM-DD'
+  todayLocalDate: string; // 'YYYY-MM-DD'
 }): { currentStreak: number; bestStreak: number; lastActiveDate: string; isNewStreakDay: boolean } {
   if (input.lastActiveDate === input.todayLocalDate) {
     // Already counted today; no change.
@@ -102,19 +109,21 @@ export function nextStreak(input: {
 `isYesterday` and `todayLocalDate` derive from `Intl.DateTimeFormat().resolvedOptions().timeZone` (alternatives D22).
 
 ### Milestone rule (`src/lib/milestones.ts`)
+
 ```ts
 export const MILESTONE_THRESHOLDS = [3, 7, 14, 30, 60, 100] as const;
 
 export function newMilestonesFor(streak: number, alreadyReached: string[]): string[] {
-  return MILESTONE_THRESHOLDS
-    .filter((t) => streak >= t && !alreadyReached.includes(`streak-${t}`))
-    .map((t) => `streak-${t}`);
+  return MILESTONE_THRESHOLDS.filter(
+    (t) => streak >= t && !alreadyReached.includes(`streak-${t}`),
+  ).map((t) => `streak-${t}`);
 }
 ```
 
 The "celebrate on the next lesson completion" UX is achieved by computing `newMilestones = newMilestonesFor(currentStreak, milestonesReached)` at completion time, displaying a card for each, and writing them to `milestonesReached` in the same transaction so they never re-fire.
 
 ### Daily-goal-done check
+
 ```ts
 export function dailyGoalDone(lastCompletionDate: string | null, today: string): boolean {
   return lastCompletionDate === today;
@@ -146,7 +155,7 @@ export function dailyGoalDone(lastCompletionDate: string | null, today: string):
 - **Clock change / DST:** `todayLocalDate()` reads fresh on each call; a learner who completes a slot at 11:59pm and another at 12:01am gets streak +1 on the second (correct).
 - **Timezone change mid-day** (travel): `lastActiveDate` may equal "today" in new tz already; first correct check just no-ops on streak (no crash).
 - **`lastActiveDate` is null** (brand new account): first correct check sets `currentStreak: 1, lastActiveDate: today, isNewStreakDay: true`.
-- **Milestone crossed but lesson abandoned before wrap:** celebration doesn't fire. The milestone is *not* recorded yet (only added at `applyLessonCompletion`). Next lesson completion fires it. Acceptable.
+- **Milestone crossed but lesson abandoned before wrap:** celebration doesn't fire. The milestone is _not_ recorded yet (only added at `applyLessonCompletion`). Next lesson completion fires it. Acceptable.
 - **Multiple new milestones at once** (e.g. learner does 7 days in a row at signup): `newMilestonesFor` returns multiple; the celebration screen stacks them vertically.
 - **Negative XP somehow** (defensive — should never happen): clamp to ≥ 0 in the update.
 - **`xpEarnedThisAttempt` overflow on replay:** the field resets to 0 on `startReplay` (owned by `spec-progress-persistence`); no overflow in practice.

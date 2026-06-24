@@ -109,7 +109,9 @@ export function ScheduleReminder({ uid }: { uid: string }) {
                   {meta.label}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium leading-snug">{event.title}</span>
+                  <span className="block truncate text-sm font-medium leading-snug">
+                    {event.title}
+                  </span>
                   {event.time && (
                     <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
                       <Clock className="h-3 w-3" aria-hidden="true" />

@@ -24,13 +24,11 @@ import type { Lesson } from './types';
  * old 6-lesson spine and the new granular plan do not appear twice (overlap
  * resolved per D88). `main` still holds the prior arrangement.
  */
-export const lessons: Lesson[] = [howLikely, ...roadmapStubLessons].map(
-  (lesson, i) => (lesson.number === i + 1 ? lesson : { ...lesson, number: i + 1 }),
+export const lessons: Lesson[] = [howLikely, ...roadmapStubLessons].map((lesson, i) =>
+  lesson.number === i + 1 ? lesson : { ...lesson, number: i + 1 },
 );
 
-export const lessonById = new Map<string, Lesson>(
-  lessons.map((lesson) => [lesson.id, lesson]),
-);
+export const lessonById = new Map<string, Lesson>(lessons.map((lesson) => [lesson.id, lesson]));
 
 function validateAllLessons(): void {
   for (const lesson of lessons) {

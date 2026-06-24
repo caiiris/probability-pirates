@@ -4,11 +4,12 @@
 
 ## Purpose
 
-Persist every check the learner makes server-side so progress survives reload, device switch, and crash. Make resume restore the *exact* slot and the *exact* variant the learner was looking at. Give other features (habit loop, course path) a clean API to read progress and a fast log they can later mine for mastery signals.
+Persist every check the learner makes server-side so progress survives reload, device switch, and crash. Make resume restore the _exact_ slot and the _exact_ variant the learner was looking at. Give other features (habit loop, course path) a clean API to read progress and a fast log they can later mine for mastery signals.
 
 ## User-facing behavior
 
 The learner never thinks about this spec directly. They notice it when:
+
 - They close the app mid-lesson and reopen — they land on the same slot they left.
 - They reload on a different device — same.
 - They replay a completed lesson — they get a fresh mix of variants (different from last time, but stable for the duration of the replay).
@@ -24,27 +25,29 @@ The learner never thinks about this spec directly. They notice it when:
 ```
 
 ### `/users/{uid}/lessonProgress/{lessonId}` shape
-| field | type | notes |
-| --- | --- | --- |
-| `state` | `'in_progress'` \| `'completed'` | doc absence = `not_started` |
-| `slotIndex` | number | 0-based current slot; used for resume |
-| `attemptId` | string | UUID, regenerated on replay-from-scratch — seeds variant selection |
-| `selectedVariantIds` | map<string, string> | `{ [slotId]: variantId }`; populated lazily as slots are reached |
-| `xpEarnedThisAttempt` | number | resets to 0 on replay |
-| `completedAt` | Timestamp \| null | set on transition to `'completed'` |
-| `updatedAt` | Timestamp | `serverTimestamp()` on every write |
+
+| field                 | type                             | notes                                                              |
+| --------------------- | -------------------------------- | ------------------------------------------------------------------ |
+| `state`               | `'in_progress'` \| `'completed'` | doc absence = `not_started`                                        |
+| `slotIndex`           | number                           | 0-based current slot; used for resume                              |
+| `attemptId`           | string                           | UUID, regenerated on replay-from-scratch — seeds variant selection |
+| `selectedVariantIds`  | map<string, string>              | `{ [slotId]: variantId }`; populated lazily as slots are reached   |
+| `xpEarnedThisAttempt` | number                           | resets to 0 on replay                                              |
+| `completedAt`         | Timestamp \| null                | set on transition to `'completed'`                                 |
+| `updatedAt`           | Timestamp                        | `serverTimestamp()` on every write                                 |
 
 ### `/users/{uid}/stepAttempts/{autoId}` shape (append-only)
-| field | type | notes |
-| --- | --- | --- |
-| `lessonId` | string | |
-| `slotId` | string | matches a `Slot.id` in the content model |
-| `variantId` | string | matches a `Variant.id` within the slot |
-| `attemptNumber` | number | 1, 2, 3 within the same slot in the same sitting |
-| `wasCorrect` | boolean | |
-| `xpAwarded` | number | per `spec-habit-loop` table |
-| `answerPayload` | map | what the learner submitted (cell list, fraction, choice id) |
-| `createdAt` | Timestamp | `serverTimestamp()` |
+
+| field           | type      | notes                                                       |
+| --------------- | --------- | ----------------------------------------------------------- |
+| `lessonId`      | string    |                                                             |
+| `slotId`        | string    | matches a `Slot.id` in the content model                    |
+| `variantId`     | string    | matches a `Variant.id` within the slot                      |
+| `attemptNumber` | number    | 1, 2, 3 within the same slot in the same sitting            |
+| `wasCorrect`    | boolean   |                                                             |
+| `xpAwarded`     | number    | per `spec-habit-loop` table                                 |
+| `answerPayload` | map       | what the learner submitted (cell list, fraction, choice id) |
+| `createdAt`     | Timestamp | `serverTimestamp()`                                         |
 
 ### Variant selection algorithm
 
@@ -69,6 +72,7 @@ export function selectVariantIndex(
 - On replay, the player generates a new `attemptId` (`crypto.randomUUID()`); selection re-runs with the new seed; `selectedVariantIds` is reset.
 
 ### Firestore security rules (this spec's slice)
+
 ```
 match /users/{uid}/lessonProgress/{lessonId} {
   allow read, write: if request.auth.uid == uid;
@@ -107,7 +111,7 @@ The `attemptNumber <= 10` cap is a cheap defense against a stuck client retrying
 - **`selectedVariantIds` is missing when player needs it:** treat as first visit, compute, write.
 - **Replay from a partially-completed lesson:** "replay" only makes sense once `state === 'completed'`. Mid-lesson "start over" is out of scope for MVP (would require a confirmation dialog and clarity on whether it counts as a new attempt for streak purposes).
 - **Variant pool shrinks between deploys** (a variant gets removed): `selectedVariantIds[slotId]` points to a variant that no longer exists. Fallback: log to Sentry and re-run `selectVariantIndex` for this slot.
-- **`stepAttempts` write fails:** the inline toast tells the learner; one retry; on second failure, the learner's UI is unblocked but the attempt is lost. The next correct write will save the *next* slot's progress (so they don't get stuck).
+- **`stepAttempts` write fails:** the inline toast tells the learner; one retry; on second failure, the learner's UI is unblocked but the attempt is lost. The next correct write will save the _next_ slot's progress (so they don't get stuck).
 - **Hash collision** between two different `attemptId`s causing the same variant order: rare and harmless — both learners see a valid variant.
 - **Lesson is `comingSoon: true`:** the player should refuse to open it (see `spec-course-path`); this spec assumes only real lessons reach `progressService`.
 

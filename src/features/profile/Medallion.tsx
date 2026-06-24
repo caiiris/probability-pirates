@@ -32,15 +32,7 @@ type Props = {
 /** A collectible "treasure medallion": coin disc + unique emblem, with a tactile
  *  bottom edge. Earned ones are full color with a shine; locked ones are a quiet
  *  ghost so there's something to chase. */
-export function Medallion({
-  emblem,
-  tone,
-  earned,
-  badge,
-  size = 64,
-  onClick,
-  ariaLabel,
-}: Props) {
+export function Medallion({ emblem, tone, earned, badge, size = 64, onClick, ariaLabel }: Props) {
   const s = toneSwatch(tone);
   const depth = Math.round(size * 0.07);
 
@@ -64,7 +56,9 @@ export function Medallion({
       {/* inner ring */}
       <span
         className="absolute inset-1 rounded-full"
-        style={{ boxShadow: earned ? `inset 0 0 0 2px ${s.soft}66` : 'inset 0 0 0 2px rgb(0 0 0 / 0.04)' }}
+        style={{
+          boxShadow: earned ? `inset 0 0 0 2px ${s.soft}66` : 'inset 0 0 0 2px rgb(0 0 0 / 0.04)',
+        }}
         aria-hidden="true"
       />
       {/* shine */}

@@ -55,9 +55,10 @@ function DieContext({ locked }: { locked: boolean }) {
               className={`
                 relative rounded-xl p-1 transition-colors select-none touch-manipulation
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
-                ${isOn
-                  ? 'bg-[color:var(--green-soft)] ring-2 ring-[color:var(--success)]'
-                  : 'bg-card ring-1 ring-border hover:ring-primary/50'
+                ${
+                  isOn
+                    ? 'bg-[color:var(--green-soft)] ring-2 ring-[color:var(--success)]'
+                    : 'bg-card ring-1 ring-border hover:ring-primary/50'
                 }
                 ${locked ? 'cursor-default opacity-60' : 'cursor-pointer'}
               `}

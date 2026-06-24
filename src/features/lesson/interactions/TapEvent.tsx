@@ -46,11 +46,12 @@ export function TapEvent({ variant, feedbackState, onChange }: Props) {
                 min-w-[44px] min-h-[44px] md:min-w-[56px] md:min-h-[56px]
                 px-4 py-2 rounded-xl border-2 font-semibold text-lg
                 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
-                ${isSelected
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : isRed
-                  ? 'border-border bg-card text-[color:var(--coral-base)] hover:border-[color:var(--coral-base)]/40'
-                  : 'border-border bg-card text-foreground hover:border-primary/50'
+                ${
+                  isSelected
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : isRed
+                      ? 'border-border bg-card text-[color:var(--coral-base)] hover:border-[color:var(--coral-base)]/40'
+                      : 'border-border bg-card text-foreground hover:border-primary/50'
                 }
                 ${locked ? 'cursor-default' : 'cursor-pointer'}
               `}

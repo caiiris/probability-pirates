@@ -28,10 +28,7 @@ const makeProgress = (state: LessonProgress['state']): LessonProgress => ({
   updatedAt: null,
 });
 
-const lessons = [
-  makeLesson('l1', 1),
-  makeLesson('l2', 2, true),
-];
+const lessons = [makeLesson('l1', 1), makeLesson('l2', 2, true)];
 
 describe('nextRecommendedLesson', () => {
   it('returns first real lesson when no progress', () => {
@@ -84,7 +81,10 @@ describe('dailyGoalDone', () => {
   it('returns true when a lesson was completed today', () => {
     const prog: LessonProgress = {
       ...makeProgress('completed'),
-      completedAt: { seconds: Math.floor(new Date('2026-06-23T12:00:00').getTime() / 1000), nanoseconds: 0 },
+      completedAt: {
+        seconds: Math.floor(new Date('2026-06-23T12:00:00').getTime() / 1000),
+        nanoseconds: 0,
+      },
     };
     const map = new Map([['l1', prog]]);
     expect(dailyGoalDone(map, '2026-06-23')).toBe(true);

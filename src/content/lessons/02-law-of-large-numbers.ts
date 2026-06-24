@@ -22,7 +22,8 @@ export const lesson2: Lesson = {
         {
           id: 'heads',
           interactionKind: 'fill-fraction',
-          prompt: 'A fair coin has two equally likely sides. What is P(heads)? Enter it as a fraction.',
+          prompt:
+            'A fair coin has two equally likely sides. What is P(heads)? Enter it as a fraction.',
           numerator: 1,
           denominator: 2,
           feedbackCorrect: 'Right. One favorable side out of two.',
@@ -31,12 +32,14 @@ export const lesson2: Lesson = {
             '1/1': 'A coin has two sides, and heads is only one of them.',
             '2/2': 'That would make heads certain on every flip.',
           },
-          explanation: 'Favorable outcomes over total outcomes: 1 head out of 2 equally likely sides.',
+          explanation:
+            'Favorable outcomes over total outcomes: 1 head out of 2 equally likely sides.',
         },
         {
           id: 'six',
           interactionKind: 'fill-fraction',
-          prompt: 'What is P(rolling a six) on a fair die? Tap the faces to count, then enter the fraction.',
+          prompt:
+            'What is P(rolling a six) on a fair die? Tap the faces to count, then enter the fraction.',
           numerator: 1,
           denominator: 6,
           showDieContext: true,
@@ -65,7 +68,8 @@ export const lesson2: Lesson = {
         {
           id: 'coin-converge',
           interactionKind: 'simulate-proportion',
-          prompt: 'Flip the coin many times. Watch the running share of heads. Keep flipping until you reach 200.',
+          prompt:
+            'Flip the coin many times. Watch the running share of heads. Keep flipping until you reach 200.',
           scenario: 'coin',
           targetProbability: 0.5,
           targetLabel: 'True P(heads) = 50%',
@@ -82,7 +86,8 @@ export const lesson2: Lesson = {
         {
           id: 'die-converge',
           interactionKind: 'simulate-proportion',
-          prompt: 'Roll the die many times. Watch the running share of sixes. Keep rolling until you reach 200.',
+          prompt:
+            'Roll the die many times. Watch the running share of sixes. Keep rolling until you reach 200.',
           scenario: 'die-six',
           targetProbability: 1 / 6,
           targetLabel: 'True P(six) is about 16.7%',
@@ -149,7 +154,8 @@ export const lesson2: Lesson = {
         {
           id: 'estimate-messy',
           interactionKind: 'multiple-choice',
-          prompt: 'Suppose a probability is too messy to work out by counting. How could you still estimate it?',
+          prompt:
+            'Suppose a probability is too messy to work out by counting. How could you still estimate it?',
           options: [
             { id: 'count', label: 'List every possible outcome by hand' },
             { id: 'trials', label: 'Run the situation many times and take the share that succeed' },
@@ -173,13 +179,18 @@ export const lesson2: Lesson = {
             'You want the chance that two people in a room of 30 share a birthday, and the formula is hard. What is the most reliable way to estimate it?',
           options: [
             { id: 'count', label: 'Write out every combination of birthdays' },
-            { id: 'trials', label: 'Fill the room with random birthdays many times and take the share with a match' },
+            {
+              id: 'trials',
+              label:
+                'Fill the room with random birthdays many times and take the share with a match',
+            },
             { id: 'guess', label: 'Assume it must be about 30 out of 365' },
           ],
           correctOptionId: 'trials',
           feedbackCorrect:
             'Right. Simulate the room many times and read off the share. You will do exactly this in the birthday lesson coming up.',
-          feedbackDefault: 'You cannot list the combinations by hand, but you can repeat the trial.',
+          feedbackDefault:
+            'You cannot list the combinations by hand, but you can repeat the trial.',
           feedbackByOption: {
             count: 'There are far too many combinations to write out.',
             guess: 'That intuition is way off, as you will see when the birthday lesson arrives.',
@@ -193,8 +204,7 @@ export const lesson2: Lesson = {
       id: 'wrap',
       kind: 'wrap',
       title: 'You watched probability settle',
-      body:
-        'A single trial is unpredictable, but the long-run share is not. That is why simulation works: repeat a situation enough times and the share lands on the true probability. Next, the counting tools that make the formula side work when the sample space is too big to list.',
+      body: 'A single trial is unpredictable, but the long-run share is not. That is why simulation works: repeat a situation enough times and the share lands on the true probability. Next, the counting tools that make the formula side work when the sample space is too big to list.',
       segueToLessonId: 'counting-carefully',
     },
   ],

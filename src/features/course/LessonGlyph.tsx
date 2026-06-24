@@ -53,8 +53,24 @@ const GLYPHS: Record<GlyphName, ReactNode> = {
   // two overlapping cards (counting / combinations)
   cards: (
     <>
-      <rect x="9.5" y="5" width="10" height="13.5" rx="2.2" {...stroke} transform="rotate(11 14.5 12)" />
-      <rect x="5" y="6.5" width="10" height="13.5" rx="2.2" {...stroke} transform="rotate(-6 10 13)" />
+      <rect
+        x="9.5"
+        y="5"
+        width="10"
+        height="13.5"
+        rx="2.2"
+        {...stroke}
+        transform="rotate(11 14.5 12)"
+      />
+      <rect
+        x="5"
+        y="6.5"
+        width="10"
+        height="13.5"
+        rx="2.2"
+        {...stroke}
+        transform="rotate(-6 10 13)"
+      />
     </>
   ),
   // a door (conditional probability / Monty Hall)

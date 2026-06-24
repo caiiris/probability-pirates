@@ -9,18 +9,21 @@ Turn a `Lesson` object plus a `LessonProgress` doc into a full-screen, mobile-fi
 ## User-facing behavior
 
 ### Entering a lesson
+
 - Route `/lesson/:lessonId`. The player takes over the screen — navigation chrome is hidden at every breakpoint (bottom nav on mobile, sidebar on desktop — both gone).
 - If the lesson is `comingSoon: true` → redirect to `/` with a toast "This lesson isn't ready yet."
 - If progress doc exists → start at `slotIndex`.
 - If progress doc doesn't exist → call `getOrCreateProgress` and start at slot 0.
 
 ### Header
+
 - Compact, ~56px tall.
 - Left: close X icon (32px touch target). Tapping prompts a confirm dialog: "Leave lesson? Your progress is saved." with [Stay] [Leave]. Leave routes to `/`.
 - Center: slim progress bar showing `slotIndex / totalSlots`.
 - Right: small flame chip with `currentStreak`.
 
 ### Slot body
+
 - One slot fills the screen. Renderer is chosen from `slot.kind`:
   - `concept` → `<ConceptSlotView>` — illustration + prompt + "Got it." CTA. With the enriched fields from D75 (`title`, `body[]`, `example.steps[]`), the view becomes a real "teach" beat: heading in the display face, lede `prompt`, body paragraphs at a comfortable measure, and the worked example as a bordered card with mono-numeric steps. The CTA is unchanged. Slots that omit the new fields keep the legacy centered one-liner so unconverted lessons stay visually intact.
   - `problem` → `<ProblemSlotView>` — picks the variant via `pickVariantForSlot`, then renders the matching interaction component (see `spec-interactions`).
@@ -28,12 +31,14 @@ Turn a `Lesson` object plus a `LessonProgress` doc into a full-screen, mobile-fi
 - Slot enters from the right (slide); exits to the left. Framer Motion `AnimatePresence`.
 
 ### Bottom CTA
+
 - Full-width shadcn `Button` (`size="lg"`, `w-full`), 56px tall, thumb-reachable.
 - Label is `Check` while the slot is unanswered; becomes `Continue` **only after a correct answer**. There is no way to advance a problem slot without answering correctly.
 - Disabled state when the interaction isn't ready (e.g. fill-fraction inputs empty).
 - For `concept` and `wrap` slots, the CTA is just `Got it` / `Continue` (no Check phase).
 
 ### Feedback area
+
 - Sits between the interaction and the bottom CTA.
 - Empty until a Check happens.
 - On correct: green check icon scales in (Framer, 200ms) + `feedbackCorrect` copy in `text-emerald-700`.
@@ -41,16 +46,19 @@ Turn a `Lesson` object plus a `LessonProgress` doc into a full-screen, mobile-fi
 - **After 2 wrong attempts on the same slot:** if the variant has an `explanation` field, it is appended below the per-wrong hint in a softer panel (label: "Still stuck? Here's the idea."). The CTA **does not** change to Continue — the learner must still produce a correct answer. If `explanation` is absent, the per-wrong hint is shown with slightly stronger emphasis but no new content. (No bail-out. Avoids cognitive offloading. Phase 2's LLM will fill in intermediate progressive hints between attempt 1 and the explanation; see `docs/alternatives.md` D55.)
 
 ### Transitions
+
 - Continue tap → record attempt (via `progressService.recordAttempt`) → bump `slotIndex` → animate the next slot in.
 - On the last slot's Continue → call `markLessonCompleted` → navigate to `/celebration/:lessonId` (rendered by `spec-habit-loop`).
 
 ## Data model
 
 This spec does not own any persistent data. It reads:
+
 - The static `Lesson` from `lessonById.get(lessonId)`.
 - The reactive `LessonProgress` from `useLessonProgress(lessonId)`.
 
 And calls:
+
 - `pickVariantForSlot` (`spec-progress-persistence`)
 - `progressService.recordVariantSelection` (first slot visit)
 - `progressService.recordAttempt` (on Check)
@@ -80,7 +88,7 @@ And calls:
 - **Progress doc is loading** → show a centered shadcn `Skeleton` for the slot area; keep the header rendered.
 - **`slotIndex` is past the end of `slots`** (data drift, e.g. lesson got shorter) → treat as completed, navigate to celebration.
 - **`selectedVariantIds[slotId]` references a missing variant** → fall back to `pickVariantForSlot` recomputation; log to Sentry (handled by `spec-progress-persistence`).
-- **User taps Continue on a wrap slot but `markLessonCompleted` fails** → show a toast "Couldn't save — try again"; keep them on the wrap slot. Do *not* let them out without saving completion (or the celebration screen will be wrong).
+- **User taps Continue on a wrap slot but `markLessonCompleted` fails** → show a toast "Couldn't save — try again"; keep them on the wrap slot. Do _not_ let them out without saving completion (or the celebration screen will be wrong).
 - **User taps the close X mid-slot** → confirm dialog; on confirm, route home; the in-flight progress is already saved (every Check writes), so resume works.
 - **Explanation reveal fires twice (double-tap on the 2nd wrong):** idempotent — `explanationRevealed` flips from `false` to `true` once and stays.
 - **Wrong-answer hint missing for the specific wrong answer:** fall through to `feedbackDefault`. This is the audit-feedback backlog by design.

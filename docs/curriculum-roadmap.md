@@ -4,7 +4,7 @@
 > (L1–L5 shipped, L6 stubbed) is a sampler; this doc is the curriculum we'd
 > grow into. Companion to [`prd.md`](prd.md) (product scope),
 > [`alternatives.md`](alternatives.md) (decision history), and
-> [`specs/spec-practice.md`](specs/spec-practice.md) (the *separate*
+> [`specs/spec-practice.md`](specs/spec-practice.md) (the _separate_
 > adaptive-practice surface — `/practice`, D85 — which draws on this content
 > but is not the teaching path).
 >
@@ -24,7 +24,7 @@
   sample-space arithmetic; sample spaces before counting principles; counting
   before conditional reasoning.
 - **One anchor object per unit.** Within a unit, lean on a consistent prop
-  (Unit 3 = dice, Unit 5 = cards) so cohesion compounds. Vary *across* units so
+  (Unit 3 = dice, Unit 5 = cards) so cohesion compounds. Vary _across_ units so
   the learner keeps hearing "probability is about the **structure**, not the prop."
 - **Diverge from Brilliant in two places.** (a) Isolate "what does probability
   even mean?" as its own unit — Brilliant jumps straight from "Counting Outcomes"
@@ -36,14 +36,14 @@
 
 ## 2. Where we are today (5 shipped + 1 stub)
 
-| # | Lesson | What it covers | Density |
-| --- | --- | --- | --- |
-| L1 | What is probability? | Sample space, equally-likely, events, single events, two-dice | **Very dense** — 7 min, ~11 slots, 4 sub-topics |
-| L2 | Law of large numbers | Empirical-vs-theoretical, convergence | Single concept |
-| L3 | Counting carefully | Mult, add, perm, comb, complement (5 principles in one) | **Very dense** |
-| L4 | Counting gets hard | Combinations applied + birthday paradox | Two-concept |
-| L5 | Conditional probability | Conditional formula + Monty Hall | Two-concept |
-| L6 | Distributions | Stub (`comingSoon`) | — |
+| #   | Lesson                  | What it covers                                                | Density                                         |
+| --- | ----------------------- | ------------------------------------------------------------- | ----------------------------------------------- |
+| L1  | What is probability?    | Sample space, equally-likely, events, single events, two-dice | **Very dense** — 7 min, ~11 slots, 4 sub-topics |
+| L2  | Law of large numbers    | Empirical-vs-theoretical, convergence                         | Single concept                                  |
+| L3  | Counting carefully      | Mult, add, perm, comb, complement (5 principles in one)       | **Very dense**                                  |
+| L4  | Counting gets hard      | Combinations applied + birthday paradox                       | Two-concept                                     |
+| L5  | Conditional probability | Conditional formula + Monty Hall                              | Two-concept                                     |
+| L6  | Distributions           | Stub (`comingSoon`)                                           | —                                               |
 
 **L1 and L3 are way too dense** for the "one idea per lesson" model. Splitting
 them is most of the work.
@@ -72,8 +72,8 @@ each unit (new lesson kind — see § 5).
 
 ### Unit 1 — Defining Probability
 
-*Goal: turn the `how-likely` opener's intuition into a precise definition —
-both the long-run interpretation and the equally-likely-outcomes formula.*
+_Goal: turn the `how-likely` opener's intuition into a precise definition —
+both the long-run interpretation and the equally-likely-outcomes formula._
 
 1. **The long-run idea** — Probability as the share you'd see if you repeated
    forever. (Light flavor of L2; LLN proper comes later.)
@@ -84,7 +84,7 @@ both the long-run interpretation and the equally-likely-outcomes formula.*
 
 ### Unit 2 — Compound experiments (counting outcomes)
 
-*Goal: how the sample space grows when experiments combine.* (Anchor: dice.)
+_Goal: how the sample space grows when experiments combine._ (Anchor: dice.)
 
 1. **Two coins** — HH, HT, TH, TT. The easy starter.
 2. **Two dice** — The 6×6 grid; sums.
@@ -96,7 +96,7 @@ both the long-run interpretation and the equally-likely-outcomes formula.*
 
 ### Unit 3 — Events
 
-*Goal: events as subsets, not as numbers.*
+_Goal: events as subsets, not as numbers._
 
 1. **An event is a set** — Even rolls, hearts, sums of 7.
 2. **P(event) by counting** — Use the equally-likely formula on subsets.
@@ -106,7 +106,7 @@ both the long-run interpretation and the equally-likely-outcomes formula.*
 
 ### Unit 4 — Counting techniques
 
-*Goal: tools when listing every outcome stops working.* (Anchor: cards.)
+_Goal: tools when listing every outcome stops working._ (Anchor: cards.)
 
 1. **The addition principle** — Disjoint choices.
 2. **Inclusion–exclusion** — Overlap correction.
@@ -118,7 +118,7 @@ both the long-run interpretation and the equally-likely-outcomes formula.*
 
 ### Unit 5 — Probabilities of multiple events
 
-*Goal: combining probabilities (not just outcomes).*
+_Goal: combining probabilities (not just outcomes)._
 
 1. **Independent events** — Multiply.
 2. **Mutually exclusive events** — Add.
@@ -129,7 +129,7 @@ both the long-run interpretation and the equally-likely-outcomes formula.*
 
 ### Unit 6 — Conditional probability
 
-*Goal: how new information changes belief.*
+_Goal: how new information changes belief._
 
 1. **Given that X happened** — Pure intuition (urns, cards).
 2. **The conditional formula** — Theorem callout.
@@ -141,7 +141,7 @@ both the long-run interpretation and the equally-likely-outcomes formula.*
 
 ### Unit 7 — Expected Value
 
-*Goal: when you bet on a probability, what payoff do you expect?* The genuine
+_Goal: when you bet on a probability, what payoff do you expect?_ The genuine
 probability capstone — every probability textbook ends here, and the unit lands
 on real-world decisions (gambles, insurance) rather than formal abstraction.
 
@@ -159,7 +159,7 @@ on real-world decisions (gambles, insurance) rather than formal abstraction.
 
 ### Out of scope (future Statistics track)
 
-Per **D90**, this curriculum is *classical HS probability* and ends on Expected
+Per **D90**, this curriculum is _classical HS probability_ and ends on Expected
 Value. The following sit on the statistics side of the high-school taxonomy and
 would belong in a future "Statistics" course-2, not here:
 
@@ -167,9 +167,9 @@ would belong in a future "Statistics" course-2, not here:
   Unit 7 teaches Expected Value without ever needing the term — by talking
   about "average payoff," not "the expectation of a random variable."
 - **Variance and standard deviation.** Useful, but the moment you start
-  *measuring* spread you've crossed into descriptive statistics.
+  _measuring_ spread you've crossed into descriptive statistics.
 - **Named distributions:** binomial, geometric, Poisson, uniform (continuous),
-  normal. The combinations work that *generates* the binomial coefficients
+  normal. The combinations work that _generates_ the binomial coefficients
   stays in Unit 4; the named distribution itself goes to stats.
 - **Central Limit Theorem.** Technically a probability theorem, but
   pedagogically it's the doorway to inferential statistics (sampling
@@ -177,7 +177,7 @@ would belong in a future "Statistics" course-2, not here:
 - **Monte Carlo as a method.** L2's Law of Large Numbers already foreshadows
   it; a full treatment belongs alongside resampling and bootstrap in stats.
 
-These ideas are *not* hidden anywhere in the path: the stub lessons that
+These ideas are _not_ hidden anywhere in the path: the stub lessons that
 covered them (`random-variable`, `distributions-intro`, `variance-spread`,
 `binomial-distribution`, `normal-distribution`, `central-limit-theorem`,
 `monte-carlo`, `capstone-problem-set`) and the old "Famous Distributions"
@@ -188,14 +188,14 @@ focused on what we plan to author is the explicit design choice.
 
 ## 4. How current lessons map in
 
-| Today | Becomes |
-| --- | --- |
-| L1 | Unit 2.1 + 2.2 + 3.1 + 3.2 + 4.1 + 4.2 (split into 6 lessons) |
+| Today    | Becomes                                                            |
+| -------- | ------------------------------------------------------------------ |
+| L1       | Unit 2.1 + 2.2 + 3.1 + 3.2 + 4.1 + 4.2 (split into 6 lessons)      |
 | L2 (LLN) | Unit 1.3 (light) + Unit 9.4 (proper return with CLT / Monte Carlo) |
-| L3 | Unit 3.4 + 5.1 + 5.3 + 5.4 + 5.5 |
-| L4 | Unit 5.4 (combos applied) + Unit 6.4 (birthday) |
-| L5 | Unit 7 (split across 5–6 lessons) |
-| L6 | Units 8 + 9 |
+| L3       | Unit 3.4 + 5.1 + 5.3 + 5.4 + 5.5                                   |
+| L4       | Unit 5.4 (combos applied) + Unit 6.4 (birthday)                    |
+| L5       | Unit 7 (split across 5–6 lessons)                                  |
+| L6       | Units 8 + 9                                                        |
 
 The existing slot model (`ConceptSlot` / `ProblemSlot` / `WrapSlot`) handles all
 of this **with no schema changes**. The biggest content moves are mechanical
@@ -249,7 +249,7 @@ Capabilities the new sequence wants but we don't have yet:
 2. **Split L1 into Unit 2** (3 lessons + practice). Highest-leverage move — L1 is
    the front door and the most overstuffed.
 3. **Then Unit 3** — repurposes the two-dice flashcard, adds tree diagrams.
-4. **Then back-fill Unit 1** (the pure-intuition lessons). These are the *hardest*
+4. **Then back-fill Unit 1** (the pure-intuition lessons). These are the _hardest_
    to author well — comparative likelihood needs new interactions and very careful
    copy — so they shouldn't be the first thing shipped under deadline pressure,
    even though they're #1 in the order.
@@ -272,5 +272,5 @@ places:
 - **They wrap their card-deck framing around everything**, a pedagogical
   commitment (concrete object → familiarity). We've been mixed (dice, coins,
   cards, M&Ms) — closer to Khan Academy. Keep the variety because it stresses that
-  probability is about the *structure*, not the prop — but within a single unit,
+  probability is about the _structure_, not the prop — but within a single unit,
   pick one anchor object (Unit 3 = dice, Unit 5 = cards) for cohesion.

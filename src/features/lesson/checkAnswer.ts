@@ -1,9 +1,7 @@
 import type { Variant } from '@/content/types';
 import type { AttemptPayload } from '@/features/progress/progressService';
 
-export type CheckResult =
-  | { wasCorrect: true }
-  | { wasCorrect: false; matchedWrongKey: string };
+export type CheckResult = { wasCorrect: true } | { wasCorrect: false; matchedWrongKey: string };
 
 /**
  * Pure function: evaluates an answer payload against a variant's correctness rules.

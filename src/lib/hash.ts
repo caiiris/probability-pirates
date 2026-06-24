@@ -7,7 +7,7 @@ export function fnv1a32(input: string): number {
   for (let i = 0; i < input.length; i++) {
     hash ^= input.charCodeAt(i);
     // Multiply by FNV prime (32-bit overflow is intentional — >>> 0 keeps it unsigned)
-    hash = (Math.imul(hash, 16777619) >>> 0);
+    hash = Math.imul(hash, 16777619) >>> 0;
   }
   return hash;
 }

@@ -31,21 +31,15 @@ export const ACCENTS = {
 export type AccentName = keyof typeof ACCENTS;
 
 /** Stable ordering for cycling through accents (e.g. lesson nodes, confetti). */
-export const ACCENT_ORDER: AccentName[] = [
-  'violet',
-  'blue',
-  'teal',
-  'green',
-  'amber',
-  'coral',
-];
+export const ACCENT_ORDER: AccentName[] = ['violet', 'blue', 'teal', 'green', 'amber', 'coral'];
 
 /** The saturated base of every accent, in order — handy for multi-color bursts. */
 export const ACCENT_BASES: string[] = ACCENT_ORDER.map((name) => ACCENTS[name].base);
 
 /** Pick a deterministic accent for an index (wraps). Use for ordered content. */
 export function accentForIndex(index: number): AccentStop {
-  const name = ACCENT_ORDER[((index % ACCENT_ORDER.length) + ACCENT_ORDER.length) % ACCENT_ORDER.length];
+  const name =
+    ACCENT_ORDER[((index % ACCENT_ORDER.length) + ACCENT_ORDER.length) % ACCENT_ORDER.length];
   return ACCENTS[name];
 }
 

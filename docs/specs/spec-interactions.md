@@ -9,6 +9,7 @@ Render each kind of problem the content model supports in a way that is visual, 
 ## User-facing behavior
 
 Each interaction shares a contract with the lesson player:
+
 - Receives `variant`, `attemptNumber`, `feedbackState: 'idle' | 'correct' | 'wrong'` as props.
 - Exposes `onChange(answerPayload | null)` to keep the parent's Check button enabled/disabled correctly.
 - Resets internal state on `slot.id` change (key-based remount).
@@ -19,47 +20,52 @@ Each interaction shares a contract with the lesson player:
 
 Every interaction renders a small, persistent instructional hint above or below the interaction area that makes the build phase explicit, e.g.:
 
-| Kind | Affordance copy |
-| --- | --- |
-| `tap-outcomes` | "Tap to collect. Tap again to remove." |
-| `fill-fraction` | "Type your fraction. Tap Check when ready." |
-| `tap-event` | "Tap to mark. Tap again to unmark." |
-| `grid-event` | "Tap cells to count them. Tap again to remove." |
-| `multiple-choice` | "Tap your choice. You can change it before tapping Check." |
-| `simulate-proportion` | "Run trials and watch the share settle. Run more to see it steady." |
-| `monty-hall` | "Play a few rounds, then run a batch on autopilot to compare the strategies." |
+| Kind                  | Affordance copy                                                               |
+| --------------------- | ----------------------------------------------------------------------------- |
+| `tap-outcomes`        | "Tap to collect. Tap again to remove."                                        |
+| `fill-fraction`       | "Type your fraction. Tap Check when ready."                                   |
+| `tap-event`           | "Tap to mark. Tap again to unmark."                                           |
+| `grid-event`          | "Tap cells to count them. Tap again to remove."                               |
+| `multiple-choice`     | "Tap your choice. You can change it before tapping Check."                    |
+| `simulate-proportion` | "Run trials and watch the share settle. Run more to see it steady."           |
+| `monty-hall`          | "Play a few rounds, then run a batch on autopilot to compare the strategies." |
 
 The copy is rendered in `text-muted-foreground` at body size, dismissible by tapping a small `×` (state stored per-user in `localStorage` under `interactionHintsDismissed`). Exact wording owned by `docs/ui-stack.md`.
 
 ### 1. `TapOutcomes`
+
 - Renders a row of large tappable faces (die / coin / card suits) above an "outcomes-collected" pill row.
 - Each tap adds the face to the collected list; tapping the same face twice triggers a hint via the `duplicate` key in `feedbackByWrongValue`.
 - Done when all `expectedOutcomes` are collected (in any order).
 - `answerPayload`: `{ collected: string[] }`.
 
 ### 2. `FillFraction`
+
 - Two number inputs stacked vertically (numerator on top), with a horizontal divider line. Numeric keyboard on mobile.
 - Inputs accept 0–999 each; non-numeric chars stripped on input.
 - `answerPayload`: `{ numerator: number; denominator: number }`.
 - On correct, animates the fraction reducing to lowest terms (e.g. `3/6 → 1/2`).
 
 ### 3. `TapEvent`
+
 - Renders the variant's `sampleSpace` as a row of large tappable chips.
 - Tapping a chip toggles its "selected" state with a satisfying scale-bounce.
 - `answerPayload`: `{ selected: string[] }`.
-- On wrong: only the *incorrect* taps flash rose; correct ones stay neutral. Hint via the wrong-outcome key.
+- On wrong: only the _incorrect_ taps flash rose; correct ones stay neutral. Hint via the wrong-outcome key.
 
 ### 4. `GridEvent` — **the rich interaction**
+
 - Renders an `rows × cols` grid of tappable cells. Each cell shows the outcome label (e.g. `(2, 5)` for dice pairs).
 - Cell size scales with viewport per D63: **44×44px minimum on mobile** (touch target floor), **56×56px on tablet (`md:`)**, **64×64px on desktop (`lg:`)**. The 6×6 grid fits on a 390px-wide phone with 4px gaps; on wider viewports the grid is centered with proportional gaps.
 - Tap a cell → toggles it indigo (using `--primary`).
 - Live counter below the grid renders `liveCounterTemplate` with `{count}` substituted (e.g. `"6 / 36"`).
 - `answerPayload`: `{ selectedCells: Array<[number, number]> }` (1-indexed).
-- On wrong: each *incorrect* selected cell briefly flashes rose, then deselects. Correct ones stay indigo. Hint copy is `feedbackByCell[row,col]` if present, else `feedbackDefault`. (See `feedbackByCell` extension below.)
+- On wrong: each _incorrect_ selected cell briefly flashes rose, then deselects. Correct ones stay indigo. Hint copy is `feedbackByCell[row,col]` if present, else `feedbackDefault`. (See `feedbackByCell` extension below.)
 - On correct: every correct cell pulses emerald once.
 - Smooth 60 FPS: each cell is a small `<motion.button>` with `whileTap={{ scale: 0.94 }}`. No re-renders of the full grid on tap (memoize cells on `(row, col, selected)`).
 
 ### 5. `MultipleChoice`
+
 - 2–4 large option cards, full width, stacked vertically.
 - Single-select (tap an option → outlined indigo).
 - `answerPayload`: `{ optionId: string }`.
@@ -67,6 +73,7 @@ The copy is rendered in `text-muted-foreground` at body size, dismissible by tap
 - Optional `context` blurb renders above the options; each option may carry `subtext`.
 
 ### 6. `SimulateProportion` — convergence simulator (D73)
+
 - Runs a binary trial many times and plots the **running share of successes** converging to a horizontal reference line at `targetProbability`. Custom inline SVG (`ProportionChart`), no chart library.
 - `scenario` drives the per-trial visual and the generator: `coin` (last flip), `die-six` (last face, highlighted on a six), `birthday` (a room of `roomSize` birthdays with collisions marked).
 - Run buttons batch trials (`+1 / +10 / +50`, or `+1 / +25 / +100 rooms` for birthday). Trial generators are pure functions in `src/lib/simulations.ts`; the chart history is decimated to ~160 points so redraws stay cheap.
@@ -74,6 +81,7 @@ The copy is rendered in `text-muted-foreground` at body size, dismissible by tap
 - `answerPayload`: `{ trials: number }`.
 
 ### 7. `MontyHall` — the conditional-probability payoff (D73)
+
 - Three doors. Manual mode: tap a door to pick → the host opens a goat door → Switch / Stay → the result reveals all doors (car vs goats), the picked door ringed emerald on a win, rose on a loss.
 - Autopilot mode: a "Run 100 games" button simulates 100 always-switch and 100 always-stay games, accumulating win rates plotted as two series converging to the `2/3` and `1/3` reference lines.
 - Manual outcomes are attributed to the strategy chosen (switch or stay) so the on-screen rates stay honest.
@@ -93,11 +101,12 @@ export type GridEventVariant = BaseVariant & {
   cols: number;
   correctCells: Array<[number, number]>;
   liveCounterTemplate: string;
-  feedbackByCell?: Record<string, string>;  // key: "row,col" (1-indexed)
+  feedbackByCell?: Record<string, string>; // key: "row,col" (1-indexed)
 };
 ```
 
 Authoring example:
+
 ```ts
 feedbackByCell: {
   '1,1': 'That sums to 2, not 7.',
@@ -109,27 +118,27 @@ The audit-feedback script (`scripts/audit-feedback.ts`) is updated to flag grid 
 
 ### `answerPayload` shapes (consumed by `checkAnswer`)
 
-| interactionKind | `answerPayload` |
-| --- | --- |
-| `tap-outcomes` | `{ collected: string[] }` |
-| `fill-fraction` | `{ numerator: number; denominator: number }` |
-| `tap-event` | `{ selected: string[] }` |
-| `grid-event` | `{ selectedCells: Array<[number, number]> }` |
-| `multiple-choice` | `{ optionId: string }` |
-| `simulate-proportion` | `{ trials: number }` |
-| `monty-hall` | `{ games: number }` |
+| interactionKind       | `answerPayload`                              |
+| --------------------- | -------------------------------------------- |
+| `tap-outcomes`        | `{ collected: string[] }`                    |
+| `fill-fraction`       | `{ numerator: number; denominator: number }` |
+| `tap-event`           | `{ selected: string[] }`                     |
+| `grid-event`          | `{ selectedCells: Array<[number, number]> }` |
+| `multiple-choice`     | `{ optionId: string }`                       |
+| `simulate-proportion` | `{ trials: number }`                         |
+| `monty-hall`          | `{ games: number }`                          |
 
 ### `checkAnswer` semantics (this defines correctness)
 
-| kind | Correct when | `matchedWrongKey` (for hint lookup) |
-| --- | --- | --- |
-| `tap-outcomes` | `collected` (as a set) equals `expectedOutcomes` (as a set) AND no duplicates | `'duplicate'` if a duplicate was tapped, else the first unexpected value |
-| `fill-fraction` | `numerator / denominator === variant.numerator / variant.denominator` (cross-multiply to avoid float) OR an equivalent reduced form | `"${numerator}/${denominator}"` |
-| `tap-event` | `selected` (as a set) equals `correctOutcomes` (as a set) | the first wrong outcome in `selected` |
-| `grid-event` | `selectedCells` (as a set of `"row,col"`) equals `correctCells` (as a set) | the first wrong cell in `selectedCells`, key `"row,col"` |
-| `multiple-choice` | `optionId === correctOptionId` | `optionId` |
-| `simulate-proportion` | `trials >= variant.minTrials` | `'incomplete'` (near-unreachable: Check is gated below threshold) |
-| `monty-hall` | `games >= variant.minGames` | `'incomplete'` (near-unreachable: Check is gated below threshold) |
+| kind                  | Correct when                                                                                                                        | `matchedWrongKey` (for hint lookup)                                      |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `tap-outcomes`        | `collected` (as a set) equals `expectedOutcomes` (as a set) AND no duplicates                                                       | `'duplicate'` if a duplicate was tapped, else the first unexpected value |
+| `fill-fraction`       | `numerator / denominator === variant.numerator / variant.denominator` (cross-multiply to avoid float) OR an equivalent reduced form | `"${numerator}/${denominator}"`                                          |
+| `tap-event`           | `selected` (as a set) equals `correctOutcomes` (as a set)                                                                           | the first wrong outcome in `selected`                                    |
+| `grid-event`          | `selectedCells` (as a set of `"row,col"`) equals `correctCells` (as a set)                                                          | the first wrong cell in `selectedCells`, key `"row,col"`                 |
+| `multiple-choice`     | `optionId === correctOptionId`                                                                                                      | `optionId`                                                               |
+| `simulate-proportion` | `trials >= variant.minTrials`                                                                                                       | `'incomplete'` (near-unreachable: Check is gated below threshold)        |
+| `monty-hall`          | `games >= variant.minGames`                                                                                                         | `'incomplete'` (near-unreachable: Check is gated below threshold)        |
 
 ## Implementation outline
 

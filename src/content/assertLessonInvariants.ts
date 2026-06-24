@@ -6,11 +6,7 @@ function assertNonEmptyString(value: string, path: string): void {
   }
 }
 
-function assertVariantInvariants(
-  lesson: Lesson,
-  slot: ProblemSlot,
-  variant: Variant,
-): void {
+function assertVariantInvariants(lesson: Lesson, slot: ProblemSlot, variant: Variant): void {
   const basePath = `${lesson.id}/${slot.id}/${variant.id}`;
 
   assertNonEmptyString(variant.prompt, `${basePath}.prompt`);
@@ -38,9 +34,7 @@ function assertVariantInvariants(
         throw new Error(`${basePath}: denominator must be positive`);
       }
       if (variant.numerator < 0 || variant.numerator > variant.denominator) {
-        throw new Error(
-          `${basePath}: numerator must be between 0 and denominator inclusive`,
-        );
+        throw new Error(`${basePath}: numerator must be between 0 and denominator inclusive`);
       }
       if (variant.numeratorLabel !== undefined) {
         assertNonEmptyString(variant.numeratorLabel, `${basePath}.numeratorLabel`);
@@ -59,9 +53,7 @@ function assertVariantInvariants(
       }
       for (const outcome of variant.correctOutcomes) {
         if (!variant.sampleSpace.includes(outcome)) {
-          throw new Error(
-            `${basePath}: correctOutcome "${outcome}" is not in sampleSpace`,
-          );
+          throw new Error(`${basePath}: correctOutcome "${outcome}" is not in sampleSpace`);
         }
       }
       break;
@@ -70,10 +62,7 @@ function assertVariantInvariants(
       if (variant.rows <= 0 || variant.cols <= 0) {
         throw new Error(`${basePath}: rows and cols must be positive`);
       }
-      assertNonEmptyString(
-        variant.liveCounterTemplate,
-        `${basePath}.liveCounterTemplate`,
-      );
+      assertNonEmptyString(variant.liveCounterTemplate, `${basePath}.liveCounterTemplate`);
       for (const [row, col] of variant.correctCells) {
         if (row < 1 || row > variant.rows || col < 1 || col > variant.cols) {
           throw new Error(
@@ -100,18 +89,14 @@ function assertVariantInvariants(
     }
     case 'simulate-proportion': {
       if (variant.targetProbability < 0 || variant.targetProbability > 1) {
-        throw new Error(
-          `${basePath}: targetProbability must be between 0 and 1`,
-        );
+        throw new Error(`${basePath}: targetProbability must be between 0 and 1`);
       }
       if (variant.minTrials <= 0) {
         throw new Error(`${basePath}: minTrials must be positive`);
       }
       assertNonEmptyString(variant.targetLabel, `${basePath}.targetLabel`);
       if (variant.scenario === 'birthday' && (variant.roomSize ?? 0) < 2) {
-        throw new Error(
-          `${basePath}: birthday scenario requires roomSize >= 2`,
-        );
+        throw new Error(`${basePath}: birthday scenario requires roomSize >= 2`);
       }
       break;
     }
@@ -135,11 +120,11 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
     case 'concept': {
       const hasTeachContent = Boolean(
         slot.title ||
-          (slot.body && slot.body.length > 0) ||
-          slot.example ||
-          slot.theorem ||
-          slot.derivation ||
-          slot.quote,
+        (slot.body && slot.body.length > 0) ||
+        slot.example ||
+        slot.theorem ||
+        slot.derivation ||
+        slot.quote,
       );
       if (slot.prompt !== undefined) {
         assertNonEmptyString(slot.prompt, `${basePath}.prompt`);

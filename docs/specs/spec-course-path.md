@@ -9,6 +9,7 @@ Be the right answer to "what should I do now?" Every time the learner opens the 
 ## User-facing behavior
 
 ### Header (sticky, ~80px)
+
 - Top row: app name "Pascal" (small), Profile avatar icon (taps to `/profile`).
 - Below: a flex row with three elements:
   - **Flame chip:** `🔥 N` (current streak). Amber background if streak > 0; gray if 0.
@@ -16,14 +17,16 @@ Be the right answer to "what should I do now?" Every time the learner opens the 
   - **Course progress:** small text `X / 6 lessons`.
 
 ### Hero card
+
 - One full-width card just below the header.
 - States (evaluated in order):
-  - **Welcome (brand-new user, per D70):** if `useAllLessonProgress(uid)` is empty *and* `profile.stepsCompleted === 0`, show `"Welcome, {displayUsername}. Let's begin."` with a Start CTA that routes to `/lesson/what-is-probability`. The condition flips false the moment the learner advances any slot; no client-side flag needed.
+  - **Welcome (brand-new user, per D70):** if `useAllLessonProgress(uid)` is empty _and_ `profile.stepsCompleted === 0`, show `"Welcome, {displayUsername}. Let's begin."` with a Start CTA that routes to `/lesson/what-is-probability`. The condition flips false the moment the learner advances any slot; no client-side flag needed.
   - **Resume:** if any lesson has `state === 'in_progress'`, show `"Resume Lesson N, Step X of Y"` with a Continue CTA that routes to `/lesson/:id`.
   - **Start:** if no in-progress lesson, show `"Start Lesson N: <title>"` where N is the next `not_started` real lesson. (For MVP that's always Lesson 1.)
-  - **All caught up:** if *all* unlocked lessons are completed → `"All caught up. Come back tomorrow."` + a re-do button for Lesson 1 (triggers replay; see `spec-progress-persistence.startReplay`).
+  - **All caught up:** if _all_ unlocked lessons are completed → `"All caught up. Come back tomorrow."` + a re-do button for Lesson 1 (triggers replay; see `spec-progress-persistence.startReplay`).
 
 ### Course path list
+
 - Responsive layout of all 6 lessons (the full `lessons` array). One shadcn `Card` per lesson. Mobile: single-column vertical list. Tablet (`md:`): 2-column grid. Desktop (`lg:`): 3-column grid. Cards reflow on viewport resize. (Per D63.)
 - Card contents:
   - **Lesson number badge** (`1`..`6`) on the left.
@@ -37,6 +40,7 @@ Be the right answer to "what should I do now?" Every time the learner opens the 
   - Locked lesson (Lessons 2–6, `comingSoon: true`): show toast "Coming soon. Finish Lesson N first." (via Sonner).
 
 ### Navigation chrome (responsive per D63, implementation per D71)
+
 - Persistent `AppShell` navigation (also used by Profile). Two destinations: Home (active) and Profile.
 - **Mobile (<`md:` = <768px):** bottom nav bar built from shadcn `Button variant="ghost"`, full-width, ~64px tall.
 - **Tablet+ (`md:` and up):** **shadcn `Sidebar` block** (`npx shadcn add sidebar`) on the left. Use the block's defaults for collapse/expand and focus management; override only the visual register to match the rest of the app per `docs/ui-directive.md`.
@@ -45,13 +49,15 @@ Be the right answer to "what should I do now?" Every time the learner opens the 
 ## Data model
 
 This spec is read-only relative to Firestore. It consumes:
+
 - The static `lessons: Lesson[]` from `src/content/index.ts`.
 - `useAllLessonProgress(uid)` → `Map<lessonId, LessonProgress>`.
 - `useAuth()` → `{ profile }` for streak fields.
 
 It computes:
+
 - `nextRecommendedLesson(lessons, progressMap)` — first `in_progress` real lesson, else first `not_started` real lesson, else `null` (all done).
-- `courseProgress(lessons, progressMap)` — number of completed *real* lessons over total real lessons (= 1 for MVP).
+- `courseProgress(lessons, progressMap)` — number of completed _real_ lessons over total real lessons (= 1 for MVP).
 
 ## Implementation outline
 
@@ -73,7 +79,7 @@ It computes:
 - **First-time user** (no progress doc at all): hero card shows "Start Lesson 1"; all real lessons show `Not started`; streak shows 0 (gray); daily goal gray.
 - **User completed Lesson 1, no in-progress**: hero shows "All caught up. Come back tomorrow."; Lesson 1 card shows `Completed`; tapping it opens a Replay confirmation dialog ("Start over from the beginning?") that, on confirm, calls `startReplay` and routes to `/lesson/1`.
 - **Network is slow** (progress doc still loading): hero card and lesson list render shadcn `Skeleton` placeholders.
-- **Locked lesson tap**: toast appears but tap does *not* navigate; the card visibly shakes briefly (Framer).
+- **Locked lesson tap**: toast appears but tap does _not_ navigate; the card visibly shakes briefly (Framer).
 - **`comingSoon: true` lesson with `state: completed` somehow** (data drift): trust `comingSoon` over state; render as locked.
 - **User has multiple `in_progress` lessons** (shouldn't happen in MVP since only Lesson 1 is real): show the one with the most recent `updatedAt`.
 - **`useAllLessonProgress` returns nothing for hours after signup** (Firestore propagation delay, rare): hero card shows the "Start" state — same as a brand new user. Acceptable.
