@@ -6,6 +6,7 @@ import { MOTION } from '@/lib/motion';
 import { useInteractionHint } from './useInteractionHint';
 import { InteractionHint } from './InteractionHint';
 import { HintDisclosure, HintReferenceGrid } from './HintDisclosure';
+import { DiceRoller } from './DiceRoller';
 
 const AFFORDANCE = 'Tap your choice. You can change it before tapping Check.';
 
@@ -46,13 +47,14 @@ export function MultipleChoice({ variant, feedbackState, onChange }: Props) {
       <p className="text-xl font-medium text-center">{variant.prompt}</p>
       {hintVisible && <InteractionHint text={AFFORDANCE} onDismiss={dismissHint} />}
 
-      {(variant.context || grid) && (
-        <div className="flex flex-col items-center gap-2">
+      {(variant.context || grid || variant.showDiceRoller) && (
+        <div className="flex flex-col items-center gap-3">
           {variant.context && (
             <p className="w-full text-sm text-muted-foreground text-center bg-muted rounded-lg px-4 py-2.5">
               {variant.context}
             </p>
           )}
+          {variant.showDiceRoller && <DiceRoller />}
           {grid && (
             <HintDisclosure>
               <HintReferenceGrid

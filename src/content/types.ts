@@ -13,13 +13,26 @@ export type Slot = ConceptSlot | WrapSlot | ProblemSlot;
 export type ConceptSlot = {
   id: string;
   kind: 'concept';
-  /** Lede sentence — the one-line idea the slot is built around. */
-  prompt: string;
+  /**
+   * Lede sentence, the one-line idea the slot is built around. Optional on
+   * enriched slots (those with a title/body/quote/etc.); required on the thin
+   * one-liner shape, which has nothing else to show.
+   */
+  prompt?: string;
   illustration: IllustrationRef;
   /** Optional short heading or term being introduced (renders in the display face). */
   title?: string;
   /** Optional supporting paragraphs — the "teach". Kept short; comfortable measure, not full width. */
   body?: string[];
+  /**
+   * Optional pull-quote (D88). Renders as a styled box with a large quotation
+   * mark and italic text, directly under the lede prompt. Used for inspirational
+   * or framing quotes (e.g. the course-opener welcome).
+   */
+  quote?: {
+    text: string;
+    attribution?: string;
+  };
   /**
    * Optional named theorem statement (D77). Renders as a bordered callout
    * directly under the lede prompt (above the body / example / derivation),
@@ -58,6 +71,8 @@ export type WrapSlot = {
   title: string;
   body: string;
   segueToLessonId?: string;
+  /** Optional Captain Pascal cameo line shown on the wrap (D88). */
+  mascotLine?: string;
 };
 
 export type ProblemSlot = {
@@ -65,6 +80,19 @@ export type ProblemSlot = {
   kind: 'problem';
   interactionKind: InteractionKind;
   variants: [Variant, ...Variant[]];
+  /**
+   * Commit-once "prediction / challenge" question (D88). When true the learner
+   * answers once and Continue unlocks immediately, right OR wrong (no retry, no
+   * bail-out gate). Correct shows `feedbackCorrect`; wrong shows the matching
+   * `feedbackBy*` copy. Use for gut-check questions whose payoff is the reveal
+   * on the next slots, not getting the answer right first try.
+   */
+  commitOnce?: boolean;
+  /**
+   * Renders a "Challenge question" banner (with the Captain Pascal mascot) above
+   * the interaction. Presentation only.
+   */
+  challenge?: boolean;
 };
 
 export type InteractionKind =
@@ -91,6 +119,12 @@ type BaseVariant = {
   feedbackCorrect: string;
   feedbackDefault: string;
   explanation?: string;
+  /**
+   * Optional teaching caption shown INSIDE the interaction (just below its
+   * content) once the learner answers correctly, distinct from the footer
+   * feedback. Currently rendered by `tap-outcomes` and `fill-fraction`.
+   */
+  afterNote?: string;
 };
 
 export type TapOutcomesVariant = BaseVariant & {
@@ -107,6 +141,10 @@ export type FillFractionVariant = BaseVariant & {
   feedbackByWrongAnswer?: Record<string, string>;
   /** When true, renders an interactive d6 reference above the inputs (tap to highlight faces). */
   showDieContext?: boolean;
+  /** Optional label beside the numerator input, e.g. "ways to roll even". */
+  numeratorLabel?: string;
+  /** Optional label beside the denominator input, e.g. "ways in total". */
+  denominatorLabel?: string;
 };
 
 export type TapEventVariant = BaseVariant & {
@@ -145,6 +183,8 @@ export type MultipleChoiceVariant = BaseVariant & {
   feedbackByOption: Record<string, string>;
   /** Optional context blurb shown above the options. */
   context?: string;
+  /** When true, renders the two-dice "Roll the dice!" roller above the options (play, no answer state). */
+  showDiceRoller?: boolean;
   /** Optional read-only grid shown inside a collapsible "Need a hint?" panel. */
   gridReference?: {
     rows: number;

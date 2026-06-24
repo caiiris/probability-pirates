@@ -73,8 +73,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Track active profile listener so we can tear it down when the user changes
     let unsubProfile: (() => void) | null = null;
+    // The uid the current `state`/listener belongs to. Used to detect a genuine
+    // account switch (vs. a same-user token refresh, which also fires
+    // onAuthStateChanged) so we only blow away cached profile data when the
+    // identity actually changes.
+    let activeUid: string | null = null;
 
     const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
+      const nextUid = firebaseUser?.uid ?? null;
+      const userChanged = nextUid !== activeUid;
+
       // Always tear down the previous profile listener before starting a new one
       if (unsubProfile) {
         unsubProfile();
@@ -82,8 +90,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (!firebaseUser) {
+        activeUid = null;
         setState({ status: 'unauthenticated' });
         return;
+      }
+
+      // On a real account switch, immediately drop the previous user's profile
+      // so their XP / achievements / streak can never bleed onto the new
+      // account's screen during the window before the new snapshot lands (or if
+      // that snapshot errors). Without this, signing in as B while A's profile
+      // is cached in state would render A's progress under B's session.
+      if (userChanged) {
+        activeUid = nextUid;
+        setState({ status: 'authenticated', user: firebaseUser, profile: null });
       }
 
       // Authenticated: subscribe to the user's profile doc.
@@ -97,19 +116,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         (p) => p.providerId === 'google.com',
       );
       const userRef = doc(db, 'users', firebaseUser.uid);
-      unsubProfile = onSnapshot(userRef, (snap) => {
-        if (!snap.exists() && isGoogleUser) {
-          setState({ status: 'needs_username', user: firebaseUser });
-          return;
-        }
-        const profile = snap.exists() ? (snap.data() as UserProfile) : null;
-        setState({ status: 'authenticated', user: firebaseUser, profile });
-        // Backfill/repair the public projection for accounts that predate it.
-        // One-shot per session, best-effort (never blocks auth).
-        if (profile) {
-          void ensurePublicProfile(firebaseUser.uid, profile);
-        }
-      });
+      unsubProfile = onSnapshot(
+        userRef,
+        (snap) => {
+          if (!snap.exists() && isGoogleUser) {
+            setState({ status: 'needs_username', user: firebaseUser });
+            return;
+          }
+          const profile = snap.exists() ? (snap.data() as UserProfile) : null;
+          setState({ status: 'authenticated', user: firebaseUser, profile });
+          // Backfill/repair the public projection for accounts that predate it.
+          // One-shot per session, best-effort (never blocks auth).
+          if (profile) {
+            void ensurePublicProfile(firebaseUser.uid, profile);
+          }
+        },
+        (err) => {
+          // Never leave the previous user's profile on screen if the read fails.
+          // Surface the current user with no profile rather than stale data.
+          console.error('[AuthProvider] profile snapshot error:', err);
+          setState({ status: 'authenticated', user: firebaseUser, profile: null });
+        },
+      );
     });
 
     return () => {

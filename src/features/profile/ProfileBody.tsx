@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { Chest } from '@/components/illustrations/Chest';
-import { CompassRose } from '@/components/illustrations/CompassRose';
 import { OceanScene } from '@/features/course/OceanScene';
 import { FlairBadge } from '@/features/economy/FlairBadge';
 import { DefaultAvatar } from './DefaultAvatar';
@@ -85,13 +84,15 @@ export function ProfileBody({
         </div>
       </OceanScene>
 
-      {/* Rank — what XP buys you: levels + a pirate rank */}
+      {/* Rank — what XP buys you: levels + a pirate rank. Sits quietly next to
+          the identity banner; the disc carries enough weight on its own. */}
       <Section title="Rank">
         <RankPanel xp={xp} />
       </Section>
 
-      {/* Stats */}
-      <Section title="Captain's log" icon={<CompassRose className="h-5 w-5" />}>
+      {/* Stats — supporting; recedes so the page has hierarchy instead of four
+          cards of equal weight. */}
+      <Section title="Stats">
         <StatsGrid
           xp={xp}
           lessonsCompleted={lessonsCompleted}
@@ -103,16 +104,17 @@ export function ProfileBody({
         />
       </Section>
 
-      {/* Activity grid */}
-      <Section title="Voyage log">
+      {/* Activity grid — also supporting. */}
+      <Section title="Activity">
         <ActivityGrid activityDates={activityDates} />
       </Section>
 
-      {/* Trophies */}
+      {/* Trophies — the page's hero collection. Elevation + chest icon carry
+          the weight; no tinted background so it stays clean. */}
       <Section
+        elevated
         title="Treasure shelf"
         icon={<Chest open className="h-6 w-6" />}
-        tint="color-mix(in srgb, var(--amber-soft) 45%, var(--card))"
       >
         <TrophyCase
           milestonesReached={milestonesReached}
@@ -124,21 +126,29 @@ export function ProfileBody({
   );
 }
 
-/** A titled card section — gives the profile clear, separated blocks. */
+/**
+ * A titled section. `elevated` is opt-in: only the page's hero collection wears
+ * a real shadow, so the page reads as one prominent block + a few supporting
+ * ones, instead of four equally-weighted cards stacked.
+ */
 function Section({
   title,
   icon,
   tint,
+  elevated = false,
   children,
 }: {
   title: string;
   icon?: ReactNode;
   tint?: string;
+  elevated?: boolean;
   children: ReactNode;
 }) {
   return (
     <section
-      className="rounded-2xl border p-4 shadow-soft sm:p-5"
+      className={`rounded-2xl border p-4 sm:p-5 ${
+        elevated ? 'shadow-soft' : 'border-border/70'
+      }`}
       style={{ background: tint ?? 'var(--card)' }}
     >
       <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-bold tracking-tight">

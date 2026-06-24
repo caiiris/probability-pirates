@@ -16,6 +16,9 @@ function assertVariantInvariants(
   assertNonEmptyString(variant.prompt, `${basePath}.prompt`);
   assertNonEmptyString(variant.feedbackCorrect, `${basePath}.feedbackCorrect`);
   assertNonEmptyString(variant.feedbackDefault, `${basePath}.feedbackDefault`);
+  if (variant.afterNote !== undefined) {
+    assertNonEmptyString(variant.afterNote, `${basePath}.afterNote`);
+  }
 
   if (variant.interactionKind !== slot.interactionKind) {
     throw new Error(
@@ -38,6 +41,12 @@ function assertVariantInvariants(
         throw new Error(
           `${basePath}: numerator must be between 0 and denominator inclusive`,
         );
+      }
+      if (variant.numeratorLabel !== undefined) {
+        assertNonEmptyString(variant.numeratorLabel, `${basePath}.numeratorLabel`);
+      }
+      if (variant.denominatorLabel !== undefined) {
+        assertNonEmptyString(variant.denominatorLabel, `${basePath}.denominatorLabel`);
       }
       break;
     }
@@ -124,7 +133,19 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
 
   switch (slot.kind) {
     case 'concept': {
-      assertNonEmptyString(slot.prompt, `${basePath}.prompt`);
+      const hasTeachContent = Boolean(
+        slot.title ||
+          (slot.body && slot.body.length > 0) ||
+          slot.example ||
+          slot.theorem ||
+          slot.derivation ||
+          slot.quote,
+      );
+      if (slot.prompt !== undefined) {
+        assertNonEmptyString(slot.prompt, `${basePath}.prompt`);
+      } else if (!hasTeachContent) {
+        throw new Error(`${basePath}: concept slot must have a prompt or teach content`);
+      }
       if (slot.title !== undefined) {
         assertNonEmptyString(slot.title, `${basePath}.title`);
       }
@@ -151,6 +172,12 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
         }
         assertNonEmptyString(slot.theorem.statement, `${basePath}.theorem.statement`);
       }
+      if (slot.quote !== undefined) {
+        assertNonEmptyString(slot.quote.text, `${basePath}.quote.text`);
+        if (slot.quote.attribution !== undefined) {
+          assertNonEmptyString(slot.quote.attribution, `${basePath}.quote.attribution`);
+        }
+      }
       if (slot.derivation !== undefined) {
         assertNonEmptyString(slot.derivation.title, `${basePath}.derivation.title`);
         if (slot.derivation.steps.length === 0) {
@@ -168,6 +195,9 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
     case 'wrap': {
       assertNonEmptyString(slot.title, `${basePath}.title`);
       assertNonEmptyString(slot.body, `${basePath}.body`);
+      if (slot.mascotLine !== undefined) {
+        assertNonEmptyString(slot.mascotLine, `${basePath}.mascotLine`);
+      }
       break;
     }
     case 'problem': {

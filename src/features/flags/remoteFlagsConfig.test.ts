@@ -20,8 +20,8 @@ describe('parseAvailableLessonIds', () => {
     expect(parseAvailableLessonIds('["a",1,"b",null]')).toEqual(['a', 'b']);
   });
 
-  it('bundled default is parseable and contains lesson 1', () => {
+  it('bundled default is parseable and enables the how-likely opener (D88)', () => {
     const ids = parseAvailableLessonIds(REMOTE_CONFIG_DEFAULTS.available_lesson_ids);
-    expect(ids).toContain('what-is-probability');
+    expect(ids).toContain('how-likely');
   });
 });

@@ -88,7 +88,7 @@ export function Medallion({
 
       {badge !== undefined ? (
         <span
-          className="num absolute -bottom-1 -right-1 grid min-w-[20px] place-items-center rounded-full px-1 text-[10px] font-bold text-white ring-2 ring-card"
+          className="absolute -bottom-1 -right-1 grid min-w-[20px] place-items-center rounded-full px-1 text-[10px] font-bold text-white ring-2 ring-card"
           style={{ background: earned ? s.deep : 'var(--ink-soft)' }}
         >
           {badge}

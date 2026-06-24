@@ -111,7 +111,12 @@ function LessonPlayerInner({
   // nothing is written and no XP/completion is re-awarded.
   const isReview = searchParams.get('mode') === 'review';
   const progressState = useLessonProgress(uid, lesson.id);
-  const courseTotal = useLessons().filter((l) => !l.comingSoon).length;
+  // Whole planned course as the denominator (live + locked roadmap stubs),
+  // so the 'course-cleared' achievement only fires after every lesson — not
+  // when the single currently-authored lesson is finished and the rest of
+  // the path is still locked previews (D91; same fix as HomePage,
+  // CelebrationScreen, PublicProfilePage).
+  const courseTotal = useLessons().length;
   const [currentAnswer, setCurrentAnswer] = useState<AttemptPayload | null>(null);
   const pickedVariantIdRef = useRef('');
   const [pickedVariantId, setPickedVariantId] = useState('');
@@ -431,6 +436,60 @@ function LessonPlayerInner({
     setSubmitting(false);
     setViewSlotIndex(nextIndex);
   }
+
+  // -------------------------------------------------------------------------
+  // Keyboard navigation
+  // -------------------------------------------------------------------------
+  // Left = back a slot. Right = advance via the same path the Continue button
+  // uses (concept/wrap freely, problem only once correct, review mode freely).
+  // Suppressed while typing in inputs, with any modifier held, or with a
+  // dialog open, so it never hijacks text entry or modal focus.
+  const advanceRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    advanceRef.current = () => {
+      if (isReviewMode) handleContinueReview();
+      else handleContinue();
+    };
+  });
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+
+      const el = document.activeElement as HTMLElement | null;
+      if (
+        el &&
+        (el.tagName === 'INPUT' ||
+          el.tagName === 'TEXTAREA' ||
+          el.tagName === 'SELECT' ||
+          el.isContentEditable)
+      ) {
+        return;
+      }
+      if (document.querySelector('[role="dialog"]')) return;
+      if (submitting) return;
+
+      if (e.key === 'ArrowLeft') {
+        if (displayIndex > 0) {
+          e.preventDefault();
+          setViewSlotIndex((prev) => Math.max(0, prev - 1));
+        }
+        return;
+      }
+
+      // Right arrow: only fire when Continue would be available. Problem slots
+      // require a correct answer first; review mode lets you scroll freely.
+      const continueVisible =
+        slot.kind !== 'problem' || slotState.feedbackState === 'correct';
+      if (isReviewMode || continueVisible) {
+        e.preventDefault();
+        advanceRef.current();
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [displayIndex, isReviewMode, slot.kind, slotState.feedbackState, submitting]);
 
   // -------------------------------------------------------------------------
   // Derive feedback copy

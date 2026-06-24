@@ -5,24 +5,28 @@ import { lesson3 } from './lessons/03-counting-carefully';
 import { lesson4 } from './lessons/04-counting-gets-hard';
 import { lesson5 } from './lessons/05-conditional-probability';
 import { lesson6 } from './lessons/06-distributions';
+import { howLikely } from './lessons/how-likely';
 import { roadmapStubLessons } from './lessons/roadmapStubs';
 import type { Lesson } from './types';
 
 /**
- * The six authored lessons ship first, in pedagogical order. The roadmap
- * stubs (blank, locked previews of the full curriculum — see
- * `docs/curriculum-roadmap.md`) follow, so the live "Start here" lesson and
- * all progress/recommendation/reward behavior are unchanged.
+ * The live catalog (D88): the `how-likely` course opener leads, then the 9-unit
+ * curriculum from `docs/curriculum-roadmap.md` follows as blank, locked stubs.
+ * `how-likely` is the one authored, playable lesson; the `two-dice` stub stays a
+ * locked preview of the future Unit 3 compound lesson.
+ *
+ * Numbers are assigned by position (1…N) so "Lesson N" is always monotonic on
+ * the path regardless of how the stubs are ordered.
+ *
+ * The original five dense lessons (`lesson1`-`lesson5`) and the `distributions`
+ * stub are NOT on the live path. They are kept imported and re-exported below as
+ * the content reservoir for the later Unit 2-4 / Unit 5 / Unit 7 splits, so the
+ * old 6-lesson spine and the new granular plan do not appear twice (overlap
+ * resolved per D88). `main` still holds the prior arrangement.
  */
-export const lessons: Lesson[] = [
-  lesson1,
-  lesson2,
-  lesson3,
-  lesson4,
-  lesson5,
-  lesson6,
-  ...roadmapStubLessons,
-];
+export const lessons: Lesson[] = [howLikely, ...roadmapStubLessons].map(
+  (lesson, i) => (lesson.number === i + 1 ? lesson : { ...lesson, number: i + 1 }),
+);
 
 export const lessonById = new Map<string, Lesson>(
   lessons.map((lesson) => [lesson.id, lesson]),
@@ -45,6 +49,7 @@ function validateAllLessons(): void {
 
 validateAllLessons();
 
-export { lesson1, lesson2, lesson3, lesson4, lesson5, lesson6 };
+// `lesson1`-`lesson6` are the preserved source content (not on the live path).
+export { lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, howLikely };
 export type { Lesson } from './types';
 export * from './types';

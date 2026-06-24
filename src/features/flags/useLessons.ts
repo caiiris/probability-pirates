@@ -11,9 +11,9 @@ import { useRemoteFlags } from './RemoteFlagsProvider';
  *     Remote Config cannot flip an empty lesson on; this is a safety net.
  *   - Otherwise, the lesson is `comingSoon` iff its id is NOT in the
  *     Remote Config `available_lesson_ids` list. The list defaults to
- *     ["what-is-probability"] until the first fetch resolves, matching
- *     the bundled state. This means flipping a lesson on (or rolling it
- *     back) requires no redeploy — just a Remote Config update.
+ *     ["how-likely"] until the first fetch resolves, matching the bundled
+ *     state (D88). This means flipping a lesson on (or rolling it back)
+ *     requires no redeploy, just a Remote Config update.
  */
 export function useLessons(): Lesson[] {
   const { availableLessonIds } = useRemoteFlags();

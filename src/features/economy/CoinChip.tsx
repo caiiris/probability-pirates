@@ -19,7 +19,7 @@ export function CoinChip({ coins, size = 'sm', className = '' }: Props) {
       <span className="text-amber-base">
         <Coin className={iconSize} />
       </span>
-      <span className={`num font-bold text-foreground leading-none ${textSize}`}>
+      <span className={`font-bold text-foreground leading-none ${textSize}`}>
         {coins.toLocaleString()}
       </span>
     </span>

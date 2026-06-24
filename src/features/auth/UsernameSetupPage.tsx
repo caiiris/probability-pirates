@@ -80,7 +80,7 @@ export function UsernameSetupPage() {
           <CardHeader className="pb-2">
             <h2 className="text-lg font-semibold">Pick a username</h2>
             <p className="text-sm text-muted-foreground">
-              This is how you'll show up across Probability Pirates. You can't change it later.
+              This is how you'll show up across Probability Pirates. You can change it later in your profile.
             </p>
           </CardHeader>
           <CardContent>

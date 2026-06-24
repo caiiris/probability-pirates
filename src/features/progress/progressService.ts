@@ -1,5 +1,6 @@
 import {
   doc,
+  deleteDoc,
   getDoc,
   setDoc,
   updateDoc,
@@ -230,5 +231,42 @@ export async function startReplay(
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Prune stale progress (D91)
+// ---------------------------------------------------------------------------
+
+/**
+ * Delete the user's `lessonProgress` docs for a given list of lesson ids.
+ * Called from a one-shot effect on Home with the ids of lessons that exist
+ * in the user's progress but are now blank stubs in the catalog (e.g. a
+ * lesson that was authored on a branch, then re-locked when the catalog
+ * shifted). Without this, a stale progress doc keeps living in Firestore and
+ * — until D91's visual guard in `LessonNode` was added — would render the
+ * lesson with a green completed-check next to a "Coming soon" meta.
+ *
+ * Best-effort, idempotent: never throws (errors logged), no-op when there's
+ * nothing to prune. Uses a single batched write so all deletes commit
+ * atomically (or none do).
+ */
+export async function pruneStaleProgress(
+  uid: string,
+  staleLessonIds: string[],
+): Promise<void> {
+  if (!uid || staleLessonIds.length === 0) return;
+  try {
+    if (staleLessonIds.length === 1) {
+      await deleteDoc(progressRef(uid, staleLessonIds[0]));
+      return;
+    }
+    const batch = writeBatch(db);
+    for (const lessonId of staleLessonIds) {
+      batch.delete(progressRef(uid, lessonId));
+    }
+    await batch.commit();
+  } catch (err) {
+    console.warn('[pruneStaleProgress] failed:', err);
   }
 }

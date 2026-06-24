@@ -2,10 +2,11 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Wordmark } from '@/components/Brandmark';
-import { FlameIcon, BoltIcon } from '@/components/icons/StatIcons';
+import { FlameIcon } from '@/components/icons/StatIcons';
 import { CoinChip } from '@/features/economy/CoinChip';
 import { DefaultAvatar } from '@/features/profile/DefaultAvatar';
 import { LevelBadge } from '@/features/profile/LevelBadge';
+import { NotificationBell } from '@/features/notifications/NotificationBell';
 import { levelFromXp } from '@/lib/levels';
 
 /**
@@ -15,15 +16,18 @@ import { levelFromXp } from '@/lib/levels';
  * avatar is the user's actual identity mark (not a generic icon) and links to the
  * profile, where the full rank + progress-to-next-level lives.
  *
- * Layout: three zones — brand (mobile) on the left, the centered level-progress
- * bar in the middle, and the habit-loop stat cluster (streak, XP on desktop,
- * coins, avatar) on the right. The center bar's rank/remaining labels collapse on
- * narrow screens; on mobile the raw XP pill is dropped to avoid crowding.
+ * Layout: three zones — Probability Pirates wordmark on the left (full-width
+ * across the page so it crosses above the sidebar on desktop too), the centered
+ * level-progress bar in the middle, and the right cluster (streak when nonzero,
+ * coins, bell, avatar). The center bar's rank/remaining labels collapse on
+ * narrow screens. Raw XP isn't repeated on the right; the level bar already
+ * shows it.
  */
 export function AppHeader() {
   const auth = useAuth();
   const isMobile = useIsMobile();
   const profile = auth.status === 'authenticated' ? auth.profile : null;
+  const uid = auth.status === 'authenticated' ? auth.user.uid : '';
 
   const streak = profile?.currentStreak ?? 0;
   const xp = profile?.xp ?? 0;
@@ -47,14 +51,19 @@ export function AppHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-40 flex items-center gap-3 border-b border-border bg-background/85 px-4 py-3 backdrop-blur">
-      {/* Left: brand on mobile only (desktop has it in the sidebar). Fixed width
-          so the center bar never slides under it. */}
-      {isMobile ? (
-        <div className="shrink-0">
-          <Wordmark markSize={20} />
-        </div>
-      ) : null}
+    <header
+      className="sticky top-0 z-40 flex items-center gap-3 border-b border-[color:var(--line-strong)] bg-card/90 px-4 py-3 backdrop-blur"
+      style={{ boxShadow: '0 2px 8px rgb(33 28 48 / 0.04)' }}
+    >
+      {/* Left: brand anchors the full-width header on every breakpoint. The
+          fixed width means the centered level bar never slides under it. */}
+      <Link
+        to="/"
+        aria-label="Probability Pirates home"
+        className="shrink-0 rounded-md transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <Wordmark markSize={isMobile ? 20 : 24} />
+      </Link>
 
       {/* Center: the level progress bar fills the *leftover* space between the
           brand and the stat cluster, so it scales down as the window narrows
@@ -89,21 +98,18 @@ export function AppHeader() {
         </Link>
       </div>
 
-      {/* Right: habit-loop stat cluster. Fixed width — the center bar yields to it. */}
+      {/* Right: habit-loop stat cluster. Fixed width — the center bar yields to
+          it. Streak is hidden until the user has one (otherwise it's just a dead
+          "0" pill for new learners). Raw XP isn't repeated here because the
+          centered level bar already shows it as progress + remaining-to-next. */}
       <div className="flex shrink-0 items-center justify-end gap-2">
-        <MiniStat
-          icon={<FlameIcon className="h-4 w-4" />}
-          value={streak}
-          dim={streak === 0}
-          label={`${streak} day streak`}
-        />
-        {!isMobile ? (
+        {streak > 0 && (
           <MiniStat
-            icon={<BoltIcon className="h-4 w-4" />}
-            value={xp.toLocaleString()}
-            label={`${xp} XP`}
+            icon={<FlameIcon className="h-4 w-4" />}
+            value={streak}
+            label={`${streak} day streak`}
           />
-        ) : null}
+        )}
         <Link
           to="/store"
           aria-label={`${coins} coins — open store`}
@@ -111,6 +117,7 @@ export function AppHeader() {
         >
           <CoinChip coins={coins} />
         </Link>
+        <NotificationBell uid={uid} />
         {avatar}
       </div>
     </header>
@@ -121,22 +128,18 @@ function MiniStat({
   icon,
   value,
   label,
-  dim = false,
 }: {
   icon: React.ReactNode;
   value: string | number;
   label: string;
-  dim?: boolean;
 }) {
   return (
     <span
-      className={`flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 shadow-soft ${
-        dim ? 'opacity-60' : ''
-      }`}
+      className="flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 shadow-soft"
       aria-label={label}
     >
       {icon}
-      <span className="num text-sm font-bold leading-none text-foreground">{value}</span>
+      <span className="text-sm font-bold leading-none text-foreground">{value}</span>
     </span>
   );
 }

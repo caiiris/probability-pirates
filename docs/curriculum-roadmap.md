@@ -50,33 +50,39 @@ them is most of the work.
 
 ---
 
-## 3. Proposed full sequence — 9 units, ~40 short lessons
+## 3. Proposed full sequence — 7 units, ~41 short lessons
+
+> **Updated 2026-06-24 (D89, D90):** scope is **classical HS probability**,
+> ending on Expected Value.
+>
+> - D89 merged "Likelihood" into "Sample Spaces" → "Defining Probability"
+>   (`Which is more likely?` and `The probability scale` dropped because the
+>   `how-likely` opener already covers comparative likelihood and the 0..1
+>   scale; `review-likelihood` folded into the unit review).
+> - D90 dropped the statistics-track material — the formal "random variable"
+>   abstraction, variance, the named distributions (binomial, normal),
+>   Central Limit Theorem, Monte Carlo, and the catch-all capstone — as
+>   out-of-scope for HS probability. Unit 7 was reshaped to **Expected
+>   Value** (the genuine probability capstone), and the original Unit 8
+>   ("Famous Distributions") was removed. See the "Out of scope" callout at
+>   the end of § 3 for what's reserved for a future Statistics track.
 
 Short focused lessons grouped into units, with a **Level Review** at the end of
 each unit (new lesson kind — see § 5).
 
-### Unit 1 — Likelihood (pure intuition, no formulas)
+### Unit 1 — Defining Probability
 
-*Goal: build the language of probability before any math.*
+*Goal: turn the `how-likely` opener's intuition into a precise definition —
+both the long-run interpretation and the equally-likely-outcomes formula.*
 
-1. **Which is more likely?** — Comparative intuition. "Picking a red M&M from a
-   bag of mostly red" vs. "rolling a 6". Drag-to-rank.
-2. **The probability scale** — 0 to 1. Impossible / unlikely / even / likely /
-   certain. Slider interaction (new).
-3. **The long-run idea** — Probability as the share you'd see if you repeated
+1. **The long-run idea** — Probability as the share you'd see if you repeated
    forever. (Light flavor of L2; LLN proper comes later.)
-4. **Level review.**
+2. **The sample space** — {H, T} and {1..6}. Listing every possibility.
+3. **Equally-likely outcomes** — favorable/total formula, with theorem callout.
+4. **Practice — single events** (practice-only lesson — new lesson kind).
+5. **Level review.**
 
-### Unit 2 — Listing outcomes
-
-*Goal: introduce the formal idea of the sample space.*
-
-1. **The sample space** — {H, T} and {1..6}. Listing every possibility.
-2. **Equally-likely outcomes** — favorable/total formula, with theorem callout.
-3. **Practice — single events** (practice-only lesson — new lesson kind).
-4. **Level review.**
-
-### Unit 3 — Compound experiments (counting outcomes)
+### Unit 2 — Compound experiments (counting outcomes)
 
 *Goal: how the sample space grows when experiments combine.* (Anchor: dice.)
 
@@ -88,7 +94,7 @@ each unit (new lesson kind — see § 5).
 5. **Practice — counting outcomes.**
 6. **Level review.**
 
-### Unit 4 — Events
+### Unit 3 — Events
 
 *Goal: events as subsets, not as numbers.*
 
@@ -98,7 +104,7 @@ each unit (new lesson kind — see § 5).
 4. **Practice — events on dice and cards.**
 5. **Level review.**
 
-### Unit 5 — Counting techniques
+### Unit 4 — Counting techniques
 
 *Goal: tools when listing every outcome stops working.* (Anchor: cards.)
 
@@ -110,7 +116,7 @@ each unit (new lesson kind — see § 5).
 6. **Practice — counting word problems.**
 7. **Level review.**
 
-### Unit 6 — Probabilities of multiple events
+### Unit 5 — Probabilities of multiple events
 
 *Goal: combining probabilities (not just outcomes).*
 
@@ -121,7 +127,7 @@ each unit (new lesson kind — see § 5).
 5. **Practice — multi-step compound.**
 6. **Level review.**
 
-### Unit 7 — Conditional probability
+### Unit 6 — Conditional probability
 
 *Goal: how new information changes belief.*
 
@@ -133,31 +139,50 @@ each unit (new lesson kind — see § 5).
 6. **Practice — trees + Bayes.**
 7. **Level review.**
 
-### Unit 8 — Random variables and expected value
+### Unit 7 — Expected Value
 
-*Goal: probability **of** something becomes a number **with** a value.*
+*Goal: when you bet on a probability, what payoff do you expect?* The genuine
+probability capstone — every probability textbook ends here, and the unit lands
+on real-world decisions (gambles, insurance) rather than formal abstraction.
 
-1. **What is a random variable?**
-2. **Distributions** — Uniform, Bernoulli (intuitive only).
-3. **Expected value (intuition)** — Long-run average.
-4. **Computing E(X)** — Worked examples (gambling, insurance).
-5. **Variance and spread (light).**
-6. **Practice — expected value.**
-7. **Level review.**
+1. **Expected value (intuition)** — Long-run average payoff of a chance event.
+2. **Computing E(X)** — Weighted sums on dice, spinners, and cards.
+3. **Fair games** — When is a bet fair? E(X) = 0 says break-even.
+4. **Practice — gambles and insurance** — Lotteries, casinos, and insurance,
+   settled by expected value.
+5. **Level review.**
 
-### Unit 9 — Famous distributions
+> **~41 lessons total, ~3–5 min each.** ≈2.5 hours of content vs. today's ~6 min
+> — a real curriculum, not a sampler. Smaller than the original 9-unit
+> projection (D86) because (a) the merge in D89 collapsed two thin units into
+> one and (b) the statistics-track material in D90 moved to a future course.
 
-*Goal: the shapes you actually see.*
+### Out of scope (future Statistics track)
 
-1. **The binomial distribution** — Many coin flips.
-2. **The normal distribution (intuitive)** — Bell shape.
-3. **Central limit theorem (intuitive)** — Why the bell appears everywhere.
-4. **Monte Carlo as a tool** — Simulation as a problem-solving move (revisit +
-   extend L2).
-5. **Capstone problem set.**
+Per **D90**, this curriculum is *classical HS probability* and ends on Expected
+Value. The following sit on the statistics side of the high-school taxonomy and
+would belong in a future "Statistics" course-2, not here:
 
-> **~40 lessons total, ~3–5 min each.** ≈3 hours of content vs. today's ~30 min
-> — a real curriculum, not a sampler.
+- **Random variables as a formal abstraction** ("an RV is a function Ω → ℝ").
+  Unit 7 teaches Expected Value without ever needing the term — by talking
+  about "average payoff," not "the expectation of a random variable."
+- **Variance and standard deviation.** Useful, but the moment you start
+  *measuring* spread you've crossed into descriptive statistics.
+- **Named distributions:** binomial, geometric, Poisson, uniform (continuous),
+  normal. The combinations work that *generates* the binomial coefficients
+  stays in Unit 4; the named distribution itself goes to stats.
+- **Central Limit Theorem.** Technically a probability theorem, but
+  pedagogically it's the doorway to inferential statistics (sampling
+  distributions → confidence intervals → hypothesis tests).
+- **Monte Carlo as a method.** L2's Law of Large Numbers already foreshadows
+  it; a full treatment belongs alongside resampling and bootstrap in stats.
+
+These ideas are *not* hidden anywhere in the path: the stub lessons that
+covered them (`random-variable`, `distributions-intro`, `variance-spread`,
+`binomial-distribution`, `normal-distribution`, `central-limit-theorem`,
+`monte-carlo`, `capstone-problem-set`) and the old "Famous Distributions"
+chapter were deleted in D90, not parked as locked previews. Keeping the IA
+focused on what we plan to author is the explicit design choice.
 
 ---
 

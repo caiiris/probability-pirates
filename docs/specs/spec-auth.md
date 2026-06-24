@@ -160,5 +160,5 @@ Other features extend the rules for their own subcollections (see those specs).
 - Forgot password / email verification (Phase 2).
 - Multi-factor auth (Phase 3).
 - Account deletion (Phase 3 / GDPR compliance).
-- Username change after registration (alternatives D16 — sentinels are write-once).
+- ~~Username change after registration~~ — **shipped 2026-06-24**: renames release + re-reserve the sentinel in one transaction (D16 amendment).
 - Email change (out of MVP; Firebase Auth supports it but our mirrored `email` would need sync).

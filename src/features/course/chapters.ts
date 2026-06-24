@@ -19,57 +19,44 @@ export type Chapter = {
   lessonIds: string[];
 };
 
+// The course opens on a single hook lesson (`how-likely`), then runs the
+// curriculum from `docs/curriculum-roadmap.md`. Scope is **classical HS
+// probability**, ending on expected value:
+//   - D89 collapsed the original 9 units to 8 by merging "Likelihood" into
+//     "Sample Spaces" → "Defining Probability".
+//   - D90 narrowed the count to 7 by dropping the RV/distributions/CLT
+//     /Monte Carlo material (statistics-track, not classical probability)
+//     and reshaping the final unit as "Expected Value" — the genuine
+//     probability capstone.
+// `how-likely` is the one authored, playable lesson; every other node is a
+// locked preview until its content is authored. The old 3-chapter spine
+// (Chance Basics / The Art of Counting / Going Deeper) was removed in D88.
 export const CHAPTERS: Chapter[] = [
   {
-    id: 'foundations',
+    id: 'start-here',
     number: 1,
-    title: 'Chance Basics',
-    subtitle: 'What randomness is, and how it settles down.',
+    title: 'Start Here',
+    subtitle: 'Tap, count, and meet your first surprise.',
     accent: 'violet',
-    lessonIds: ['what-is-probability', 'law-of-large-numbers'],
+    lessonIds: ['how-likely'],
   },
   {
-    id: 'counting',
+    id: 'defining-probability',
     number: 2,
-    title: 'The Art of Counting',
-    subtitle: 'Count the ways things can happen.',
-    accent: 'green',
-    lessonIds: ['counting-carefully', 'counting-gets-hard'],
-  },
-  {
-    id: 'deeper',
-    number: 3,
-    title: 'Going Deeper',
-    subtitle: 'Conditions, and the shapes of chance.',
-    accent: 'amber',
-    lessonIds: ['conditional-probability', 'distributions'],
-  },
-
-  // --------------------------------------------------------------------------
-  // Roadmap units (locked previews). These hold the forward-looking curriculum
-  // from `docs/curriculum-roadmap.md` as blank, coming-soon lessons. They sit
-  // after the live content above; until a stub is authored + flipped on, every
-  // node renders locked. See `src/content/lessons/roadmapStubs.ts`.
-  // --------------------------------------------------------------------------
-  {
-    id: 'likelihood',
-    number: 4,
-    title: 'Likelihood',
-    subtitle: 'The language of chance, before any math.',
-    accent: 'violet',
-    lessonIds: ['likelihood-compare', 'probability-scale', 'long-run-frequency', 'review-likelihood'],
-  },
-  {
-    id: 'sample-spaces',
-    number: 5,
-    title: 'Sample Spaces',
-    subtitle: 'List every outcome, then count it.',
+    title: 'Defining Probability',
+    subtitle: 'From the long-run feeling to the favorable-over-total formula.',
     accent: 'blue',
-    lessonIds: ['sample-space', 'equally-likely-outcomes', 'practice-single-events', 'review-sample-spaces'],
+    lessonIds: [
+      'long-run-frequency',
+      'sample-space',
+      'equally-likely-outcomes',
+      'practice-single-events',
+      'review-sample-spaces',
+    ],
   },
   {
     id: 'compound',
-    number: 6,
+    number: 3,
     title: 'Compound Experiments',
     subtitle: 'When experiments combine, outcomes multiply.',
     accent: 'teal',
@@ -84,7 +71,7 @@ export const CHAPTERS: Chapter[] = [
   },
   {
     id: 'events',
-    number: 7,
+    number: 4,
     title: 'Events',
     subtitle: 'Events are sets of outcomes.',
     accent: 'green',
@@ -92,7 +79,7 @@ export const CHAPTERS: Chapter[] = [
   },
   {
     id: 'counting-techniques',
-    number: 8,
+    number: 5,
     title: 'Counting Techniques',
     subtitle: 'Tools for when listing stops working.',
     accent: 'amber',
@@ -108,7 +95,7 @@ export const CHAPTERS: Chapter[] = [
   },
   {
     id: 'combining',
-    number: 9,
+    number: 6,
     title: 'Combining Probabilities',
     subtitle: 'Multiply, add, and flip to the complement.',
     accent: 'coral',
@@ -123,7 +110,7 @@ export const CHAPTERS: Chapter[] = [
   },
   {
     id: 'conditional',
-    number: 10,
+    number: 7,
     title: 'Conditional Probability',
     subtitle: 'How new information changes belief.',
     accent: 'violet',
@@ -138,33 +125,17 @@ export const CHAPTERS: Chapter[] = [
     ],
   },
   {
-    id: 'random-variables',
-    number: 11,
-    title: 'Random Variables',
-    subtitle: 'Outcomes become numbers with value.',
+    id: 'expected-value',
+    number: 8,
+    title: 'Expected Value',
+    subtitle: 'When you bet on a probability, what payoff do you expect?',
     accent: 'blue',
     lessonIds: [
-      'random-variable',
-      'distributions-intro',
       'expected-value-intuition',
       'computing-expected-value',
-      'variance-spread',
+      'fair-games',
       'practice-expected-value',
-      'review-random-variables',
-    ],
-  },
-  {
-    id: 'famous-distributions',
-    number: 12,
-    title: 'Famous Distributions',
-    subtitle: 'The shapes you actually see.',
-    accent: 'teal',
-    lessonIds: [
-      'binomial-distribution',
-      'normal-distribution',
-      'central-limit-theorem',
-      'monte-carlo',
-      'capstone-problem-set',
+      'review-expected-value',
     ],
   },
 ];

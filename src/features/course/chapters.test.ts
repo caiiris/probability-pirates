@@ -42,8 +42,11 @@ describe('chapter structure', () => {
 
   it('groups lessons in declared chapter order, preserving lesson order', () => {
     const groups = groupLessonsIntoChapters(lessons);
-    // The first three chapters hold the live content in authored order.
-    expect(groups[0].lessons.map((l) => l.id)).toEqual(['what-is-probability', 'law-of-large-numbers']);
-    expect(groups[0].chapter.id).toBe('foundations');
+    // The path opens on the single hook lesson, then the curriculum: 9 units
+    // (D88), collapsed to 8 by D89's Likelihood + Sample Spaces merge.
+    expect(groups[0].chapter.id).toBe('start-here');
+    expect(groups[0].lessons.map((l) => l.id)).toEqual(['how-likely']);
+    expect(groups[1].chapter.id).toBe('defining-probability');
+    expect(groups[1].lessons[0].id).toBe('long-run-frequency');
   });
 });

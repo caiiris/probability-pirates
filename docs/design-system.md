@@ -397,3 +397,127 @@ From the full-app UI audit. Two issues fixed; the rest queued.
   one-line lede prompt are centered; running prose is left-aligned within
   `max-w-prose` (`text-balance` on the lede). Matches `ui-directive.md`'s "don't
   center everything." (`ConceptSlotView.tsx`)
+
+## 14. Follow notifications — 2026-06-24
+
+- **D46 — In-app notifications via owner-only subcollection.** "X started
+  following you" needed an inbox without Cloud Functions (Spark plan). The
+  natural shape: `users/{uid}/notifications/{notifId}` (owner-only `read`,
+  sender `create` with a closed-set `type`, owner-only `update` restricted to
+  flipping `read`). `socialService.follow()` queues a `batch.set` into the
+  recipient's inbox via `notificationsService.queueFollowNotification` so the
+  follow and the notification land atomically. Doc id `follow_{fromUid}` makes
+  re-following refresh rather than spam. A `NotificationBell` in the persistent
+  header shows an unread badge (capped at "9+"); tapping opens a panel with the
+  most recent 20 items (real-time via `onSnapshot`) and marks everything read.
+  The schema and the rules' closed-set `type` enum are ready to extend to kudos
+  / achievements / leaderboard movement without a rules rewrite.
+  (`firebase/firestore.rules`, `features/notifications/*`,
+  `features/social/socialService.ts`, `components/AppHeader.tsx`,
+  `docs/specs/spec-social.md`, `docs/data-schema.md`)
+
+## 15. UI audit — small fixes — 2026-06-24
+
+- **D47 — Notification badge: primary, not coral.** The unread dot was initially
+  coral (`--coral-base`), which is the *destructive/wrong-answer* color elsewhere
+  in the app. A follow is positive news, so the badge now uses `bg-primary` to
+  avoid the semantic mismatch and to stop the chrome's one pop of color from
+  reading as an error. (`features/notifications/NotificationBell.tsx`)
+- **D48 — Header right-cluster discipline.** The persistent app bar was getting
+  busy: streak chip + XP chip + coin chip + bell + avatar, regardless of state.
+  Two changes: (1) the streak chip is **hidden until `streak > 0`** so new
+  learners aren't staring at a dead "0 day streak" pill; (2) the raw-XP chip is
+  **gone entirely from the cluster**, because the centered level bar already
+  shows XP as progress toward the next level and as a remaining count. The right
+  cluster is now: streak (when earned) → coins → bell → avatar.
+  (`components/AppHeader.tsx`)
+- **D49 — "Today's goal" pill states the goal.** The Home pill used to read
+  just `Today's goal` when undone — a label that repeats the section's purpose
+  without saying what to do. It now reads **"Finish 1 lesson today"** (and
+  "Done today" once met). Matches `ui-directive.md`'s "empty/idle states tell
+  the user what to do next." (`features/course/HomePage.tsx`)
+
+## 16. UI audit — polish pass — 2026-06-24
+
+- **D50 — Page header style is the same on every page.** Schedule used
+  `text-xl font-semibold` while every other top-level page used
+  `font-display text-2xl font-bold tracking-tight`. Now Schedule matches, and
+  the filler subtitle ("Plan tests, homework, and study sessions.") that just
+  restated the heading was cut. (`features/schedule/SchedulePage.tsx`)
+- **D51 — Login card opens straight into the action.** The "Sign in" h2 that
+  sat between `AuthHero` (which already says "Probability Pirates" with a
+  tagline) and the very first control (a button labeled "Sign in with Google")
+  was filler. Removed; the card now opens directly with the Google button.
+  (`features/auth/LoginPage.tsx`)
+- **D52 — Notification panel: shaped skeletons + mobile sheet.** The loading
+  state was a bare "Loading…" string inside a panel that otherwise had shaped
+  rows — inconsistent with the rest of the app's loading convention (D40). Now
+  shows three shaped rows (avatar circle + two text lines). On **mobile**, the
+  panel is no longer a tiny floating dropdown anchored to a 32px bell; it
+  becomes a **top sheet** (fixed inset, just under the header, with a backdrop
+  click-outside). Desktop keeps the small anchored 320px dropdown.
+  (`features/notifications/NotificationBell.tsx`)
+- **D53 — Trading Post item identity.** Item cards (avatar styles, flair rows)
+  gained a subtle warm parchment tint (`color-mix(in srgb, var(--amber-soft)
+  35%, var(--card))`) and a `hover:-translate-y-0.5` tactile lift, so the wares
+  feel laid out on a shop table — without literal wood-grain or texture work.
+  Equipped items pop back to plain card with a violet ring so the active state
+  still stands out. (`features/economy/StorePage.tsx`)
+
+## 17. Anti-vibe-coded pass — 2026-06-24
+
+A self-honest audit asked whether the UI still read as AI-generated. The
+metaphor and the bones were intentional, but several layers above that read as
+defaults. Three coordinated passes addressed the loudest tells.
+
+- **D54 — Plain words over thesaurus stack.** Three nautical noun phrases on
+  one Profile page ("Captain's log," "Voyage log," "Treasure shelf") read like
+  a prompt-themed checklist. New rule: keep the metaphor **only where the
+  illustration earns it** (the chest = Treasure shelf, the ocean = course path,
+  the captain mascot = Captain's log card on Home), and use plain words
+  everywhere else. Renames:
+  - Profile sections: `Captain's log → Stats`; `Voyage log → Activity`;
+    `Treasure shelf` kept.
+  - Home: `Your path → Path`.
+  - Friends: `Your Crew → Friends`; `Find explorers → Find learners`;
+    `The weekly voyage → Weekly leaderboard`; empty-search `No explorers found
+    → No learners found`.
+  - Leaderboard empty state: cut "Recruit a crew to start your voyage" for
+    plain "Follow other learners to start the leaderboard."
+  - Store: `Forgiveness → Streak Freeze` (single-item section, plain name);
+    `Profile flair → Flair` (shorter).
+  Stripping the possessive ("Your") + the thesaurus is the most direct
+  anti-AI-default copy move.
+  (`features/profile/ProfileBody.tsx`, `features/course/HomePage.tsx`,
+  `features/social/SocialPage.tsx`, `features/social/Leaderboard.tsx`,
+  `features/economy/StorePage.tsx`)
+- **D55 — Opt-in elevation: one hero per page, the rest recede.** Every card
+  in the app wore the same `rounded-2xl border bg-card p-4 shadow-soft` shell,
+  so there was no visual hierarchy — four cards on Profile all weighed
+  identically. New pattern: card containers default to a hairline
+  `border-border/70` with no shadow; only the page's hero collection wears
+  `shadow-soft` (and any tint). Implemented via an `elevated` prop on the
+  Profile `Section` component. Only **Treasure shelf** is elevated; Rank /
+  Stats / Activity sit lighter. The Leaderboard followed: rows lost their
+  per-row `shadow-soft`, and **only the "(you)" row** keeps the shadow +
+  violet wash, so the eye lands there first. The empty state lost its shadow
+  too. (`features/profile/ProfileBody.tsx`,
+  `features/social/Leaderboard.tsx`)
+- **D56 — Mono numerals reserved for comparative data.** The `.num` (JetBrains
+  Mono, tabular) treatment was on every number in the app, including
+  single-digit counters in pills and discs. That reads as data-dashboard-y for
+  numbers that aren't actually being compared. New rule:
+  - **Keep mono** on: stats grid tiles, fractions (math + progress
+    `X / Y` form), leaderboard XP across rows, RankPanel "75 / 150 XP," the
+    celebration hero "+45" count-up, lesson grid axis labels.
+  - **Drop mono** on: header streak chip, level disc, RankPanel "Lv N," coin
+    chip, lesson header XP/streak chips, home freeze count, leaderboard rank
+    badges (single digit), celebration streak chip, chapter banner number disc,
+    medallion stack badge, store price label.
+  The chrome now reads as friendly; real comparative data still gets the
+  treatment it earns. (`components/AppHeader.tsx`,
+  `features/profile/LevelBadge.tsx`, `features/economy/CoinChip.tsx`,
+  `features/lesson/LessonHeader.tsx`, `features/course/HomePage.tsx`,
+  `features/social/Leaderboard.tsx`, `features/habit/CelebrationScreen.tsx`,
+  `features/course/ChapterBanner.tsx`, `features/profile/Medallion.tsx`,
+  `features/economy/StorePage.tsx`)

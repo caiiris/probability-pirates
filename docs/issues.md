@@ -295,9 +295,59 @@ IDs are monotonically increasing, zero-padded to 3 digits, **never reused**.
 - **Description:** §12.6 says the implementer should leave `FEEDBACK_TODO()` placeholders and let the content owner author copy. The owner explicitly asked for finished, good lessons, so all prompts, `feedbackCorrect`, `feedbackDefault`, per-wrong hints, and `explanation` strings for Lessons 2-4 were written by the agent in Lesson 1's voice and under `ui-directive.md` (no em dashes, sentence case, plain verbs, no filler). `explanation` is populated on every variant (so these lessons do not carry the I001 gap). This is the one deliberate departure from the guardrail and is flagged here so it stays auditable.
 - **Proposed action:** read the copy in the three lesson files and edit anything off-voice or factually loose. `npm run audit-feedback` shows no TODO placeholders for these lessons.
 
+### I033 — Reported cross-device "progress sync": XP/achievements appear shared between distinct accounts
+
+- **Status:** resolved 2026-06-24 — root cause confirmed as the `AuthProvider` stale-profile leak (B055); not a backend data bug.
+- **Confirming evidence (2026-06-24, from reporter):** the affected accounts were `caiiris1011` (824 XP) and `janestreetsthegoat`. When `janestreetsthegoat` *first* signed in, the header showed `caiiris1011`'s XP, then it **corrected to its own** once the profile snapshot loaded; `kittysnowball43` started at 0 normally. The "shows the other user's value, then corrects" pattern is the exact signature of B055: the previous user's profile lingered in React state during the account switch until the new `onSnapshot` arrived. `kittysnowball43` didn't reproduce it because that session had no prior high-XP profile in memory (no in-app account switch / fresh load). The earlier "separate devices" framing is reconciled by the switching device having had `caiiris1011` loaded first and switching accounts without a full page reload (React state survives; Firestore's default in-memory cache does not).
+- **Resolution:** fixed by **B055** — on a genuine uid change `AuthProvider` immediately resets `profile` to `null`, and the profile `onSnapshot` now has an error handler that falls back to `null` instead of leaving stale data. Verified the live data layer is correct and per-user (table below); no server-side sharing or hardcoding exists.
+- **Type:** bug
+- **Severity:** major (if real: a user could see another user's progress)
+- **Discovered:** 2026-06-24 by user report — "when someone else signs up, all our progress is synced; the xp, achievements etc appear to be hardcoded." User states the two testers were on **separate devices**.
+- **Spec ref:** `src/features/auth/AuthProvider.tsx`, `src/features/auth/userService.ts` (`registerUser`, `claimUsername`), `src/features/social/publicProfile.ts`, `firebase/firestore.rules`
+- **Investigation (2026-06-24, via Firebase MCP against live `brilliant-clone-102a7`):**
+  - **Backend data is NOT shared.** All 5 accounts have *distinct* per-user values. Snapshot at time of investigation:
+
+    | username | uid (prefix) | provider | xp | achievements |
+    | --- | --- | --- | ---: | ---: |
+    | caiiris1011 | nlgmAC… | google (+password) | 824 | 7 |
+    | janestreetsthegoat | m3iCaU… | google | 122 | 4 |
+    | orchardoak | jZqyd… | google | 40 | 0 |
+    | ee89 | u4cHc2… | google | 0 | 0 |
+    | kittysnowball43 | Il2HJF… | google | 0 | 0 |
+
+  - **Fresh sign-ups correctly start at 0** (`ee89`, `kittysnowball43`). Nothing is hardcoded server-side.
+  - **Registration is atomic and correct.** `registerUser` (email) and `claimUsername` (Google first-time) both write `/usernames/{name}`, `/users/{uid}`, and `/publicProfiles/{uid}` in a single `runTransaction`, all seeded with `xp:0`. Verified `kittysnowball43`: all three docs present and consistent. No orphans.
+  - **All reads key on the live `uid`.** `AuthProvider` subscribes to `/users/{firebaseUser.uid}`; `AppHeader`, `ProfilePage`, `ProfileBody`, `StatsGrid`, `LevelBadge`/`RankPanel`, `TrophyCase`, `useAllLessonProgress`, and `useLeaderboard` all read from the per-uid profile / per-uid `publicProfiles`. No component renders hardcoded or globally-shared stats. Firestore rules enforce owner-only reads on `/users/{uid}`.
+  - **Conclusion:** there is no code path or data state by which two *distinct* accounts on *separate* devices could show identical XP/achievements. The report cannot currently be reproduced.
+- **Fixed sub-cause (B055):** a *same-browser* account switch left the previous user's profile in React state (and `onSnapshot` had no error handler), so account B could transiently — or permanently, on a profile-read error — render account A's stats. Fixed in `AuthProvider`. This fully explains the symptom **only** for same-device/same-browser testing.
+- **Leading hypotheses for a genuine cross-device report (need data to disambiguate):**
+  1. **Both devices authenticated as the same Google account.** All accounts use Google sign-in; `signInWithGoogle` sets `prompt: 'select_account'`, but if a tester picked the same Google identity (or the second device reused an existing session), both land on the same uid → same data by design, not a bug.
+  2. **Misread surface.** The locked `/progress` insights page is an identical "Coming soon" placeholder for everyone; the friends leaderboard shows other users' XP by design. Either could be misread as "my progress is shared."
+  3. **Stale deployment.** A previously-deployed bundle (Firebase Hosting) predating B055 could exhibit the same-browser bleed; confirm the live site is rebuilt/redeployed from current `main`.
+- **Proposed action / repro ask:** on EACH device, open `/profile` and record the **username shown** and the account's **email** (and ideally the `uid` from `auth.currentUser` in devtools). If the two devices show the **same uid**, it is hypothesis #1 (same login), not a data bug. If they show **different uids but identical XP/achievements**, capture a screenshot from both + the exact values and reopen this issue with that evidence — that would indicate a real, currently-unidentified shared read and warrants deeper investigation. Until such evidence exists, treat the data layer as correct (verified above) and B055 as the shipped fix.
+
 ---
 
 ## Closed issues
+
+### I034 — In-app feedback / bug reports + site footer (attribution)
+
+- **Status:** resolved 2026-06-24
+- **Type:** ad-hoc-decision (feature addition)
+- **Severity:** minor (additive; no behavior change to existing flows)
+- **Discovered:** 2026-06-24, user request — "there should be somewhere that lets the user send in bug reports or feedback" + a footer / "made by Iris Cai".
+- **Spec ref:** `src/features/feedback/feedbackService.ts`, `src/features/feedback/FeedbackDialog.tsx`, `src/components/AppFooter.tsx`, `src/components/AppShell.tsx`, `firebase/firestore.rules`, `docs/data-schema.md` §5c
+- **Decisions (user-selected):**
+  - **Delivery:** in-app form persisted to a new top-level `/feedback/{autoId}` collection (vs mailto / external form), so it matches the existing Firestore stack with no third-party dependency. Owner reviews submissions in the Firebase console.
+  - **Footer:** `© {year} Probability Pirates · Made by Iris Cai` + a "Send feedback" button, shown on all chromed routes (hidden on immersive lesson/celebration screens).
+  - **Scope:** both bug reports and general feedback via a `type` toggle (`'bug' | 'feedback'`).
+- **Description:**
+  - **`FeedbackDialog`** — segmented bug/feedback toggle (per-type placeholder), 2000-char message box with counter, success toast. Auto-captures `uid`, `username`, current `route`, and `userAgent` so the owner has triage context; the user only types the message.
+  - **`AppFooter`** — renders attribution + the feedback trigger; lives inside the scroll area below the routed page on both mobile and desktop layouts (so it never overlaps the mobile bottom nav). `AppShell` `main` switched to a flex column with a `flex-1` content wrapper so the footer sinks to the bottom on short pages.
+  - **`feedbackService.submitFeedback`** — single `addDoc` to `/feedback`, client-side trims + length-clamps before write.
+- **Firestore rules:** `/feedback/{id}` is **create-only** for signed-in users with a locked shape (`uid == auth.uid`, `type in ['bug','feedback']`, message 1–2000, length-capped `username`/`route`/`userAgent`, `createdAt == request.time`, `keys().hasOnly([...])`). `read`/`update`/`delete` are all `false`. Validated via `firebase_validate_security_rules` and deployed to `brilliant-clone-102a7`.
+- **Accepted gap:** no email/notification on new feedback (no Cloud Functions on Spark). Owner polls the console. If volume grows, add an admin-only "unread feedback" view or a Cloud Function relay.
+- **Resolution:** shipped. `tsc -b` clean, lint clean. Rules + hosting deployed live (https://probability-pirates.web.app).
 
 ### I032 — Schedule promoted from "study sessions" to first-class event types (tests / homework / study / other)
 

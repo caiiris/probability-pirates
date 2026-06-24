@@ -1,7 +1,9 @@
+import { useEffect, useRef } from 'react';
 import { Check, Snowflake } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useAllLessonProgress } from '@/features/progress/useAllLessonProgress';
+import { pruneStaleProgress } from '@/features/progress/progressService';
 import { useLessons } from '@/features/flags/useLessons';
 import { courseProgress, dailyGoalDone, nextRecommendedLesson } from './recommendations';
 import { HeroCard } from './HeroCard';
@@ -17,6 +19,32 @@ export function HomePage() {
   const progressState = useAllLessonProgress(uid);
   const lessons = useLessons();
 
+  // Prune stale progress for lessons that are blank stubs in the current
+  // catalog (D91). This handles the case where a lesson was authored on a
+  // branch, completed by the user, and then re-locked when the catalog
+  // shifted — leaving a Firestore progress doc that no longer corresponds
+  // to playable content. The visual guard in LessonNode handles the render
+  // side; this cleans up the data behind it. Best-effort, idempotent.
+  // Pruned ids are tracked in a ref so we never re-fire on a snapshot
+  // re-emit (the Firestore deletion will trigger an updated snapshot, which
+  // would otherwise re-run the effect with a now-empty stale set).
+  //
+  // ⚠️ This hook MUST stay above the early return below — moving it after
+  // the conditional return would break React's Rules of Hooks (the hook
+  // count would change between renders).
+  const prunedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!uid) return;
+    if (progressState.status !== 'ready') return;
+    const staleIds = lessons
+      .filter((l) => l.slots.length === 0 && progressState.data.has(l.id))
+      .map((l) => l.id)
+      .filter((id) => !prunedRef.current.has(id));
+    if (staleIds.length === 0) return;
+    staleIds.forEach((id) => prunedRef.current.add(id));
+    pruneStaleProgress(uid, staleIds);
+  }, [uid, progressState, lessons]);
+
   if (auth.status === 'loading' || progressState.status === 'loading') {
     return <HomePageSkeleton />;
   }
@@ -31,10 +59,14 @@ export function HomePage() {
   const recommendation = nextRecommendedLesson(lessons, progressMap);
   const isNewUser = progressMap.size === 0 && (profile?.stepsCompleted ?? 0) === 0;
 
-  const realLessons = lessons.filter((l) => !l.comingSoon);
+  // Course-complete celebration only fires when the *whole* planned course is
+  // done — not when the single currently-authored lesson is finished and the
+  // rest of the path is still locked roadmap previews. Pre-D91 this was
+  // `realLessons.every(...)`, which prematurely declared "all caught up"
+  // after one lesson on the new path layout.
   const allCompleted =
-    realLessons.length > 0 &&
-    realLessons.every((l) => progressMap.get(l.id)?.state === 'completed');
+    lessons.length > 0 &&
+    lessons.every((l) => progressMap.get(l.id)?.state === 'completed');
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
@@ -42,18 +74,21 @@ export function HomePage() {
       {uid ? <ScheduleReminder uid={uid} /> : null}
 
       {/* Today's nudge — streak / XP / coins now live in the persistent app bar;
-          this row carries the home-specific daily-goal cue and any streak freezes. */}
+          this row carries the home-specific daily-goal cue and any streak freezes.
+          The pill states the actual goal when undone (per ui-directive.md:
+          empty/idle states tell the user what to do), and reads as a quiet
+          confirmation once done. */}
       <div className="flex items-center gap-2.5 flex-wrap">
         <span
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border ${
             goalDone
               ? 'bg-[color:var(--green-soft)] text-[color:var(--green-deep)] border-transparent'
-              : 'bg-card text-muted-foreground border-border'
+              : 'bg-card text-foreground border-border'
           }`}
-          aria-label={goalDone ? 'Daily goal complete' : 'Daily goal: complete a lesson today'}
+          aria-label={goalDone ? 'Daily goal complete' : "Today's goal: finish one lesson"}
         >
           {goalDone ? <Check className="w-3.5 h-3.5" strokeWidth={3} aria-hidden="true" /> : null}
-          {goalDone ? 'Done today' : "Today's goal"}
+          {goalDone ? 'Done today' : 'Finish 1 lesson today'}
         </span>
         {freezes > 0 ? (
           <span
@@ -63,7 +98,7 @@ export function HomePage() {
           >
             <Snowflake className="w-4 h-4" aria-hidden="true" />
             {freezes > 1 ? (
-              <span className="num text-xs font-bold leading-none">{freezes}</span>
+              <span className="text-xs font-bold leading-none">{freezes}</span>
             ) : null}
           </span>
         ) : null}
@@ -88,9 +123,16 @@ export function HomePage() {
       {/* Course path */}
       <section aria-label="Course path" className="pt-2">
         <div className="mx-auto max-w-md flex items-baseline justify-between mb-6 px-1">
-          <h2 className="font-display text-lg font-bold tracking-tight">Your path</h2>
-          <span className="text-sm text-muted-foreground">
-            <span className="num font-semibold text-foreground">{completed}</span> / {total} done
+          <h2 className="font-display text-lg font-bold tracking-tight">Path</h2>
+          {/* "X / Y lessons" reads as the user's share of the planned course
+              (D91). The old "X / Y done" implied finality, which looked odd
+              when only one lesson was authored ("1 / 1 done" while the path
+              clearly continued below). */}
+          <span
+            className="text-sm text-muted-foreground"
+            aria-label={`${completed} of ${total} lessons complete`}
+          >
+            <span className="num font-semibold text-foreground">{completed}</span> / {total} lessons
           </span>
         </div>
         <CoursePath

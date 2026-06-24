@@ -14,7 +14,7 @@ IDs are monotonically increasing (`B001`…), never reused.
 
 | Verdict | Count |
 | --- | ---: |
-| **Fixed** | 35 |
+| **Fixed** | 36 |
 | **Wontfix / Known gap** | 4 |
 | **False positives** | 5 |
 
@@ -404,6 +404,16 @@ IDs are monotonically increasing (`B001`…), never reused.
 - **Files fixed:** `src/features/schedule/SchedulePage.tsx`
 - **Design choice:** an effect (not a `key`-based remount) keeps the dialog's mount stable while still resetting deterministically; `defaultDate` is in the dep array so reopening on a different day prefills correctly.
 
+### B055 — AuthProvider keeps the previous user's profile on account switch (stale XP/achievements bleed)
+- **Status:** fixed · 2026-06-24
+- **Severity:** high (one user can see another user's XP / achievements / streak within the same browser session)
+- **Symptom (reported):** "when someone else signs up, all our progress is synced — the xp, achievements etc appear to be hardcoded." Surfaced 2026-06-24.
+- **Investigation:** Verified live Firestore (`brilliant-clone-102a7`). All 5 accounts have *distinct* per-user data in both `/users/{uid}` and `publicProfiles/{uid}`; the two newest sign-ups (`ee89`, `kittysnowball43`) correctly start at `xp:0, achievements:[]`. Registration (`registerUser`) and the Google path (`claimUsername`) both seed `xp:0` inside a single atomic transaction; the username sentinel + private doc + public projection are consistent. Every read path (`AuthProvider`, `AppHeader`, `ProfilePage`, `StatsGrid`, `LevelBadge`, `RankPanel`, `TrophyCase`, `useAllLessonProgress`, `useLeaderboard`) keys strictly on the live `uid`. **Conclusion: no backend data sharing and no hardcoded stats source.** The only reproducible defect is a client-side stale-state bug on a *same-browser* account switch (see root cause). A genuine *cross-device* bleed is NOT explained by current code/data — tracked separately in `docs/issues.md` I033.
+- **Root cause:** In `AuthProvider`, `onAuthStateChanged` tore down the old profile listener and subscribed to the new user's doc, but (a) left the previous user's `profile` sitting in React state until the new snapshot arrived, and (b) passed **no error callback** to `onSnapshot`. So during the auth-switch window — or *permanently* if the new profile read errored (e.g. transient `permission-denied` while the auth token propagates) — the new account rendered the previous account's XP/achievements/streak.
+- **Fix:** Track the `activeUid` in the effect closure. On a real uid change, immediately `setState` to `{ authenticated, user, profile: null }` so the prior profile can never render under the new session (same-user token refreshes are ignored, so no flicker). Added an `onSnapshot` error handler that falls back to `profile: null` instead of leaving stale data on screen.
+- **File fixed:** `src/features/auth/AuthProvider.tsx`
+- **Verify:** `tsc --noEmit` clean. Manual: sign in as A, then sign in as B in the same tab → header/profile must show B's stats (or zeros), never A's.
+
 ---
 
 ## Wontfix / Known gaps
@@ -427,3 +437,4 @@ IDs are monotonically increasing (`B001`…), never reused.
 | 2026-06-23 | Firebase plugin pass: B051 (rules hardening) + B052 (banner type narrowing) fixed; Remote Config introduced (see `docs/issues.md` I027); 33 fixed total; `npm run verify` passes 65/65 tests |
 | 2026-06-23 | Schedule feature audit: B053 (`/schedule` crash — hook field mismatch) + B054 (add-event dialog stale date) fixed; 35 fixed total; `npm run verify` passes 89/89 tests |
 | 2026-06-23 | Schedule typed-events pass (`docs/issues.md` I032): event-type taxonomy (study/test/homework/other) + optional time, type-colored badges and calendar dots, rules validation extended; `npm run verify` passes 118/118 tests |
+| 2026-06-24 | B055 (AuthProvider stale profile on account switch) fixed; cross-device sync report investigated and logged as `docs/issues.md` I033 (live data verified distinct per user, no backend sharing found); 36 fixed total |

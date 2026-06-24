@@ -3,6 +3,9 @@ import { nextRecommendedLesson, courseProgress, dailyGoalDone } from './recommen
 import type { Lesson } from '@/content/types';
 import type { LessonProgress } from '@/features/progress/progressService';
 
+// Test fixtures default to a single concept slot so the lesson reads as
+// "real, authored content." Coming-soon stubs use `slots: []` to model the
+// locked-preview state.
 const makeLesson = (id: string, number: number, comingSoon?: boolean): Lesson => ({
   id,
   number,
@@ -10,7 +13,9 @@ const makeLesson = (id: string, number: number, comingSoon?: boolean): Lesson =>
   blurb: '',
   estimatedMinutes: 4,
   comingSoon,
-  slots: [],
+  slots: comingSoon
+    ? []
+    : [{ id: 'c', kind: 'concept', prompt: 'p', illustration: { kind: 'die' } }],
 });
 
 const makeProgress = (state: LessonProgress['state']): LessonProgress => ({
@@ -46,18 +51,28 @@ describe('nextRecommendedLesson', () => {
 });
 
 describe('courseProgress', () => {
-  it('counts only available (non-coming-soon) lessons as the total', () => {
-    // fixture: l1 is real, l2 is comingSoon → total reflects 1 available lesson
+  it('counts the full planned course as the total (live + locked stubs)', () => {
+    // fixture: l1 is real, l2 is comingSoon → total still reflects both, so
+    // the user sees their share of the planned curriculum (D91).
     const { completed, total } = courseProgress(lessons, new Map());
     expect(completed).toBe(0);
-    expect(total).toBe(1);
+    expect(total).toBe(2);
   });
 
-  it('returns 1/1 after completing the only available lesson', () => {
+  it('after completing the one real lesson, returns 1/2 (not 1/1)', () => {
     const map = new Map([['l1', makeProgress('completed')]]);
     const { completed, total } = courseProgress(lessons, map);
     expect(completed).toBe(1);
-    expect(total).toBe(1);
+    expect(total).toBe(2);
+  });
+
+  it('ignores stale progress on lessons that are blank stubs (no slots)', () => {
+    // A lesson with empty slots is a locked roadmap stub. Stale progress on
+    // such a lesson — e.g. left over from a branch where it was authored
+    // — must not contribute to the completed count.
+    const staleStubProgress = new Map([['l2', makeProgress('completed')]]);
+    const { completed } = courseProgress(lessons, staleStubProgress);
+    expect(completed).toBe(0);
   });
 });
 

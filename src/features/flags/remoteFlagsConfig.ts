@@ -7,23 +7,17 @@
  * Param: `available_lesson_ids`
  *   JSON array of lesson IDs that should be playable. A lesson is treated
  *   as "comingSoon" iff its id is NOT in this list, OR its slots array is
- *   empty (safety net — a lesson without content is never playable).
+ *   empty (safety net, a lesson without content is never playable).
  *
- *   Default: Lessons 1–5 (the lessons that ship with content). Lesson 6
- *   (Distributions) ships without slots and stays `comingSoon` regardless of
- *   this list. Flip a lesson on or off by updating Remote Config (no redeploy
- *   required); the empty-slots safety net in `useLessons` still prevents a
- *   contentless lesson from going live.
+ *   Default: only `how-likely`, the single authored opener lesson on the new
+ *   9-unit path (D88). Every other unit lesson is a blank, locked stub. Flip a
+ *   lesson on or off by updating Remote Config (no redeploy required); the
+ *   empty-slots safety net in `useLessons` still prevents a contentless lesson
+ *   from going live, so only lessons that have authored content can be enabled.
  */
 
 export const REMOTE_CONFIG_DEFAULTS = {
-  available_lesson_ids: JSON.stringify([
-    'what-is-probability',
-    'law-of-large-numbers',
-    'counting-carefully',
-    'counting-gets-hard',
-    'conditional-probability',
-  ]),
+  available_lesson_ids: JSON.stringify(['how-likely']),
 } as const;
 
 /** How long Remote Config values are cached client-side. Per Firebase docs,

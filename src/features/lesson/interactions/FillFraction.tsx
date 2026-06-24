@@ -117,32 +117,56 @@ export function FillFraction({ variant, feedbackState, onChange }: Props) {
       {hintVisible && <InteractionHint text={AFFORDANCE} onDismiss={dismissHint} />}
       {variant.showDieContext && <DieContext locked={locked} />}
 
-      {/* Fraction input */}
-      <div className="flex flex-col items-center gap-0">
-        <Input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          max={999}
-          value={num}
-          onChange={(e) => handleNum(e.target.value)}
-          disabled={locked}
-          aria-label="Numerator"
-          className="w-24 text-center text-2xl font-semibold h-14 border-b-0 rounded-b-none"
-        />
-        <div className="h-0.5 w-24 bg-foreground" role="presentation" />
-        <Input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          max={999}
-          value={den}
-          onChange={(e) => handleDen(e.target.value)}
-          disabled={locked}
-          aria-label="Denominator"
-          className="w-24 text-center text-2xl font-semibold h-14 border-t-0 rounded-t-none"
-        />
+      {/* Fraction input, with optional labels naming what each line counts. */}
+      <div className="flex items-center gap-4">
+        <div className="flex flex-col items-center gap-0">
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={999}
+            value={num}
+            onChange={(e) => handleNum(e.target.value)}
+            disabled={locked}
+            aria-label={variant.numeratorLabel ?? 'Numerator'}
+            className="w-24 text-center text-2xl font-semibold h-14 border-b-0 rounded-b-none"
+          />
+          <div className="h-0.5 w-24 bg-foreground" role="presentation" />
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={999}
+            value={den}
+            onChange={(e) => handleDen(e.target.value)}
+            disabled={locked}
+            aria-label={variant.denominatorLabel ?? 'Denominator'}
+            className="w-24 text-center text-2xl font-semibold h-14 border-t-0 rounded-t-none"
+          />
+        </div>
+
+        {(variant.numeratorLabel || variant.denominatorLabel) && (
+          <div
+            className="flex flex-col justify-between self-stretch py-2 text-left text-xs leading-snug text-muted-foreground max-w-[9rem]"
+            aria-hidden="true"
+          >
+            <span>{variant.numeratorLabel}</span>
+            <span>{variant.denominatorLabel}</span>
+          </div>
+        )}
       </div>
+
+      {/* Teaching caption that appears once the answer is correct. */}
+      {locked && variant.afterNote && (
+        <motion.p
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={MOTION.slide}
+          className="max-w-sm text-center text-sm font-medium text-foreground"
+        >
+          {variant.afterNote}
+        </motion.p>
+      )}
     </div>
   );
 }

@@ -18,7 +18,7 @@ function RankBadge({ rank }: { rank: number }) {
   if (medal) {
     return (
       <span
-        className="num grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-bold text-white"
+        className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-bold text-white"
         style={{ background: medal.base, boxShadow: `0 2.5px 0 ${medal.deep}` }}
       >
         {rank}
@@ -26,7 +26,7 @@ function RankBadge({ rank }: { rank: number }) {
     );
   }
   return (
-    <span className="num grid h-8 w-8 shrink-0 place-items-center rounded-full bg-muted text-sm font-semibold text-muted-foreground">
+    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-muted text-sm font-semibold text-muted-foreground">
       {rank}
     </span>
   );
@@ -54,22 +54,28 @@ export function Leaderboard({ myUid }: { myUid: string }) {
   return (
     <div className="space-y-3">
       {state.friendCount === 0 && (
-        <div className="flex items-center gap-3 rounded-2xl border border-[color:var(--info)]/25 bg-[color:var(--info)]/5 px-4 py-3 text-sm text-muted-foreground shadow-soft">
+        <div className="flex items-center gap-3 rounded-2xl border border-[color:var(--info)]/25 bg-[color:var(--info)]/5 px-4 py-3 text-sm text-muted-foreground">
           <CompassRose className="w-10 shrink-0" />
           <span>
-            Recruit a crew to start your voyage — follow other learners and you'll
-            race them here each week. XP resets every Monday, so everyone gets a
-            fresh start.
+            Follow other learners to start the leaderboard. XP resets every
+            Monday, so everyone gets a fresh start.
           </span>
         </div>
       )}
 
-      <ol className="space-y-2">
+      {/* Rows are a quiet vertical list; only the learner's own row carries the
+          shadow + tint so the eye lands there first instead of skimming a
+          stack of identical cards. */}
+      <ol className="space-y-1.5">
         {state.entries.map((e) => {
           const row = (
             <div
-              className={`flex items-center gap-3 rounded-2xl border px-3 py-2.5 shadow-soft transition-colors
-                ${e.isMe ? 'bg-primary-soft border-primary/30' : 'bg-card border-border'}`}
+              className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors
+                ${
+                  e.isMe
+                    ? 'bg-primary-soft border-primary/30 shadow-soft'
+                    : 'bg-card border-border/70 hover:bg-muted/40'
+                }`}
             >
               <RankBadge rank={e.rank} />
               <DefaultAvatar username={e.displayUsername} size={36} />

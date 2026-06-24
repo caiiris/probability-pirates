@@ -11,7 +11,8 @@ import { CaptainMascot } from '@/components/illustrations/CaptainMascot';
  */
 export function ProgressPage() {
   return (
-    <div className="mx-auto max-w-lg px-4 py-10">
+    <div className="min-h-full bg-white">
+      <div className="mx-auto max-w-lg px-4 py-10">
       <div className="flex flex-col items-center text-center">
         <div className="relative">
           <span className="grid h-20 w-20 place-items-center rounded-2xl bg-primary-soft text-primary">
@@ -64,6 +65,7 @@ export function ProgressPage() {
             Keep charting your course! I'm building the map that shows how far you've come.
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 
 | Section | Topic | Entries |
 |---|---|---|
-| A | Product & Pedagogy | D1–D8, D55, D56, D69, D70, D73, D75, D76, D77, D78, D84, D85, D86 |
+| A | Product & Pedagogy | D1–D8, D55, D56, D69, D70, D73, D75, D76, D77, D78, D84, D85, D86, D88, D89, D90, D91 |
 | B | Stack | D9–D12 |
 | C | Data & Persistence | D13–D16 |
 | D | Auth & Identity | D17–D18 |
@@ -287,6 +287,105 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Many stub ids now exist; they must stay globally unique. Guarded by a new catalog test (unique ids) and a new `chapters.test.ts` (every chapter id resolves, no double-assignment, no orphans).
 - **See also:** D6 / D43 / D84 / D85 (visible-but-locked stub precedent), D76 (course renumbering), D77 / D78 (the theorem/derivation/flashcard content shapes these stubs will use), [`curriculum-roadmap.md`](curriculum-roadmap.md).
 
+### D88 — Collapse to the 9-unit plan; ship the `how-likely` course opener, lock the rest
+- **Status:** resolved (on the `two-dice-demo` branch; `main` unchanged)
+- **Amends:** D86. D86 appended the roadmap stubs *below* the live six-lesson spine, so the same material showed twice (a dense lesson and a granular locked stub). D88 makes the course path read as one coherent 9-unit plan led by a single polished opener, under a tonight deadline.
+- **Chose:**
+  - The live catalog (`src/content/index.ts`) is the `how-likely` opener followed by the 9-unit roadmap as locked stubs. `how-likely` is the one authored, playable lesson; every other unit lesson (including the `two-dice` stub, reserved for the future Unit 3 compound lesson) stays blank and locked. Numbers are assigned by array position (1…N) so display order is always monotonic regardless of stub ordering.
+  - `how-likely` (`src/content/lessons/how-likely.ts`) is a **gentle-ramp course opener** carved/extended from Lesson 1's two-dice act. Arc: **welcome + a pull-quote** (Oscar Wilde, via a new optional `ConceptSlot.quote` field + `ConceptSlotView` treatment) → **the famous hard questions** (lottery, soulmate, shared birthday) → **tap one die's faces** (`tap-outcomes`) → a **tap-to-count even-number question** (`fill-fraction`, inputs annotated favorable/total) → **define probability** rigorously → **apply it** to P(rolling a 3) → **Captain Pascal's commit-once challenge** (fair game? he wins on 7, you win on 2) → the signature 6×6 grid → derive the 36-roll count by cases → wrap. Opens big-and-human, then lands on the humble die (owner call); the one-die-vs-two-dice contrast is the lesson (one die: counting trivial, all equal; two dice: rolls equal, totals not). The tap-to-count question is placed before the definition (you can tap to discover favorable/total; the definition then names it). It sits in a lead **"Start Here"** chapter ahead of Unit 1. This **revives the `tap-outcomes` interaction** (unused since Lesson 1 went multiple-choice) and adds three small, reusable extensions: **`ProblemSlot.commitOnce`** (a no-retry prediction/challenge that unlocks Continue right or wrong, a deliberate exception to the no-bail-out gate D55, via a new `allowContinueOnWrong` footer prop), **`ProblemSlot.challenge`** (a Captain Pascal "Challenge question" banner), and **`FillFractionVariant.numeratorLabel`/`denominatorLabel`** (annotated fraction inputs).
+  - **Rigorous definition of probability, up front (owner request).** A `definition` beat after the one-die tap states it precisely as a named `theorem` ("Probability", `{k/N}`) with a plain gloss: favorable / total when outcomes are equally likely, a number from 0 (never / rare) to 1 (always / common). **Terminology:** the defined quantity is **probability**, not "likelihood" — in statistics "likelihood" is a distinct technical term (the likelihood function), so naming the concept "likelihood" is imprecise; "likely" stays as casual English. (Resolved by **D89**: the "Likelihood" chapter was merged into Sample Spaces and renamed "Defining Probability".)
+  - **Introduction order (owner review):** the 36 count is derived *after* the grid, by **enumeration / cases** ("first die 1 → 6 rolls, first die 2 → 6 rolls, …, six cases of 6 = 36"), not via a named multiplication-principle theorem and not using the term "sample space" — both are deferred to their own later lessons. An earlier draft put a "6 × 6 = 36" multiplication page *before* the grid; removed. The rule: show the idea concretely, name the tool in its own lesson. The one principled exception is the course's core object, **probability** itself, which is fair to define in the opener (vs deferring tools/techniques).
+  - The old three-chapter spine (`foundations` / `counting` / `deeper`) was removed from `chapters.ts`; chapters are now "Start Here" (1) + the nine units (2–10).
+  - Lock the rest by narrowing the bundled Remote Config default to `['how-likely']`, plus a **defaults-as-floor** change in `RemoteFlagsProvider` (below).
+  - **Non-destructive:** the five dense lessons (`lesson1`–`lesson5`) and the `distributions` stub are kept imported and re-exported from `content/index.ts` as the content reservoir for the later Unit 2-4 / 5 / 7 splits; their files and per-file tests are untouched. `main` still holds the prior arrangement.
+- **Considered:**
+  - **Ship Lesson 1 as the demo unchanged** (lowest risk, already complete). Rejected: it is the dense lesson the plan explicitly wants to split, and the owner wanted the opener to model the new one-idea shape.
+  - **Two-dice alone as the opener** (the first cut of this work). Superseded in-session: the owner noted two dice is "kinda hard," so a one-die tap-and-count ramp was added in front of it. The lesson grew from a Unit 3 mid-path node into the course's front-door hook.
+  - **Keep the opener inside Unit 3 / reorder units so Compound is Unit 1.** Rejected: it breaks the intuition-first progression. A standalone "Start Here" hook ahead of Unit 1 keeps the cold-open without resequencing the curriculum.
+  - **Delete the old lessons to resolve the overlap.** Rejected: destructive; they are the source for the future splits.
+- **Gaps / risks:**
+  - **Live Remote Config is shared across branches and lists the old five lessons (v3), not `how-likely`.** Once `fetchAndActivate` resolves it overrides the bundled default. The Firebase MCP could not publish a fix (permission). **Mitigation shipped:** `RemoteFlagsProvider` now unions the live list with the bundled defaults, so a lesson this build ships as available can never be hidden by a stale shared template; the opener stays unlocked locally and when deployed without any RC publish. **Trade-off:** a defaulted id can no longer be taken down purely via RC (acceptable here; the default set is just the opener). If `main` ever adopts this floor, its default set would gain the same property.
+  - **First playable node is now Lesson 1** (the opener leads the path), which removed the earlier "first playable node is mid-path" wart.
+  - **Numbering by position** means the per-file `number` on stubs is advisory; the catalog re-numbers on load. `number` is display-only and stubs carry no persisted progress, so this is safe; the catalog test pins monotonic numbering.
+  - **`how-likely` lightly touches likelihood, equally-likely, and compound counting** that later units formalize. That is the intended cold-open trade (hook breadth now, rigor later), not a sequencing violation, because it names none of the tools.
+- **See also:** D86 (the skeleton this amends), D77 / D78 (derivation + flashcard shapes), the `tap-outcomes` removal in `design-iterations.md` ("Sample-space slot"), [`curriculum-roadmap.md`](curriculum-roadmap.md) (the split mapping deferred here).
+
+### D89 — Merge "Likelihood" + "Sample Spaces" into "Defining Probability"; drop two lessons covered by `how-likely`
+- **Status:** resolved
+- **Amends:** D86 (curriculum skeleton) and D88 (the 9-unit collapse + the `how-likely` opener). Resolves D88's open suggestion to rename the "Likelihood" chapter on terminology grounds.
+- **Chose:** Collapse the original Unit 1 ("Likelihood") and Unit 2 ("Sample Spaces") into a single new **"Defining Probability"** unit (chapter id `defining-probability`, subtitle *"From the long-run feeling to the favorable-over-total formula"*). Within that merged unit, drop two lessons:
+  - `likelihood-compare` ("Which is more likely?") — `how-likely` already builds comparative-likelihood intuition by tapping a die's faces and asking which roll is more likely than another.
+  - `probability-scale` ("The probability scale") — `how-likely`'s rigorous definition of probability already states the 0..1 scale ("a number from 0 (never / rare) to 1 (always / common)"); a separate slider lesson would re-teach that.
+
+  The merged unit keeps `long-run-frequency` (intuition lead-in), `sample-space`, `equally-likely-outcomes`, `practice-single-events`, and `review-sample-spaces` (the unit's single Level Review; the old `review-likelihood` was dropped to avoid two reviews back-to-back).
+- **Wiring fixes that fell out of the merge:**
+  - `how-likely`'s wrap `segueToLessonId: 'likelihood-compare'` → `'long-run-frequency'`.
+  - `chapters.test.ts` updated to assert the new `groups[1].chapter.id === 'defining-probability'` and that `long-run-frequency` is its first lesson.
+  - The catalog count fell to 1 + 48 = 49 lessons (was 1 + 51 = 52). Numbering still assigned by position in `content/index.ts`, so display order stays monotonic.
+- **Considered:**
+  - **Drop only the two lessons; keep two thin units.** Rejected: a 2-lesson "Likelihood" unit (`long-run-frequency` + `review-likelihood`) reads as filler next to the much richer Sample Spaces unit, especially with `how-likely` already covering comparative likelihood and the 0..1 scale.
+  - **Rename "Likelihood" to "Defining Probability" and keep both units.** Rejected for the same reason: still two thin units doing one job; the merge is the substance and the rename was D88's open suggestion.
+  - **Keep the chapter id `sample-spaces` (just rename title).** Rejected: the unit's character changes (it now opens with the long-run lesson and is the home of the *definition*, not just the listing technique). A fresh id (`defining-probability`) makes the merge explicit in the codebase and keeps the `sample-space` lesson id distinct from the chapter id.
+  - **Drop `long-run-frequency` too.** Rejected: the long-run idea is the *other* definition of probability (frequentist), and it's the bridge to L2's Law of Large Numbers material later. `how-likely` doesn't teach it — it only counts equally-likely outcomes. The unit needs both definitions.
+- **Gaps / risks:**
+  - **Subtle pedagogy:** "Defining Probability" now contains a frequentist intuition (`long-run-frequency`) followed by a classical definition (`equally-likely-outcomes`), without explicitly naming the two interpretations. That's intentional for the cold-open arc, but the eventual prose for `equally-likely-outcomes` should briefly acknowledge "this is one of two ways to define probability, and we'll see they agree" so the unit doesn't read as inconsistent.
+  - **Single review covers a slightly larger surface.** `review-sample-spaces` now has to mix in the long-run-frequency idea. Acceptable, and the renamed copy ("Defining probability review") signals it.
+  - **Lesson ids carry old framing.** `sample-space`, `review-sample-spaces`, etc. are still in the merged "Defining Probability" unit. Renaming lesson ids would invalidate any future progress data and cascade through Remote Config; not worth it. Chapter id and titles take the new framing; lesson ids stay stable.
+- **See also:** D88 (the 9-unit plan this amends), [`curriculum-roadmap.md`](curriculum-roadmap.md) (now reflects 8 units), `roadmapStubs.ts` header comment.
+
+### D90 — Scope as classical probability ending on Expected Value; drop the statistics-track Unit 8 ("Famous Distributions") and trim Unit 7 to EV
+- **Status:** resolved
+- **Amends:** D86 / D88 / D89 (curriculum scope decisions). Final unit count is **7** (under the "Start Here" lead chapter).
+- **Trigger:** owner pushback — *"i think random variables and expected value and whatnot are not classic probability, no? more statistics."* Half-right: in academic math (Pitman, Ross) random variables, EV, variance, CLT, and the named distributions all live in the *probability* course. But in the **AP / high-school taxonomy** that the persona (D2) actually meets, the line moves: AP Stats covers RVs, EV, binomial, normal, and CLT, and HS "probability" effectively ends at conditional probability + Bayes. Given the persona, the HS line is the right one to draw — with one carve-out.
+- **Chose:**
+  - **Keep Expected Value** as the closing unit. EV is a genuine probability capstone — every probability textbook ends here, and Brilliant's own probability path ends on EV. Pedagogically it's the natural payoff of "given a probability of X, what payoff do you expect?"
+  - **Drop the formal "random variable" abstraction.** An HS course can teach EV without ever invoking "an RV is a function Ω → ℝ." Skipping the abstraction lets the unit lead with payoffs, not formalism, and removes a stand-alone lesson that would have been pure vocabulary.
+  - **Drop variance / spread.** Useful, but it's where statistics begins (you start measuring spread once you have samples). Out of scope.
+  - **Drop the entire "Famous Distributions" unit:** binomial, normal, CLT, Monte Carlo, capstone problem set. CLT is technically a probability theorem but pedagogically it's the doorway to inferential statistics; binomial and normal pair with sampling/inference more naturally; Monte Carlo is a technique that L2's LLN already foreshadows. All belong in a future Statistics course, not this one.
+  - **Reshape Unit 7** from 7 lessons → 5: `expected-value-intuition` → `computing-expected-value` → **`fair-games`** (new — when E(X) = 0 the bet is break-even) → `practice-expected-value` (retitled to "Practice: gambles and insurance") → `review-expected-value` (renamed from `review-random-variables`, since the unit is no longer about RVs). Chapter id renamed `random-variables` → `expected-value`.
+  - **Delete the dropped stubs from the path entirely** (per owner — no "Statistics course-2" placeholder yet). The roadmap doc records that they belong to a future track but the path itself stays focused.
+- **Considered:**
+  - **Drop EV too — end on Conditional Probability.** Rejected: EV is universally treated as the probability capstone in the relevant textbooks (Pitman, Ross) and in Brilliant's own probability path. Conditional probability is the *deepest* idea, but EV is the *most useful* — and the "given P(X), what payoff do you expect?" framing is the natural closer for an HS-targeted course.
+  - **Keep binomial in probability** (it pairs naturally with combinations). Rejected: binomial *as a named distribution* belongs with sampling and the normal approximation. The combinations work itself stays — it's already in Unit 4. A future stats course would build on Unit 4 to introduce the binomial.
+  - **Add a "Statistics (course 2)" locked-stub chapter at the bottom of the path** as a "next course" preview. Rejected (owner): keeps the IA tight and avoids advertising scope we don't yet plan to author.
+  - **Keep `review-random-variables` id and just retitle.** Rejected: the lesson is unauthored, so renaming the id is purely cosmetic with zero cascade (no Remote Config flag, no progress data, no reference from any other file). `review-expected-value` matches the unit it lives in.
+- **Gaps / risks:**
+  - **Lost the CLT moment.** CLT is one of the most beautiful results in the subject, and the path now stops short of it. Acceptable for an HS first course; if the persona ever broadens (test prep / college intro), reopen this decision and revive Unit 8 as a stats-track addition.
+  - **`fair-games` is new ground.** It needs a clean "is this game worth playing?" framing to be the bridge between the formula and the application; the practice lesson then naturally attacks lotteries / insurance / casinos. Easy to author, just hadn't been listed before.
+  - **Dropped stub ids are gone, not orphaned.** No file or test references `random-variable`, `distributions-intro`, `variance-spread`, `binomial-distribution`, `normal-distribution`, `central-limit-theorem`, `monte-carlo`, or `capstone-problem-set` after this change. The catalog test (uniqueness, monotonic numbering) and chapter test (no orphans, no fallback "More to Explore") catch any future re-introduction at the wrong layer.
+  - **The roadmap doc kept the 8-unit framing under D89; this brings it to 7.** Updated `curriculum-roadmap.md` § 3 with a short "out of scope" callout naming the dropped material, so a future stats track has a starting point.
+- **See also:** D88 (the 9-unit plan), D89 (the previous merge), [`curriculum-roadmap.md`](curriculum-roadmap.md) (now reflects 7 units + an "Out of scope" note for the statistics track).
+
+### D91 — Course progress counts the *whole planned course*; locked stubs render with no progress; stale Firestore docs are pruned
+- **Status:** resolved
+- **Trigger:** owner observed two cosmetic warts on the live path: *"right now path and 1/1 done look a little odd. anything better we can say while still encoding progress?"* — the home header read "1 / 1 done" once `how-likely` was finished, implying course completion while the path obviously continued; and *"two dice is randomly in the middle, can we lock it and delete the progress on it"* — the `two-dice` lesson was a locked stub on this branch but rendered with a green completed-check from a stale Firestore progress doc left over from an earlier authoring branch.
+- **Chose:** three small, complementary changes:
+  - **Course-progress denominator now counts the whole planned course** (live + locked stubs), not just non-coming-soon lessons. The header reads "1 / 42 lessons" instead of "1 / 1 done" — honestly encoding the user's share of the planned curriculum, with the locked nodes on the path itself communicating "more is coming." `courseProgress(lessons, progressMap)` was rewritten: `total = lessons.length`, `completed = lessons that have authored slots and are completed` (so a stale completed-state on a now-blank stub never inflates the count). Reverses the older `total = real.length` rationale (which assumed unavailable lessons were a fluke; they are now an intentional roadmap preview).
+  - **Header copy** in `HomePage` shifted from `{n} / {n} done` to `{n} / {n} lessons`. Drops the implication of finality. Profile's `StatsGrid` already labels its row "Course" and shows `1 / 42`, so no copy change there.
+  - **`allCompleted` everywhere now requires the *full* catalog to be done.** Pre-D91 the celebration / "all caught up" hero fired on completing the single authored lesson because `realLessons.every(...)` is trivially satisfied with one lesson. Updated in `HomePage`, `HeroCard`, `CelebrationScreen.courseTotal`, `PublicProfilePage`, and `LessonPlayer.courseTotal` (which feeds the **'course-cleared' achievement** in `lib/achievements.ts` — without this fix the achievement would have been awarded on the very first lesson, since `lessonsCompleted >= courseTotal` trivially holds when `courseTotal === 1`). The CaptainsLog daily tip already covers the "you've done what's available, more coming" case for the home screen.
+  - **Stale-progress fixes (the `two-dice` issue):**
+    - **Visual guard in `LessonNode`:** when `lesson.comingSoon` is true, the component now treats `progress.state` as `undefined` regardless of what Firestore says. A coming-soon lesson always renders as locked — no green check, no "Completed · tap to review" meta, no in-progress label. Defensive: handles any future re-locked lesson, not just `two-dice`.
+    - **Data fix via `pruneStaleProgress`:** new helper in `progressService.ts` that batches deletes for a given list of `lessonProgress` ids. A one-shot `useEffect` in `HomePage` runs it with the ids of lessons that exist in the user's progress map but have empty `slots` in the catalog. Idempotent (`prunedRef` keeps a per-session set so a Firestore snapshot re-emit after the delete doesn't refire), best-effort (errors logged, never thrown). Single-id case takes the `deleteDoc` fast path; multi-id case batches.
+- **Considered:**
+  - **Hide the count entirely when only one lesson is authored.** Rejected: the user wanted progress encoded, not hidden, and "1 / 42 lessons" is honest scope-setting (the locked nodes on the path back this up).
+  - **Keep `total = real.length` and just hide the hero.** Rejected: the underlying mismatch (denominator says one thing, path shows another) would still leak into Profile and Public Profile.
+  - **Filter stale entries client-side without an actual delete.** Rejected: the owner's ask was to *delete* the progress, not just hide it. The filter (visual guard in `LessonNode`) handles the immediate render; the delete makes the cleanup durable.
+  - **Run the prune from the auth provider on login** instead of from `HomePage`. Rejected: `HomePage` is where both the lessons hook and the progress subscription already live, so the effect lands naturally; running it from auth would require duplicating both subscriptions.
+  - **Mark lessons that have a stale progress doc with a special "archived" flag** (so review is still possible). Rejected: the stub literally has no slots, so review would crash. Wiping the progress is the right move.
+- **Gaps / risks:**
+  - **`profile.lessonsCompleted`** (a separate Firestore counter on `users/{uid}`) can still be off-by-one if a lesson was completed and then re-locked, since `lessonsCompleted` is a server-side `increment`. Not addressed here — out of scope for the cosmetic fix the owner asked for. The Profile UI uses `Math.min(profile.lessonsCompleted, courseTotal)` which clamps it visually; the Firestore field stays slightly higher than reality until the user does enough new lessons to "catch up."
+  - **Pre-existing achievements stay awarded.** A user who hit the `course-cleared` achievement on the broken pre-D91 threshold (when `courseTotal` was 1 and finishing `how-likely` was enough) keeps the achievement on their profile — `award()` is idempotent and never revokes. New users won't earn it until they actually complete the full 42-lesson course. Acceptable: revoking an achievement would feel worse than the (rare) early-bird false positive.
+  - **Prune semantics are catalog-driven.** A lesson going coming-soon via Remote Config (with content still in `slots`) will *not* prune the user's progress, because the criterion is `slots.length === 0` (i.e., truly contentless), not `comingSoon`. That's the intended distinction: a temporarily-flagged-off lesson is still "real," and its progress should resume if the lesson is flipped back on.
+  - **No prune for `stepAttempts` or `users/{uid}/...` counters.** Same reason as the `lessonsCompleted` carve-out: out of scope for this pass. Could be added later if attempt history feels stale on Profile.
+  - **The denominator can shrink over time.** If a future authoring pass deletes a stub (e.g., D90 dropped 8), the planned count drops. A user mid-course would see "5 / 42 → 5 / 34" between sessions. Acceptable: the path itself is the visible truth, and the count tracks it.
+- **Tests:** `recommendations.test.ts` updated:
+  - `'counts only available (non-coming-soon) lessons as the total'` → `'counts the full planned course as the total (live + locked stubs)'` (now `total = 2` on the 2-lesson fixture, was `1`).
+  - `'returns 1/1 after completing the only available lesson'` → `'after completing the one real lesson, returns 1/2 (not 1/1)'`.
+  - New: `'ignores stale progress on lessons that are blank stubs (no slots)'` exercises the guard in `courseProgress`.
+  - Test fixture's `makeLesson` was updated so non-coming-soon lessons now have a single concept slot (modeling the "real, authored content" distinction the function uses).
+  - 27/27 test files, 206/206 tests still green.
+- **See also:** D86 / D88 / D90 (the catalog/scope decisions this builds on), D58 (PRD §9.6 acceptance — the "course progress" AC; the visible-on-path denominator is consistent with what the user can see), D55 (no bail-out — celebration only fires on real completion).
+
 ---
 
 ## B. Stack
@@ -360,13 +459,19 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Will likely be replaced/augmented in Phase 3 by a richer score that the `stepAttempts` log can feed
 
 ### D16 — Username uniqueness pattern
-- **Status:** resolved
+- **Status:** resolved (renames enabled 2026-06-24 — see amendment below)
 - **Chose:** Sentinel doc per username — `/usernames/{lowercased}` containing `{ uid }`, created in the same `runTransaction` that writes `/users/{uid}`
 - **Considered:** Firestore extension for unique fields (heavyweight), Cloud Function trigger (latency)
 - **Gaps / risks:**
   - Doubles the writes at registration (one to sentinel, one to user doc)
   - Sentinel is **never released** in MVP — if a user deletes their account (Phase 3), their username stays claimed
   - If the Firebase Auth `createUserWithEmailAndPassword` succeeds but the Firestore transaction fails, we need to clean up the orphan auth user (must implement)
+- **Amendment (2026-06-24) — renames now allowed.** The original "sentinels are write-once, no renames in MVP" stance was reversed because the permanence created registration anxiety. A rename runs through `userService.changeUsername`:
+  - Case-only edits (same lowercased key) just rewrite `displayUsername` on `/users` + `/publicProfiles`.
+  - Real renames run one `runTransaction` that reserves the new `/usernames/{newLower}` (failing on `username-taken`), releases the old sentinel (`delete`), and re-points `/users/{uid}` and `/publicProfiles/{uid}`.
+  - **Rules changed:** `/usernames` now allows `delete` for the sentinel owner (`resource.data.uid == auth.uid`); `/users` update allowlist adds `username` + `displayUsername` with a lowercase + ≤30-char guard.
+  - **Accepted gap:** usernames denormalized into social edges (`publicProfiles/{x}/followers|following/{…}`) and historical notifications are NOT rewritten on rename — rules only let each user write their own edges, so a full fan-out needs Cloud Functions (none on Spark). Authoritative surfaces (app header, own/public profile, leaderboard) read live and reflect the new name immediately; stale names only linger in follow lists until that relationship is re-established. Revisit with a Cloud Function fan-out if it becomes noticeable.
+  - **Not added:** server-side rename rate-limiting (no Cloud Functions); acceptable for current scale.
 
 ---
 

@@ -14,7 +14,10 @@ import { ProfileBody } from './ProfileBody';
 export function PublicProfilePage() {
   const { username = '' } = useParams<{ username: string }>();
   const auth = useAuth();
-  const courseTotal = useLessons().filter((l) => !l.comingSoon).length;
+  // Whole planned course as the denominator (live + locked roadmap stubs),
+  // so the public stat reads as the user's share of the entire curriculum
+  // rather than just the currently-shipped subset (D91).
+  const courseTotal = useLessons().length;
   const state = usePublicProfile(username);
 
   const me = auth.status === 'authenticated' ? auth.user : null;

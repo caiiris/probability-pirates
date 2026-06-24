@@ -42,6 +42,12 @@ projection powers all social reads:
   - **`followers/{followerUid}`** — written by the follower (doc id is their uid).
   - **`kudos/{fromUid}`** — written by the sender (doc id is their uid).
 
+A separate **private inbox** lives on the recipient's owner-only doc tree (see
+"Notifications" below):
+
+- **`users/{uid}/notifications/{notifId}`** — sender-create, owner-read; carries
+  the inbox feed.
+
 Counts come from `getCountFromServer` aggregation queries, so no user ever writes a
 counter on another user's document.
 
@@ -82,12 +88,55 @@ followers, `fromUid` for kudos). See `firebase/firestore.rules`.
 
 Shared components: `ProfileBody` (extracted from `ProfilePage`, used by both
 profiles), `FollowButton`, `FollowCounts`, `FollowListDialog`, `UserListItem`,
-`KudosButton`, `Leaderboard` (+ `useLeaderboard`), `usePublicProfile`.
+`KudosButton`, `Leaderboard` (+ `useLeaderboard`), `usePublicProfile`,
+`NotificationBell` (in `AppHeader`).
+
+## Notifications
+
+A lightweight in-app inbox, today firing on **follows only** (the schema and the
+rules' closed `type` enum are ready to extend to kudos, achievements, etc.). No
+push, no email; the bell + dot in the header is the entire surface.
+
+**Why a private subcollection on `users/{uid}` (not `publicProfiles/{uid}`):**
+notifications are addressed personal data ("X followed you"), so they live on
+the owner-only tree. Anyone authenticated can *create* a notification in someone
+else's inbox (which is how follows fan out without Cloud Functions), but only
+the recipient can read, mark read, or delete.
+
+**Trigger:** `socialService.follow()` adds a single `batch.set` to the target's
+inbox as part of its existing write batch via
+`notificationsService.queueFollowNotification(batch, me, targetUid)`. Follow +
+notification land atomically.
+
+**Doc id:** `follow_{fromUid}`. Re-following after an unfollow refreshes the
+same doc instead of stacking duplicates. (Unfollow does not tombstone — the
+"X followed you" event remains historically true until the recipient deletes it.)
+
+**Shape (enforced in rules):** `{ type, fromUid, fromUsername,
+fromDisplayUsername, createdAt, read }`; `type` is a closed enum (currently
+`'follow'`); `fromUid == request.auth.uid`; `createdAt == request.time`;
+`read == false` on create; `keys().hasOnly(...)`; recipient cannot be the sender.
+
+**Mark-as-read:** owner-only `update`, restricted to flipping `read`. The bell's
+"open the panel" event marks all currently-loaded items read in a single
+`writeBatch`. Owner-only `delete` is allowed for future "clear" UX.
+
+**UI:** `NotificationBell` in `AppHeader` shows a coral unread badge (capped at
+"9+"). Tap to open a small panel listing the most recent 20 items, newest first
+(avatar + "X started following you" + relative timestamp); each row links to
+`/u/:username`. Click-outside or Escape closes. Both the unread count and the
+list are real-time `onSnapshot` subscriptions (`useUnreadCount`,
+`useRecentNotifications`).
+
+**Cost note:** two live subscriptions per session per user. The unread query is
+capped at 20 (rules limit growth via the closed-set `type` + sender gate). For a
+free-tier deployment this is well within bounds.
 
 ## Analytics
 
-New events (`src/lib/analytics.ts`): `follow_user`, `unfollow_user`, `user_search`,
-`kudos_sent`, `achievement_earned`, `leaderboard_view`.
+Events (`src/lib/analytics.ts`): `follow_user`, `unfollow_user`, `user_search`,
+`kudos_sent`, `achievement_earned`, `leaderboard_view`. A `notification_open`
+event is a reasonable follow-up but is not wired today.
 
 ## Edge cases
 
@@ -102,7 +151,13 @@ New events (`src/lib/analytics.ts`): `follow_user`, `unfollow_user`, `user_searc
 
 ## Out of scope
 
-- Activity feed / notifications.
+- Activity feed (a chronological feed of friends' actions). The new follow
+  notification is point-to-point, not a broadcast feed.
+- Notification *types* beyond `follow` (kudos / achievements / leaderboard
+  movement). Extending the `type` enum + adding a row variant is mechanical when
+  wanted.
+- Push or email notifications (no Cloud Functions / messaging configured).
 - Mutual-follow "friend" semantics (following is one-directional).
 - Blocking / privacy controls beyond the PII boundary — Phase 3.
-- Server-side fan-out or Cloud Functions (Spark plan; mirroring is client-side).
+- Server-side fan-out or Cloud Functions (Spark plan; mirroring + notifications
+  are client-side).

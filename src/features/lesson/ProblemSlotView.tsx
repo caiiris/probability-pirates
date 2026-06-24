@@ -11,6 +11,7 @@ import { GridEvent } from './interactions/GridEvent';
 import { MultipleChoice } from './interactions/MultipleChoice';
 import { SimulateProportion } from './interactions/SimulateProportion';
 import { MontyHall } from './interactions/MontyHall';
+import { CaptainMascot } from '@/components/illustrations/CaptainMascot';
 
 type Props = {
   slot: ProblemSlot;
@@ -84,7 +85,20 @@ export function ProblemSlotView({
   // itself horizontally (mx-auto max-w-sm).
   return (
     <div className="min-h-full flex flex-col">
-      <div className="my-auto w-full">{interaction}</div>
+      <div className="my-auto w-full">
+        {slot.challenge && (
+          <div className="mx-auto mb-6 flex max-w-sm items-center gap-3 rounded-xl border-2 border-primary/30 bg-[color:var(--primary-soft)]/50 px-4 py-3">
+            <CaptainMascot className="h-10 w-10 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary">
+                Challenge question
+              </p>
+              <p className="text-xs text-muted-foreground">Captain Pascal wants to play a game.</p>
+            </div>
+          </div>
+        )}
+        {interaction}
+      </div>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { AuthHero } from './AuthHero';
 import { signIn } from './userService';
 import { GoogleSignInButton } from './GoogleSignInButton';
@@ -42,10 +42,9 @@ export function LoginPage() {
         </div>
 
         <Card className="rounded-2xl shadow-soft">
-          <CardHeader className="pb-3">
-            <h2 className="text-lg font-semibold">Sign in</h2>
-          </CardHeader>
-          <CardContent>
+          {/* No "Sign in" subheader — AuthHero sets the page intent, and the
+              very first control says "Sign in with Google" already. */}
+          <CardContent className="pt-6">
             <GoogleSignInButton onError={setError} label="Sign in with Google" />
 
             <div className="my-5 flex items-center gap-3">

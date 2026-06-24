@@ -104,37 +104,60 @@ function MonthCalendar({
   const cells = calendarCells(year, month);
   const today = todayString();
 
+  // Wall-calendar frame: deep red title band, white body, Sundays in red — the
+  // classic kitchen-calendar treatment, restrained enough for a study app. The
+  // frame visually anchors the page (since the rest of Schedule sits on plain
+  // white) and the red-Sunday convention is an instant "calendar" cue.
   return (
-    <div className="space-y-3">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="icon" onClick={onPrev} aria-label="Previous month">
-          <ChevronLeft className="w-4 h-4" />
-        </Button>
-        <h2 className="text-base font-semibold">
+    <div className="overflow-hidden rounded-2xl border border-[color:var(--coral-deep)]/25 bg-card shadow-soft">
+      {/* Red title band */}
+      <div
+        className="flex items-center justify-between px-3 py-2 text-white"
+        style={{ background: 'var(--coral-deep)' }}
+      >
+        <button
+          type="button"
+          onClick={onPrev}
+          aria-label="Previous month"
+          className="grid h-7 w-7 place-items-center rounded-full text-white/85 transition-colors hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <h2 className="font-display text-sm font-bold uppercase tracking-[0.16em]">
           {MONTH_NAMES[month]} {year}
         </h2>
-        <Button variant="ghost" size="icon" onClick={onNext} aria-label="Next month">
-          <ChevronRight className="w-4 h-4" />
-        </Button>
+        <button
+          type="button"
+          onClick={onNext}
+          aria-label="Next month"
+          className="grid h-7 w-7 place-items-center rounded-full text-white/85 transition-colors hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
 
-      {/* Day-of-week headers */}
-      <div className="grid grid-cols-7 text-center">
-        {DAY_ABBR.map((d) => (
-          <div key={d} className="text-[11px] font-medium text-muted-foreground py-1">
+      {/* Day-of-week headers — Sunday in red, weekdays muted. */}
+      <div className="grid grid-cols-7 border-b border-border/70 bg-muted/40 text-center">
+        {DAY_ABBR.map((d, i) => (
+          <div
+            key={d}
+            className={`py-1.5 text-[11px] font-semibold uppercase tracking-wide ${
+              i === 0 ? 'text-[color:var(--coral-deep)]' : 'text-muted-foreground'
+            }`}
+          >
             {d}
           </div>
         ))}
       </div>
 
       {/* Day cells */}
-      <div className="grid grid-cols-7 gap-y-1">
+      <div className="grid grid-cols-7 p-1.5 gap-y-1">
         {cells.map((cell, i) => {
           const dateStr = toDateString(cell);
           const inMonth = cell.getMonth() === month;
           const isToday = dateStr === today;
           const isSelected = dateStr === selected;
+          const isSunday = cell.getDay() === 0;
           const dayEvents = eventsByDate.get(dateStr) ?? [];
           const hasEvents = dayEvents.length > 0;
           // Unique pending event types for this day, in their declared order
@@ -143,6 +166,16 @@ function MonthCalendar({
             dayEvents.some((e) => !e.completed && e.eventType === t),
           );
           const hasCompleted = dayEvents.some((e) => e.completed);
+
+          // Text color: selected = white, today's ring keeps default ink, Sunday
+          // in-month is red (wall-calendar tradition), out-of-month is faded.
+          const textColor = isSelected
+            ? 'text-primary-foreground'
+            : !inMonth
+              ? 'text-muted-foreground/40'
+              : isSunday
+                ? 'text-[color:var(--coral-deep)]'
+                : 'text-foreground';
 
           return (
             <button
@@ -155,13 +188,12 @@ function MonthCalendar({
                 relative flex flex-col items-center justify-start pt-1.5 pb-2 rounded-lg
                 text-sm font-medium transition-colors select-none touch-manipulation
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+                ${textColor}
                 ${isSelected
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary'
                   : isToday
-                  ? 'bg-primary/10 text-primary ring-1 ring-primary/30'
-                  : inMonth
-                  ? 'hover:bg-muted text-foreground'
-                  : 'text-muted-foreground/40 hover:bg-muted/50'
+                    ? 'ring-2 ring-[color:var(--coral-deep)]/70'
+                    : 'hover:bg-muted'
                 }
               `}
             >
@@ -805,14 +837,10 @@ export function SchedulePage() {
   const loading = eventsState.status === 'loading';
 
   return (
+    <div className="min-h-full bg-white">
     <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">Schedule</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Plan tests, homework, and study sessions.
-          </p>
-        </div>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="font-display text-2xl font-bold tracking-tight">Schedule</h1>
         {uid && (
           <Button size="sm" onClick={() => setAddOpen(true)} className="gap-1.5 shrink-0">
             <Plus className="w-4 h-4" />
@@ -865,6 +893,7 @@ export function SchedulePage() {
         lessons={lessons}
         onOpenChange={(open) => !open && setDetailEvent(null)}
       />
+    </div>
     </div>
   );
 }

@@ -16,6 +16,8 @@ type Props = {
   explanationRevealed?: boolean;
   isReady: boolean;
   isSubmitting: boolean;
+  /** Commit-once questions (D88): a wrong answer also unlocks Continue (no retry). */
+  allowContinueOnWrong?: boolean;
   onCheck: () => void;
   onContinue: () => void;
 };
@@ -30,11 +32,13 @@ export function LessonFooter({
   explanationRevealed,
   isReady,
   isSubmitting,
+  allowContinueOnWrong,
   onCheck,
   onContinue,
 }: Props) {
-  const showCheck = slotKind === 'problem' && feedbackState !== 'correct';
-  const showContinue = slotKind !== 'problem' || feedbackState === 'correct';
+  const committedWrong = !!allowContinueOnWrong && feedbackState === 'wrong';
+  const showCheck = slotKind === 'problem' && feedbackState !== 'correct' && !committedWrong;
+  const showContinue = slotKind !== 'problem' || feedbackState === 'correct' || committedWrong;
 
   // Haptic punctuation on Android; a no-op everywhere else (see lib/haptics).
   useEffect(() => {

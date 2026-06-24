@@ -41,6 +41,7 @@ export const ERROR_COPY = {
   auth: {
     emailInUse: 'That email is already registered. Try signing in instead.',
     usernameTaken: 'That username is taken. Try another one.',
+    usernameInvalid: 'Usernames are 3 to 20 characters: letters, numbers, and underscores only.',
     // Stays deliberately vague: never reveal whether the identifier exists (D50).
     invalidCredentials: 'That login does not match our records. Check your details and try again.',
     tooManyRequests: 'Too many tries just now. Wait a moment, then try again.',

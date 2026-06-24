@@ -98,6 +98,8 @@ export function ProfilePage() {
       {/* Edit profile dialog */}
       <EditProfileDialog
         uid={uid}
+        currentUsername={profile.username}
+        currentDisplayUsername={profile.displayUsername}
         currentBio={profile.bio}
         open={editOpen}
         onOpenChange={setEditOpen}

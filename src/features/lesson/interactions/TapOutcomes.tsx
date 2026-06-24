@@ -103,6 +103,18 @@ export function TapOutcomes({ variant, feedbackState, onChange }: Props) {
           ))}
         </div>
       )}
+
+      {/* Teaching caption that appears once the answer is correct. */}
+      {locked && variant.afterNote && (
+        <motion.p
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={MOTION.slide}
+          className="max-w-xs text-center text-sm font-medium text-foreground"
+        >
+          {variant.afterNote}
+        </motion.p>
+      )}
     </div>
   );
 }

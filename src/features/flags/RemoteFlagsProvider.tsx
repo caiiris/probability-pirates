@@ -45,10 +45,16 @@ export function RemoteFlagsProvider({ children }: { children: React.ReactNode })
       .finally(() => {
         if (cancelled) return;
         const raw = getString(rc, 'available_lesson_ids');
-        setFlags({
-          availableLessonIds: new Set(parseAvailableLessonIds(raw)),
-          ready: true,
-        });
+        // Union the live list with the bundled defaults so the shared, live
+        // template can never hide a lesson this build shipped as playable
+        // (D88). On this branch the bundled default is ['how-likely'], so the
+        // opener stays unlocked even though the live template still lists main's
+        // five lessons. Trade-off: a defaulted id can't be taken down remotely.
+        const merged = new Set<string>([
+          ...DEFAULT_FLAGS.availableLessonIds,
+          ...parseAvailableLessonIds(raw),
+        ]);
+        setFlags({ availableLessonIds: merged, ready: true });
       });
 
     return () => {

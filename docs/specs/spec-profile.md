@@ -103,5 +103,5 @@ match /avatars/{filename} {
 - Account deletion / data export — Phase 3 GDPR.
 - Avatar cropping UI — pickers handle native cropping on iOS; Android accepts as-is; we don't ship a custom cropper.
 - Image compression on upload (`browser-image-compression` is ~30 KB; revisit if upload payloads cause complaints).
-- Editing username after registration (alternatives D16).
+- ~~Editing username after registration~~ — **shipped 2026-06-24** via `userService.changeUsername`, surfaced in the Edit profile dialog (D16 amendment).
 - Email change.

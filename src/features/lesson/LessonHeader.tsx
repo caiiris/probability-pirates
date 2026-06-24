@@ -71,27 +71,27 @@ export function LessonHeader({ slotIndex, totalSlots, currentStreak, currentXp, 
             bar reaches 100% on the final step. */}
         <StepProgress total={totalSlots} currentIndex={slotIndex} />
 
-        {/* XP chip */}
+        {/* XP chip — running total. Plain Inter (single counter, not data the
+            user compares; the live tally during a lesson reads as motivation). */}
         <span
-          className="flex items-center gap-1 text-sm font-semibold px-2.5 py-1 rounded-full bg-card border border-border shrink-0 num"
+          className="flex items-center gap-1 text-sm font-semibold px-2.5 py-1 rounded-full bg-card border border-border shrink-0"
           aria-label={`${currentXp} XP`}
         >
           <BoltIcon className="w-4 h-4" />
           {currentXp.toLocaleString()}
         </span>
 
-        {/* Streak chip */}
-        <span
-          className={`flex items-center gap-1 text-sm font-semibold px-2.5 py-1 rounded-full shrink-0 num ${
-            currentStreak > 0
-              ? 'bg-card border border-border'
-              : 'bg-muted text-muted-foreground'
-          }`}
-          aria-label={`${currentStreak} day streak`}
-        >
-          <FlameIcon className="w-4 h-4" />
-          {currentStreak}
-        </span>
+        {/* Streak chip — only shown once the learner has a streak (matches
+            AppHeader's policy of not surfacing dead 0-day pills). */}
+        {currentStreak > 0 && (
+          <span
+            className="flex items-center gap-1 text-sm font-semibold px-2.5 py-1 rounded-full bg-card border border-border shrink-0"
+            aria-label={`${currentStreak} day streak`}
+          >
+            <FlameIcon className="w-4 h-4" />
+            {currentStreak}
+          </span>
+        )}
       </header>
 
       {/* Confirm leave dialog */}

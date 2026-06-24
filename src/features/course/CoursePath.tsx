@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useId } from 'react';
 import type { LessonProgress } from '@/features/progress/progressService';
 import { ACCENTS, type AccentName } from '@/lib/theme';
 import { LessonNode } from './LessonNode';
@@ -56,18 +56,13 @@ export function CoursePath({ lessons, progressMap, currentLessonId, uid, claimed
   // Stable global index per lesson so each node keeps a consistent glyph/accent.
   const globalIndex = new Map(lessons.map((l, i) => [l.id, i]));
 
-  // The trophy ("course complete") sits at the end of the *playable* course —
-  // the last chapter that has any non-coming-soon lesson — not the literal last
-  // chapter. This keeps the trophy on the live content even when locked roadmap
-  // units (all coming-soon) are appended below as a preview, and it migrates
-  // forward automatically as those units are authored and flipped on. Chapters
-  // after the trophy render their usual (locked) chest markers.
-  const trophyGroupIdx = (() => {
-    for (let i = groups.length - 1; i >= 0; i--) {
-      if (groups[i].lessons.some((l) => !l.comingSoon)) return i;
-    }
-    return groups.length - 1;
-  })();
+  // The big treasure ("course complete") sits at the very bottom of the path —
+  // the literal last chapter — as the aspirational end goal of the whole 9-unit
+  // course (D88, owner request). It renders locked until that final chapter is
+  // complete. Every earlier chapter shows its usual chest marker. (This replaces
+  // the D86 behavior that parked the trophy on the last *playable* chapter, which
+  // put it near the top while only the opener is unlocked.)
+  const trophyGroupIdx = groups.length - 1;
 
   return (
     <OceanScene>
@@ -187,6 +182,9 @@ function CurveConnector({
   // Park the flying die across the path from the bend, in the roomy side.
   const mid = (fromFrac + toFrac) / 2;
   const dieLeft = mid < 0.5 ? mid + 0.3 : mid - 0.3;
+  // Per-connector unique filter id so the ink-wobble filters don't collide
+  // across SVGs (some browsers treat SVG filter ids as document-global).
+  const inkId = useId().replace(/:/g, '');
 
   return (
     <li className="w-full" aria-hidden="true">
@@ -198,6 +196,17 @@ function CurveConnector({
           preserveAspectRatio="none"
           className="block"
         >
+          {/* Hand-drawn ink wobble: a tiny turbulence-displacement so the
+              treasure-map route reads as drawn by a navigator instead of
+              exported from Figma. The preserveAspectRatio="none" stretches
+              horizontal displacement more than vertical, which actually helps
+              the "long pen stroke" feel. */}
+          <defs>
+            <filter id={inkId} x="-5%" y="-20%" width="110%" height="140%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="1" seed={Math.round(x1 + x2)} />
+              <feDisplacementMap in="SourceGraphic" scale="0.6" />
+            </filter>
+          </defs>
           <path
             d={`M ${x1} 0 C ${x1} ${GAP_H * 0.5}, ${x2} ${GAP_H * 0.5}, ${x2} ${GAP_H}`}
             fill="none"
@@ -207,6 +216,7 @@ function CurveConnector({
             strokeDasharray={done ? '0.1 7' : '0.1 6'}
             vectorEffect="non-scaling-stroke"
             opacity={done ? 1 : 0.9}
+            filter={`url(#${inkId})`}
           />
         </svg>
         {die ? (

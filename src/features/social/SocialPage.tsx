@@ -46,9 +46,9 @@ export function SocialPage() {
       <OceanScene calm>
         <div className="flex flex-col items-center gap-2 py-3 text-center">
           <CompassRose className="w-16 drop-shadow-sm" />
-          <h1 className="font-display text-2xl font-bold tracking-tight">Your Crew</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight">Friends</h1>
           <p className="max-w-xs text-sm text-[color:var(--ink)]/75">
-            Find fellow explorers and race the weekly voyage.
+            Follow other learners and race them each week.
           </p>
           {uid && (
             <div className="mt-1">
@@ -60,7 +60,7 @@ export function SocialPage() {
 
       {/* Search */}
       <div className="space-y-3">
-        <h2 className="font-display text-lg font-bold tracking-tight">Find explorers</h2>
+        <h2 className="font-display text-lg font-bold tracking-tight">Find learners</h2>
         <div className="relative">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
@@ -85,8 +85,8 @@ export function SocialPage() {
             ) : (
               <EmptyState
                 icon={<CompassRose className="w-12" />}
-                title="No explorers found"
-                description={`No learners match “${queryText.trim()}”. Try another username.`}
+                title="No learners found"
+                description={`No one matches “${queryText.trim()}”. Try another username.`}
               />
             )}
           </div>
@@ -96,7 +96,7 @@ export function SocialPage() {
       {/* Weekly leaderboard */}
       <div className="space-y-3">
         <div className="flex items-baseline justify-between">
-          <h2 className="font-display text-lg font-bold tracking-tight">The weekly voyage</h2>
+          <h2 className="font-display text-lg font-bold tracking-tight">Weekly leaderboard</h2>
           <span className="text-xs text-muted-foreground">Resets Monday</span>
         </div>
         {uid && <Leaderboard myUid={uid} />}

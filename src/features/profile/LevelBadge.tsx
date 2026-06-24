@@ -11,7 +11,7 @@ export function LevelBadge({ xp, size = 40 }: { xp: number; size?: number }) {
 
   return (
     <span
-      className="num grid shrink-0 place-items-center rounded-full font-bold leading-none text-white"
+      className="grid shrink-0 place-items-center rounded-full font-bold leading-none text-white"
       style={{
         width: size,
         height: size,
@@ -42,7 +42,7 @@ export function RankPanel({ xp }: { xp: number }) {
           <p className="font-display text-lg font-bold leading-none tracking-tight">
             {info.rank.name}
           </p>
-          <p className="num text-xs font-medium text-muted-foreground">
+          <p className="text-xs font-medium text-muted-foreground">
             Lv {info.level}
           </p>
         </div>

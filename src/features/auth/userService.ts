@@ -180,6 +180,96 @@ export async function signOutUser(): Promise<void> {
 
 import { setDoc } from 'firebase/firestore';
 
+// 3-20 chars, letters/numbers/underscores — same rule as registration.
+const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
+
+// ---------------------------------------------------------------------------
+// Change username (D16 reversed — renames are allowed)
+//
+// `username` (lowercased) is the lookup key in the `/usernames/{name}` sentinel
+// and the search key in the public projection; `displayUsername` is the cased
+// label shown to people. A rename therefore has to move the sentinel atomically
+// and re-point the private doc + public projection.
+//
+// Two cases:
+//   - Case-only edit (e.g. "janestreet" -> "JaneStreet"): the lowercased key is
+//     unchanged, so the sentinel stays put — we just update displayUsername.
+//   - Real rename: a single transaction reserves the new sentinel (failing if
+//     taken), releases the old one, and updates both profile docs.
+//
+// Known gap: usernames denormalized into follow-list edges
+// (`publicProfiles/{x}/followers/{me}` etc.) and historical notifications are
+// NOT rewritten — rules only let each user write their own edges, so a full
+// fan-out needs Cloud Functions (Spark plan has none). Authoritative surfaces
+// (header, profile, leaderboard, public profile) read live and update instantly.
+// ---------------------------------------------------------------------------
+
+export async function changeUsername(params: {
+  newUsername: string;
+  currentUsername: string;
+}): Promise<AuthResult> {
+  const firebaseUser = auth.currentUser;
+  if (!firebaseUser) {
+    return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.notSignedIn } };
+  }
+
+  const uid = firebaseUser.uid;
+  const display = params.newUsername.trim();
+  if (!USERNAME_RE.test(display)) {
+    return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.usernameInvalid } };
+  }
+
+  const newLower = display.toLowerCase();
+  const oldLower = params.currentUsername.toLowerCase();
+
+  // Case-only change: the sentinel key is unchanged, so no transaction needed.
+  if (newLower === oldLower) {
+    try {
+      await Promise.all([
+        setDoc(doc(db, 'users', uid), { username: newLower, displayUsername: display }, { merge: true }),
+        setDoc(doc(db, 'publicProfiles', uid), { username: newLower, displayUsername: display }, { merge: true }),
+      ]);
+      return { ok: true };
+    } catch (err) {
+      console.error('[changeUsername] case-only update failed:', err);
+      return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.unknown } };
+    }
+  }
+
+  const newRef = doc(db, 'usernames', newLower);
+  const oldRef = doc(db, 'usernames', oldLower);
+
+  try {
+    await runTransaction(db, async (tx) => {
+      const newSnap = await tx.get(newRef);
+      if (newSnap.exists()) {
+        throw new Error('username-taken');
+      }
+      tx.set(newRef, { uid, createdAt: serverTimestamp() });
+      tx.delete(oldRef);
+      tx.update(doc(db, 'users', uid), { username: newLower, displayUsername: display });
+      tx.set(
+        doc(db, 'publicProfiles', uid),
+        { username: newLower, displayUsername: display },
+        { merge: true },
+      );
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : '';
+    const code = (err as { code?: string }).code ?? '';
+    console.error('[changeUsername]', code, err);
+    if (message === 'username-taken') {
+      return { ok: false, error: { code: 'username-taken', message: ERROR_COPY.auth.usernameTaken } };
+    }
+    if (code === 'permission-denied' || code.includes('permission')) {
+      return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.permissionDenied } };
+    }
+    return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.unknown } };
+  }
+
+  return { ok: true };
+}
+
 export async function updateProfile(
   uid: string,
   updates: { bio?: string; avatarUrl?: string | null },

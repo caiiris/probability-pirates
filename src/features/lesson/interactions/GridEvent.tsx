@@ -1,11 +1,10 @@
-import { memo, useState, useCallback, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Dices } from 'lucide-react';
-import { Die } from '@/components/illustrations/Die';
+import { Fragment, memo, useState, useCallback, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import type { GridEventVariant } from '@/content/types';
 import type { InteractionProps } from './InteractionProps';
 import { MOTION } from '@/lib/motion';
 import { HintDisclosure, HintReferenceGrid } from './HintDisclosure';
+import { DiceRoller } from './DiceRoller';
 
 type Props = InteractionProps<GridEventVariant>;
 
@@ -57,69 +56,6 @@ const GridCell = memo(function GridCell({
   );
 });
 
-/** Animated simulation roller shown when simulationEnabled is true. */
-function DiceSimulator() {
-  const [roll, setRoll] = useState<{ d1: number; d2: number; key: number } | null>(null);
-  const [rolling, setRolling] = useState(false);
-  const tickRef = useRef(0);
-
-  function handleRoll() {
-    if (rolling) return;
-    setRolling(true);
-    const tick = ++tickRef.current;
-
-    // Brief "tumbling" phase — swap faces quickly then settle
-    let ticks = 0;
-    const interval = setInterval(() => {
-      setRoll({
-        d1: Math.ceil(Math.random() * 6),
-        d2: Math.ceil(Math.random() * 6),
-        key: tick * 100 + ticks,
-      });
-      ticks++;
-      if (ticks >= 8) {
-        clearInterval(interval);
-        setRolling(false);
-      }
-    }, 80);
-  }
-
-  return (
-    <div className="flex flex-col items-center gap-3">
-      <button
-        type="button"
-        onClick={handleRoll}
-        disabled={rolling}
-        className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-60 select-none"
-      >
-        <Dices className="w-4 h-4" aria-hidden="true" />
-        Roll the dice!
-      </button>
-
-      <AnimatePresence mode="wait">
-        {roll && (
-          <motion.div
-            key={roll.key}
-            className="flex items-center gap-3"
-            initial={{ opacity: 0.6, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.08 }}
-          >
-            <Die value={roll.d1} className="w-12 h-12 drop-shadow-md" />
-            <span className="text-lg font-bold text-muted-foreground">+</span>
-            <Die value={roll.d2} className="w-12 h-12 drop-shadow-md" />
-            {!rolling && (
-              <span className="ml-2 text-base font-semibold text-primary">
-                = {roll.d1 + roll.d2}
-              </span>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 export function GridEvent({ variant, feedbackState, wrongTick, onChange }: Props) {
   const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
   const [flashWrong, setFlashWrong] = useState(false);
@@ -155,31 +91,76 @@ export function GridEvent({ variant, feedbackState, wrongTick, onChange }: Props
   return (
     <div className="flex flex-col items-center gap-6 px-4 py-6">
       <p className="text-xl font-medium text-center">{variant.prompt}</p>
-      {variant.simulationEnabled && <DiceSimulator />}
+      {variant.simulationEnabled && <DiceRoller />}
 
-      {/* Column headers (die faces 1–cols) */}
+      {/* Annotated grid: "Die 1" labels the rows (left side), "Die 2" labels
+          the columns (top), with face numbers 1–N along each axis so a learner
+          can read any cell's roll directly from the margins. Decorative; cells
+          carry the canonical aria-label. */}
       <div className="overflow-x-auto w-full flex justify-center">
-        <div className="inline-grid gap-1"
-          style={{ gridTemplateColumns: `repeat(${variant.cols}, minmax(0, 1fr))` }}>
-          {Array.from({ length: variant.rows }, (_, r) =>
-            Array.from({ length: variant.cols }, (_, c) => {
-              const row = r + 1;
-              const col = c + 1;
-              const key = `${row},${col}`;
-              return (
-                <GridCell
-                  key={key}
-                  row={row}
-                  col={col}
-                  label={`${row}+${col}`}
-                  isSelected={selectedCells.has(key)}
-                  flashWrong={flashWrong}
-                  locked={locked}
-                  onToggle={toggle}
-                />
-              );
-            })
-          )}
+        <div className="inline-flex flex-col items-center gap-2">
+          <span
+            className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+            aria-hidden="true"
+          >
+            Die 2
+          </span>
+
+          <div className="inline-flex items-center gap-2">
+            <span
+              className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+              style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+              aria-hidden="true"
+            >
+              Die 1
+            </span>
+
+            <div
+              className="inline-grid gap-1"
+              style={{ gridTemplateColumns: `auto repeat(${variant.cols}, minmax(0, 1fr))` }}
+            >
+              {/* Corner + column number track */}
+              <span aria-hidden="true" />
+              {Array.from({ length: variant.cols }, (_, c) => (
+                <span
+                  key={`ch-${c}`}
+                  className="num text-center text-xs font-semibold text-muted-foreground"
+                  aria-hidden="true"
+                >
+                  {c + 1}
+                </span>
+              ))}
+
+              {/* Row number track + cells */}
+              {Array.from({ length: variant.rows }, (_, r) => (
+                <Fragment key={`row-${r}`}>
+                  <span
+                    className="num self-center pr-1 text-right text-xs font-semibold text-muted-foreground"
+                    aria-hidden="true"
+                  >
+                    {r + 1}
+                  </span>
+                  {Array.from({ length: variant.cols }, (_, c) => {
+                    const row = r + 1;
+                    const col = c + 1;
+                    const key = `${row},${col}`;
+                    return (
+                      <GridCell
+                        key={key}
+                        row={row}
+                        col={col}
+                        label={`${row}+${col}`}
+                        isSelected={selectedCells.has(key)}
+                        flashWrong={flashWrong}
+                        locked={locked}
+                        onToggle={toggle}
+                      />
+                    );
+                  })}
+                </Fragment>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -32,7 +32,7 @@ function PriceLabel({ price, canAfford }: { price: number; canAfford: boolean })
       <span className="text-amber-base">
         <Coin className="h-3.5 w-3.5" />
       </span>
-      <span className="num">{price}</span>
+      <span>{price}</span>
     </span>
   );
 }
@@ -121,13 +121,12 @@ export function StorePage() {
       </Link>
 
       {/* Treasure-shop banner */}
-      <OceanScene>
+      <OceanScene calm>
         <div className="flex flex-col items-center gap-2 py-3 text-center">
           <Chest open className="w-16 drop-shadow-sm" />
           <h1 className="font-display text-2xl font-bold tracking-tight">Trading Post</h1>
           <p className="max-w-xs text-sm text-[color:var(--ink)]/75">
-            Spend the coins you earn from chests and achievements. For fun and
-            forgiveness — never for shortcutting the learning.
+            Spend the coins you earn from chests and achievements.
           </p>
           <div className="mt-1">
             <CoinChip coins={coins} size="md" />
@@ -147,9 +146,16 @@ export function StorePage() {
             return (
               <div
                 key={style.id}
-                className={`relative flex flex-col items-center gap-2 rounded-2xl border bg-card p-3 text-center shadow-soft transition-colors ${
-                  equipped ? 'border-primary/40 ring-2 ring-primary/25' : 'border-border'
+                className={`relative flex flex-col items-center gap-2 rounded-2xl border p-3 text-center shadow-soft transition-all ${
+                  equipped
+                    ? 'border-primary/40 ring-2 ring-primary/25'
+                    : 'border-[color:var(--amber-base)]/15 hover:-translate-y-0.5'
                 }`}
+                style={{
+                  background: equipped
+                    ? 'var(--card)'
+                    : 'color-mix(in srgb, var(--amber-soft) 35%, var(--card))',
+                }}
               >
                 {equipped && (
                   <span className="absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full bg-primary text-primary-foreground">
@@ -187,17 +193,17 @@ export function StorePage() {
         </div>
       </section>
 
-      {/* Streak Freeze — purchasable */}
+      {/* Streak Freeze — purchasable. Single-item section: name it plainly
+          rather than wrapping the one item in a metaphor ("Forgiveness"). */}
       <section className="space-y-3">
-        <h2 className="font-display text-lg font-bold tracking-tight">Forgiveness</h2>
-        <div className="rounded-2xl border bg-card p-4 space-y-3 shadow-soft">
+        <h2 className="font-display text-lg font-bold tracking-tight">Streak Freeze</h2>
+        <div className="rounded-2xl border border-border/70 bg-card p-4 space-y-3">
           <div className="flex items-center gap-4">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[color:var(--blue-soft)] text-[color:var(--blue-deep)]">
               <Snowflake className="h-5 w-5" aria-hidden="true" />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold">Streak Freeze</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Automatically protects your streak on a day you miss. Everyone has off days.
               </p>
             </div>
@@ -216,7 +222,7 @@ export function StorePage() {
 
       {/* Profile flair */}
       <section className="space-y-3">
-        <h2 className="font-display text-lg font-bold tracking-tight">Profile flair</h2>
+        <h2 className="font-display text-lg font-bold tracking-tight">Flair</h2>
         <p className="text-xs text-muted-foreground">A title badge shown under your name.</p>
         <div className="space-y-2">
           {PROFILE_FLAIR.map((flair) => {
@@ -227,9 +233,16 @@ export function StorePage() {
             return (
               <div
                 key={flair.id}
-                className={`flex items-center gap-3 rounded-2xl border bg-card p-3 shadow-soft transition-colors ${
-                  equipped ? 'border-primary/40 ring-2 ring-primary/25' : 'border-border'
+                className={`flex items-center gap-3 rounded-2xl border p-3 shadow-soft transition-all ${
+                  equipped
+                    ? 'border-primary/40 ring-2 ring-primary/25'
+                    : 'border-[color:var(--amber-base)]/15 hover:-translate-y-0.5'
                 }`}
+                style={{
+                  background: equipped
+                    ? 'var(--card)'
+                    : 'color-mix(in srgb, var(--amber-soft) 35%, var(--card))',
+                }}
               >
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   {flair.background ? (

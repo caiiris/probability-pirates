@@ -36,9 +36,16 @@ service cloud.firestore {
                          'achievements', 'weeklyXp', 'weekKey',
                          'coins', 'claimedChests', 'streakFreezes',
                          'avatarStyle', 'ownedAvatarStyles',
-                         'profileFlair', 'ownedFlair'
+                         'profileFlair', 'ownedFlair',
+                         // username changes (D16 reversed): both the lookup key
+                         // and the display casing may be edited from the profile.
+                         'username', 'displayUsername'
                        ])
-                    && request.resource.data.bio.size() <= 200;
+                    && request.resource.data.bio.size() <= 200
+                    && request.resource.data.displayUsername is string
+                    && request.resource.data.displayUsername.size() <= 30
+                    && request.resource.data.username is string
+                    && request.resource.data.username == request.resource.data.username.lower();
 
       allow delete: if false;
 
@@ -59,6 +66,35 @@ service cloud.firestore {
                       && request.resource.data.xpAwarded <= 20
                       && request.resource.data.wasCorrect is bool;
         allow update, delete: if false;
+      }
+
+      // notifications — owner-only read; any authenticated user may CREATE a
+      // notification on someone else's account (that's how a follow drops a
+      // "X started following you" inbox item without Cloud Functions).
+      //
+      // Shape is locked down: closed-set `type`, the sender must be the writer
+      // (`fromUid == auth.uid`), the recipient cannot be the sender, and
+      // `createdAt` must be the server clock. The owner may toggle `read` and
+      // delete their own items; nobody else can update or delete.
+      match /notifications/{notifId} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null
+                      && request.auth.uid != uid
+                      && request.resource.data.fromUid == request.auth.uid
+                      && request.resource.data.type in ['follow']
+                      && request.resource.data.read == false
+                      && request.resource.data.createdAt == request.time
+                      && request.resource.data.fromUsername is string
+                      && request.resource.data.fromUsername.size() <= 30
+                      && request.resource.data.fromDisplayUsername is string
+                      && request.resource.data.fromDisplayUsername.size() <= 30
+                      && request.resource.data.keys().hasOnly(
+                           ['type', 'fromUid', 'fromUsername', 'fromDisplayUsername', 'createdAt', 'read']
+                         );
+        allow update: if request.auth != null
+                      && request.auth.uid == uid
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+        allow delete: if request.auth != null && request.auth.uid == uid;
       }
 
       // studyEvents — owner CRUD, title/notes length-capped.
@@ -129,8 +165,37 @@ service cloud.firestore {
     }
 
     // ------------------------------------------------------------------
+    // /feedback/{id} — bug reports + general feedback. Create-only from
+    // signed-in clients; nobody reads/edits/deletes via the client (the owner
+    // reviews submissions in the Firebase console). Shape + sizes are locked
+    // down so the collection can't be abused as arbitrary storage.
+    // ------------------------------------------------------------------
+    match /feedback/{id} {
+      allow read, update, delete: if false;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.type in ['bug', 'feedback']
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() >= 1
+                    && request.resource.data.message.size() <= 2000
+                    && request.resource.data.username is string
+                    && request.resource.data.username.size() <= 30
+                    && request.resource.data.route is string
+                    && request.resource.data.route.size() <= 200
+                    && request.resource.data.userAgent is string
+                    && request.resource.data.userAgent.size() <= 500
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.keys().hasOnly(
+                         ['uid', 'username', 'type', 'message', 'route', 'userAgent', 'createdAt']
+                       );
+    }
+
+    // ------------------------------------------------------------------
     // /usernames/{name} — public read needed for username→email login
     // resolution. Create-only, length-capped to prevent storage abuse.
+    // Delete is allowed only for the owner (D16 reversed): a username change
+    // moves the sentinel by creating the new doc and releasing the old one in
+    // one transaction. Update stays forbidden (renames go create+delete).
     // ------------------------------------------------------------------
     match /usernames/{name} {
       allow read: if true;
@@ -139,7 +204,9 @@ service cloud.firestore {
                     && name == name.lower()
                     && name.size() >= 3
                     && name.size() <= 30;
-      allow update, delete: if false;
+      allow delete: if request.auth != null
+                    && resource.data.uid == request.auth.uid;
+      allow update: if false;
     }
   }
 }

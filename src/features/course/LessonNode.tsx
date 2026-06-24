@@ -26,7 +26,13 @@ export function LessonNode({ lesson, progress, index, isCurrent }: Props) {
   const c = ACCENTS[accent];
 
   const locked = !!lesson.comingSoon;
-  const state = progress?.state;
+  // Locked lessons always render as locked, regardless of any stored progress.
+  // A coming-soon lesson with a stale Firestore progress doc (e.g. left over
+  // from a branch where it was authored, then re-locked when the catalog
+  // shifted) would otherwise show a green completed-check next to a
+  // "Coming soon" meta — the worst of both worlds. Stale progress is wiped
+  // separately by `pruneStaleProgress` in HomePage; this is the visual guard.
+  const state = locked ? undefined : progress?.state;
   const completed = state === 'completed';
   const inProgress = state === 'in_progress';
 

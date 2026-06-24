@@ -14,7 +14,8 @@ export function ConceptSlotView({ slot }: Props) {
     (slot.body && slot.body.length > 0) ||
     slot.example ||
     slot.theorem ||
-    slot.derivation
+    slot.derivation ||
+    slot.quote
   );
 
   // Thin one-liner concept (legacy shape): centered, large lede, no body.
@@ -53,9 +54,30 @@ export function ConceptSlotView({ slot }: Props) {
         </h2>
       )}
 
-      <p className="text-lg font-medium leading-relaxed text-foreground text-center text-balance">
-        {slot.prompt}
-      </p>
+      {slot.prompt && (
+        <p className="text-lg font-medium leading-relaxed text-foreground text-center text-balance">
+          {slot.prompt}
+        </p>
+      )}
+
+      {slot.quote && (
+        <figure className="relative rounded-xl border bg-muted/30 px-5 pt-5 pb-4">
+          <span
+            aria-hidden="true"
+            className="absolute -top-3 left-4 font-display text-5xl leading-none text-primary/30 select-none"
+          >
+            &ldquo;
+          </span>
+          <blockquote className="text-[1.05rem] italic leading-relaxed text-foreground text-center text-balance">
+            {slot.quote.text}
+          </blockquote>
+          {slot.quote.attribution && (
+            <figcaption className="mt-2 text-xs font-medium uppercase tracking-wide text-muted-foreground text-center">
+              {slot.quote.attribution}
+            </figcaption>
+          )}
+        </figure>
+      )}
 
       {slot.theorem && (
         <aside

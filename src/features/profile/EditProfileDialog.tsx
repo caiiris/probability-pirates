@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import {
@@ -9,46 +10,93 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { updateProfile } from '@/features/auth/userService';
+import { changeUsername, updateProfile } from '@/features/auth/userService';
 
 const BIO_MAX = 150;
+const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
 
 type Props = {
   uid: string;
+  /** Lowercased lookup key (the `/usernames` sentinel id). */
+  currentUsername: string;
+  /** Cased label shown to others. */
+  currentDisplayUsername: string;
   currentBio: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
-export function EditProfileDialog({ uid, currentBio, open, onOpenChange }: Props) {
+export function EditProfileDialog({
+  uid,
+  currentUsername,
+  currentDisplayUsername,
+  currentBio,
+  open,
+  onOpenChange,
+}: Props) {
+  const [displayUsername, setDisplayUsername] = useState(currentDisplayUsername);
   const [bio, setBio] = useState(currentBio);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  // Sync bio from latest profile when the dialog opens (handles remote updates)
+  // Sync fields from the latest profile when the dialog opens (handles remote updates)
   useEffect(() => {
-    if (open) setBio(currentBio);
-  }, [open, currentBio]);
+    if (open) {
+      setDisplayUsername(currentDisplayUsername);
+      setBio(currentBio);
+      setError('');
+    }
+  }, [open, currentDisplayUsername, currentBio]);
 
+  const usernameTrimmed = displayUsername.trim();
   const bioTrimmed = bio.trim();
   const overLimit = bio.length > BIO_MAX;
-  const canSave = !overLimit && !saving;
+  const usernameChanged = usernameTrimmed !== currentDisplayUsername;
+  const usernameValid = USERNAME_RE.test(usernameTrimmed);
+  const canSave = !overLimit && !saving && (!usernameChanged || usernameValid);
 
   async function handleSave() {
-    if (!canSave) return;
+    if (overLimit || saving) return;
     setSaving(true);
     setError('');
-    const result = await updateProfile(uid, { bio: bioTrimmed });
-    setSaving(false);
-    if (result.ok) {
-      onOpenChange(false);
-    } else {
-      setError(result.error.message);
+
+    if (usernameChanged) {
+      if (!usernameValid) {
+        setError('Usernames are 3 to 20 characters: letters, numbers, and underscores only.');
+        setSaving(false);
+        return;
+      }
+      const result = await changeUsername({
+        newUsername: usernameTrimmed,
+        currentUsername,
+      });
+      if (!result.ok) {
+        setError(result.error.message);
+        setSaving(false);
+        return;
+      }
     }
+
+    if (bioTrimmed !== currentBio) {
+      const result = await updateProfile(uid, { bio: bioTrimmed });
+      if (!result.ok) {
+        setError(result.error.message);
+        setSaving(false);
+        return;
+      }
+    }
+
+    setSaving(false);
+    onOpenChange(false);
   }
 
   function handleOpenChange(next: boolean) {
-    if (!next) setBio(currentBio); // discard on close
+    if (!next) {
+      // discard on close
+      setDisplayUsername(currentDisplayUsername);
+      setBio(currentBio);
+      setError('');
+    }
     onOpenChange(next);
   }
 
@@ -60,6 +108,25 @@ export function EditProfileDialog({ uid, currentBio, open, onOpenChange }: Props
         </DialogHeader>
 
         <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              autoComplete="username"
+              value={displayUsername}
+              onChange={(e) => {
+                setDisplayUsername(e.target.value);
+                if (error) setError('');
+              }}
+              placeholder="yourname"
+              className={usernameChanged && !usernameValid ? 'border-destructive' : ''}
+              aria-describedby="username-hint"
+            />
+            <p id="username-hint" className="text-xs text-muted-foreground">
+              3 to 20 characters: letters, numbers, and underscores.
+            </p>
+          </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="bio">Bio</Label>
             <Textarea

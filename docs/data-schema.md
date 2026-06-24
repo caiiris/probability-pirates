@@ -7,6 +7,8 @@
 > - `docs/specs/spec-progress-persistence.md` — `/users/{uid}/lessonProgress/{lessonId}`, `/users/{uid}/stepAttempts/{autoId}`
 > - `docs/specs/spec-habit-loop.md` — mutations on `/users/{uid}` (xp, streak, milestones)
 > - `docs/specs/spec-profile.md` — Storage `avatars/{filename}`
+> - `docs/specs/spec-social.md` — `/publicProfiles/{uid}` + `following/`, `followers/`, `kudos/`; `/users/{uid}/notifications/{notifId}`
+> - `docs/issues.md` I034 — `/feedback/{autoId}` (no dedicated spec)
 
 ---
 
@@ -18,10 +20,21 @@ firestore/
 │   └── {uid}/                          [spec-auth]
 │       ├── lessonProgress/
 │       │   └── {lessonId}              [spec-progress-persistence]
-│       └── stepAttempts/
-│           └── {autoId}                [spec-progress-persistence, append-only]
-└── usernames/
-    └── {lowercasedUsername}            [spec-auth, write-once sentinel]
+│       ├── stepAttempts/
+│       │   └── {autoId}                [spec-progress-persistence, append-only]
+│       ├── studyEvents/
+│       │   └── {eventId}               [spec-schedule, owner CRUD]
+│       └── notifications/
+│           └── {notifId}               [spec-social, sender-create / owner-read]
+├── publicProfiles/                     [spec-social]
+│   └── {uid}/                          PII-free projection of /users/{uid}
+│       ├── following/{followeeUid}     owner-write (list owner)
+│       ├── followers/{followerUid}     sender-write (follower)
+│       └── kudos/{fromUid}             sender-write (cheerer)
+├── usernames/
+│   └── {lowercasedUsername}            [spec-auth, rename-capable sentinel — D16 amended]
+└── feedback/
+    └── {autoId}                        [I034, create-only; reviewed in console]
 
 storage/
 └── avatars/
@@ -65,7 +78,7 @@ Write-once doc that reserves a username. The doc *being created* is the uniquene
 | `uid` | string | the owning user's UID |
 | `createdAt` | Timestamp | `serverTimestamp()` |
 
-**Mutators:** `userService.registerUser` (create only — no renames in MVP per D16).
+**Mutators:** `userService.registerUser` (create), `userService.changeUsername` (rename: create new + delete old sentinel in one transaction — D16 amendment 2026-06-24).
 
 **Readers:** `userService.signIn` (for login-by-username); `userService.registerUser` (for the pre-transaction availability check).
 
@@ -112,6 +125,65 @@ Every Check submission writes one doc. Server enforces `1 ≤ attemptNumber ≤ 
 
 ---
 
+## 5b. `/users/{uid}/notifications/{notifId}` — private inbox
+
+In-app inbox for the recipient. Today the only `type` is `follow` (the doc id is
+`follow_{fromUid}` so re-following refreshes the same row rather than stacking
+duplicates).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `type` | `'follow'` | closed enum in rules; extensible |
+| `fromUid` | string | must equal `request.auth.uid` |
+| `fromUsername` | string | lowercased, ≤ 30 |
+| `fromDisplayUsername` | string | ≤ 30 |
+| `createdAt` | Timestamp | `serverTimestamp()` (rules enforce `== request.time`) |
+| `read` | boolean | `false` on create; recipient flips to `true` |
+
+**Mutators:** `notificationsService.queueFollowNotification` (create, batched
+inside `socialService.follow`); `markNotificationRead` /
+`markAllNotificationsRead` (recipient flips `read`).
+
+**Readers:** `useUnreadCount(uid)` (header badge),
+`useRecentNotifications(uid, max)` (bell panel). Both are live `onSnapshot`
+subscriptions, owner-only by rules.
+
+**Rules contract:** sender-create with `fromUid == auth.uid`,
+`type in ['follow']`, `read == false`, `createdAt == request.time`, strict
+`keys().hasOnly(...)`; recipient ≠ sender; only the owner may `read`, `update`
+(`affectedKeys().hasOnly(['read'])`), or `delete`. See `firebase/firestore.rules`.
+
+---
+
+## 5c. `/feedback/{autoId}` — bug reports + general feedback (top-level)
+
+Append-only inbox for in-app feedback. Written from the footer's "Send feedback"
+dialog (`src/features/feedback/`). Create-only from signed-in clients; no client
+read/update/delete — the owner reviews submissions in the Firebase console.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `uid` | string | must equal `request.auth.uid` |
+| `username` | string | submitter's lowercased username, ≤ 30 (context only) |
+| `type` | `'bug' \| 'feedback'` | closed enum in rules |
+| `message` | string | 1–2000 chars |
+| `route` | string | pathname the user was on, ≤ 200 (triage context) |
+| `userAgent` | string | `navigator.userAgent`, ≤ 500 (triage context) |
+| `createdAt` | Timestamp | `serverTimestamp()` (rules enforce `== request.time`) |
+
+**Mutators:** `feedbackService.submitFeedback` (create only).
+
+**Readers:** none in-app by design. Owner reads via
+[Firestore console → `feedback`](https://console.firebase.google.com/project/brilliant-clone-102a7/firestore/data/~2Ffeedback).
+No Cloud Functions on Spark, so there is no email/notification on new feedback.
+
+**Rules contract:** `create` requires `uid == auth.uid`, `type in ['bug','feedback']`,
+`1 ≤ message.size() ≤ 2000`, length-capped `username`/`route`/`userAgent`,
+`createdAt == request.time`, and strict `keys().hasOnly([...])`. `read`, `update`,
+`delete` are all `false`. See `firebase/firestore.rules`.
+
+---
+
 ## 6. Firebase Storage — `avatars/{filename}`
 
 `filename` matches `{uid}.png` or `{uid}.jpg` / `{uid}.jpeg`. Size cap 2 MB. Content-type must match the extension.
@@ -155,13 +227,26 @@ service cloud.firestore {
       }
     }
 
-    // spec-auth
+    // spec-auth — rename-capable sentinel (D16 amended): owner may release
+    // their own name so changeUsername can move it; update stays forbidden.
     match /usernames/{name} {
       allow read: if true;
       allow create: if request.auth != null
                     && request.resource.data.uid == request.auth.uid
                     && name == name.lower();
-      allow update, delete: if false;
+      allow delete: if request.auth != null
+                    && resource.data.uid == request.auth.uid;
+      allow update: if false;
+    }
+
+    // I034 — feedback inbox: create-only, locked shape, no client reads.
+    match /feedback/{id} {
+      allow read, update, delete: if false;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.type in ['bug', 'feedback']
+                    && request.resource.data.message.size() >= 1
+                    && request.resource.data.message.size() <= 2000;
     }
   }
 }

@@ -31,7 +31,7 @@ export function ChapterBanner({ chapter, lessons, progressMap }: Props) {
       style={{ background: `color-mix(in srgb, ${c.soft} 88%, #ffffff)`, borderColor: `${c.base}40` }}
     >
       <div
-        className="num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-lg font-bold text-white"
+        className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-lg font-bold text-white"
         style={{ background: c.base, boxShadow: `0 3px 0 ${c.deep}` }}
         aria-hidden="true"
       >

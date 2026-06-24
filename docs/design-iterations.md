@@ -587,6 +587,109 @@ Each variant has four numeric options with targeted wrong-answer feedback (e.g. 
 
 ---
 
+## Path progress count + locked-lesson stale-progress polish — 2026-06-24
+
+Owner spotted two cosmetic warts on the live path: *"right now path and 1/1 done look a little odd. anything better we can say while still encoding progress? also right now two dice is randomly in the middle, can we lock it and delete the progress on it"*. Decision recorded as **D91**.
+
+### What looked wrong
+
+- **Header read "1 / 1 done"** once `how-likely` was finished — implying course completion while ~40 locked roadmap previews were obviously visible below. Same misleading framing rippled into the Profile stats grid ("Course: 1 / 1") and into the celebration screen's "course complete" trigger (which fired on the very first lesson).
+- **`two-dice` rendered with a green completed-check** even though it was a locked stub — its Firestore `lessonProgress/two-dice` doc was left over from an earlier branch where the lesson was authored and completed by the tester. The visual was the worst of both worlds: locked grey disc + bright completed check + "Coming soon" meta.
+
+### Three fixes
+
+1. **Course-progress denominator now counts the whole planned course** (live + locked stubs), not just non-coming-soon lessons. Header reads "1 / 42 lessons" instead of "1 / 1 done" — honest scope, with the locked nodes on the path itself communicating "more is coming." `courseProgress(lessons, progressMap)` rewritten: `total = lessons.length`, `completed` only counts lessons that *have* authored slots and are completed (so a stale completed-state on a now-blank stub never inflates the count).
+2. **Header copy** shifted from "{n} / {n} done" to "{n} / {n} lessons." Drops the implication of finality. The Profile `StatsGrid` already labels its row "Course," so no copy change there.
+3. **`allCompleted` everywhere** — `HomePage`, `HeroCard`, `CelebrationScreen.courseTotal`, `PublicProfilePage` — now requires the *full* catalog to be done before the "all caught up" / course-complete celebration fires. Pre-fix this fired on the first lesson because `realLessons.every(...)` is trivially satisfied with one lesson.
+
+### Stale-progress fixes (the `two-dice` issue)
+
+- **Visual guard in `LessonNode`:** when `lesson.comingSoon` is true, the component now treats `progress.state` as `undefined` regardless of what Firestore says. A coming-soon lesson always renders as locked — no green check, no "Completed" meta, no in-progress label. Defensive: this handles any future re-locked lesson, not just `two-dice`.
+- **Data cleanup via `pruneStaleProgress`:** new helper in `progressService.ts` that batches deletes for a list of `lessonProgress` doc ids. A one-shot `useEffect` in `HomePage` runs it with the ids of lessons that exist in the user's progress map but have `slots: []` in the catalog. Idempotent (a `prunedRef` keeps a per-session set so a Firestore snapshot re-emit after the delete doesn't refire), best-effort (errors logged, never thrown). Single-id case takes the `deleteDoc` fast path; multi-id case batches into one atomic write.
+
+### Why catalog-driven, not flag-driven
+
+The prune criterion is `slots.length === 0` (truly contentless), not `comingSoon` (which can be set via Remote Config too). That distinction matters: a lesson temporarily flagged off via Remote Config still has authored content, and its progress should resume if/when the lesson is flipped back on. Only "lesson literally has no content right now" justifies a delete.
+
+### What was NOT touched
+
+- `profile.lessonsCompleted` — a separate Firestore counter on `users/{uid}`, updated via server-side `increment`. Can still be off-by-one if a lesson was completed and re-locked. The Profile UI clamps it visually with `Math.min(profile.lessonsCompleted, courseTotal)`. Out of scope for this cosmetic pass.
+- `stepAttempts` history — same reasoning. Could be pruned later if it ever feels stale on Profile.
+
+### Tests
+
+`recommendations.test.ts` updated:
+- `'counts only available (non-coming-soon) lessons as the total'` → `'counts the full planned course as the total (live + locked stubs)'`.
+- `'returns 1/1 after completing the only available lesson'` → `'after completing the one real lesson, returns 1/2 (not 1/1)'`.
+- New: `'ignores stale progress on lessons that are blank stubs (no slots)'` exercises the guard in `courseProgress`.
+- Test fixture's `makeLesson` now gives non-coming-soon lessons a single concept slot, modeling the real / stub distinction the function uses.
+
+`npm run verify` is green: 27 test files, 206 tests passing (one new test for the stale-stub case).
+
+### Audit follow-ups (caught the same day)
+
+A close re-read of the diff caught two issues `npm run verify` didn't:
+
+1. **Hook ordering in `HomePage`.** The `useRef` + `useEffect` for the prune were initially placed *after* the `if (auth.status === 'loading' …) return <HomePageSkeleton />` early return — a Rules of Hooks violation that would have surfaced as a "hook count changed between renders" warning the moment `progressState` flipped from `loading` to `ready`. Moved both hooks above the early return; the effect's body still no-ops via `if (progressState.status !== 'ready') return;` so behavior is identical, but React's hook list stays stable across renders. Sentinel comment added so the next reader doesn't move them back down.
+2. **Course-Cleared achievement could fire on lesson 1.** `LessonPlayer.tsx:114` was computing `courseTotal = useLessons().filter((l) => !l.comingSoon).length` and passing it into `applyLessonCompletion → newAchievementsFor`, which awards `course-cleared` when `lessonsCompleted >= courseTotal`. With the catalog at one playable lesson, that threshold was trivially satisfied on the first completion. Fix: same `useLessons().length` change as the other course-total sites — now requires the full planned course, matching the celebration-screen + hero-card semantics. (Existing achievements awarded under the broken threshold stay awarded — `award()` is idempotent and never revokes; the audit note in D91 documents the trade.)
+
+---
+
+## Curriculum: scope to classical probability ending on Expected Value — 2026-06-24
+
+Owner pushed back on the tail of the roadmap: *"i think random variables and expected value and whatnot are not classic probability, no? more statistics."* Half-right — academically those topics live in the *probability* course (Pitman, Ross), but in the **AP / HS taxonomy** that the persona (D2) actually meets, the line moves: AP Stats is where RVs, EV, binomial, normal, and CLT go; "probability" effectively ends at conditional probability + Bayes. Given the persona, the HS line is the right one to draw — with one carve-out. Decision recorded as **D90**.
+
+### What changed
+
+- **Reshaped Unit 7** from "Random variables and expected value" (7 lessons) into **"Expected Value"** (5 lessons): `expected-value-intuition` → `computing-expected-value` → **`fair-games`** (new) → `practice-expected-value` (retitled to "Practice: gambles and insurance") → `review-expected-value` (renamed from `review-random-variables`). Chapter id `random-variables` → `expected-value`, subtitle *"When you bet on a probability, what payoff do you expect?"*
+- **Dropped the entire old Unit 8** ("Famous Distributions"): `binomial-distribution`, `normal-distribution`, `central-limit-theorem`, `monte-carlo`, `capstone-problem-set` — gone from the path entirely.
+- **Dropped from Unit 7**: the formal `random-variable` abstraction, `distributions-intro`, and `variance-spread`.
+- **Updated comments** in `roadmapStubs.ts` and `chapters.ts` to spell out the scope decision so the next reader sees the rationale, not just an empty file.
+
+### Why keep Expected Value
+
+EV is universally treated as the probability capstone in the relevant textbooks (Pitman, Ross), and Brilliant's own probability path ends on EV (their Levels 4–5). It's literally "given a probability of X, what payoff do you expect?" — the natural completion of conditional probability. Skipping it would leave the course feeling truncated.
+
+### Why drop the formal "random variable"
+
+An HS course can teach EV without ever invoking "an RV is a function Ω → ℝ." The unit now talks about **payoffs** and **average winnings**, not random variables. Skipping the abstraction lets the unit lead with applications (fair games, gambles, insurance) instead of vocabulary, and removes a stand-alone lesson that would have been pure formalism.
+
+### Why no Statistics course-2 stub
+
+Owner explicitly chose not to add a "Statistics (course 2)" locked-stub chapter at the bottom of the path. The dropped material is recorded as out-of-scope in `curriculum-roadmap.md` but isn't advertised in the IA. Easy to revisit if a stats track ever materializes; the roadmap doc has the starting list ready.
+
+### Verification
+
+`npm run verify` is green: 27 test files, 205 tests. The catalog lost 8 lesson ids and 1 chapter; the existing chapter-structure regression tests (no orphans, no double assignment, monotonic numbering, no fallback "More to Explore") covered the change without an update. `chapters.test.ts`'s explicit `groups[1]` assertion still passes (it pins the merged "Defining Probability" chapter, which is unchanged here).
+
+---
+
+## Curriculum: collapse "Likelihood" + "Sample Spaces" → "Defining Probability" — 2026-06-24
+
+Owner reviewed the path after the `how-likely` opener landed and pushed back on the top of the curriculum: *"i think which is more likely and the probability scale can be removed. then, we can probably combine sections 2 and 3."* The opener already builds comparative-likelihood intuition (tap a die's faces, see which roll is more likely) and states the 0..1 scale in its rigorous-definition beat, so two of the planned Unit 1 lessons would have re-taught what `how-likely` just taught. Decision recorded as **D89** (also resolves the open rename suggestion in D88's gloss — "likelihood" being a distinct technical term in statistics).
+
+### What changed
+
+- **Dropped from `roadmapStubs.ts`:** `likelihood-compare` ("Which is more likely?"), `probability-scale` ("The probability scale"), `review-likelihood`. The third was dropped because the merge collapses two thin reviews into one (`review-sample-spaces`, retitled "Defining probability review").
+- **Merged in `chapters.ts`:** the old "Likelihood" and "Sample Spaces" chapters became one chapter with id `defining-probability`, title "Defining Probability", subtitle *"From the long-run feeling to the favorable-over-total formula."* Lesson order in the merged unit: `long-run-frequency` → `sample-space` → `equally-likely-outcomes` → `practice-single-events` → `review-sample-spaces`. Subsequent chapters renumbered down by one (now 8 unit chapters total under the "Start Here" lead, vs. 9 before).
+- **Two small wiring fixes:** `how-likely`'s wrap had `segueToLessonId: 'likelihood-compare'`, now `'long-run-frequency'`. `chapters.test.ts` updated to assert `groups[1].chapter.id === 'defining-probability'` and that `long-run-frequency` is its first lesson.
+- **Doc updates:** `curriculum-roadmap.md` § 3 now lists 8 units; `roadmapStubs.ts` header doc-comment notes the merge; D88's open rename suggestion is closed by linking to D89.
+
+### Why "Defining Probability" (and not just keep "Sample Spaces")
+
+The merged unit's job changed: it now opens with the long-run intuition lesson and lands on the favorable-over-total formula. That's the *definition* arc, not just the listing technique. A fresh chapter id makes the merge explicit; lesson ids (`sample-space`, `review-sample-spaces`) stay stable so any future progress data and Remote Config refer to the same things.
+
+### What stayed
+
+- `long-run-frequency` survives — it's the *other* definition of probability (frequentist), and it's the bridge to L2's Law of Large Numbers material later. `how-likely` only counts equally-likely outcomes; it does not teach the long-run interpretation.
+- All eight downstream units are unchanged in content, just renumbered.
+
+### Verification
+
+`npm run verify` is green: 27 test files, 205 tests. The catalog lost three lesson ids and two unit chapters, all caught by the existing chapter-structure regression tests (no orphans, no double assignment, monotonic numbering, no fallback "More to Explore" chapter).
+
+---
+
 ## Curriculum skeleton — full roadmap scaffolded as locked stubs — 2026-06-24
 
 Owner asked to "refactor the pages (the lessons)" toward the fuller probability sequence from [`curriculum-roadmap.md`](curriculum-roadmap.md): *"feel free to leave further lessons blank. lock them. don't change any content for now, but names/stuff are good."* Decision recorded as **D86**.
@@ -730,6 +833,153 @@ Both elements are wrapped in `<aside aria-label="…">` so screen readers announ
 - Author convention: `theorem` for named rules, `example` for short numerical demos, `derivation` for proofs. The matrix is intentionally simple but should be re-checked when the next lesson is authored.
 - The amber tab on the derivation card is the only place amber appears in the lesson player today. If the streak/progress UI later lands on amber as a primary signal, the derivation tab should rotate to a different accent (or to the lesson's accent ramp).
 - L2 (Law of Large Numbers) and L5's `setup` slot still use the legacy thin shape. They are not named-rule beats, so D77 does not require touching them. If L2 gets a theorem-style restatement of the law, this pattern is the way to add it.
+
+---
+
+## "How likely?" course opener + collapse to the 9-unit plan — 2026-06-24
+
+Owner asked to merge the five authored lessons into the new 9-unit curriculum
+(`curriculum-roadmap.md`), update the path UI, and ship one demo-able lesson by
+tonight with the rest locked, without losing the carefully planned problem types
+/ interactions. Audience refined to a curious, algebra-comfortable younger
+learner (enrichment, not test prep); rigor must stay but be manageable
+(derivations clear, theorems always introduced with an explanation). Built on a
+`two-dice-demo` branch off `main` so the prior arrangement is preserved.
+Decision recorded as **D88**.
+
+The design evolved over the session: it started as a focused mid-path "two
+dice" lesson, then (owner: "two dice is kinda hard, but you can just look at it"
+and "what if we introduce likelihood, first one die, then two dice") became a
+gentle-ramp **course opener** at the front of the path.
+
+### What shipped
+
+- **New opener** `src/content/lessons/how-likely.ts` (id `how-likely`, number 1,
+  ~6 min). Arc: **welcome + a pull-quote** (Oscar Wilde) → **the famous hard
+  questions** (lottery, soulmate, shared birthday) with "probability can take a
+  swing at all of these" → **tap one die's faces** ("how many ways to roll a
+  die?", `tap-outcomes`) → an **intuitive definition** ("probability is how likely
+  you get what you want, out of all the ways") that gives the tap a purpose and
+  softens the jump into fractions → two **tap-to-count `fill-fraction` questions,
+  easy first** (P(roll a 5) = 1/6, then P(roll even) = 3/6; inputs annotated "ways
+  to roll …" / "ways in total") → a **comparison that seeds the key principle**
+  (more likely to roll even or a 5? more ways → bigger fraction → more likely) →
+  a **sharper "better definition" of probability** (the rigorous `{k/N}` theorem)
+  → **apply it** to P(rolling a 3) (no die-tap scaffold now), then a playful
+  big-number check (P(roll 14 on a 67-sided die) = 1/67, the formula scales) → a
+  **flip-to-reveal flashcard** ("why is a probability always between 0 and 1?",
+  read-only, via the `derivation.question` card) → **Captain Pascal's commit-once
+  challenge** (with the "Roll the dice!" roller under the game intro, so the
+  learner can get a feel for the totals before answering) ("he wins on
+  7, you win on 2, is it fair?") → the signature 6×6 `grid-event` → derive the
+  36-roll count by cases → wrap (the game was never fair: 6 ways vs 1). Opening
+  big-and-human then landing on the humble die was an owner call; the
+  one-die-vs-two-dice contrast is the lesson (one die: counting trivial, all
+  equal; two dice: rolls equal, totals not). The tap-and-count even question is
+  placed *before* the definition (you can tap to discover favorable/total), which
+  the definition then names.
+- **Rigorous definition of probability (owner request).** A `definition` concept
+  beat after the one-die tap states it precisely: probability is favorable / total
+  when outcomes are equally likely, a number from 0 (never, "rare") to 1 (always,
+  "common"). Delivered as a named `theorem` ("Probability", `{k/N}`) with a plain
+  gloss, anchored on the die the learner just counted. **Terminology:** the term
+  is **probability**, not "likelihood" — in statistics "likelihood" is a distinct
+  technical concept (the likelihood function), so the defined quantity is named
+  probability; "likely" stays as casual English. (Open suggestion to the owner:
+  rename the Unit 1 "Likelihood" chapter accordingly.)
+- **Count derived after the grid, by cases (owner fix).** An earlier draft put a
+  "6 × 6 = 36" concept page *before* the grid, which smuggles in the multiplication
+  principle (its own later lesson) before it is taught. Now the 36 count comes
+  *after* the grid, as the `count-the-rolls` derivation flashcard, built by
+  enumeration: "first die shows 1, the second has 6 options; first die shows 2, 6
+  options; … six cases of 6, so 6+6+6+6+6+6 = 36." No named theorem, no "sample
+  space" term (Unit 2). Rule: show the idea concretely, name the tool in its own
+  lesson — with the lone principled exception that the course's core object,
+  probability itself, is defined up front.
+- **Dice roller moved to the challenge.** The "Roll the dice!" two-dice
+  simulator was extracted from `GridEvent` into a reusable `DiceRoller`
+  component and now renders under Captain Pascal's game intro (via
+  `MultipleChoiceVariant.showDiceRoller`), not on the grid slot, so it doesn't
+  compete with the 6×6 grid on the next slide. `simulationEnabled` dropped from
+  this lesson's grid variants (the flag still works for other lessons).
+- **Revived `tap-outcomes`.** It had been unused in production since Lesson 1 went
+  multiple-choice; the renderer (3D dice faces), dispatch, and `checkAnswer` arm
+  were all still present and tested, so the one-die tap beat reuses it directly.
+- **New `quote` concept-slot field.** A small optional `ConceptSlot.quote`
+  (`{ text, attribution? }`) renders as a styled pull-quote box (large quotation
+  mark, italic, centered) under the lede, via `ConceptSlotView`. Validated in
+  `assertLessonInvariants`. Same pattern as the `theorem`/`derivation` additions
+  (D75/D77). The welcome uses it; quote sourced from The Probability Web.
+- **Commit-once "challenge" questions (engine change).** New optional
+  `ProblemSlot.commitOnce` lets a question be answered exactly once and unlock
+  Continue right OR wrong, a deliberate exception to the no-bail-out gate (D55)
+  for gut-check/prediction questions whose payoff is the reveal on later slots.
+  Wired via a new `allowContinueOnWrong` prop on `LessonFooter` (a wrong answer
+  hides Check and shows Continue, keeping the coral "wrong" wash + the matching
+  `feedbackByOption` copy). Correct shows the green "good call, let's prove it";
+  wrong shows "lots of people say that, let's prove them wrong." A sibling
+  `ProblemSlot.challenge` flag renders a "Challenge question" banner with the
+  Captain Pascal mascot above the interaction (`ProblemSlotView`). Used by the
+  fair-game challenge. (Edge: a wrong commit still counts against the `flawless`
+  achievement; acceptable, not surfaced.)
+- **Annotated fraction inputs.** Optional `FillFractionVariant.numeratorLabel` /
+  `denominatorLabel` render small labels beside the numerator/denominator inputs
+  (e.g. "ways to roll even" / "ways in total"), so the favorable-over-total idea
+  is legible while typing. Validated in `assertLessonInvariants`.
+- **In-interaction teaching note (`afterNote`).** Optional `BaseVariant.afterNote`
+  renders a caption *inside* the interaction (below its content) once the answer
+  is correct, distinct from the footer feedback. Rendered by `tap-outcomes` and
+  `fill-fraction`. Used so the one-die tap reveals "There are six ways to roll a
+  six-sided die" under the faces, and the first fraction reveals "This fraction
+  you just worked out tells us how likely something is to happen." (Note: copy
+  before the definition says "fraction"/"how likely", not "probability".)
+- **Path collapsed to the 9-unit plan.** Removed the old three-chapter spine
+  (`foundations` / `counting` / `deeper`) from `chapters.ts`; chapters are now
+  "Start Here" (1) + the nine units (2–10). The duplication D86 introduced (each
+  topic shown once dense, once as a locked stub) is gone. The catalog re-numbers
+  lessons by position in `content/index.ts`, so display order stays monotonic.
+- **Locked the rest.** Bundled Remote Config default narrowed to `['how-likely']`;
+  every other unit lesson (including the `two-dice` stub, reserved for the future
+  Unit 3 compound lesson) is blank and locked.
+- **Big treasure moved to the path bottom.** `CoursePath` `trophyGroupIdx` now
+  always points at the last chapter (Famous Distributions), so the course-complete
+  treasure is the aspirational end-of-path goal (locked until then) rather than
+  parked on the last playable chapter near the top. Reverses the D86 trophy
+  placement; earlier chapters keep their regular chests.
+- **Non-destructive.** `lesson1`–`lesson5` + the `distributions` stub stay
+  imported and re-exported from `content/index.ts` as the content reservoir for
+  the future splits; their files and per-file tests are untouched.
+
+### Wiring audited (no old code broken)
+
+- `HeroCard` no longer hardcodes `/lesson/what-is-probability` for a new learner's
+  "Start" — it follows the catalog's first playable lesson.
+- `recommendations` / `courseProgress` / `CelebrationScreen` all filter
+  `!comingSoon` and look up by id, so they resolve to `how-likely` cleanly.
+- Tests updated: catalog block in `01-what-is-probability.test.ts` (asserts
+  `how-likely` is the only playable lesson, at number 1), `chapters.test.ts`
+  (first chapter `start-here`), `remoteFlagsConfig.test.ts` (default enables
+  `how-likely`). New `how-likely.test.ts`. `npm run verify` 200/200 green; earlier
+  build was 293.97 KB gz (under the 300 KB ceiling).
+
+### Issue hit — live Remote Config publish blocked, fixed with a defaults floor
+
+`RemoteFlagsProvider` calls `fetchAndActivate` and reads the live, **shared**
+`available_lesson_ids` template, which lists the old five lessons (v3) and not
+`how-likely`. Once the fetch resolves it overrides the bundled default and would
+re-lock the opener. Publishing a fix via the Firebase MCP failed (permission),
+and setting the live value to just the opener would lock `main`'s five lessons.
+**Fix shipped:** `RemoteFlagsProvider` now unions the live list with the bundled
+defaults, so a lesson this build ships as available can never be hidden by a
+stale shared template — the opener stays unlocked locally and when deployed,
+with no RC publish needed. Trade-off: a defaulted id can't be taken down purely
+via RC (fine here; the default set is just the opener).
+
+### Deferred
+
+The actual content splits of Lessons 1/3/5 into their granular unit lessons, and
+authoring the rest of Unit 3 (`two-coins`, `two-dice`, `tree-diagrams`,
+`multiplication-principle`), per `curriculum-roadmap.md` §4/§7.
 
 ---
 

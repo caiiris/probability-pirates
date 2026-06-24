@@ -106,9 +106,11 @@ export function CelebrationScreen() {
 
   // `completed` param carries the actual lessonsCompleted count after this lesson (B017)
   const completedCount = parseInt(searchParams.get('completed') ?? '0', 10) || (lesson ? lesson.number : 1);
-  // Denominator is the number of available (non-coming-soon) lessons, so the bar
-  // can actually reach 100% and "course complete" fires on the last real lesson.
-  const courseTotal = lessons.filter((l) => !l.comingSoon).length || 1;
+  // Denominator is the *full planned course* (live + locked roadmap stubs), so
+  // the progress bar reflects the user's share of the whole curriculum and
+  // "course complete" only fires when truly every lesson is done — not when
+  // the single currently-authored lesson is finished (D91).
+  const courseTotal = lessons.length || 1;
   const progressPct = Math.min(100, Math.round((completedCount / courseTotal) * 100));
   const courseComplete = completedCount >= courseTotal;
 
@@ -211,7 +213,7 @@ export function CelebrationScreen() {
               }`}
             >
               <FlameIcon className="w-4 h-4" />
-              <span className="num">{newStreak}</span> day streak
+              <span>{newStreak}</span> day streak
               {streakDelta > 0 && (
                 <span className="ml-1 text-xs font-normal opacity-75">+{streakDelta}</span>
               )}

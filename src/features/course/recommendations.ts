@@ -30,20 +30,30 @@ export function nextRecommendedLesson(
 }
 
 /**
- * Completed vs. total **available** (non-coming-soon) lessons. The total is
- * derived from the actual content — not a hardcoded course size — so the UI
- * never shows an unreachable denominator (e.g. "5 / 6" when only 5 ship).
- * (Supersedes the old fixed COURSE_SIZE=6 from PRD §9.6 AC #2, per owner.)
+ * Completed vs. total **planned** lessons in the course (live + locked roadmap
+ * stubs). The denominator reflects the entire planned curriculum so the count
+ * encodes scope alongside progress — e.g. with 1 authored lesson and ~40 locked
+ * stubs visible on the path, "1 / 42 lessons" is the truthful read instead of
+ * the misleading "1 / 1 done" we used to show.
+ *
+ * Reverses the older "available-only" denominator (the old comment cited PRD
+ * §9.6 AC #2 / former `COURSE_SIZE=6`). That rationale assumed the unavailable
+ * lessons were a one-off fluke. Today most of the path is *intentionally*
+ * locked roadmap previews (D86 / D88), and the locked nodes are visible on the
+ * path itself — so a denominator that includes them is consistent with what
+ * the user can actually see, not a misleading claim of finality. Decision: D91.
+ *
+ * `completed` only counts lessons that are actually completed and not blank
+ * stubs (a stale progress doc on a now-locked lesson contributes nothing).
  */
 export function courseProgress(
   lessons: Lesson[],
   progressMap: Map<string, LessonProgress>,
 ): { completed: number; total: number } {
-  const real = lessons.filter((l) => !l.comingSoon);
-  const completed = real.filter(
-    (l) => progressMap.get(l.id)?.state === 'completed',
+  const completed = lessons.filter(
+    (l) => l.slots.length > 0 && progressMap.get(l.id)?.state === 'completed',
   ).length;
-  return { completed, total: real.length };
+  return { completed, total: lessons.length };
 }
 
 /**

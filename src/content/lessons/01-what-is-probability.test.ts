@@ -134,26 +134,19 @@ describe('lesson1 invariants', () => {
 });
 
 describe('course catalog', () => {
-  it('ships five authored lessons first, then blank/locked stubs (live + roadmap)', () => {
-    // Lessons 1-5 carry content and no comingSoon flag.
-    expect(lessons.slice(0, 5).every((lesson) => !lesson.comingSoon)).toBe(true);
-    expect(lessons.slice(0, 5).every((lesson) => lesson.slots.length > 0)).toBe(true);
-    // Everything from index 5 on (distributions + roadmap stubs) is an empty,
-    // coming-soon stub. Blank slots also auto-lock via useLessons.
-    expect(lessons.slice(5).every((lesson) => lesson.comingSoon)).toBe(true);
-    expect(lessons.slice(5).every((lesson) => lesson.slots.length === 0)).toBe(true);
+  it('opens on how-likely as the only authored, playable lesson (D88)', () => {
+    const playable = lessons.filter((l) => !l.comingSoon);
+    expect(playable.map((l) => l.id)).toEqual(['how-likely']);
+    // The single playable lesson carries content; every locked stub is empty.
+    expect(playable[0].slots.length).toBeGreaterThan(0);
+    expect(
+      lessons.filter((l) => l.id !== 'how-likely').every((l) => l.comingSoon && l.slots.length === 0),
+    ).toBe(true);
   });
 
-  it('keeps the five live lessons first, in their authored order (D76)', () => {
-    expect(lessons.slice(0, 6).map((l) => l.id)).toEqual([
-      'what-is-probability',
-      'law-of-large-numbers',
-      'counting-carefully',
-      'counting-gets-hard',
-      'conditional-probability',
-      'distributions',
-    ]);
-    expect(lessons.slice(0, 6).map((l) => l.number)).toEqual([1, 2, 3, 4, 5, 6]);
+  it('leads the path with how-likely at lesson number 1', () => {
+    expect(lessons[0].id).toBe('how-likely');
+    expect(lessons[0].number).toBe(1);
   });
 
   it('has globally unique lesson ids and monotonically numbered stubs', () => {

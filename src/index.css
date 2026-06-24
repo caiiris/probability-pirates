@@ -33,9 +33,13 @@
 :root {
   /* ---- Layer 1: Primitive ramps ------------------------------------------ */
 
-  /* neutral — warm, faintly plum-tinted (not pure gray, not cream) */
-  --paper:       #FAFAFC; /* page background        */
-  --surface:     #FFFFFF; /* cards, popovers, sheets */
+  /* neutral — faintly warm off-white for the page substrate (so the whole app
+     reads as "drawn on a chart table," not on shadcn-default off-white), pure
+     white for cards so they pop as fresh paper laid on top. Tuned to barely-
+     warm rather than yellow parchment so the bg doesn't compete with content
+     on grid-heavy pages (Schedule, Practice, Progress). */
+  --paper:       #FAF8F3; /* page background, barely-warm off-white */
+  --surface:     #FFFFFF; /* cards, popovers, sheets               */
   --ink:         #211C30; /* primary text            */
   --ink-soft:    #6B6577; /* secondary / muted text  */
   --line:        #ECEAF1; /* borders, dividers       */
@@ -196,7 +200,20 @@
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    /* Paper-grain noise: a tiled SVG turbulence baked into a data-URI so it
+       costs ~300 bytes, no extra request. Sits on top of the parchment
+       background so every page surface reads as "drawn on textured paper"
+       rather than the flat shadcn off-white default. Cards (bg-card =
+       #FFFFFF) sit on top and read as fresh paper laid over the chart table.
+       baseFrequency tuned coarser (0.65) and alpha bumped (~0.10) so the
+       grain is actually visible at normal viewing distance instead of a
+       theoretical-only texture. */
+    background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.13 0 0 0 0 0.22 0 0 0 0.10 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-attachment: fixed;
   }
+
 
   /* Display face carries headings; intentional negative tracking for tight,
      confident titles. Body and UI text stay Inter. */

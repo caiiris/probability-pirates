@@ -35,6 +35,7 @@ import { db } from '@/lib/firebase';
 import { ERROR_COPY } from '@/lib/errors';
 import { COINS_PER_ACHIEVEMENT } from '@/lib/coins';
 import type { AchievementId } from '@/lib/achievements';
+import { queueFollowNotification } from '@/features/notifications/notificationsService';
 
 export type SocialUser = {
   uid: string;
@@ -80,6 +81,9 @@ export async function follow(
     const batch = writeBatch(db);
     batch.set(doc(db, 'publicProfiles', me.uid, 'following', target.uid), edgePayload(target));
     batch.set(doc(db, 'publicProfiles', target.uid, 'followers', me.uid), edgePayload(me));
+    // Drop a "X started following you" notification in the target's inbox as
+    // part of the same batch so the follow + notif land together.
+    queueFollowNotification(batch, me, target.uid);
 
     const earnsFirst = !(myAchievements ?? []).includes('new-connection');
     if (earnsFirst) {

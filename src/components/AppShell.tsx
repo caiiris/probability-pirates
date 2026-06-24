@@ -3,8 +3,8 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home, User, CalendarDays, Users, LineChart, Dumbbell, Lock } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Wordmark } from '@/components/Brandmark';
 import { AppHeader } from '@/components/AppHeader';
+import { AppFooter } from '@/components/AppFooter';
 import {
   Sidebar,
   SidebarContent,
@@ -168,8 +168,11 @@ export function AppShell() {
     return (
       <div className="flex min-h-screen flex-col">
         <AppHeader />
-        <main ref={scrollRef} className="flex-1 overflow-y-auto pb-16">
-          <RoutedPage scrollRef={scrollRef} />
+        <main ref={scrollRef} className="flex flex-1 flex-col overflow-y-auto pb-16">
+          <div className="flex-1">
+            <RoutedPage scrollRef={scrollRef} />
+          </div>
+          <AppFooter />
         </main>
         <nav
           className="fixed inset-x-0 bottom-0 z-50 flex h-16 border-t border-border bg-background/95 backdrop-blur"
@@ -183,29 +186,35 @@ export function AppShell() {
     );
   }
 
-  // Tablet/desktop: shadcn Sidebar + persistent top bar
+  // Tablet/desktop: full-width header above a Sidebar + content split. Putting
+  // the header on top (instead of inside the SidebarInset alongside the
+  // sidebar's own brand block) ends the "boxed-in" L-shape and lets the
+  // wordmark anchor the whole top edge. The Sidebar is now purely nav, no
+  // duplicated brand label.
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarContent className="pt-6">
-          <div className="mb-6 px-4">
-            <Wordmark markSize={24} />
-          </div>
-          <SidebarMenu>
-            {NAV_ITEMS.map((item) => (
-              <SidebarMenuItem key={item.to}>
-                <NavItem {...item} />
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarContent>
-      </Sidebar>
-      <SidebarInset>
-        <AppHeader />
-        <main ref={scrollRef} className="flex-1 overflow-y-auto">
-          <RoutedPage scrollRef={scrollRef} />
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="flex h-screen flex-col">
+      <AppHeader />
+      <SidebarProvider className="flex-1 min-h-0 overflow-hidden">
+        <Sidebar>
+          <SidebarContent className="pt-4">
+            <SidebarMenu>
+              {NAV_ITEMS.map((item) => (
+                <SidebarMenuItem key={item.to}>
+                  <NavItem {...item} />
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarContent>
+        </Sidebar>
+        <SidebarInset>
+          <main ref={scrollRef} className="flex flex-1 flex-col overflow-y-auto">
+            <div className="flex-1">
+              <RoutedPage scrollRef={scrollRef} />
+            </div>
+            <AppFooter />
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </div>
   );
 }
