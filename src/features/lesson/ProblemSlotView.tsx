@@ -10,6 +10,7 @@ import { TapEvent } from './interactions/TapEvent';
 import { GridEvent } from './interactions/GridEvent';
 import { MultipleChoice } from './interactions/MultipleChoice';
 import { SimulateProportion } from './interactions/SimulateProportion';
+import { ScrubTrials } from './interactions/ScrubTrials';
 import { MontyHall } from './interactions/MontyHall';
 import { CaptainMascot } from '@/components/illustrations/CaptainMascot';
 
@@ -74,6 +75,9 @@ export function ProblemSlotView({
       break;
     case 'simulate-proportion':
       interaction = <SimulateProportion {...sharedProps} variant={variant} />;
+      break;
+    case 'scrub-trials':
+      interaction = <ScrubTrials {...sharedProps} variant={variant} />;
       break;
     case 'monty-hall':
       interaction = <MontyHall {...sharedProps} variant={variant} />;

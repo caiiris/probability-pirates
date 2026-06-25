@@ -86,6 +86,12 @@ export function checkAnswer(variant: Variant, payload: AttemptPayload): CheckRes
       return { wasCorrect: false, matchedWrongKey: 'incomplete' };
     }
 
+    case 'scrub-trials': {
+      const p = payload as { trials: number };
+      if (p.trials >= variant.reachN) return { wasCorrect: true };
+      return { wasCorrect: false, matchedWrongKey: 'incomplete' };
+    }
+
     case 'monty-hall': {
       const p = payload as { games: number };
       if (p.games >= variant.minGames) return { wasCorrect: true };

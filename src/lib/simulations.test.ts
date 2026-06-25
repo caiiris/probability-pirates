@@ -7,6 +7,8 @@ import {
   montyHallWins,
   setupMontyGame,
   switchTarget,
+  mulberry32,
+  cumulativeSuccesses,
 } from './simulations';
 
 /** Deterministic rng that cycles through a fixed list of values in [0,1). */
@@ -65,6 +67,55 @@ describe('montyHallWins', () => {
     }
     expect(wins / runs).toBeGreaterThan(0.6);
     expect(wins / runs).toBeLessThan(0.73);
+  });
+});
+
+describe('mulberry32 (seeded PRNG)', () => {
+  it('produces the same sequence for the same seed (deterministic)', () => {
+    const a = mulberry32(0xc0de);
+    const b = mulberry32(0xc0de);
+    for (let i = 0; i < 50; i++) {
+      expect(a()).toBe(b());
+    }
+  });
+
+  it('produces values in [0, 1)', () => {
+    const r = mulberry32(7);
+    for (let i = 0; i < 1000; i++) {
+      const v = r();
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThan(1);
+    }
+  });
+});
+
+describe('cumulativeSuccesses', () => {
+  it('starts at 0 and grows monotonically by 0 or 1', () => {
+    const result = cumulativeSuccesses('coin', 500, 1);
+    expect(result).toHaveLength(501);
+    expect(result[0]).toBe(0);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i] - result[i - 1]).toBeGreaterThanOrEqual(0);
+      expect(result[i] - result[i - 1]).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('is deterministic in seed (same seed → same prefix counts)', () => {
+    const a = cumulativeSuccesses('coin', 200, 42);
+    const b = cumulativeSuccesses('coin', 200, 42);
+    expect(a).toEqual(b);
+  });
+
+  it("converges to ~50% on coin and ~16.7% on die-six over 10,000 trials", () => {
+    const coin = cumulativeSuccesses('coin', 10_000, 0xc0de);
+    const dieSix = cumulativeSuccesses('die-six', 10_000, 0xc0de);
+    const coinShare = coin[10_000] / 10_000;
+    const dieShare = dieSix[10_000] / 10_000;
+    // Wide envelopes — the test only catches "wildly wrong," not noise.
+    expect(coinShare).toBeGreaterThan(0.45);
+    expect(coinShare).toBeLessThan(0.55);
+    expect(dieShare).toBeGreaterThan(0.13);
+    expect(dieShare).toBeLessThan(0.20);
   });
 });
 

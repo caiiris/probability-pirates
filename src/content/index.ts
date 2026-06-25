@@ -6,25 +6,45 @@ import { lesson4 } from './lessons/04-counting-gets-hard';
 import { lesson5 } from './lessons/05-conditional-probability';
 import { lesson6 } from './lessons/06-distributions';
 import { howLikely } from './lessons/how-likely';
+import { longRunFrequency } from './lessons/long-run-frequency';
 import { roadmapStubLessons } from './lessons/roadmapStubs';
 import type { Lesson } from './types';
 
 /**
- * The live catalog (D88): the `how-likely` course opener leads, then the 9-unit
- * curriculum from `docs/curriculum-roadmap.md` follows as blank, locked stubs.
- * `how-likely` is the one authored, playable lesson; the `two-dice` stub stays a
- * locked preview of the future Unit 3 compound lesson.
+ * The live catalog. The `how-likely` course opener leads (D88), then the
+ * curriculum from `docs/curriculum-roadmap.md` (collapsed to 7 units in D90)
+ * follows. Within that curriculum, lessons that have been authored swap in for
+ * their stub by id; everything else stays as a blank, locked preview.
+ *
+ * Currently authored, in catalog order: `how-likely`, `long-run-frequency`
+ * (D92). The `two-dice` stub is reserved for the future Unit 2 compound
+ * lesson.
  *
  * Numbers are assigned by position (1…N) so "Lesson N" is always monotonic on
  * the path regardless of how the stubs are ordered.
  *
  * The original five dense lessons (`lesson1`-`lesson5`) and the `distributions`
  * stub are NOT on the live path. They are kept imported and re-exported below as
- * the content reservoir for the later Unit 2-4 / Unit 5 / Unit 7 splits, so the
+ * the content reservoir for the later Unit 2 / Unit 4 / Unit 6 splits, so the
  * old 6-lesson spine and the new granular plan do not appear twice (overlap
  * resolved per D88). `main` still holds the prior arrangement.
  */
-export const lessons: Lesson[] = [howLikely, ...roadmapStubLessons].map((lesson, i) =>
+
+// Lessons we have hand-authored from the roadmap. Each one swaps in for the
+// matching id in `roadmapStubLessons` below (no manual surgery on the stub
+// list). To author another one: write the file, import it, add it here.
+// `how-likely` is excluded — it's the dedicated course opener (no roadmap
+// stub mirrors it; it sits ahead of Unit 1 in the path).
+const authoredRoadmapLessons: Lesson[] = [longRunFrequency];
+const authoredRoadmapById = new Map<string, Lesson>(
+  authoredRoadmapLessons.map((lesson) => [lesson.id, lesson]),
+);
+
+const liveRoadmap = roadmapStubLessons.map(
+  (stub) => authoredRoadmapById.get(stub.id) ?? stub,
+);
+
+export const lessons: Lesson[] = [howLikely, ...liveRoadmap].map((lesson, i) =>
   lesson.number === i + 1 ? lesson : { ...lesson, number: i + 1 },
 );
 
@@ -48,6 +68,6 @@ function validateAllLessons(): void {
 validateAllLessons();
 
 // `lesson1`-`lesson6` are the preserved source content (not on the live path).
-export { lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, howLikely };
+export { lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, howLikely, longRunFrequency };
 export type { Lesson } from './types';
 export * from './types';

@@ -5,6 +5,7 @@ import { Calendar } from '@/components/illustrations/Calendar';
 import { renderInlineMath } from '@/components/Fraction';
 import type { ConceptSlot, IllustrationRef } from '@/content/types';
 import { DerivationCard } from './DerivationCard';
+import { SettlingLineFigure } from './SettlingLineFigure';
 
 type Props = { slot: ConceptSlot };
 
@@ -108,6 +109,8 @@ export function ConceptSlotView({ slot }: Props) {
             ))}
           </div>
         )}
+
+        {slot.figure?.kind === 'settling-line' && <SettlingLineFigure {...slot.figure} />}
 
         {slot.example && (
           <div className="rounded-xl border bg-muted/30 px-4 py-4 space-y-2 text-left">

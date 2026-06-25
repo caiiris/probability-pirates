@@ -210,6 +210,35 @@ describe('checkAnswer: simulate-proportion', () => {
 });
 
 // ---------------------------------------------------------------------------
+// scrub-trials — correct once the slider has reached `reachN`
+// ---------------------------------------------------------------------------
+const scrub: Variant = {
+  id: 'test',
+  interactionKind: 'scrub-trials',
+  prompt: '',
+  scenario: 'coin',
+  targetProbability: 0.5,
+  targetLabel: 'True P(heads) = 50%',
+  minN: 10,
+  maxN: 10_000,
+  reachN: 1_000,
+  feedbackCorrect: '',
+  feedbackDefault: '',
+};
+
+describe('checkAnswer: scrub-trials', () => {
+  it('correct once reachN is reached', () => {
+    expect(checkAnswer(scrub, { trials: 1_000 }).wasCorrect).toBe(true);
+    expect(checkAnswer(scrub, { trials: 9_999 }).wasCorrect).toBe(true);
+  });
+  it('wrong (incomplete) below reachN', () => {
+    const r = checkAnswer(scrub, { trials: 50 });
+    expect(r.wasCorrect).toBe(false);
+    if (!r.wasCorrect) expect(r.matchedWrongKey).toBe('incomplete');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // monty-hall — correct once minGames reached
 // ---------------------------------------------------------------------------
 const monty: Variant = {

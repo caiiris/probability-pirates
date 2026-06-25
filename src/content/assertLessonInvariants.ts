@@ -100,6 +100,22 @@ function assertVariantInvariants(lesson: Lesson, slot: ProblemSlot, variant: Var
       }
       break;
     }
+    case 'scrub-trials': {
+      if (variant.targetProbability < 0 || variant.targetProbability > 1) {
+        throw new Error(`${basePath}: targetProbability must be between 0 and 1`);
+      }
+      if (variant.minN <= 0 || variant.maxN <= 0) {
+        throw new Error(`${basePath}: minN and maxN must be positive`);
+      }
+      if (variant.minN >= variant.maxN) {
+        throw new Error(`${basePath}: minN must be strictly less than maxN`);
+      }
+      if (variant.reachN < variant.minN || variant.reachN > variant.maxN) {
+        throw new Error(`${basePath}: reachN must be within [minN, maxN]`);
+      }
+      assertNonEmptyString(variant.targetLabel, `${basePath}.targetLabel`);
+      break;
+    }
     case 'monty-hall': {
       if (variant.minGames <= 0) {
         throw new Error(`${basePath}: minGames must be positive`);
@@ -173,6 +189,22 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
         );
         if (slot.derivation.question !== undefined) {
           assertNonEmptyString(slot.derivation.question, `${basePath}.derivation.question`);
+        }
+      }
+      if (slot.figure !== undefined) {
+        if (slot.figure.kind === 'settling-line') {
+          if (slot.figure.targetProbability < 0 || slot.figure.targetProbability > 1) {
+            throw new Error(
+              `${basePath}.figure.targetProbability must be between 0 and 1`,
+            );
+          }
+          assertNonEmptyString(slot.figure.targetLabel, `${basePath}.figure.targetLabel`);
+          if (slot.figure.trialCount !== undefined && slot.figure.trialCount <= 0) {
+            throw new Error(`${basePath}.figure.trialCount must be positive`);
+          }
+          if (slot.figure.caption !== undefined) {
+            assertNonEmptyString(slot.figure.caption, `${basePath}.figure.caption`);
+          }
         }
       }
       break;
