@@ -1,0 +1,267 @@
+[
+  {
+    "id": "cl0001-p01",
+    "clusterId": "CL-0001",
+    "templateId": "at-least-one-via-complement",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 945,
+    "params": {
+      "id": "cl0001-p01",
+      "n": 3,
+      "pNum": 1,
+      "pDen": 2,
+      "scenarioId": "checkInPrompt"
+    },
+    "prompt": "Pascal sends 3 independent check-in prompts. Each prompt has a 1/2 chance of being noticed. What is the probability that at least one prompt is noticed?",
+    "answer": {
+      "kind": "fraction",
+      "num": "7",
+      "den": "8",
+      "display": "7/8",
+      "decimal": 0.875
+    },
+    "verification": {
+      "solver": "1 - ((pDen - pNum) / pDen)^n",
+      "exactComplement": "1/8",
+      "simulation": {
+        "seed": 12648449,
+        "trials": 50000,
+        "estimate": 0.87512,
+        "sigmaThreshold": 0.00739509972887452,
+        "absoluteDifference": 0.00012000000000000899,
+        "passed": true
+      }
+    },
+    "workedSolution": {
+      "title": "Use the complement",
+      "steps": [
+        "\"At least one\" is easier to get by looking at the opposite event: zero successes.",
+        "One attempt fails with probability 1/2.",
+        "Because the attempts are independent, all 3 attempts fail with probability (1/2)^3 = 1/8.",
+        "So P(at least one success) = 1 - 1/8 = 7/8."
+      ]
+    },
+    "reviewNotes": [
+      "Review learner-facing wording for clarity and age fit.",
+      "Verify this feels like complement-rule practice, not arithmetic grind.",
+      "No source wording should be present; run harvest wording audit before product use."
+    ]
+  },
+  {
+    "id": "cl0001-p02",
+    "clusterId": "CL-0001",
+    "templateId": "at-least-one-via-complement",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 1050,
+    "params": {
+      "id": "cl0001-p02",
+      "n": 4,
+      "pNum": 3,
+      "pDen": 5,
+      "scenarioId": "clearPing"
+    },
+    "prompt": "A sensor sends 4 independent pings. Each ping has a 3/5 chance of arriving clearly. What is the probability that at least one ping arrives clearly?",
+    "answer": {
+      "kind": "fraction",
+      "num": "609",
+      "den": "625",
+      "display": "609/625",
+      "decimal": 0.9744
+    },
+    "verification": {
+      "solver": "1 - ((pDen - pNum) / pDen)^n",
+      "exactComplement": "16/625",
+      "simulation": {
+        "seed": 12648546,
+        "trials": 50000,
+        "estimate": 0.97378,
+        "sigmaThreshold": 0.003531617193298274,
+        "absoluteDifference": 0.0006200000000000649,
+        "passed": true
+      }
+    },
+    "workedSolution": {
+      "title": "Use the complement",
+      "steps": [
+        "\"At least one\" is easier to get by looking at the opposite event: zero successes.",
+        "One attempt fails with probability 2/5.",
+        "Because the attempts are independent, all 4 attempts fail with probability (2/5)^4 = 16/625.",
+        "So P(at least one success) = 1 - 16/625 = 609/625."
+      ]
+    },
+    "reviewNotes": [
+      "Review learner-facing wording for clarity and age fit.",
+      "Verify this feels like complement-rule practice, not arithmetic grind.",
+      "No source wording should be present; run harvest wording audit before product use."
+    ]
+  },
+  {
+    "id": "cl0001-p03",
+    "clusterId": "CL-0001",
+    "templateId": "at-least-one-via-complement",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 1035,
+    "params": {
+      "id": "cl0001-p03",
+      "n": 5,
+      "pNum": 1,
+      "pDen": 3,
+      "scenarioId": "puzzleStrategy"
+    },
+    "prompt": "A learner tries 5 independent puzzle strategies. Each strategy has a 1/3 chance of working. What is the probability that at least one strategy works?",
+    "answer": {
+      "kind": "fraction",
+      "num": "211",
+      "den": "243",
+      "display": "211/243",
+      "decimal": 0.8683127572016461
+    },
+    "verification": {
+      "solver": "1 - ((pDen - pNum) / pDen)^n",
+      "exactComplement": "32/243",
+      "simulation": {
+        "seed": 12648643,
+        "trials": 50000,
+        "estimate": 0.86848,
+        "sigmaThreshold": 0.007561273466900971,
+        "absoluteDifference": 0.00016724279835389488,
+        "passed": true
+      }
+    },
+    "workedSolution": {
+      "title": "Use the complement",
+      "steps": [
+        "\"At least one\" is easier to get by looking at the opposite event: zero successes.",
+        "One attempt fails with probability 2/3.",
+        "Because the attempts are independent, all 5 attempts fail with probability (2/3)^5 = 32/243.",
+        "So P(at least one success) = 1 - 32/243 = 211/243."
+      ]
+    },
+    "reviewNotes": [
+      "Review learner-facing wording for clarity and age fit.",
+      "Verify this feels like complement-rule practice, not arithmetic grind.",
+      "No source wording should be present; run harvest wording audit before product use."
+    ]
+  },
+  {
+    "id": "cl0001-p04",
+    "clusterId": "CL-0001",
+    "templateId": "at-least-one-via-complement",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 1080,
+    "params": {
+      "id": "cl0001-p04",
+      "n": 6,
+      "pNum": 1,
+      "pDen": 4,
+      "scenarioId": "qualityCheck"
+    },
+    "prompt": "A robot runs 6 independent quality checks. Each check has a 1/4 chance of catching a flaw. What is the probability that at least one check catches the flaw?",
+    "answer": {
+      "kind": "fraction",
+      "num": "3367",
+      "den": "4096",
+      "display": "3367/4096",
+      "decimal": 0.822021484375
+    },
+    "verification": {
+      "solver": "1 - ((pDen - pNum) / pDen)^n",
+      "exactComplement": "729/4096",
+      "simulation": {
+        "seed": 12648740,
+        "trials": 50000,
+        "estimate": 0.8234,
+        "sigmaThreshold": 0.008552840569101052,
+        "absoluteDifference": 0.0013785156250000208,
+        "passed": true
+      }
+    },
+    "workedSolution": {
+      "title": "Use the complement",
+      "steps": [
+        "\"At least one\" is easier to get by looking at the opposite event: zero successes.",
+        "One attempt fails with probability 3/4.",
+        "Because the attempts are independent, all 6 attempts fail with probability (3/4)^6 = 729/4096.",
+        "So P(at least one success) = 1 - 729/4096 = 3367/4096."
+      ]
+    },
+    "reviewNotes": [
+      "Review learner-facing wording for clarity and age fit.",
+      "Verify this feels like complement-rule practice, not arithmetic grind.",
+      "No source wording should be present; run harvest wording audit before product use."
+    ]
+  },
+  {
+    "id": "cl0001-p05",
+    "clusterId": "CL-0001",
+    "templateId": "at-least-one-via-complement",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 1140,
+    "params": {
+      "id": "cl0001-p05",
+      "n": 4,
+      "pNum": 7,
+      "pDen": 10,
+      "scenarioId": "checkInPrompt"
+    },
+    "prompt": "Pascal sends 4 independent check-in prompts. Each prompt has a 7/10 chance of being noticed. What is the probability that at least one prompt is noticed?",
+    "answer": {
+      "kind": "fraction",
+      "num": "9919",
+      "den": "10000",
+      "display": "9919/10000",
+      "decimal": 0.9919
+    },
+    "verification": {
+      "solver": "1 - ((pDen - pNum) / pDen)^n",
+      "exactComplement": "81/10000",
+      "simulation": {
+        "seed": 12648837,
+        "trials": 50000,
+        "estimate": 0.99132,
+        "sigmaThreshold": 0.002004294140090221,
+        "absoluteDifference": 0.0005800000000000249,
+        "passed": true
+      }
+    },
+    "workedSolution": {
+      "title": "Use the complement",
+      "steps": [
+        "\"At least one\" is easier to get by looking at the opposite event: zero successes.",
+        "One attempt fails with probability 3/10.",
+        "Because the attempts are independent, all 4 attempts fail with probability (3/10)^4 = 81/10000.",
+        "So P(at least one success) = 1 - 81/10000 = 9919/10000."
+      ]
+    },
+    "reviewNotes": [
+      "Review learner-facing wording for clarity and age fit.",
+      "Verify this feels like complement-rule practice, not arithmetic grind.",
+      "No source wording should be present; run harvest wording audit before product use."
+    ]
+  }
+]

@@ -1,0 +1,441 @@
+[
+  {
+    "id": "openintro-ahss",
+    "title": "OpenIntro Advanced High School Statistics",
+    "url": "https://www.openintro.org/book/ahss/",
+    "retrieval": {
+      "kind": "manual-download",
+      "path": "docs/curriculum-harvest/raw/openintro-ahss.txt"
+    },
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "commercialOk": true,
+      "shareAlike": true,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["sample-space", "conditional", "expected-value"],
+    "notes": "Best high-school fit. Do not use OpenIntro branding or title for derivatives."
+  },
+  {
+    "id": "openintro-statistics",
+    "title": "OpenIntro Statistics",
+    "url": "https://www.openintro.org/book/os/",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "http://openintro.org/go?id=stat_os4_probability_chapter&referrer=%2Fbook%2Fos%2Findex.php"
+    },
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "commercialOk": true,
+      "shareAlike": true,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["sample-space", "conditional", "distributions"],
+    "notes": "Use for probability chapter structure and exercise families; avoid OpenIntro branding."
+  },
+  {
+    "id": "openstax-intro-statistics-original",
+    "title": "OpenStax Introductory Statistics, original edition",
+    "url": "https://openstax.org/details/books/introductory-statistics",
+    "retrieval": {
+      "kind": "manual-download",
+      "path": "docs/curriculum-harvest/raw/openstax-intro-statistics-original.txt"
+    },
+    "license": {
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "commercialOk": true,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["events", "conditional", "tree-diagrams", "expected-value"],
+    "notes": "Prefer this original CC BY edition over newer noncommercial editions."
+  },
+  {
+    "id": "illustrative-mathematics-hs-first-edition",
+    "title": "Illustrative Mathematics high-school first edition: Tables of Relative Frequencies",
+    "url": "https://curriculum.illustrativemathematics.org/HS/students/2/8/4/index.html",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://curriculum.illustrativemathematics.org/HS/students/2/8/4/index.html"
+    },
+    "license": {
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "commercialOk": true,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["relative-frequency", "tables", "conditional"],
+    "notes": "Use first-edition materials only; newer v.360 materials are noncommercial."
+  },
+  {
+    "id": "grinstead-snell",
+    "title": "Introduction to Probability by Grinstead and Snell",
+    "url": "https://chance.dartmouth.edu/teaching_aids/books_articles/probability_book/book.html",
+    "retrieval": {
+      "kind": "manual-download",
+      "path": "docs/curriculum-harvest/raw/grinstead-snell.txt"
+    },
+    "license": {
+      "name": "GNU Free Documentation License",
+      "url": "https://www.gnu.org/licenses/fdl-1.3.html",
+      "commercialOk": true,
+      "shareAlike": true,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["counting", "conditional", "expected-value"],
+    "notes": "Strong source for deep tricks. Prefer inspiration and template families over direct adaptation because the license is heavier."
+  },
+  {
+    "id": "ck12-probability-statistics",
+    "title": "CK-12 Probability and Statistics",
+    "url": "https://www.ck12.org/",
+    "retrieval": {
+      "kind": "manual-download",
+      "path": "docs/curriculum-harvest/raw/ck12-probability-statistics.txt"
+    },
+    "license": {
+      "name": "CK-12 Curriculum Materials License",
+      "url": "https://help.ck12.org/hc/en-us/articles/1260801398229--Why-did-CK-12-update-the-Terms-of-Use-and-change-to-a-CK-12-Curriculum-Materials-License",
+      "commercialOk": false,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "inspiration-only",
+    "status": "approved",
+    "targetTopics": ["independence", "conditional", "events"],
+    "notes": "High-school level, but license is CK-12-specific. Do not directly adapt without a separate permission pass."
+  },
+  {
+    "id": "onlinestatbook-probability",
+    "title": "Online Statistics Education: Probability",
+    "url": "https://onlinestatbook.com/2/probability/probability.html",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://onlinestatbook.com/2/probability/probability.html"
+    },
+    "license": {
+      "name": "Public domain",
+      "url": "https://onlinestatbook.com/2/index.html",
+      "commercialOk": true,
+      "shareAlike": false,
+      "requiresAttribution": false
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["sample-space", "events", "conditional", "expected-value"],
+    "notes": "Official site says public domain and requests citation where possible. Good source for accessible explanations and interactive probability ideas."
+  },
+  {
+    "id": "libretexts-openintro-probability-exercises",
+    "title": "Statistics LibreTexts: OpenIntro Probability Exercises",
+    "url": "https://stats.libretexts.org/Bookshelves/Introductory_Statistics/OpenIntro_Statistics_(Diez_et_al)./02%3A_Probability/2.E%3A_Probability_(Exercises)",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://stats.libretexts.org/Bookshelves/Introductory_Statistics/OpenIntro_Statistics_(Diez_et_al)./02%3A_Probability/2.E%3A_Probability_(Exercises)"
+    },
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "commercialOk": true,
+      "shareAlike": true,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["events", "conditional", "sampling-without-replacement", "expected-value"],
+    "notes": "LibreTexts page metadata identifies OpenIntro as source and CC BY-SA. Use to find exercise families; final copy still must pass wording audit."
+  },
+  {
+    "id": "openstax-statistics-practice",
+    "title": "OpenStax Statistics Chapter 3 Practice",
+    "url": "https://openstax.org/books/statistics/pages/3-practice",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://openstax.org/books/statistics/pages/3-practice"
+    },
+    "license": {
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "commercialOk": true,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["events", "independence", "contingency-tables", "tree-diagrams"],
+    "notes": "Direct chapter practice page for probability topics. Prefer abstracting families over copying exercise contexts."
+  },
+  {
+    "id": "openstax-statistics-homework",
+    "title": "OpenStax Statistics Chapter 3 Homework",
+    "url": "https://openstax.org/books/statistics/pages/3-homework",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://openstax.org/books/statistics/pages/3-homework"
+    },
+    "license": {
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "commercialOk": true,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["events", "independence", "contingency-tables", "tree-diagrams", "games"],
+    "notes": "Exercise-heavy companion to OpenStax practice. Use for problem-family coverage; final prompts still need new wording and attribution."
+  },
+  {
+    "id": "open-up-hs-math-unit10-representations",
+    "title": "Open Up HS Math II Unit 10 Lesson 2: Representations for Probability",
+    "url": "https://access.openupresources.org/curricula/our-hs-math/en/integrated/math-2/unit-10/lesson-2/index.html",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://access.openupresources.org/curricula/our-hs-math/en/integrated/math-2/unit-10/lesson-2/index.html"
+    },
+    "license": {
+      "name": "CC BY",
+      "url": "https://www.openupresources.org/help-support/licensing-questions/",
+      "commercialOk": true,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["two-way-tables", "venn-diagrams", "tree-diagrams", "conditional"],
+    "notes": "Closest age-band source. Verify exact curriculum page attribution before direct adaptation; use Pascal-authored contexts by default."
+  },
+  {
+    "id": "open-up-hs-math-unit10-independence",
+    "title": "Open Up HS Math II Unit 10 Lesson 5: Declaring Independence",
+    "url": "https://access.openupresources.org/curricula/our-hs-math/en/integrated/math-2/unit-10/lesson-5/index.html",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://access.openupresources.org/curricula/our-hs-math/en/integrated/math-2/unit-10/lesson-5/index.html"
+    },
+    "license": {
+      "name": "CC BY",
+      "url": "https://www.openupresources.org/help-support/licensing-questions/",
+      "commercialOk": true,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["independence", "conditional", "multiplication-rule"],
+    "notes": "High-school lesson on independence tests and multiplication rule. Use for pedagogy and misconception structure."
+  },
+  {
+    "id": "seeing-theory-basic-probability",
+    "title": "Seeing Theory: Basic Probability",
+    "url": "https://seeing-theory.brown.edu/basic-probability/",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://seeing-theory.brown.edu/basic-probability/"
+    },
+    "license": {
+      "name": "Apache-2.0 repository with noncommercial request in project docs",
+      "url": "https://github.com/seeingtheory/Seeing-Theory",
+      "commercialOk": false,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "inspiration-only",
+    "status": "approved",
+    "targetTopics": ["visualizations", "expected-value", "distributions"],
+    "notes": "Useful for interaction inspiration. Do not reuse visualizations or copy until commercial/license posture is reviewed."
+  },
+  {
+    "id": "cmu-oli-probability-statistics",
+    "title": "CMU OLI Probability & Statistics Open + Free",
+    "url": "https://oli.cmu.edu/courses/probability-statistics-open-free/",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://oli.cmu.edu/courses/probability-statistics-open-free/"
+    },
+    "license": {
+      "name": "CC BY-NC-SA 4.0",
+      "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "commercialOk": false,
+      "shareAlike": true,
+      "requiresAttribution": true
+    },
+    "reuseMode": "inspiration-only",
+    "status": "approved",
+    "targetTopics": ["simulations", "conditional", "random-variables", "binomial"],
+    "notes": "Strong interactive pedagogy, but noncommercial/share-alike. Do not directly adapt unless commercial posture is resolved."
+  },
+  {
+    "id": "openlearn-decision-trees-uncertainty",
+    "title": "OpenLearn Decision Trees and Dealing with Uncertainty",
+    "url": "https://www.open.edu/openlearn/money-business/decision-trees-and-dealing-uncertainty/content-section-1",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://www.open.edu/openlearn/money-business/decision-trees-and-dealing-uncertainty/content-section-1"
+    },
+    "license": {
+      "name": "CC BY-NC-SA 4.0 with possible third-party restrictions",
+      "url": "https://about.open.ac.uk/strategy-and-policies/policies-and-statements/copyright-openlearn",
+      "commercialOk": false,
+      "shareAlike": true,
+      "requiresAttribution": true
+    },
+    "reuseMode": "inspiration-only",
+    "status": "approved",
+    "targetTopics": ["probability-basics", "decision-trees", "uncertainty"],
+    "notes": "Use for adult-friendly decision/probability framing only; check acknowledgements before any direct adaptation."
+  },
+  {
+    "id": "openlearn-bayesian-statistics",
+    "title": "OpenLearn Bayesian Statistics",
+    "url": "https://www.open.edu/openlearn/science-maths-technology/bayesian-statistics/content-section-0",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://www.open.edu/openlearn/science-maths-technology/bayesian-statistics/content-section-0"
+    },
+    "license": {
+      "name": "CC BY-NC-SA 4.0 with possible third-party restrictions",
+      "url": "https://about.open.ac.uk/strategy-and-policies/policies-and-statements/copyright-openlearn",
+      "commercialOk": false,
+      "shareAlike": true,
+      "requiresAttribution": true
+    },
+    "reuseMode": "inspiration-only",
+    "status": "approved",
+    "targetTopics": ["bayes", "conditional", "relative-frequency"],
+    "notes": "Use for Bayes sequencing and probability-estimation ideas only; noncommercial and course-specific restrictions apply."
+  },
+  {
+    "id": "nist-stat-handbook-distributions",
+    "title": "NIST/SEMATECH e-Handbook: Gallery of Distributions",
+    "url": "https://www.itl.nist.gov/div898/handbook/eda/section3/eda366.htm",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://www.itl.nist.gov/div898/handbook/eda/section3/eda366.htm"
+    },
+    "license": {
+      "name": "Public domain / NIST public information",
+      "url": "https://www.nist.gov/open/license",
+      "commercialOk": true,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["distributions", "reference"],
+    "notes": "Advanced reference for formulas and distribution checks. Not a learner-facing source for current middle/high-school lessons."
+  },
+  {
+    "id": "evans-rosenthal-science-uncertainty",
+    "title": "Probability and Statistics: The Science of Uncertainty",
+    "url": "https://utstat.utoronto.ca/mikevans/jeffrosenthal/",
+    "retrieval": {
+      "kind": "manual-download",
+      "path": "docs/curriculum-harvest/raw/evans-rosenthal-science-uncertainty.txt"
+    },
+    "license": {
+      "name": "Free distribution with no alteration and no profit",
+      "url": "https://utstat.utoronto.ca/mikevans/jeffrosenthal/",
+      "commercialOk": false,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "inspiration-only",
+    "status": "approved",
+    "targetTopics": ["probability-models", "random-variables", "expectation"],
+    "notes": "More advanced; license allows copying/distribution only if unaltered and not sold. Use only for inspiration unless permission is granted."
+  },
+  {
+    "id": "stat110-probability",
+    "title": "Harvard Stat 110 Probability",
+    "url": "https://stat110.hsites.harvard.edu/",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://stat110.hsites.harvard.edu/strategic-practice-problems"
+    },
+    "license": {
+      "name": "Free access, copyrighted / permission required for reuse",
+      "url": "https://stat110.hsites.harvard.edu/",
+      "commercialOk": false,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "inspiration-only",
+    "status": "approved",
+    "targetTopics": ["counting", "conditional", "bayes", "expected-value", "challenge"],
+    "notes": "Excellent problem design, but not open-licensed. Extract only high-level themes; do not copy problems, solutions, or wording."
+  },
+  {
+    "id": "mathigon-probability",
+    "title": "Mathigon Probability / Interactive Textbooks",
+    "url": "https://mathigon.org/",
+    "retrieval": {
+      "kind": "none"
+    },
+    "license": {
+      "name": "Free noncommercial access, commercial license required",
+      "url": "https://mathigon.org/faqs",
+      "commercialOk": false,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "inspiration-only",
+    "status": "approved",
+    "targetTopics": ["interactive-design"],
+    "notes": "Do not ingest or copy. Use only as a reminder to make interactions tactile and visually clear."
+  },
+  {
+    "id": "mit-ocw-probability-random",
+    "title": "MIT OCW Probability: Random Isn't So Random",
+    "url": "https://ocw.mit.edu/",
+    "retrieval": {
+      "kind": "manual-download",
+      "path": "docs/curriculum-harvest/raw/mit-ocw-probability-random.txt"
+    },
+    "license": {
+      "name": "CC BY-NC-SA",
+      "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "commercialOk": false,
+      "shareAlike": true,
+      "requiresAttribution": true
+    },
+    "reuseMode": "inspiration-only",
+    "status": "approved",
+    "targetTopics": ["conditional", "base-rate", "challenge"],
+    "notes": "Good enrichment source. Treat as inspiration-only unless Pascal's commercial posture is resolved."
+  },
+  {
+    "id": "aops-alcumus-contests",
+    "title": "AoPS / Alcumus / contest-style proprietary sources",
+    "url": "https://artofproblemsolving.com/",
+    "retrieval": {
+      "kind": "none"
+    },
+    "license": {
+      "name": "Proprietary / permission required",
+      "url": "https://artofproblemsolving.com/company/tos",
+      "commercialOk": false,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "blocked",
+    "status": "blocked",
+    "targetTopics": ["challenge"],
+    "notes": "Do not ingest or copy. Useful only as a high-level reminder that challenge problems should reward problem-solving tricks."
+  }
+]
+

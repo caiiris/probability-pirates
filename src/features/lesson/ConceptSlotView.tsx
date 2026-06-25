@@ -6,6 +6,8 @@ import { renderInlineMath } from '@/components/Fraction';
 import type { ConceptSlot, IllustrationRef } from '@/content/types';
 import { DerivationCard } from './DerivationCard';
 import { SettlingLineFigure } from './SettlingLineFigure';
+import { TwoCoinsGridFigure } from './TwoCoinsGridFigure';
+import { SubsetPickerFigure } from './SubsetPickerFigure';
 
 type Props = { slot: ConceptSlot };
 
@@ -15,6 +17,7 @@ export function ConceptSlotView({ slot }: Props) {
     (slot.body && slot.body.length > 0) ||
     slot.example ||
     slot.theorem ||
+    slot.definition ||
     slot.derivation ||
     slot.quote
   );
@@ -78,6 +81,32 @@ export function ConceptSlotView({ slot }: Props) {
           </figure>
         )}
 
+        {slot.definition && (
+          <aside
+            aria-label={
+              slot.definition.name ? `Definition: ${slot.definition.name}` : 'Definition'
+            }
+            className="rounded-xl border border-t-4 border-t-[color:var(--blue-base)] bg-[color:var(--blue-soft)]/50 px-4 py-3.5 space-y-1.5"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--blue-deep)]">
+              {slot.definition.name ? (
+                <>
+                  Definition{' '}
+                  <span aria-hidden="true" className="opacity-60">
+                    ·
+                  </span>{' '}
+                  {slot.definition.name}
+                </>
+              ) : (
+                'Definition'
+              )}
+            </p>
+            <p className="text-[0.95rem] leading-relaxed text-foreground">
+              {renderInlineMath(slot.definition.statement)}
+            </p>
+          </aside>
+        )}
+
         {slot.theorem && (
           <aside
             aria-label={slot.theorem.name ? `Theorem: ${slot.theorem.name}` : 'Theorem'}
@@ -111,6 +140,8 @@ export function ConceptSlotView({ slot }: Props) {
         )}
 
         {slot.figure?.kind === 'settling-line' && <SettlingLineFigure {...slot.figure} />}
+        {slot.figure?.kind === 'two-coins-grid' && <TwoCoinsGridFigure {...slot.figure} />}
+        {slot.figure?.kind === 'subset-picker' && <SubsetPickerFigure {...slot.figure} />}
 
         {slot.example && (
           <div className="rounded-xl border bg-muted/30 px-4 py-4 space-y-2 text-left">

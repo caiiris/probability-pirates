@@ -17,7 +17,7 @@ import {
   applyLessonCompletion,
   applySlotAdvance,
 } from '@/features/habit/habitService';
-import { checkAnswer } from './checkAnswer';
+import { checkAnswer } from '@/lib/checkAnswer';
 import { useSlotState } from './useSlotState';
 import { LessonHeader } from './LessonHeader';
 import { LessonFooter } from './LessonFooter';
@@ -537,6 +537,9 @@ function LessonPlayerInner({
             break;
           case 'scrub-trials':
             hint = variant.feedbackByWrongValue?.[key];
+            break;
+          case 'fill-text':
+            hint = variant.feedbackByWrongAnswer?.[key];
             break;
           case 'monty-hall':
             hint = variant.feedbackByWrongValue?.[key];

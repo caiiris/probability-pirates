@@ -1,0 +1,187 @@
+[
+  {
+    "id": "at-least-one-via-complement-p01",
+    "instanceId": "at-least-one-via-complement:2175510829",
+    "templateId": "at-least-one-via-complement",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 1250,
+    "params": {
+      "m": 4,
+      "n": 5
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair 4-sided die is rolled 5 times independently. What is the probability of getting a 1 at least once?",
+    "answer": "781/1024",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(at least one 1 in 5 rolls)",
+      "steps": [
+        "Complement rule: P(at least one) = 1 − P(zero occurrences).",
+        "P(miss on a single trial) = 1 − 1/4 = 3/4.",
+        "Trials are independent, so P(miss all 5) = (3/4)^5 = 243/1024.",
+        "P(at least one) = 1 − 243/1024 = 781/1024."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.7626953125,
+      "simulationEstimate": 0.7618,
+      "absoluteDifference": 0.0008953124999999673,
+      "sigmaThreshold": 0.009512916818477057,
+      "passed": true
+    }
+  },
+  {
+    "id": "at-least-one-via-complement-p02",
+    "instanceId": "at-least-one-via-complement:2174672186",
+    "templateId": "at-least-one-via-complement",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 950,
+    "params": {
+      "m": 4,
+      "n": 2
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair 4-sided die is rolled 2 times independently. What is the probability of getting a 1 at least once?",
+    "answer": "7/16",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(at least one 1 in 2 rolls)",
+      "steps": [
+        "Complement rule: P(at least one) = 1 − P(zero occurrences).",
+        "P(miss on a single trial) = 1 − 1/4 = 3/4.",
+        "Trials are independent, so P(miss all 2) = (3/4)^2 = 9/16.",
+        "P(at least one) = 1 − 9/16 = 7/16."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.4375,
+      "simulationEstimate": 0.43738,
+      "absoluteDifference": 0.00012000000000000899,
+      "sigmaThreshold": 0.011092649593311781,
+      "passed": true
+    }
+  },
+  {
+    "id": "at-least-one-via-complement-p03",
+    "instanceId": "at-least-one-via-complement:4048150833",
+    "templateId": "at-least-one-via-complement",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 1100,
+    "params": {
+      "m": 6,
+      "n": 3
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair six-sided die is rolled 3 times independently. What is the probability of getting a 6 at least once?",
+    "answer": "91/216",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(at least one 6 in 3 rolls)",
+      "steps": [
+        "Complement rule: P(at least one) = 1 − P(zero occurrences).",
+        "P(miss on a single trial) = 1 − 1/6 = 5/6.",
+        "Trials are independent, so P(miss all 3) = (5/6)^3 = 125/216.",
+        "P(at least one) = 1 − 125/216 = 91/216."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.4212962962962963,
+      "simulationEstimate": 0.41692,
+      "absoluteDifference": 0.004376296296296267,
+      "sigmaThreshold": 0.011040962979362797,
+      "passed": true
+    }
+  },
+  {
+    "id": "at-least-one-via-complement-p04",
+    "instanceId": "at-least-one-via-complement:956615306",
+    "templateId": "at-least-one-via-complement",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 1100,
+    "params": {
+      "m": 2,
+      "n": 4
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair coin is flipped 4 times independently. What is the probability of getting heads at least once?",
+    "answer": "15/16",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(at least one head in 4 flips)",
+      "steps": [
+        "Complement rule: P(at least one) = 1 − P(zero occurrences).",
+        "P(miss on a single trial) = 1 − 1/2 = 1/2.",
+        "Trials are independent, so P(miss all 4) = (1/2)^4 = 1/16.",
+        "P(at least one) = 1 − 1/16 = 15/16."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.9375,
+      "simulationEstimate": 0.93834,
+      "absoluteDifference": 0.0008399999999999519,
+      "sigmaThreshold": 0.005412658773652742,
+      "passed": true
+    }
+  },
+  {
+    "id": "at-least-one-via-complement-p05",
+    "instanceId": "at-least-one-via-complement:890490568",
+    "templateId": "at-least-one-via-complement",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 900,
+    "params": {
+      "m": 2,
+      "n": 2
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair coin is flipped 2 times independently. What is the probability of getting heads at least once?",
+    "answer": "3/4",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(at least one head in 2 flips)",
+      "steps": [
+        "Complement rule: P(at least one) = 1 − P(zero occurrences).",
+        "P(miss on a single trial) = 1 − 1/2 = 1/2.",
+        "Trials are independent, so P(miss all 2) = (1/2)^2 = 1/4.",
+        "P(at least one) = 1 − 1/4 = 3/4."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.75,
+      "simulationEstimate": 0.75142,
+      "absoluteDifference": 0.0014199999999999768,
+      "sigmaThreshold": 0.009682458365518542,
+      "passed": true
+    }
+  }
+]

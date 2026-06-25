@@ -23,6 +23,9 @@ const FEEDBACK_FIELDS_BY_KIND: Record<
   // to feedbackDefault, so the per-key hint is optional.
   'simulate-proportion': [{ field: 'feedbackByWrongValue', requirement: 'optional' }],
   'scrub-trials': [{ field: 'feedbackByWrongValue', requirement: 'optional' }],
+  // `fill-text` has too large an input space to enumerate per-key feedback;
+  // per-input hints are optional and the default carries most failures.
+  'fill-text': [{ field: 'feedbackByWrongAnswer', requirement: 'optional' }],
   'monty-hall': [{ field: 'feedbackByWrongValue', requirement: 'optional' }],
 };
 
@@ -41,7 +44,8 @@ function getVariantFeedbackRecord(
         ? variant.feedbackByWrongValue
         : undefined;
     case 'feedbackByWrongAnswer':
-      return variant.interactionKind === 'fill-fraction'
+      return variant.interactionKind === 'fill-fraction' ||
+        variant.interactionKind === 'fill-text'
         ? variant.feedbackByWrongAnswer
         : undefined;
     case 'feedbackByWrongOutcome':

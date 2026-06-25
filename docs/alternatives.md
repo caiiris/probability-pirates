@@ -30,6 +30,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 | J       | Project Structure & Tooling   | D38–D48, D64, D74, D81                                                                |
 | K       | PRD Acceptance Criteria Style | D49–D54, D57–D62                                                                      |
 | L       | Platform & Responsive         | D63, D65, D66                                                                         |
+| M       | Phase 2 — AI                  | D92–D98                                                                               |
 
 ---
 
@@ -411,6 +412,31 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - 27/27 test files, 206/206 tests still green.
 - **See also:** D86 / D88 / D90 (the catalog/scope decisions this builds on), D58 (PRD §9.6 acceptance — the "course progress" AC; the visible-on-path denominator is consistent with what the user can see), D55 (no bail-out — celebration only fires on real completion).
 
+### D100 — Content-aware problem helpers, not a generic scratchpad
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** Skip a generic per-lesson "scratchpad" / "logbook" surface. Instead, extend the existing pattern of small, problem-shaped helpers embedded in the interaction itself — ungraded, ignorable, scoped to the question they help with. The d6 reference behind `showDieContext: true` on fill-fraction problems (`how-likely.ts`) is the canonical example: tap faces to highlight, count, then enter the fraction. It never affects progress and disappears with the slot.
+- **Why:** Content-aware helpers have no discoverability problem (the tool is in the problem), no mode-switching friction (no open/close), and scaffold the right move per question rather than a generic textarea that's passable at everything and great at nothing. They also read as bespoke ("made on purpose") rather than "we added a notes feature," consistent with the anti-vibe-coded direction.
+- **Considered:**
+  - **Generic text scratchpad (rejected).** Per-lesson bottom sheet on mobile / side panel on desktop, monospace `<textarea>` plus a "math row" of quick-insert chips (tally, fraction, ×, ÷, →, =), in-memory only. Cheaper to build, catches anything, but never *great* at any one task and adds modal friction on every problem that doesn't need it.
+  - **Generic drawing scratchpad (rejected).** Same surface, HTML5 canvas. Even worse on desktop (mouse-drawing is miserable) and only marginally better on mobile (finger imprecision). Implementation cost is also disproportionate — pointer events, stroke buffering, eraser UX, resize-on-rotate.
+  - **Always-on sidebar scratchpad (rejected).** No discoverability problem but eats screen real estate constantly and pressures learners to "use it" even when the problem doesn't need it.
+  - **Per-problem on-demand text scratchpad (rejected).** A "tap to open" version of the generic option. Still suffers from the "generic = generically useful" problem; the d6-style helper already proves the bespoke pattern beats it.
+- **What gets built instead (sketch list, build as the curriculum needs each one):**
+  - Single die → existing `showDieContext` d6 ✓
+  - Single coin → two coin faces, tap to highlight
+  - Cards → 52-card grid that highlights on tap
+  - Two-coins / two-dice → 4-cell or 36-cell mini-grid, mark-up only
+  - "How many ways" counting → tally chip with +/−
+  - Tree problems → tree skeleton with labelable branches
+  - Sample-space listing → blank list with quick "add outcome" inputs
+- **When to revisit:** if a future reasoning-heavy problem (Bayes word problems, complement-rule arguments, "is this fair?" setups) lands and learners visibly struggle without somewhere to write text and arithmetic, add a generic logbook then — as the backstop, not the default. Don't build the generic tool before the content demands it.
+- **Gaps / risks:**
+  - Implementation cost scales with problem types. Mitigation: each helper is small (30–80 lines of React), and you only build them when authoring a problem that needs one.
+  - Risk of over-scaffolding — if a helper does too much of the counting for the learner, it weakens the retrieval/effort that makes the practice stick. Each helper should reveal *what to count*, not *the count*. (D8 / D55 mindset: never bail the learner out.)
+  - Possible inconsistency if helpers diverge stylistically across problem types. Mitigation: shared shell (size, tap-affordance, color of "highlighted" state) defined once and reused.
+- **See also:** `how-likely.ts` (existing `showDieContext` usage), D55 (no-bail-out rule that constrains helper behavior).
+
 ---
 
 ## B. Stack
@@ -622,13 +648,15 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 
 ### D23 — No AI features in MVP
 
-- **Status:** resolved (gate from the brief)
+- **Status:** resolved (gate from the brief). **Amended 2026-06-25 for Phase 2 — see footer.**
 - **Chose:** Zero AI in Phase 1 — no model calls, no generated content, no chatbot tutor, no AI grading
 - **Considered:** Sneaking in an AI-generated hint here or there
 - **Gaps / risks:**
   - All hint coverage is human-authored — limited to what we anticipated
   - Demo "wow factor" comes from the interaction quality alone, not AI tricks
   - Phase 2 (Friday) is where AI lands; this is a sequencing choice, not a permanent one
+- **Amendment (2026-06-25) — Phase 2 reversal, with the "no SDK / no key in bundle" property preserved.** D92–D98 land Phase 2's AI layer. The PRD §9.10 AC #1 wording ("no model SDK in `package.json`, no API key in `.env` or the deployed build") is preserved _literally_ — the AI runtime lives in a Vercel serverless function and calls Gemini via plain `fetch` to the REST endpoint (no SDK), with `GEMINI_API_KEY` only as a Vercel server-side env var. The shipped client bundle stays clean. The "no LLM at runtime in the answer path" property is preserved by design: every served number comes from a code solver, not the model. So D23's _spirit_ (the app never teaches a wrong answer; the bundle has no model SDK) holds, while its _letter_ (no runtime model calls anywhere) is relaxed for the after-2-strikes hint, the practice wrong-answer explanation, and (stretch) the teach-the-recruit surface. See [`spec-ai-assist`](specs/spec-ai-assist.md), [`prd-phase2`](prd-phase2.md), and **D92–D98** below.
+- **See also:** D92 (Vercel-over-Cloud-Functions), D93 (Vercel-over-Firebase-AI-Logic), D94 (mastery scoring reopened), D95 (Gemini free tier + Project Spend Cap), D96 (LLM-not-judge for free text), D97 (no RAG / no embeddings), D98 (Phase 2 implementation order).
 
 ### D24 — No social features
 
@@ -1205,6 +1233,126 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Learners cannot personalize with a photo until Blaze + Storage are enabled and spec-profile avatar upload is implemented.
   - Re-enabling later is a small, self-contained spec-profile follow-up (upload UI + `avatarService` + rules deploy).
 - **Reversal trigger:** Owner upgrades Firebase project to Blaze, enables Storage in console, then closes I026 and implements avatar upload per `spec-profile.md`.
+
+---
+
+---
+
+## M. Phase 2 — AI
+
+### D92 — AI runtime lives in a Vercel serverless function (not Firebase Cloud Functions)
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** Put the AI runtime in a Vercel serverless function (`/api/hint.ts`, `/api/teach.ts`) auto-deployed alongside the Vite build. `GEMINI_API_KEY` is a server-side Vercel env var; the client bundle never sees it.
+- **Considered:**
+  - **Firebase Cloud Functions** — would require upgrading the project from Spark to Blaze, attaching a card, and managing a second backend. Rejected: Vercel Hobby is already part of the deploy pipeline, has a generous free tier (1M invocations/mo), and the function lives next to the SPA build with zero new infrastructure.
+  - **Calling the model from the client** (e.g. via Firebase AI Logic) — separately rejected in **D93**.
+  - **A dedicated Node server (Express/Fastify) elsewhere** — too much ops for a personal launch; same code-shape benefit without the operational burden lives in a Vercel function.
+- **Gaps / risks:**
+  - Vercel cold starts add a perceptible first-call delay (~300–600ms). Acceptable for an after-2-strikes hint; would matter more for a chat-style interface (we don't have one).
+  - Two clouds (Firebase for data, Vercel for AI) means two dashboards. Already true in MVP (Firebase + Vercel hosting), so no new operational drag.
+  - In-memory rate limiting in serverless is per-region/cold-instance — imperfect; acceptable for personal-scale Phase 2.
+
+### D93 — Call Gemini via `fetch` to the REST endpoint, NOT via an SDK
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** The Vercel function calls Gemini through `fetch('https://generativelanguage.googleapis.com/v1beta/models/...:generateContent', ...)`. **No `@google/generative-ai` or any other model SDK is added to `package.json`.**
+- **Considered:**
+  - **`@google/generative-ai` (the official Gemini SDK)** — would add a model SDK as a dependency. Even server-side it would show in `package.json`, weakening the "no model SDK in bundle" property the PRD §9.10 AC #1 chose. Rejected.
+  - **Firebase AI Logic (client-side Gemini via the Firebase SDK + App Check)** — Firebase's "AI Logic" surface lets the client call Gemini directly. Rejected because (1) it puts a model SDK in the client bundle, breaking the §9.10 AC literal property; (2) it makes the "code computes the verified answer first, then grounds the prompt" pattern weaker (the solver would have to ship + the client would have to be trusted to call it before the model); (3) it couples AI to the data backend, where we've been deliberately separating them.
+- **Gaps / risks:**
+  - We're writing the request/response handling by hand (small: a `callModel({ system, payload })` helper). Worth it for the bundle property.
+  - When swapping providers later, we re-implement the same one-file helper — minor.
+  - We don't get SDK conveniences like streaming or structured-output helpers; for short-JSON outputs we don't need them.
+- **See also:** D23 (the property we're preserving), D92 (where the function lives).
+
+### D94 — Reopen "no mastery scoring" for a per-skill learner model
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** Build a small, owner-only **learner model** (`users/{uid}/learnerModel/state`) with per-skill Elo + recency-weighted accuracy + misconception counts. Drives adaptive practice difficulty, topic auto-suggestion, AI hint personalization, and a visible "Strengths / keep working on" UI panel. Reverses [PRD §9.10 #8 "no mastery scoring / spaced repetition"] _partially_: per-skill rating is in, lesson-level state machine (`not_started`/`in_progress`/`completed`) is unchanged.
+- **Considered:**
+  - **Keep the 3-state lesson machine and nothing else** (Phase 1 status quo). Rejected: with Phase 2 practice landing, the engine needs _some_ signal to adapt difficulty and recommend topics; without it adaptivity is theatre.
+  - **Bayesian Knowledge Tracing (BKT)** — the textbook learning-science model. Rejected for v1: more parameters per skill, more data required to be useful; we don't have the volume to calibrate. Strong v2 candidate.
+  - **Deep Knowledge Tracing (DKT, LSTM over attempt sequences)** — overkill, data-hungry, opaque. Rejected outright.
+  - **One spec for everything**: roll the learner model into spec-practice. Rejected: it has a separate, additive write path (any attempt anywhere can update it), so it deserves its own spec.
+- **Gaps / risks:**
+  - Constants (`K = 24`, `ALPHA = 0.2`, delayed-retrieval bonus cap 1.5×) are first-cut; tune with real data.
+  - Multi-skill credit assignment (a variant tagged with two skills) is applied independently to each → mildly double-counts cross-cutting problems. Acceptable.
+  - Public visibility (a leaderboard of mastery, a public showcase) explicitly out of scope; the model stays private (consistent with D24 / D80 framing).
+- **See also:** [`spec-learner-model`](specs/spec-learner-model.md), D15 (original 3-state mastery decision).
+
+### D95 — Gemini free tier (no credit card) with Project Spend Cap as the escalation path
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** Use Gemini via Google AI Studio's **free tier** for Phase 2 demo + personal launch. No credit card. Gemini 3 Flash gives ~1,500 RPD / 10 RPM, comfortably above expected traffic. If usage ever grows past the free tier, attach billing _with a Project Spend Cap_ (e.g. $5/mo) so cost cannot surprise.
+- **Considered:**
+  - **OpenAI / Anthropic** — both fine providers; neither offers a no-card free tier with a daily budget Gemini does. Rejected on cost only — the function isolates the call behind a `callModel(...)` helper so swapping later is one file.
+  - **A local model** (e.g. running Llama on a server) — wrong shape for a personal-launch demo; no infrastructure.
+  - **Self-hosted on Cloudflare Workers AI** — viable v2 swap; not worth the migration cost now.
+- **Gaps / risks:**
+  - **Free-tier prompts may be used by Google to improve their products.** Acceptable because the request body carries only structured slot data + an anonymized attempt (no name/email/uid). Documented for the Brainlift.
+  - Free-tier rate limits are per-project not per-user; a burst of concurrent learners could hit 10 RPM. Mitigated by client-side fallback to authored copy on any 429.
+  - "Free forever" is at the provider's discretion. If pricing changes mid-Phase, the Project Spend Cap is the safety net.
+
+### D96 — LLM is a STUDENT for free-text inputs, never a JUDGE
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** Anywhere a learner produces **free text** (Phase 2 → only the "teach the recruit" surface, F4), the LLM does **not** grade. It maps the text onto a hand-authored rubric (closed-set point ids) + a closed-set misconception enum, and asks a Socratic follow-up. Correctness is decided by a **code-verified transfer problem**, not by the model's praise.
+- **Considered:**
+  - **Let the LLM grade free-text explanations holistically** (a "you got it!" / "not quite" judgment). Rejected: matches the failure mode the learning-science notes explicitly warned about (sycophancy gives a false signal of mastery; two LLMs share training data and agree on the same wrong answer; learners are poor self-judges, so they accept the false signal).
+  - **Don't let learners type free text at all in Phase 2.** Rejected: gives up the protege effect entirely, which is the most pedagogically powerful AI surface we can build.
+  - **Run a second LLM as a "judge"** to vet the first's grade. Rejected: correlated errors — they will agree on the same wrong answer with high confidence.
+- **Gaps / risks:**
+  - The rubric must be hand-authored per concept — authoring burden, but bounded (a few rubrics for the demo concepts).
+  - Novel misconceptions outside the closed enum aren't detected. Acceptable: the closed enum can be extended in a single PR.
+  - We accept that the recruit's verbal response (the follow-up question) might miss nuance the learner expressed; the transfer problem still grades fairly.
+- **See also:** [`spec-ai-assist`](specs/spec-ai-assist.md) §"Teach the recruit", [`spec-learner-model`](specs/spec-learner-model.md) §"Misconception flow".
+
+### D97 — No RAG, no embeddings, no vector DB
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** Phase 2 ships **without any retrieval layer**. The hint/explanation/teach functions inject the entire relevant context directly into the prompt: the structured slot, the learner's attempt, the learner-model summary, the code-verified answer. The total prompt size is < 1k tokens per request.
+- **Considered:**
+  - **RAG over lesson prose + textbook excerpts** — retrieve relevant chunks at request time. Rejected: the corpus is small (5 lessons) and already structured at the source; "relevant context" is always exactly "this slot + this learner," which we inject directly. RAG adds infra and a new failure mode for zero retrieval benefit.
+  - **Embeddings to cluster misconceptions automatically** — auto-discover what the learner is bad at instead of using a closed enum. Rejected: hand-authored tags + Elo + counters are more interpretable, more debuggable, and ship in a day. Embeddings buy "no taxonomy maintenance" at the cost of explainability — not the right tradeoff for an app whose USP is "the math is right."
+  - **A vector DB like Pinecone / pgvector** — too much for the corpus size; nothing to retrieve.
+- **Gaps / risks:**
+  - If lesson prose grows 10x and we want a "find a relevant example from another lesson" feature, RAG might re-enter the picture. Until then it's solving a problem we don't have.
+  - Closed misconception enum has to be extended manually for new patterns. Acceptable.
+
+### D98 — Phase 2 implementation order: verification core → learner model → practice → AI assist → stretch
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** Build in the order: (1) verification core (`src/lib/probability/exact.ts` + Monte-Carlo cross-check), (2) learner model write-path + UI panel, (3) Track 1 practice engine + first 6 templates, (4) `/api/hint` + client adapter + fallback, (5) stretch (`/api/teach`, offline vetted bank, session recap). Each step ends deployable; the AI-off path stays intact at every step.
+- **Considered:**
+  - **AI hint first, practice later** — the most visible "AI" surface. Rejected: builds the wow before the foundation, and the hint feature _depends_ on the solver (the function needs `solve()` to ground prompts). Verification core has to come first.
+  - **Learner model last** — touch it only when needed for adaptivity. Rejected: the learner model write-path is tiny once we have the skill taxonomy in place, and shipping it early means the hint feature can use it on day one. Building it late means a refactor of `/api/hint` to add learner-summary context.
+  - **Stretch features (teach-the-recruit, vetted bank) before the spine** — high risk, ambitious. Rejected: Friday is the Phase 2 deadline; the spine is the deliverable. Stretch ships only if ahead.
+- **Gaps / risks:**
+  - If verification core hits a snag, the whole chain slips. Mitigation: it's pure TS with a small surface (Fraction, nCr, nPr); risk is low.
+  - Step 3 (practice) is the biggest single chunk. Mitigation: the templates can ship one at a time once the engine is built; CI gate catches buggy `solve()` early.
+- **See also:** [`prd-phase2`](prd-phase2.md) §7 "Workflow," [`docs/design-iterations.md`](design-iterations.md) Phase 2 entry.
+
+### D99 — Practice templates live in topic folders, not a flat `templates/` directory
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** Runtime Track 1 practice templates live under `src/features/practice/templates/<topic>/<id>.ts`, with sibling tests in the same topic folder. WP-3 still owns one flat `TEMPLATES` registry in `src/features/practice/practiceEngine.ts`; topic folders are an implementation layout, not a new runtime contract.
+- **Why now:** The curriculum-harvest pipeline produced enough credible future families (complements, conditional tables, Bayes/base-rate, independence, expected value, representation choice, etc.) that the original WP-4 flat path would become noisy almost immediately. This is a major maintainability decision that should be made before WP-4 agents start creating files.
+- **Considered:**
+  - **Keep WP-4's original flat layout** (`src/features/practice/templates/<id>.ts`). Simpler for the first six templates, but it fails the moment the problem bank grows beyond the initial surface and makes later moves/renames likely.
+  - **One registry per topic** (`templates/complement/index.ts`, etc.). Rejected for v1: it adds a second registry layer and makes WP-6 serving more complex for no runtime benefit. A single `TEMPLATES` array already gives the engine the topic metadata it needs.
+  - **Put generated/static problems beside runtime templates.** Rejected: Track 1 templates are executable source code; Track 2 vetted static problems are curriculum content and should live later under `src/content/practiceProblems/` if/when that bank ships.
+  - **Keep review-generated JSON as seed content.** Rejected for CL-0001: the product should ship the parameterized template, not five fixed review examples. Review artifacts stay in `docs/curriculum-harvest/generated-problems/`.
+- **Gaps / risks:**
+  - WP-4's original spec and `spec-practice.md` both mentioned flat template paths; they must be updated before a WP-4 agent starts so agents do not fight the approved layout.
+  - Existing in-progress WP-4 work may already have created flat files. If so, move them into topic folders and update only imports/registry paths; do not change C5/C6 behavior.
+  - Topic folders reduce file clutter but do not eliminate the shared-registry edit conflict. Parallel WP-4 agents still coordinate when appending to `TEMPLATES`.
+  - `testUtils.ts` remains at `src/features/practice/templates/testUtils.ts`, so sibling tests inside topic folders import it via `../testUtils`.
+- **Implementer rules:**
+  - Do **not** edit `wp-contracts.md` for this decision. C5/C6 are unchanged.
+  - Do **not** change learner-model, XP, Firestore, or practice UI responsibilities. This is layout only.
+  - Use exact taxonomy topic ids (`counting`, `long-run`, `complement`, `conditional`, `distributions`) for folder names where possible.
+- **See also:** [`wp-4-layout-handoff`](specs/wp/wp-4-layout-handoff.md), [`problem-bank-layout-proposal`](curriculum-harvest/problem-bank-layout-proposal.md), [`spec-practice`](specs/spec-practice.md) §"First template families".
 
 ---
 

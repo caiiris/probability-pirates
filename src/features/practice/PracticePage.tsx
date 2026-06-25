@@ -1,86 +1,51 @@
-import { Lock, Dumbbell, Infinity as InfinityIcon, ShieldCheck, Gauge } from 'lucide-react';
-import { CaptainMascot } from '@/components/illustrations/CaptainMascot';
-
 /**
- * Locked placeholder for the upcoming Practice section: an adaptive, endless
- * problem set with worked solutions, every problem checked for correctness
- * before a learner sees it. Surfaced in the nav now (lock badge) and slated for
- * the Friday update.
+ * PracticePage — top-level route for /practice (WP-6b).
  *
- * Read-only and dependency-light: no data fetching, no writes.
+ * WP-6b changes vs WP-6a:
+ * - Renders TopicPicker above the session; switching topic restarts the loop
+ *   in the selected topic (key prop on PracticeSession resets its state).
+ * - Passes `topic` and `uid` down to PracticeSession for adaptive serving and
+ *   Firestore writes.
+ * - TopicPicker preselects the learner's weakest topic on first render.
  */
+
+import { useState } from 'react';
+import { Dumbbell } from 'lucide-react';
+import { TOPICS } from '@/content/skills';
+import type { Topic } from '@/content/skills';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { TopicPicker } from '@/features/practice/TopicPicker';
+import { PracticeSession } from '@/features/practice/PracticeSession';
+
 export function PracticePage() {
+  // Default to the first topic; TopicPicker overrides this once the learner
+  // model loads (via its internal subscribeLearnerModel effect).
+  const [topic, setTopic] = useState<Topic>(TOPICS[0]);
+
+  const authState = useAuth();
+  const uid =
+    authState.status === 'authenticated' ? authState.user.uid : null;
+
   return (
-    <div className="min-h-full bg-white">
-      <div className="mx-auto max-w-lg px-4 py-10">
-        <div className="flex flex-col items-center text-center">
-          <div className="relative">
-            <span className="grid h-20 w-20 place-items-center rounded-2xl bg-primary-soft text-primary">
-              <Dumbbell className="h-9 w-9" aria-hidden="true" />
-            </span>
-            <span className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-full bg-muted text-muted-foreground ring-4 ring-background">
-              <Lock className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
-            </span>
-          </div>
+    <div className="flex flex-col min-h-full bg-white">
+      <header className="shrink-0 border-b px-4 py-4 flex items-center gap-3 bg-card">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
+          <Dumbbell className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <h1 className="font-display text-xl font-semibold tracking-tight">Practice</h1>
+      </header>
 
-          <h1 className="mt-5 font-display text-2xl font-bold tracking-tight">Practice</h1>
-          <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[color:var(--green-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[color:var(--green-deep)]">
-            <Lock className="h-3 w-3" strokeWidth={3} aria-hidden="true" />
-            Arriving Friday
-          </span>
+      <TopicPicker selectedTopic={topic} onSelect={setTopic} uid={uid} />
 
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            A never-ending problem set that meets you at your level. Ask for a topic you want to
-            work on, or follow the suggestions built from the questions you miss most.
-          </p>
-        </div>
-
-        {/* What's coming: a quiet preview, all disabled */}
-        <ul className="mt-8 space-y-3" aria-label="Planned practice features">
-          <PreviewRow
-            icon={<InfinityIcon className="h-4 w-4" aria-hidden="true" />}
-            title="Unlimited problems"
-            desc="A fresh question every time, so you never run out of practice on a concept."
-          />
-          <PreviewRow
-            icon={<ShieldCheck className="h-4 w-4" aria-hidden="true" />}
-            title="Checked for correctness"
-            desc="Every problem and its solution is verified before it reaches you, so the answer is always right."
-          />
-          <PreviewRow
-            icon={<Gauge className="h-4 w-4" aria-hidden="true" />}
-            title="Adaptive difficulty"
-            desc="It ramps up when you're cruising and eases back when you're stuck, so you stay at the right challenge."
-          />
-        </ul>
-
-        <div className="mt-10 flex items-center justify-center gap-3 rounded-xl border bg-card p-4">
-          <CaptainMascot className="h-12 w-12 shrink-0" />
-          <div className="min-w-0 text-left">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
-              Captain Pascal
-            </p>
-            <p className="text-sm text-foreground/90">
-              Drop anchor here Friday. I'll have a fresh set of problems ready for you.
-            </p>
-          </div>
-        </div>
+      <div className="flex-1 flex flex-col min-h-0">
+        {/*
+         * key={topic} forces PracticeSession to remount when the topic changes,
+         * resetting all local state (instance, currentAnswer, solutionRevealed,
+         * useSlotState). This is the correct behaviour: switching topic restarts
+         * the loop in the new topic.
+         */}
+        <PracticeSession key={topic} topic={topic} uid={uid} />
       </div>
     </div>
-  );
-}
-
-function PreviewRow({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
-  return (
-    <li className="flex items-start gap-3 rounded-xl border bg-card/60 p-4 opacity-70">
-      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
-        {icon}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold">{title}</p>
-        <p className="text-xs text-muted-foreground">{desc}</p>
-      </div>
-      <Lock className="mt-1 h-3.5 w-3.5 shrink-0 text-muted-foreground/50" aria-hidden="true" />
-    </li>
   );
 }

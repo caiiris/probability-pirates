@@ -637,6 +637,205 @@ A close re-read of the diff caught two issues `npm run verify` didn't:
 
 ---
 
+## Lesson 3 — sample-space (vocabulary done right) — 2026-06-25
+
+Authoring the third live lesson of Unit 1 ("Defining Probability"): name the things the learner has been counting since Lesson 1. Outcome, sample space, event. **No probability calculations** here; the favorable / total formula returns in the next lesson with its pitfalls. Decision recorded as **D93**.
+
+### Three calls that shaped the lesson
+
+1. **Equally-likely-outcomes stays its own lesson.** Owner asked whether equally-likely deserved its own slot. Strong yes. The classical formula has real failure modes (two-coin head counts, two-dice sums, "either it happens or it doesn't") and it would be a waste to fold them into a vocabulary lesson where the formula is barely the point. Sample-space owns the toolkit; equally-likely owns the assumption.
+2. **HT-vs-TH cognitive conflict is moved out.** Earlier drafts of the sample-space slot list had a dedicated concept beat hammering "HT and TH are different outcomes, even though they both have one head and one tail." Owner pushback was sharp: _"doesn't it depend on what you're looking for? maybe we save this for equally likely outcomes."_ Right call. That tension is the perfect cognitive-conflict opener for the next lesson — staging it here would steal the punchline. Sample-space lists outcomes by their natural "what just happened?" rule and moves on; the question of whether {0H, 1H, 2H} is a valid breakdown of those four outcomes lands in `equally-likely-outcomes`.
+3. **Event upgraded from "something that can happen" to "subset of the sample space".** Lesson 2 introduced _event_ loosely so the named theorem ("P(event) is the fraction of times the event happens after many tries") could read cleanly. Sample-space upgrades the definition: an event is a subset of the sample space, and the slot's body explicitly references the previous lesson's looser take so the upgrade reads as a continuation, not a contradiction. This is how Lessons 1, 2, and 3 layer the same vocabulary deeper each time.
+
+### New figure variant: `two-coins-grid`
+
+Owner asked for the two-coin sample space to land as _"an autonomous looping thing where four coins are chosen and moved into pairs into the grid slots."_ Pure observation, no learner input. Built as a new `ConceptFigure` variant alongside `settling-line`:
+
+- 2×2 grid with row labels (1st flip = H or T) and column labels (2nd flip = H or T), so HH, HT, TH, TT each sit in their natural cell.
+- Cells fill one at a time on a 900 ms cadence, hold the full grid for 1.8 s, then clear and loop. Framer Motion `AnimatePresence` with a soft drop-and-scale entry per cell so the appearances read as construction, not popping.
+- Default timings exposed on the variant (`stepMs`, `holdMs`) for future tuning, but for now every concept slot using this figure inherits the defaults.
+- Same content-model pattern as `settling-line`: declarative chrome attached to a concept slot, validated by `assertLessonInvariants`, rendered via `ConceptSlotView`'s figure switch. No new interaction kind, no `checkAnswer` plumbing, no progress side-effects.
+
+### MCQ design rule: explain the trap, do not name the right answer
+
+Owner ground rule for this lesson and beyond: _"DON'T GIVE AWAY THE ANSWER IN HINTS."_ Every wrong-answer feedback string in this lesson explains why the chosen option fails, then leaves the learner to re-pick:
+
+| Slot | Pattern |
+| --- | --- |
+| `pick-the-event` (at-least-one-heads) | Each wrong option earns a sentence about which event _it_ is ("that is exactly two heads," "those are exactly one heads," "that is the entire sample space"), then a reminder of the question. None says "the right answer is `{HH, HT, TH}`." |
+| `pick-the-sample-space` (one-card) | Each granularity-trap option earns the same shape of correction: "two cards can both be \[that category\] and still be different draws." The pattern teaches the principle (a sample space must be at least as specific as the result) without naming the 52-card option. |
+| `three-coins` (which is NOT in the 3-flip sample space) | Each valid 3-letter string earns "this is a fine three-flip outcome, so it sits inside the sample space." Pushes the learner back to the question (find the outlier) without naming the 4-letter string. |
+
+Two lesson tests assert this directly: `pick-the-event`'s wrong-answer feedback must not contain the literal `"{HH, HT, TH}"`, and `three-coins`'s wrong-answer feedback must not contain `"HHTH"`. These tests will catch a future copy edit that slips into spoiler territory.
+
+### Slot list (10 slots, ~5 min)
+
+| # | Slot | Beat |
+| --- | --- | --- |
+| 1 | `welcome` | Frame the lesson as a vocabulary upgrade. Cite three things the learner has been counting (faces, heads, dice pairs). |
+| 2 | `define-outcome` | Theorem: outcome = one specific result of an experiment. Connects back to Lesson 1's "ways." |
+| 3 | `define-sample-space` | Theorem: sample space = set of all outcomes. `{H, T}` and `{1, 2, 3, 4, 5, 6}` shown explicitly. |
+| 4 | `list-coin` | Tap-outcomes recap: list the sample space for one flip. The mechanic is from Lesson 1; the vocabulary is new. |
+| 5 | `two-coins-grid` | The new looping animation. Four pairs appear cell by cell; HT and TH in their separate cells but no preview of the equally-likely pitfall. |
+| 6 | `define-event` | Theorem: event = subset of the sample space. Two examples (rolling even, at least one heads). Body cites Lesson 2's loose definition. |
+| 7 | `pick-the-event` | MCQ: identify "at least one heads" as a 3-element subset. Distractors test specific misreadings ("exactly two," "exactly one," "the whole sample space"). |
+| 8 | `pick-the-sample-space` | MCQ: granularity trap on a single card draw. Distractors are subsets of correct categories (color, suit, rank). |
+| 9 | `three-coins` | MCQ: which string is NOT a 3-flip outcome (correct answer is 4-letter HHTH). |
+| 10 | `wrap` | Bridge to `equally-likely-outcomes`. Mascot line: "First the list. Then the math." |
+
+### Numbers
+
+- 30 test files, **247 tests**, all passing. New file `sample-space.test.ts` adds 14 tests (arc, theorem-name pinning, event-as-subset upgrade check, figure config, no-jargon, no-giveaway, three MCQ correctness, wrap segue, validation).
+- The catalog test in `01-what-is-probability.test.ts` was updated: playable lessons are now `[how-likely, long-run-frequency, sample-space]`.
+- Bundled Remote Config defaults updated in `remoteFlagsConfig.ts` so the lesson is unlocked without a remote publish.
+- The `ConceptFigure` type became a discriminated union (`SettlingLineFigure | TwoCoinsGridFigure`); the validator now exhaustively switches on `kind`. This is the cleanest extension shape for adding a third or fourth figure later (tree diagrams, etc.) without revisiting existing slots.
+
+### Follow-up: three-coins becomes a regex-graded fill-text — 2026-06-25
+
+Owner pushed back on the original three-coins MCQ ("which of these is NOT in the sample space?"). The MCQ tested a discrimination skill (scan four strings, spot the outlier), which is a weaker pedagogical ask than constructing a valid outcome from scratch. The new shape: a single text input that the learner fills with one outcome they think belongs.
+
+To support this cleanly, a **new interaction kind `fill-text`** was added across the stack:
+
+- **`FillTextVariant`** in `content/types.ts`: a regex-graded text input. Authors write `acceptRegex` against the lowercased input. Anchors are added at evaluation time so a regex like `\s*[ht]\s*[ht]\s*[ht]\s*` is what authors actually type, not the noisy `^\s*[ht]\s*[ht]\s*[ht]\s*$/i` form.
+- **`assertLessonInvariants`** compiles the regex at lesson load. A typo in the pattern fails fast at startup rather than silently rejecting every learner attempt.
+- **`checkAnswer`** normalizes input (`trim().toLowerCase()`), anchors the pattern with `^(?:...)$`, and applies the `i` flag belt-and-suspenders. The wrong-key is the normalized input itself (or `'empty'` when blank), so authors can target very specific traps in `feedbackByWrongAnswer` if they want.
+- **`AttemptPayload`** gains `{ text: string }`.
+- **`FillText.tsx`**: single autofocused input, monospaced and uppercase-styled so the visual reads as a structured 3-letter answer slot. `wrongTick` clears the input on each wrong attempt so the learner starts fresh; correct answers lock the input in place for review.
+- The `audit-feedback.ts` registry knows about `fill-text` so the feedback-coverage script does not break on this lesson; per-input hints are optional (the input space is too large to enumerate).
+
+For the question itself:
+
+> _"You flip three coins. Type one outcome from the sample space. Use H for heads and T for tails, three letters in order."_
+
+The regex `\s*[ht]\s*[ht]\s*[ht]\s*` accepts every one of the eight valid outcomes, plus any case mix, plus any internal/edge whitespace. That covers a ton of natural typing patterns ("HHT", "h h t", " H T H ", "hHt", etc.) so the question never feels like a guess-the-format puzzle.
+
+**Anti-spoiler**: a dedicated test scans the prompt, context, placeholder, default feedback, and per-input feedback for any of the eight valid outcomes (matched as word boundaries to avoid false hits like "HEADS"). The `explanation` field is exempt because it is the post-attempt teaching moment — the full sample space is allowed there. Future copy edits that drift toward "HHT" in a placeholder will trip this test.
+
+**Numbers update**: 31 test files, **255 tests**. New checkAnswer cases (eight valid outcomes, case-insensitivity, whitespace tolerance, the three rejection types) plus the lesson-level fill-text round-trip and the no-spoiler scan.
+
+### Follow-up: close the formula loop in the new vocabulary — 2026-06-25
+
+Owner noticed the lesson defined outcome, sample space, and event but never came back to say "and probability of an event is the size of the event over the size of the sample space." Without that bridge, the new vocabulary reads as set-theory chrome that does not pay off. With it, the lesson lands the same `k/N` formula from Lesson 1 but written in the new words: favorable becomes |event|, total becomes |sample space|.
+
+New slot `classical-probability` inserted between `pick-the-event` and `pick-the-sample-space`. Two-sentence reasons for the placement:
+
+1. **After `pick-the-event`** — so the worked example can use the event the learner just identified (`{HH, HT, TH}` for "at least one heads"). No spoiler risk because that MCQ is already submitted; the reuse builds direct continuity instead.
+2. **Before `pick-the-sample-space`** — so by the time the learner is asked about granularity of a 52-card draw, they have the full vocabulary AND a formula that depends on counting outcomes correctly.
+
+The theorem is named **"Probability of an event"** rather than "Probability" (Lessons 1 and 2 already each have a theorem named "Probability" — for `k/N` and long-run share respectively). The fresh name signals that this is the third reframing of the same idea, now in the event/sample-space vocabulary, and matches what the next lesson stress-tests as the _classical_ definition. The equally-likely caveat is in the theorem statement; `equally-likely-outcomes` then tests when that caveat fails.
+
+Two worked examples land in the body: P(rolling even) = 3/6 = 1/2 on one die, and P(at least one heads) = 3/4 on two coins (reusing the just-picked subset). A third paragraph names the bridge back to Lesson 1 explicitly: "the same formula, just written with the new words."
+
+Tests pin three things specifically: (a) the theorem name and statement mention `event` + `sample space` + the equally-likely caveat, (b) the body references the previous lesson (so future edits cannot silently lose the bridge), and (c) the body uses the `3/6` worked example so the formula is shown in action.
+
+**Numbers update**: 33 test files, **301 tests**. New assertions cover slot order, theorem naming for all four named ideas (outcome, sample space, event, probability-of-an-event), the formula-in-context check, and the Lesson-1 bridge check.
+
+### Follow-up: introduce "set" and "subset" inline — 2026-06-25
+
+Owner asked whether we needed to introduce "set" and "subset" as terms. The lesson was using `{H, T}` notation and the words "set" and "subset" as if defined, but the live path's previous two lessons (`how-likely`, `long-run-frequency`) never use curly-brace set notation. So sample-space is the first place an 8–15 year old reader meets these symbols and these specific words on the path. Without an inline gloss, the lesson reads as a wall of unfamiliar shape for kids who have not seen sets in school yet.
+
+Two surgical edits — no new slots:
+
+- **`define-sample-space` body** now opens with the curly-brace gloss alongside the first example: *"For one fair coin flip, the sample space is {H, T}. The curly braces mark a set, which is just a list of items with no duplicates and no fixed order."* The notation gets explained where it first appears, not as a separate beat.
+- **`define-event` body** prepends a plain-English subset definition: *"A subset is just some of the items from a set, picked out for a reason. Some subsets have every item, some have none, but most are somewhere in between."* That sets up the worked die and two-coin examples that follow, which use "subset" repeatedly.
+
+The math vocabulary stays — this lesson's title is "Naming the toolkit" and pretending set theory does not exist would undercut its purpose. The plain-English glosses run alongside the math words so the kid who has seen sets reads fluently and the kid who has not gets a definition exactly when it is needed.
+
+Two new tests pin the additions:
+- The body of `define-sample-space` must mention `curly braces`, the word `set`, and one of `no duplicates / no repeats / order does not matter / no fixed order`.
+- The body of `define-event` must mention `subset` and one of `some of the items / some of the outcomes / part of the set / inside the set`.
+
+Both regexes are intentionally permissive so reasonable rewording keeps passing; what they guarantee is that a future edit cannot silently strip the explanation.
+
+**Numbers update**: 33 test files, **303 tests** (+2).
+
+### Follow-up: sharpen outcome-vs-event distinction — 2026-06-25
+
+Owner read the `define-event` slot and called out the confusion: _"this is confusing, people are gonna ask whats the difference between event and outcome. the question you can ask is good. but you should make it clear in the statement that an event is a set of outcomes."_ The previous statement led with "An event is a subset of the sample space" and only mentioned "set of outcomes" as a second sentence; for a kid who is fuzzy on what subset means, that ordering misses the most important takeaway.
+
+Two changes:
+
+1. **Theorem statement reordered** to lead with the set-of-outcomes framing: _"An event is the set of outcomes that count as 'yes' for whatever question you are asking. Every event is a subset of the sample space."_ The "set of outcomes" wording lands first; the subset framing follows as the formal version.
+2. **Body opens with the explicit outcome-vs-event contrast**, no more buried under the subset explanation:
+   _"An outcome is one specific result, like rolling a 3 or flipping heads. An event is bigger: it bundles all the outcomes that match your question into one set. So an event is not a single outcome, it is a group of them."_
+
+The subset definition still appears in body[1] (now tied directly to event: "That is what an event is: some of the outcomes from the sample space, the ones that match the question"). Two worked examples (die and two-coin) now use the verb "bundles" in their first sentence so the conceptual word from body[0] surfaces again in concrete contexts.
+
+The prompt is unchanged. Owner explicitly liked the "an event is a question you can ask" framing as a hook, and the new theorem statement reads as the answer to that hook.
+
+A new test pins the distinction:
+- Body must contain a singular description of outcome (one of `one specific / one result / single result / a single outcome / one outcome`).
+- Body must contain a set-style description of event (`(set|group|bag|bundle|bundles)` near the word `outcomes`).
+- Theorem statement must contain the literal phrase `set of outcomes`.
+
+A future copy edit that softens any of those three will trip the test.
+
+**Numbers update**: 34 test files, **313 tests** (+10 since the previous log entry; mostly from new lesson-shape assertions across this batch).
+
+### Follow-up: split theorem and definition callouts — 2026-06-25
+
+Owner read the `define-outcome` / `define-sample-space` / `define-event` slots and noted that they all use the `theorem` callout, but they are not theorems. _"We should have a definition block instead of theorem block for the outcome event type thing."_ Correct read. In math, a theorem is a claim that can be derived; a definition is a labeling convention. Pretending they are the same thing softens both.
+
+New content-model field `definition?: { name?: string; statement: string }` on `ConceptSlot`, mirroring the shape of `theorem` but with two distinct concerns:
+
+| Field | Use for | Visual |
+| --- | --- | --- |
+| `theorem` | Claims that can be proven (multiplication principle, complement rule, etc.) | Violet top-border accent, "Theorem" eyebrow |
+| `definition` | Labeling conventions (outcome, sample space, event, …) | Blue top-border accent, "Definition" eyebrow |
+
+`ConceptSlotView` renders both, definition first if both are present on the same slot (a beat could plausibly name a word AND state a derivable claim about it). Validation in `assertLessonInvariants` mirrors theorem: non-empty statement, non-empty name if present.
+
+**Scope of migration**: the four named-vocabulary callouts in `sample-space` (Outcome, Sample space, Event, Probability of an event) all migrate from `theorem` to `definition`. Lessons 1 and 2 still call their "Probability" callouts theorems; those are also definitions philosophically, but the user did not ask to touch them and migrating creates churn for marginal gain. They can be migrated later when those lessons get content edits.
+
+**Tone polish** in the same pass. `define-event`'s body used "bundles" four times in five paragraphs, which read mechanical; replaced with "groups together" in the worked examples (`bundles the outcomes 2, 4, and 6 into the subset` → `groups the outcomes 2, 4, and 6 together into the subset`) and removed entirely from the lead-in body[0]. Also retired the slightly stiff _"The set view says it more carefully"_ in body[4] in favor of _"Now we can pin it down"_, which is what a teacher would actually say out loud.
+
+**Test deltas**:
+- Renamed _"defines outcome, sample space, event, and probability-of-an-event as named theorem callouts"_ → _"... as named definition callouts"_; updated all four assertions from `.theorem` to `.definition`.
+- New assertion: for each of the four migrated slots, `slot.theorem` must be `undefined`. A future edit that reaches for `theorem` on a terminology slot trips here, keeping the theorem/definition discipline enforced.
+- Updated two other assertions (event-as-subset upgrade check, outcome-vs-event distinction) to read from `definition.statement` instead of `theorem.statement`.
+
+**Numbers update**: 36 test files, **369 tests** (the jump is mostly from a parallel feature branch's tests that landed alongside this work; my changes here account for the assertion edits and the no-theorem-on-terminology check).
+
+### Set/subset: split the beat, add a playful picker, lock with a fill-blank — 2026-06-25
+
+Owner read the slimmed `define-event` and called the next problem: _"too much text!! lets abstract out the set and subset stuff. and put it on one page with a definition. we should also have an interactive thing that goes through a list of three differently colored balls and lets you pick out a subset each time. but just for fun, not required."_ And: _"then have a fill in the blank question for size of set and subset, or what is a subset, etc etc."_
+
+Both reads are correct. Five paragraphs on `define-event` — an outcome/event distinction, a set/subset primer, two worked examples, and a callback to Lesson 2 — was three beats in a trench coat. The set/subset primer was the easiest one to lift out: it is a prereq for the event definition (events ARE subsets), but it is not the event definition itself, and it deserves room for a hands-on moment that the prose alone cannot deliver.
+
+**New slot layout** (sample-space, slots 5–9):
+
+```
+two-coins-grid          (existing, autonomous animation)
+define-set-subset       (NEW: subset definition + playful picker figure)
+subset-fill             (NEW: fill-text — type any 2-item subset of {R,B,G})
+define-event            (existing, body slimmed from 5 paragraphs → 3)
+pick-the-event          (existing, unchanged)
+```
+
+The subset definition is the **subset**, not "set and subset." A set is the supporting word and gets glossed in the body (curly braces, no duplicates, no fixed order); the formal blue callout names "Subset" specifically, because that is the word the next slot leans on. One definition per slot is also the cleanest fit for the `ConceptSlot.definition` shape we shipped earlier today.
+
+**Playful picker figure (`SubsetPickerFigure`)**: three colored balls (red, blue, green). Tap a ball, it springs up and grows a ring; the readout under the row updates the subset in curly-brace notation in real time. Empty set is a valid state (the readout reads `{ }` and labels it "the empty set, still a valid subset"). Full set is also valid (readout labels it "the whole set as a subset"). The boundary cases that confuse the formal definition are surfaced by playing with the toy, not just by reading them.
+
+Author-time hook is a new `ConceptFigure` variant: `{ kind: 'subset-picker', caption?: string }`. Same wiring path as `settling-line` and `two-coins-grid` — append to the discriminated union, exhaustive switch in `assertLessonInvariants`, one render-line in `ConceptSlotView`. Pure presentation: no XP, no correctness, no Continue gate. The slot's `kind` is still `concept`, so Continue is always available; the picker is something to do, not something to pass.
+
+**Fill-blank (`subset-fill`)**: _"Type a subset of {red, blue, green} with exactly two colors. Separate the colors with a comma."_ Three valid answers ({red,blue}, {red,green}, {blue,green}), each accepted in any case and with flexible separators (comma, space, or both). Picks `fill-text` over `multiple-choice` deliberately: multiple-choice over a 3-choice answer space makes the question one tap; fill-text forces the learner to recall and type a subset, which is the conceptual move we want. The regex is enumerated rather than computed (six alternations) so the matcher stays readable.
+
+**Tone**: kept the new copy in the L1/L2 voice. No em dashes. Declarative. _"A set is a collection. A subset is a piece of that collection. The picker below is yours to play with."_ The picker's readout messages handle the two boundary cases in plain language: _"The empty set. Still a valid subset."_ and _"You picked every ball. That is the whole set as a subset."_
+
+**Slimmed `define-event`**: dropped the subset primer (slot 6 has it now) and the L2 callback paragraph (the definition statement carries the upgrade — "subset of the sample space whose outcomes answer yes" — and the L2 callback was load-bearing only for prose, not for the math). Body is now three paragraphs: outcome/event distinction, die-even worked example, two-coin worked example. Same callout, same examples, half the text.
+
+**Test deltas**:
+- Slot-order test expanded to 13 IDs with new ordering assertion: `define-set-subset` and `subset-fill` both precede `define-event`, and `subset-fill` immediately follows `define-set-subset`.
+- Interaction-kind sequence updated to five problems: `tap-outcomes`, `fill-text`, `multiple-choice`, `multiple-choice`, `fill-text`.
+- New assertion: `define-set-subset` has a `Subset` definition (not `theorem`), a body that covers set/empty-set/full-set in plain English, and a `subset-picker` figure with a non-empty caption.
+- New assertion: `subset-fill` accepts all six lowercase/whitespace/separator variants of {red,blue}, {red,green}, {blue,green} and rejects single-color, three-color, duplicate-color, unknown-color, and empty inputs.
+- New assertion: subset-fill prompt/feedback do not leak a specific 2-item answer — neither as a 2-color brace group `{...}` nor as a 2-color prose pair. The full set `{red, blue, green}` is allowed (it is the source set), so the check strips braced groups first, then scans the prose tail. The explanation field IS allowed to list all three answers (post-attempt teaching moment).
+- Dropped the "body references last lesson" assertion on `define-event` — that paragraph was cut deliberately for brevity, and the definition statement carries the upgrade without prose.
+
+**Numbers update**: 36 test files, **372 tests** (+3: subset-fill grading, subset-fill no-leak, define-set-subset shape).
+
+---
+
 ## Curriculum: scope to classical probability ending on Expected Value — 2026-06-24
 
 Owner pushed back on the tail of the roadmap: _"i think random variables and expected value and whatnot are not classic probability, no? more statistics."_ Half-right — academically those topics live in the _probability_ course (Pitman, Ross), but in the **AP / HS taxonomy** that the persona (D2) actually meets, the line moves: AP Stats is where RVs, EV, binomial, normal, and CLT go; "probability" effectively ends at conditional probability + Bayes. Given the persona, the HS line is the right one to draw — with one carve-out. Decision recorded as **D90**.
@@ -1017,3 +1216,133 @@ authoring the rest of Unit 3 (`two-coins`, `two-dice`, `tree-diagrams`,
 | Security rules | `users/{uid}` allowlist extended with `coins`, `claimedChests`, `streakFreezes`, `avatarStyle`, `ownedAvatarStyles`, `profileFlair`, `ownedFlair`; public mirror fields stay PII-free. |
 | Content        | Removed the "Reducing the fraction" concept slot from Lesson 1 (per request); tests updated (7 → 6 concept slots).                                                                     |
 | Tests          | New pure-logic suites: `coins`, `avatarStyles`, `profileFlair`, `reminderRules`, plus streak-freeze cases in `streak.test.ts`. Full `npm run test` + `build` green (162 tests).        |
+
+---
+
+## Phase 2 — AI plan locked — 2026-06-25
+
+> Working session: scope the Phase 2 AI layer, write the PRD + specs, and document the decision history before writing a line of implementation code. Pairs with [`docs/prd-phase2.md`](prd-phase2.md), the new specs ([`spec-practice`](specs/spec-practice.md) extended, [`spec-learner-model`](specs/spec-learner-model.md) new, [`spec-ai-assist`](specs/spec-ai-assist.md) new), and **D92–D98** in [`docs/alternatives.md`](alternatives.md). Reverses **D23** (no AI in MVP) intentionally and partially — the "no SDK in bundle, no key in build" property is preserved literally.
+
+### Decided feature set (the spine)
+
+- **F1 — Track 1 adaptive practice.** Unlimited problems generated client-side from in-repo parameterized templates; `solve()` (code) is the answer; Monte-Carlo cross-checked in CI. No runtime LLM. Replaces the "Arriving Friday" stub at [`PracticePage.tsx`](../src/features/practice/PracticePage.tsx).
+- **F2 — Personalized hint / wrong-answer explanation.** Vercel function (`/api/hint`) calls Gemini via `fetch` (no SDK), grounded in the learner's actual `answerPayload` + weak skills + the code-verified answer. Hand-written copy is the fallback. Triggers: after 2 strikes in a lesson; after a wrong answer in practice.
+- **F3 — Per-learner mastery model.** Owner-only `users/{uid}/learnerModel/state` doc with per-skill Elo + recency-weighted accuracy + misconception counts. Materialized from the existing `stepAttempts` log. Drives F1 difficulty + topic auto-suggest, and F2's hint personalization. Visible "Strengths / keep working on" panel on Progress + Profile.
+
+### Stretch (ship if ahead)
+
+- **F4 — Teach the recruit.** Learner tutors a naive AI student; the LLM is the _student, not the judge_. Structured-JSON rubric mapping + a code-verified transfer problem decides "got it." Misconceptions flow into F3.
+- **F5 — Offline vetted problem bank + end-of-session AI recap.**
+
+### Deliberately rejected
+
+Open chatbot; RAG / vector DB / embeddings; lesson-path reordering; live per-request generation; Firebase AI Logic client SDK; LLM-only grading of free text. Reasoning in [`alternatives.md`](alternatives.md) D93, D96, D97 and the Brainlift outline.
+
+### Architecture decisions at a glance
+
+| Choice | Why |
+| --- | --- |
+| **Vercel serverless `/api`** over Firebase Cloud Functions (Blaze) | Free, already in deploy pipeline, no second backend (D92) |
+| **`fetch` to Gemini REST**, no SDK | Preserves PRD §9.10 AC #1 "no model SDK in bundle" literally (D93) |
+| **Gemini free tier** (no credit card) | $0 cost; Project Spend Cap as escalation (D95) |
+| **Solver runs first, then prompt** | "The math is right" — code computes the answer, model phrases prose (D23 amendment) |
+| **Closed-set skill + misconception taxonomy** | Interpretable, debuggable, no embeddings/RAG needed at this corpus size (D97) |
+| **LLM is student, never judge** | Avoids sycophancy + correlated-error failure modes for free-text input (D96) |
+| **Owner-only subcollections** for learner model + practice state | Avoids touching the tight `users/{uid}` update allowlist; consistent with `lessonProgress` pattern |
+
+### Learning-science levers baked into the design
+
+- Adaptive difficulty targets ~20–30% miss rate (failure >50% demotivates).
+- Templates organized by retrieval form (definition → operation → procedural → application); the engine interleaves forms within a topic.
+- Recency-weighted accuracy + a delayed-retrieval bonus on Elo updates ("performance ≠ learning").
+- Worked-solution always rendered after a wrong answer (worked-example effect).
+- Pretrieval slots (Phase 1 `commitOnce`) retained; nothing diluted.
+- Teach-the-recruit pairs the protege effect with a rubric + transfer problem so the LLM's praise cannot fake mastery.
+
+### Implementation order (each step deployable; AI-off path always intact)
+
+1. **Verification core** — `src/lib/probability/exact.ts` + Monte-Carlo cross-check tests.
+2. **Learner model** — skill taxonomy in `src/content/skills.ts`, optional `skills?: SkillId[]` on `Variant`, `learnerModelService` hooked into the same path as `recordAttempt`, owner-only rules, Strengths panel.
+3. **Track 1 practice** — 6 template families with `solve`/`explain` + tests, `practiceEngine` adaptive serving, replace [`PracticePage.tsx`](../src/features/practice/PracticePage.tsx) reusing existing interaction renderers, wire `grantPracticeXp` + learner model.
+4. **AI hint / explanation** — `/api/hint.ts` (token verify → solve → Gemini fetch → JSON), `aiHintService.ts` client adapter wired into the after-2-strikes hint + practice, `VITE_AI_ENABLED` flag + hand-written fallback.
+5. **Stretch** — `/api/teach.ts` + rubric + transfer problem for one concept; offline vetted bank in `scripts/practice/`; session recap.
+
+### Day-by-day (each ends deployable)
+
+- **Wed/now:** PRD + specs drafted, decisions locked, AI scaffold + Gemini key staged. (This entry.)
+- **Thu:** Workstreams 1–3 — verification core, learner model, Track 1 templates + engine. Unlock `/practice` behind the flag (no LLM yet).
+- **Fri (Phase 2 deadline):** Workstream 4 — `/api/hint` + fallback wiring; AI-off toggle demonstrated.
+- **Sat:** Strengths panel + topic auto-suggest live; stretch (teach-the-recruit minimal, vetted bank, recap); phone test + rate-limit fallback verified.
+- **Sun:** Final deploy, phone smoke test, Brainlift written, closed-loop demo recorded.
+
+### Verification ("the AI never gives a wrong answer")
+
+- **Exact arithmetic oracle:** `src/lib/probability/exact.ts` — bigint `Fraction`, `nCr`, `nPr`, factorial.
+- **Cross-check:** every template ships a vetting test asserting `solve()` agrees with `simulate()` over ≥1,000 sampled params (and exact enumeration where the space is small ≤ 10⁴). Failure blocks CI.
+- **Prompt grounding:** `/api/hint` and `/api/teach` compute `solve()` server-side first and pass it as ground truth; model phrases prose around it. No model-only numbers, ever.
+
+### Property preservation note
+
+PRD §9.10 AC #1's wording ("no model SDK in `package.json`, no API key in `.env` or the deployed build") is preserved **literally**: SDK never enters `package.json`, key only as a Vercel server-side env var. AC #1's _spirit_ ("the deployed app teaches without an AI dependency") is preserved by the AI-off fallback path being a full first-class citizen.
+
+---
+
+## Practice problem bank layout locked — 2026-06-25
+
+> Design decision for the Phase 2 practice build: runtime Track 1 templates are
+> organized by Practice topic folders, not as one flat `templates/` directory.
+> Formal decision: **D99** in [`alternatives.md`](alternatives.md). WP-4 handoff:
+> [`wp-4-layout-handoff.md`](specs/wp/wp-4-layout-handoff.md). Proposal:
+> [`problem-bank-layout-proposal.md`](curriculum-harvest/problem-bank-layout-proposal.md).
+
+### Decision
+
+Use topic folders for runtime practice templates:
+
+```text
+src/features/practice/templates/
+  counting/
+  complement/
+  conditional/
+  distributions/
+  long-run/
+```
+
+Each template still exports the frozen C5 `Template` contract and registers in
+the single WP-3 `TEMPLATES` array. This is a file-layout decision only: the
+practice engine, learner model, XP rules, Firestore shape, and UI work packages
+do not change.
+
+### Why this matters
+
+The original WP-4 spec was written for the first six families and used a flat
+path (`src/features/practice/templates/<id>.ts`). The curriculum-harvest pass
+quickly produced many more plausible families: complements, conditional tables,
+Bayes/base rates, independence tests, expected value, representation choice, and
+mixed strategy review. A flat directory would become noisy immediately and would
+likely be reorganized after tests/imports already existed.
+
+Topic folders make the bank easier to review and safer for parallel agents:
+
+- complement agents can work in `templates/complement/`,
+- conditional agents can work in `templates/conditional/`,
+- tests stay beside their family,
+- WP-3 keeps the one shared registry WP-6 already expects.
+
+### Non-goals / boundaries
+
+- Do **not** change `wp-contracts.md` C5/C6.
+- Do **not** create per-topic runtime registries in v1.
+- Do **not** create the Track 2 static problem bank yet.
+- Keep review artifacts in `docs/curriculum-harvest/generated-problems/`.
+- Static vetted problems, if/when Track 2 ships, should live under
+  `src/content/practiceProblems/` as curriculum content, not executable template
+  code.
+
+### Follow-up required
+
+- Update `wp-4-template-families.md` so WP-4 agents use
+  `templates/<topic>/<id>.ts`.
+- Update `spec-practice.md` to match.
+- If any flat WP-4 files already exist, move them into topic folders and update
+  only imports/registry paths. Preserve behavior and tests.

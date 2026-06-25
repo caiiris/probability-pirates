@@ -24,9 +24,9 @@ type NavEntry = {
 
 const NAV_ITEMS: NavEntry[] = [
   { to: '/', label: 'Home', icon: Home },
-  { to: '/practice', label: 'Practice', icon: Dumbbell, locked: true },
+  { to: '/practice', label: 'Practice', icon: Dumbbell },
   { to: '/schedule', label: 'Schedule', icon: CalendarDays },
-  { to: '/progress', label: 'Progress', icon: LineChart, locked: true },
+  { to: '/progress', label: 'Progress', icon: LineChart },
   { to: '/friends', label: 'Friends', icon: Users },
   { to: '/profile', label: 'Profile', icon: User },
 ];

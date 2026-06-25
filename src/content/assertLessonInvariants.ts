@@ -1,4 +1,9 @@
 import type { Lesson, ProblemSlot, Variant } from './types';
+import { SKILLS } from '@/content/skills';
+import { MISCONCEPTIONS } from '@/content/misconceptions';
+
+/** Tracks variant ids already warned about missing skills, to avoid repeat noise. */
+const _warnedMissingSkills = new Set<string>();
 
 function assertNonEmptyString(value: string, path: string): void {
   if (value.trim().length === 0) {
@@ -41,6 +46,9 @@ function assertVariantInvariants(lesson: Lesson, slot: ProblemSlot, variant: Var
       }
       if (variant.denominatorLabel !== undefined) {
         assertNonEmptyString(variant.denominatorLabel, `${basePath}.denominatorLabel`);
+      }
+      if (variant.context !== undefined) {
+        assertNonEmptyString(variant.context, `${basePath}.context`);
       }
       break;
     }
@@ -85,6 +93,20 @@ function assertVariantInvariants(lesson: Lesson, slot: ProblemSlot, variant: Var
       for (const option of variant.options) {
         assertNonEmptyString(option.label, `${basePath}.options.${option.id}.label`);
       }
+      if (variant.misconceptionByOption !== undefined) {
+        for (const [optionId, misconceptionKey] of Object.entries(variant.misconceptionByOption)) {
+          if (!(misconceptionKey in MISCONCEPTIONS)) {
+            throw new Error(
+              `${basePath}.misconceptionByOption["${optionId}"]: unknown misconception key "${misconceptionKey}"`,
+            );
+          }
+          if (!optionIds.has(optionId)) {
+            throw new Error(
+              `${basePath}.misconceptionByOption: option id "${optionId}" does not exist in options`,
+            );
+          }
+        }
+      }
       break;
     }
     case 'simulate-proportion': {
@@ -116,6 +138,29 @@ function assertVariantInvariants(lesson: Lesson, slot: ProblemSlot, variant: Var
       assertNonEmptyString(variant.targetLabel, `${basePath}.targetLabel`);
       break;
     }
+    case 'fill-text': {
+      assertNonEmptyString(variant.acceptRegex, `${basePath}.acceptRegex`);
+      // Compile the pattern at load time so a bad regex blows up here
+      // instead of silently rejecting every learner answer at runtime.
+      try {
+        new RegExp(variant.acceptRegex, 'i');
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        throw new Error(
+          `${basePath}.acceptRegex: not a valid regex (${message})`,
+        );
+      }
+      if (variant.maxLength !== undefined && variant.maxLength <= 0) {
+        throw new Error(`${basePath}.maxLength must be positive`);
+      }
+      if (variant.placeholder !== undefined) {
+        assertNonEmptyString(variant.placeholder, `${basePath}.placeholder`);
+      }
+      if (variant.context !== undefined) {
+        assertNonEmptyString(variant.context, `${basePath}.context`);
+      }
+      break;
+    }
     case 'monty-hall': {
       if (variant.minGames <= 0) {
         throw new Error(`${basePath}: minGames must be positive`);
@@ -125,6 +170,19 @@ function assertVariantInvariants(lesson: Lesson, slot: ProblemSlot, variant: Var
     default: {
       const exhaustive: never = variant;
       throw new Error(`${basePath}: unknown variant kind ${JSON.stringify(exhaustive)}`);
+    }
+  }
+
+  if (variant.skills !== undefined) {
+    for (const skillId of variant.skills) {
+      if (!(skillId in SKILLS)) {
+        throw new Error(`${basePath}.skills: unknown skill id "${skillId}"`);
+      }
+    }
+  } else {
+    if (!_warnedMissingSkills.has(variant.id)) {
+      console.warn(`[WP-2] variant ${basePath} has no skills tagged (optional during migration)`);
+      _warnedMissingSkills.add(variant.id);
     }
   }
 }
@@ -139,6 +197,7 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
         (slot.body && slot.body.length > 0) ||
         slot.example ||
         slot.theorem ||
+        slot.definition ||
         slot.derivation ||
         slot.quote,
       );
@@ -173,6 +232,12 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
         }
         assertNonEmptyString(slot.theorem.statement, `${basePath}.theorem.statement`);
       }
+      if (slot.definition !== undefined) {
+        if (slot.definition.name !== undefined) {
+          assertNonEmptyString(slot.definition.name, `${basePath}.definition.name`);
+        }
+        assertNonEmptyString(slot.definition.statement, `${basePath}.definition.statement`);
+      }
       if (slot.quote !== undefined) {
         assertNonEmptyString(slot.quote.text, `${basePath}.quote.text`);
         if (slot.quote.attribution !== undefined) {
@@ -192,16 +257,45 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
         }
       }
       if (slot.figure !== undefined) {
-        if (slot.figure.kind === 'settling-line') {
-          if (slot.figure.targetProbability < 0 || slot.figure.targetProbability > 1) {
-            throw new Error(`${basePath}.figure.targetProbability must be between 0 and 1`);
+        switch (slot.figure.kind) {
+          case 'settling-line': {
+            if (slot.figure.targetProbability < 0 || slot.figure.targetProbability > 1) {
+              throw new Error(
+                `${basePath}.figure.targetProbability must be between 0 and 1`,
+              );
+            }
+            assertNonEmptyString(slot.figure.targetLabel, `${basePath}.figure.targetLabel`);
+            if (slot.figure.trialCount !== undefined && slot.figure.trialCount <= 0) {
+              throw new Error(`${basePath}.figure.trialCount must be positive`);
+            }
+            if (slot.figure.caption !== undefined) {
+              assertNonEmptyString(slot.figure.caption, `${basePath}.figure.caption`);
+            }
+            break;
           }
-          assertNonEmptyString(slot.figure.targetLabel, `${basePath}.figure.targetLabel`);
-          if (slot.figure.trialCount !== undefined && slot.figure.trialCount <= 0) {
-            throw new Error(`${basePath}.figure.trialCount must be positive`);
+          case 'two-coins-grid': {
+            if (slot.figure.stepMs !== undefined && slot.figure.stepMs <= 0) {
+              throw new Error(`${basePath}.figure.stepMs must be positive`);
+            }
+            if (slot.figure.holdMs !== undefined && slot.figure.holdMs <= 0) {
+              throw new Error(`${basePath}.figure.holdMs must be positive`);
+            }
+            if (slot.figure.caption !== undefined) {
+              assertNonEmptyString(slot.figure.caption, `${basePath}.figure.caption`);
+            }
+            break;
           }
-          if (slot.figure.caption !== undefined) {
-            assertNonEmptyString(slot.figure.caption, `${basePath}.figure.caption`);
+          case 'subset-picker': {
+            if (slot.figure.caption !== undefined) {
+              assertNonEmptyString(slot.figure.caption, `${basePath}.figure.caption`);
+            }
+            break;
+          }
+          default: {
+            const exhaustive: never = slot.figure;
+            throw new Error(
+              `${basePath}.figure: unknown kind ${JSON.stringify(exhaustive)}`,
+            );
           }
         }
       }

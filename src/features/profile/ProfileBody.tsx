@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { Chest } from '@/components/illustrations/Chest';
 import { OceanScene } from '@/features/course/OceanScene';
 import { FlairBadge } from '@/features/economy/FlairBadge';
+import { StrengthsPanel } from '@/features/learner/StrengthsPanel';
+import type { LearnerModel } from '@/features/learner/learnerModel';
 import { DefaultAvatar } from './DefaultAvatar';
 import { RankPanel } from './LevelBadge';
 import { StatsGrid } from './StatsGrid';
@@ -30,6 +32,10 @@ type Props = {
   actions?: ReactNode;
   /** Rendered under the actions (e.g. follower/following counts). */
   counts?: ReactNode;
+  /** WP-7 — learner model for the compact strengths/growth panel. */
+  learnerModel?: LearnerModel | null;
+  /** WP-7 — true while the learner model is loading. */
+  learnerModelLoading?: boolean;
 };
 
 /**
@@ -55,6 +61,8 @@ export function ProfileBody({
   flairId,
   actions,
   counts,
+  learnerModel,
+  learnerModelLoading = false,
 }: Props) {
   return (
     <>
@@ -112,6 +120,15 @@ export function ProfileBody({
       {/* Activity grid — also supporting. */}
       <Section title="Activity">
         <ActivityGrid activityDates={activityDates} />
+      </Section>
+
+      {/* Strengths — compact read of Engine A practiced + Engine B introduced. */}
+      <Section title="Strengths">
+        <StrengthsPanel
+          model={learnerModel ?? null}
+          loading={learnerModelLoading}
+          compact
+        />
       </Section>
 
       {/* Trophies — the page's hero collection. Elevation + chest icon carry

@@ -7,6 +7,7 @@ import { lesson5 } from './lessons/05-conditional-probability';
 import { lesson6 } from './lessons/06-distributions';
 import { howLikely } from './lessons/how-likely';
 import { longRunFrequency } from './lessons/long-run-frequency';
+import { sampleSpace } from './lessons/sample-space';
 import { roadmapStubLessons } from './lessons/roadmapStubs';
 import type { Lesson } from './types';
 
@@ -17,8 +18,8 @@ import type { Lesson } from './types';
  * their stub by id; everything else stays as a blank, locked preview.
  *
  * Currently authored, in catalog order: `how-likely`, `long-run-frequency`
- * (D92). The `two-dice` stub is reserved for the future Unit 2 compound
- * lesson.
+ * (D92), `sample-space` (D93). The `two-dice` stub is reserved for the
+ * future Unit 2 compound lesson.
  *
  * Numbers are assigned by position (1…N) so "Lesson N" is always monotonic on
  * the path regardless of how the stubs are ordered.
@@ -35,7 +36,7 @@ import type { Lesson } from './types';
 // list). To author another one: write the file, import it, add it here.
 // `how-likely` is excluded — it's the dedicated course opener (no roadmap
 // stub mirrors it; it sits ahead of Unit 1 in the path).
-const authoredRoadmapLessons: Lesson[] = [longRunFrequency];
+const authoredRoadmapLessons: Lesson[] = [longRunFrequency, sampleSpace];
 const authoredRoadmapById = new Map<string, Lesson>(
   authoredRoadmapLessons.map((lesson) => [lesson.id, lesson]),
 );
@@ -66,6 +67,16 @@ function validateAllLessons(): void {
 validateAllLessons();
 
 // `lesson1`-`lesson6` are the preserved source content (not on the live path).
-export { lesson1, lesson2, lesson3, lesson4, lesson5, lesson6, howLikely, longRunFrequency };
+export {
+  lesson1,
+  lesson2,
+  lesson3,
+  lesson4,
+  lesson5,
+  lesson6,
+  howLikely,
+  longRunFrequency,
+  sampleSpace,
+};
 export type { Lesson } from './types';
 export * from './types';

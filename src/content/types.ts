@@ -1,3 +1,6 @@
+import type { SkillId } from '@/content/skills';
+import type { MisconceptionKey } from '@/content/misconceptions';
+
 export type Lesson = {
   id: string;
   number: number;
@@ -34,13 +37,27 @@ export type ConceptSlot = {
     attribution?: string;
   };
   /**
-   * Optional named theorem statement (D77). Renders as a bordered callout
-   * directly under the lede prompt (above the body / example / derivation),
-   * with `name` as the eyebrow. Used for the four named counting theorems
-   * (multiplication, addition, permutation, combination) and other named
-   * probability rules.
+   * Optional named theorem statement (D77). Renders as a violet-accented
+   * callout directly under the lede prompt, with `name` as the eyebrow.
+   * Use for **claims** that can be proven or derived (the multiplication
+   * principle, the complement rule, P(A) + P(not A) = 1, etc.). Do not
+   * use for **terminology** — that is what `definition` is for. Both can
+   * appear on the same slot if a beat names a word AND states a claim
+   * about it; the definition renders first.
    */
   theorem?: {
+    name?: string;
+    statement: string;
+  };
+  /**
+   * Optional named definition. Same shape as `theorem` but renders with
+   * a blue accent and a "Definition" eyebrow. Use for **naming a word**
+   * (outcome, sample space, event, random variable). A definition is a
+   * labeling convention, not a claim to be proven; the visual difference
+   * cues the learner that the slot is teaching vocabulary rather than
+   * stating a derivable result.
+   */
+  definition?: {
     name?: string;
     statement: string;
   };
@@ -76,7 +93,15 @@ export type ConceptSlot = {
   figure?: ConceptFigure;
 };
 
-export type ConceptFigure = {
+export type ConceptFigure = SettlingLineFigure | TwoCoinsGridFigure | SubsetPickerFigure;
+
+/**
+ * Long-run convergence chart. Shows the running fraction of successes over
+ * many trials with a horizontal reference at the true probability. Used by
+ * `long-run-frequency` so the settling story is on screen as a line, not
+ * just in prose.
+ */
+export type SettlingLineFigure = {
   kind: 'settling-line';
   /** Drives the trial generator. Must match a `ScrubTrialsVariant.scenario`. */
   scenario: 'coin' | 'die-six';
@@ -89,6 +114,46 @@ export type ConceptFigure = {
   /** Deterministic seed for the trial sequence. Same seed → same picture. */
   seed?: number;
   /** Optional caption shown beneath the chart. */
+  caption?: string;
+};
+
+/**
+ * Autonomous looping animation that builds a two-coin sample space cell by
+ * cell into a 2×2 grid (HH, HT, TH, TT). The four pairs appear in sequence,
+ * pause briefly when full, then clear and replay. Used in `sample-space` so
+ * the learner sees the four outcomes as ordered pairs being constructed,
+ * not just listed. Pure observation: no interaction.
+ *
+ * The grid layout is fixed (rows = first flip, columns = second flip), so
+ * authors only configure the caption and the per-step timing if they want
+ * to tune cadence; everything else is determined by the lesson's content.
+ */
+export type TwoCoinsGridFigure = {
+  kind: 'two-coins-grid';
+  /** Optional caption shown beneath the grid. */
+  caption?: string;
+  /** Milliseconds between cells appearing. Default 900ms. */
+  stepMs?: number;
+  /** Milliseconds the full grid stays visible before looping. Default 1800ms. */
+  holdMs?: number;
+};
+
+/**
+ * Playful subset picker. Renders a small fixed cast of colored balls
+ * (red, blue, green) that the learner can tap to add to or remove from a
+ * subset. The current subset is shown beneath the row, in curly-brace
+ * notation, so the learner can see a real-time mapping between their
+ * taps and the set notation introduced in the lesson body.
+ *
+ * Deliberately **not** a problem slot. There is no correct answer, no
+ * grading, no XP. Continue is always available; the picker is here to
+ * make the word "subset" feel concrete by hand. Used in `sample-space`
+ * to sit under the set/subset definition before the formal `define-event`
+ * beat.
+ */
+export type SubsetPickerFigure = {
+  kind: 'subset-picker';
+  /** Optional caption shown beneath the picker. */
   caption?: string;
 };
 
@@ -130,6 +195,7 @@ export type InteractionKind =
   | 'multiple-choice'
   | 'simulate-proportion'
   | 'scrub-trials'
+  | 'fill-text'
   | 'monty-hall';
 
 export type Variant =
@@ -140,6 +206,7 @@ export type Variant =
   | MultipleChoiceVariant
   | SimulateProportionVariant
   | ScrubTrialsVariant
+  | FillTextVariant
   | MontyHallVariant;
 
 type BaseVariant = {
@@ -154,6 +221,8 @@ type BaseVariant = {
    * feedback. Currently rendered by `tap-outcomes` and `fill-fraction`.
    */
   afterNote?: string;
+  /** Phase 2 (WP-2) — skill ids this variant exercises (learner model). Optional during migration. */
+  skills?: SkillId[];
 };
 
 export type TapOutcomesVariant = BaseVariant & {
@@ -174,6 +243,12 @@ export type FillFractionVariant = BaseVariant & {
   numeratorLabel?: string;
   /** Optional label beside the denominator input, e.g. "ways in total". */
   denominatorLabel?: string;
+  /**
+   * Optional context blurb shown between the prompt and the inputs. Use
+   * for a brief setup the prompt cannot carry on its own (e.g. "a suit
+   * has 13 cards") without bloating the prompt.
+   */
+  context?: string;
 };
 
 export type TapEventVariant = BaseVariant & {
@@ -210,6 +285,8 @@ export type MultipleChoiceVariant = BaseVariant & {
   options: { id: string; label: string; subtext?: string }[];
   correctOptionId: string;
   feedbackByOption: Record<string, string>;
+  /** Phase 2 (WP-2) — maps a wrong option id to a misconception key (learner model). */
+  misconceptionByOption?: Record<string, MisconceptionKey>;
   /** Optional context blurb shown above the options. */
   context?: string;
   /** When true, renders the two-dice "Roll the dice!" roller above the options (play, no answer state). */
@@ -281,6 +358,43 @@ export type ScrubTrialsVariant = BaseVariant & {
   seed?: number;
   /** Keyed by `'incomplete'` for the "scrub further" nudge. */
   feedbackByWrongValue?: Record<string, string>;
+};
+
+/**
+ * Free-text fill-in-the-blank. The learner types into a single input; the
+ * answer is graded by a regex match against the normalized input (trimmed,
+ * lower-cased). Use when the question has many equally valid answers
+ * (e.g. "type one outcome from a sample space" — any of `HHH`, `HHT`, …
+ * `TTT` is acceptable) and authoring all of them as MCQ options would be
+ * busy.
+ *
+ * Authoring rules for `acceptRegex`:
+ *   - Pattern is matched against `input.trim().toLowerCase()`, so the
+ *     regex should use lowercase character classes (`[ht]`, not `[HhTt]`).
+ *   - Anchors are added at evaluation time; do NOT include `^`/`$`.
+ *   - Use `\s*` between tokens if you want to accept optional whitespace.
+ *   - Compile errors are caught by `assertLessonInvariants`, so a bad
+ *     regex fails at lesson-load time, not at first run.
+ *
+ * `feedbackByWrongAnswer` is keyed by the normalized input. Most lessons
+ * only need `feedbackDefault` (the input space is too large to enumerate);
+ * specific known traps can be keyed explicitly if useful.
+ */
+export type FillTextVariant = BaseVariant & {
+  interactionKind: 'fill-text';
+  /**
+   * Regex source string (no leading/trailing slashes, no anchors). Matched
+   * case-insensitively against the normalized input.
+   */
+  acceptRegex: string;
+  /** Short hint shown inside the empty input. Optional. */
+  placeholder?: string;
+  /** Optional context blurb shown above the input. */
+  context?: string;
+  /** Approximate max length for the input. UI hint only, not validation. */
+  maxLength?: number;
+  /** Keyed by normalized wrong input. The default covers the rest. */
+  feedbackByWrongAnswer?: Record<string, string>;
 };
 
 /**

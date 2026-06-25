@@ -16,6 +16,7 @@ import { signOutUser } from '@/features/auth/userService';
 import { useAllLessonProgress } from '@/features/progress/useAllLessonProgress';
 import { courseProgress } from '@/features/course/recommendations';
 import { useLessons } from '@/features/flags/useLessons';
+import { useLearnerModel } from '@/features/learner/useLearnerModel';
 import { FollowCounts } from '@/features/social/FollowCounts';
 import { CoinChip } from '@/features/economy/CoinChip';
 import { ProfileBody } from './ProfileBody';
@@ -27,6 +28,8 @@ export function ProfilePage() {
   const profile = auth.status === 'authenticated' ? auth.profile : null;
   const progressState = useAllLessonProgress(uid);
   const lessons = useLessons();
+
+  const { model: learnerModel, loading: learnerModelLoading } = useLearnerModel(uid || null);
 
   const [editOpen, setEditOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -60,6 +63,8 @@ export function ProfilePage() {
         achievements={profile.achievements}
         avatarStyleId={profile.avatarStyle}
         flairId={profile.profileFlair}
+        learnerModel={learnerModel}
+        learnerModelLoading={learnerModelLoading}
         actions={
           <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
             Edit profile

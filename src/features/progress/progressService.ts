@@ -34,6 +34,7 @@ export type AttemptPayload =
   | { selectedCells: Array<[number, number]> }
   | { optionId: string }
   | { trials: number }
+  | { text: string }
   | { games: number };
 
 function progressRef(uid: string, lessonId: string) {

@@ -10,16 +10,21 @@
  *   empty (safety net, a lesson without content is never playable).
  *
  *   Default: the authored lessons on the live path. `how-likely` is the course
- *   opener (D88); `long-run-frequency` is the first roadmap unit lesson that
- *   has been authored (D92). Every other unit lesson is still a blank, locked
- *   stub. Flip a lesson on or off by updating Remote Config (no redeploy
- *   required); the empty-slots safety net in `useLessons` still prevents a
- *   contentless lesson from going live, so only lessons that have authored
- *   content can be enabled.
+ *   opener (D88); `long-run-frequency` is the long-run / frequentist lesson
+ *   (D92); `sample-space` names the toolkit and introduces events as subsets
+ *   (D93). Every other unit lesson is still a blank, locked stub. Flip a
+ *   lesson on or off by updating Remote Config (no redeploy required); the
+ *   empty-slots safety net in `useLessons` still prevents a contentless
+ *   lesson from going live, so only lessons that have authored content can
+ *   be enabled.
  */
 
 export const REMOTE_CONFIG_DEFAULTS = {
-  available_lesson_ids: JSON.stringify(['how-likely', 'long-run-frequency']),
+  available_lesson_ids: JSON.stringify([
+    'how-likely',
+    'long-run-frequency',
+    'sample-space',
+  ]),
 } as const;
 
 /** How long Remote Config values are cached client-side. Per Firebase docs,

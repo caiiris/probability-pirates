@@ -10,4 +10,6 @@ coverage/
 firebase/seed/
 .firebase/
 *.tsbuildinfo
+docs/curriculum-harvest/raw/
+docs/curriculum-harvest/chunks/
 

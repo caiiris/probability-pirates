@@ -1,4 +1,4 @@
-import { doc, arrayUnion, increment, writeBatch } from 'firebase/firestore';
+import { doc, arrayUnion, increment, updateDoc, writeBatch } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { xpForAttempt, LESSON_COMPLETION_BONUS } from '@/lib/xp';
 import { nextStreak, todayLocalDate, daysBetween } from '@/lib/streak';
@@ -238,4 +238,32 @@ export async function applyLessonCompletion(
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : 'Unknown error' };
   }
+}
+
+// ---------------------------------------------------------------------------
+// Practice XP increment (xp + weeklyXp only — never touches streak or lessons)
+// ---------------------------------------------------------------------------
+
+/**
+ * Persist a practice-session XP grant to the user doc.
+ *
+ * Strictly limited to xp / weeklyXp / weekKey — intentionally does NOT touch
+ * currentStreak, lastActiveDate, lessonsCompleted, stepsCompleted, or any
+ * other user fields. Practice XP feeds levels + leaderboard but must never
+ * tick the daily streak or count as a completed lesson (spec-practice.md).
+ *
+ * Best-effort: callers should fire-and-forget (void). Never throws to the UI.
+ */
+export async function awardPracticeXp(
+  uid: string,
+  granted: number,
+  storedWeekKey: string | null | undefined,
+): Promise<void> {
+  const weekKey = currentWeekKey();
+  const sameWeek = storedWeekKey === weekKey;
+  await updateDoc(doc(db, 'users', uid), {
+    xp: increment(granted),
+    weeklyXp: sameWeek ? increment(granted) : granted,
+    weekKey,
+  });
 }

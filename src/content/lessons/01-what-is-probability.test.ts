@@ -138,19 +138,25 @@ describe('course catalog', () => {
   it('opens on the authored lessons as the playable head of the catalog', () => {
     const playable = lessons.filter((l) => !l.comingSoon);
     // Authored, in catalog order. Add ids here as new roadmap lessons are
-    // authored (D88, D92, …). Every other lesson is a blank, locked stub.
-    expect(playable.map((l) => l.id)).toEqual(['how-likely', 'long-run-frequency']);
+    // authored (D88, D92, D93, …). Every other lesson is a blank, locked stub.
+    expect(playable.map((l) => l.id)).toEqual([
+      'how-likely',
+      'long-run-frequency',
+      'sample-space',
+    ]);
     expect(playable.every((l) => l.slots.length > 0)).toBe(true);
     const locked = lessons.filter((l) => l.comingSoon);
     expect(locked.length).toBeGreaterThan(0);
     expect(locked.every((l) => l.slots.length === 0)).toBe(true);
   });
 
-  it('leads the path with how-likely at lesson number 1, then long-run-frequency at 2', () => {
+  it('leads the path with how-likely → long-run-frequency → sample-space at numbers 1, 2, 3', () => {
     expect(lessons[0].id).toBe('how-likely');
     expect(lessons[0].number).toBe(1);
     expect(lessons[1].id).toBe('long-run-frequency');
     expect(lessons[1].number).toBe(2);
+    expect(lessons[2].id).toBe('sample-space');
+    expect(lessons[2].number).toBe(3);
   });
 
   it('has globally unique lesson ids and monotonically numbered stubs', () => {

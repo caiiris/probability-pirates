@@ -92,6 +92,21 @@ export function checkAnswer(variant: Variant, payload: AttemptPayload): CheckRes
       return { wasCorrect: false, matchedWrongKey: 'incomplete' };
     }
 
+    case 'fill-text': {
+      // Normalize: trim outer whitespace and lowercase. The author writes
+      // `acceptRegex` against the lowercase form; we anchor it at both
+      // ends here so partial matches do not slip through. The `i` flag is
+      // belt-and-suspenders given the lowercase normalization.
+      const p = payload as { text: string };
+      const normalized = p.text.trim().toLowerCase();
+      const anchored = new RegExp(`^(?:${variant.acceptRegex})$`, 'i');
+      if (anchored.test(normalized)) return { wasCorrect: true };
+      return {
+        wasCorrect: false,
+        matchedWrongKey: normalized.length > 0 ? normalized : 'empty',
+      };
+    }
+
     case 'monty-hall': {
       const p = payload as { games: number };
       if (p.games >= variant.minGames) return { wasCorrect: true };

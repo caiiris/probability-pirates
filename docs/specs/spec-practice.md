@@ -1,6 +1,6 @@
-# Spec: Practice (Alcumus-style adaptive practice)
+# Spec: Practice
 
-> An endless, adaptive problem set — inspired by AoPS **Alcumus** — where problems
+> An endless, adaptive problem set where problems
 > are effectively unlimited and **every problem + solution is vetted for
 > correctness before a learner ever sees it**. Lives under `src/features/practice/`.
 > Currently shipped as a locked nav stub (alternatives **D85**); this spec defines
@@ -62,8 +62,11 @@ to author _problems_ and _prose_, never to be the final arbiter of _correctness_
 
 A **template** is a hand-/LLM-authored problem family with code that computes its
 own answer. Example: "two fair dice, P(sum = k)" with `k` a parameter.
+Per alternatives **D99**, runtime templates are organized by Practice topic folder
+(`src/features/practice/templates/<topic>/<id>.ts`), not a single flat templates
+directory.
 
-A template (`src/features/practice/templates/*.ts`) declares:
+A template (`src/features/practice/templates/<topic>/<id>.ts`) declares:
 
 - `id`, `topic`, a difficulty rating (or a function of params → rating).
 - `sample(rng) → params` — draws a valid parameter set.
@@ -229,8 +232,233 @@ Only candidates passing **1–5** (and sampled into 6) are written to the vetted
 - **Daily-cap data model:** persist the per-day counter as
   `users/{uid}.practiceXp = { date, earnedToday }` (owner-only, mirrors the rest
   of `users/{uid}`). Resets when `date` rolls over (handled by `grantPracticeXp`).
-- **Topic taxonomy:** reuse lesson ids directly, or a finer-grained skill tree?
+- ~~**Topic taxonomy:**~~ **Resolved (Phase 2)** — neither raw lesson ids nor a deep
+  skill tree. A small flat **skill taxonomy** in `src/content/skills.ts`
+  (~15–25 ids); each variant carries `skills: string[]`. Topics on the
+  Practice page are presentation-only groupings of skill ids. Details:
+  [`spec-learner-model`](spec-learner-model.md).
 - **Track 2 acceptable defect rate** and human-review sampling rate before a batch may
   publish.
 - **Generation cost ceiling** per topic/batch, and whether a curated seed bank anchors
   generation.
+
+---
+
+## Phase 2 — Track 1 implementation specifics
+
+> Added 2026-06-25 as part of the Phase 2 AI build. Resolves the "Phasing →
+> Friday (v1)" section above with the concrete schema, math, and content
+> surface the implementer needs. The principles above (correctness, no live
+> LLM, owner-only state, no SDK in bundle) are unchanged — this section is
+> all "how," not "what."
+
+### Template schema (TypeScript)
+
+`src/features/practice/templates/types.ts` defines the contract:
+
+```ts
+import type { Variant } from '@/content/types';
+
+export type ExactAnswer =
+  | { kind: 'int'; value: number }
+  | { kind: 'fraction'; num: bigint; den: bigint }  // already reduced
+  | { kind: 'choice'; optionId: string };
+
+export type Template<Params = unknown> = {
+  /** Unique id, kebab-case (e.g. `sum-of-two-dice`). */
+  id: string;
+  /** Presentation grouping shown on /practice (e.g. `counting`, `complement`). */
+  topic: string;
+  /** Skill ids touched by this family (from src/content/skills.ts). */
+  skills: string[];
+  /** Which retrieval form the family targets — drives interleaving order. */
+  retrievalForm: 'definition' | 'operation' | 'procedural' | 'application';
+  /**
+   * Difficulty rating produced from params. Higher = harder. Calibrated by
+   * authoring (rough Elo-equivalent), tuned post-launch with attempt data.
+   */
+  rate(params: Params): number;
+  /** Draw a valid parameter set. Deterministic given `rng`. */
+  sample(rng: () => number): Params;
+  /**
+   * Build a `Variant` so the practice loop can reuse the existing interaction
+   * renderers (no new UI). Use `multiple-choice`, `fill-fraction`, or
+   * `tap-event` for v1; richer kinds opt in later.
+   */
+  render(params: Params): Variant;
+  /** The deterministic correct answer. THE SOURCE OF TRUTH. */
+  solve(params: Params): ExactAnswer;
+  /** Worked solution, reusing the D77 derivation shape. */
+  explain(params: Params): { title: string; steps: string[] };
+  /**
+   * Monte-Carlo estimator used only at template-vetting time. Required for
+   * probability-of-event templates; omit for deterministic-count templates.
+   */
+  simulate?(params: Params, trials: number, rng: () => number): number;
+};
+```
+
+A template **does not** ship to learners until its vetting test passes (next subsection).
+
+### Template vetting test (CI gate)
+
+Every template ships with a sibling `<template>.test.ts` that runs at build
+time and gates CI. The standard test is parameterized so adding a template is
+"add file + add `expectTemplateAgrees(template)` line":
+
+```ts
+// Pseudocode — actual helper lives in src/features/practice/templates/testUtils.ts
+expectTemplateAgrees(sumOfTwoDice, {
+  samples: 1_000,
+  trials: 10_000,
+  // 5-sigma tolerance: |p̂ − p| < 5·√(p(1−p)/n)
+  tolerance: 5,
+});
+```
+
+The helper:
+
+1. Seeds `mulberry32` from a fixed test seed (so failures are reproducible).
+2. Draws ≥1,000 parameter sets via `sample()`.
+3. For each, computes `p = solve(params)` and (when `simulate` is defined) an
+   estimate `p̂ = simulate(params, trials)`.
+4. Asserts `|p̂ − p| < tolerance · √(p(1−p) / trials)`.
+5. Additionally exact-enumerates the sample space when it is ≤ 10⁴ outcomes
+   (e.g. two-dice: 36 outcomes) and asserts `solve` matches.
+
+A failing template **blocks the build** — the spec's "every served problem's
+answer is computed by code" guarantee depends on this gate.
+
+### First template families (Friday surface)
+
+Six families covering the foundational ~20% of curriculum skills (see PRD §8
+"20% drives 80%"). Each family generates a wide parameter space, so total
+practice surface ≫ 6 problems.
+
+| id | Topic | Skills | Retrieval form | `solve` shape |
+| --- | --- | --- | --- | --- |
+| `sum-of-two-dice` | counting | `sample-space-enumeration`, `equally-likely-outcomes` | operation | exact fraction by enumeration |
+| `at-least-one-via-complement` | complement | `complement-rule`, `independence` | procedural | `1 − (1−p)^n` exact |
+| `k-heads-in-n` | distributions | `binomial-pmf`, `independence` | operation | binomial coefficient × `p^k(1−p)^(n−k)` |
+| `pick-k-of-n-unordered` | counting | `ordered-vs-unordered`, `combinations` | definition | `nCk` exact |
+| `conditional-bayes-2x2` | conditional | `conditional-probability`, `base-rate` | application | exact fraction from 2×2 table |
+| `gambler-fallacy-mc` | long-run | `long-run-vs-single-trial`, `independence` | definition | structured-choice (no number) |
+
+Each family file pattern:
+`src/features/practice/templates/<topic>/<id>.ts` (template) +
+`src/features/practice/templates/<topic>/<id>.test.ts` (vetting test). The
+single WP-3 registry imports from these topic folders and exposes one flat
+`TEMPLATES` array.
+
+### Retrieval-form organization (interleaving rule)
+
+The four retrieval forms from the learning-science notes — **definition,
+operation, procedural, application** — are first-class on the template
+metadata. The engine interleaves _retrieval forms_ within a topic, not just
+template ids: a learner working on `complement` sees the definition-form
+problem ("which statement defines the complement rule?"), the operation
+problem ("compute P(at least one) for given n and p"), the procedural problem
+("decompose this scenario into a complement"), and the application problem
+("which real-world setup is best solved with the complement rule?") in
+mixed order — desirable difficulty, not surface-feature ordering. This is the
+interleaving lever the engine pulls inside a single topic; cross-topic mixed
+sets stay out of scope for v1.
+
+### Adaptive serving (concrete math)
+
+Adaptive difficulty uses a lightweight Elo update per skill, calibrated to
+target ~20–30% miss rate (failure >50% demotivates — see notes). The rule:
+
+```ts
+// learner: { rating: number }, problem: { rating: number }
+const K = 24;                                  // learning-rate constant
+const expected = 1 / (1 + 10 ** ((problem.rating - learner.rating) / 400));
+const actual = wasCorrect ? 1 : 0;
+learner.rating += K * (actual - expected);
+```
+
+- New learners start at rating 1000 per skill.
+- Templates start with hand-rated difficulty (the `rate(params)` function);
+  these calibrate to learner performance over time but are not auto-tuned in
+  v1 (flagged risk).
+- **Serving:** pick a template whose `rate(params)` is in the window
+  `[learner.rating − 50, learner.rating + 100]` (slightly _above_ — desirable
+  difficulty). If no template fits, widen the window symmetrically. Avoid
+  any template whose last instance was served in the last 3 problems
+  (`lastSeenTemplateIds`).
+- **Topic auto-suggest:** Practice's default-selected topic is the topic
+  whose **weakest skill** the learner has the lowest rating on — read from
+  the learner model.
+
+### Worked solution rendering
+
+`explain(params)` returns `{ title, steps }` which the practice loop renders
+through the existing `DerivationCard` (D77 shape). No new component. After a
+wrong answer the worked solution always appears (worked-example effect —
+strongest right after a miss); after a correct answer it appears under a
+"See the working" disclosure (so the learner is forced to retrieve, then can
+self-check).
+
+### Loop-level data flow
+
+```mermaid
+flowchart LR
+    Pick[engine: pick template by rating + topic] --> Sample[sample params]
+    Sample --> Render[render Variant]
+    Sample --> Solve[solve = ground truth]
+    Render --> Renderer[existing interaction renderer]
+    Renderer --> Submit[learner submits]
+    Submit --> Check{matches solve?}
+    Check -- correct --> XP[grantPracticeXp - daily-capped]
+    Check -- correct --> LM[recordPracticeAttempt: +rating, +correct]
+    Check -- wrong --> Wrong[show explain steps]
+    Wrong --> Hint{aiEnabled?}
+    Hint -- yes --> Fn[POST /api/hint with payload+solve]
+    Hint -- no --> Authored[render Variant.feedbackByWrong*]
+    Check -- wrong --> LMw[recordPracticeAttempt: -rating, misconception++]
+```
+
+- **No runtime LLM call is required for the practice loop to function.** The
+  hint surface is opt-in via `VITE_AI_ENABLED`; with it off the loop falls
+  back to the variant's authored feedback per the rest of the app.
+- The learner-model write path mirrors `recordAttempt` — see
+  [`spec-learner-model`](spec-learner-model.md).
+
+### Data-model addendum (Phase 2)
+
+Two small additions to the Phase 1 data shape; both owner-only subdocs to
+avoid the tight `/users/{uid}` update allowlist in `firestore.rules`:
+
+- `users/{uid}/practiceState/{topicId}` —
+  `{ rating, attempts, correct, lastSeenTemplateIds[], updatedAt }`. (Replaces
+  the original spec's `users/{uid}/practice/{topicId}` location to keep the
+  user-doc rule untouched.)
+- `users/{uid}/practiceXp/today` — `{ date, earnedToday }`. (Replaces the
+  earlier "open question" of putting it on the user doc; subdoc keeps rules
+  simple.)
+
+Rules: owner-only `read, write` on both subcollections — same shape as the
+existing `lessonProgress` and `stepAttempts` rules.
+
+### What the LLM did (and didn't do) for these templates
+
+Templates were **authored by hand**, with LLM assistance for prose drafts of
+`render(params).prompt` and `explain(params).steps` only — reviewed by the
+content owner before commit (same posture as `D74` for lesson copy). The
+LLM never wrote `solve()`, and the vetting test re-derives the answer from
+`solve()` independently. So the **shipped answer path contains zero LLM
+output** — which is the precondition for unlocking the practice section
+without violating PRD §9.10 AC #1.
+
+### Acceptance criteria addendum
+
+Augments the original 6 ACs above:
+
+7. **Template-test gate.** CI fails when any template's vetting test fails;
+   no template can ship without `solve()` matching `simulate()` (or exact
+   enumeration) within tolerance.
+8. **Retrieval-form metadata present.** Every template declares
+   `retrievalForm` and `skills`; the engine respects both when serving.
+9. **Adaptive miss-rate target.** Over a session of ≥20 problems, the
+   learner's observed wrong-rate falls within 15–40% (loose band around the
+   20–30% target; tightens with more attempt data in v2).

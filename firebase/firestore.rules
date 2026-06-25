@@ -68,6 +68,19 @@ service cloud.firestore {
         allow update, delete: if false;
       }
 
+      // spec-wp-8 — Phase 2 practice subcollections, owner-only
+      match /learnerModel/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /practiceState/{topicId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /practiceXp/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
       // notifications — owner-only read; any authenticated user may CREATE a
       // notification on someone else's account (that's how a follow drops a
       // "X started following you" inbox item without Cloud Functions).

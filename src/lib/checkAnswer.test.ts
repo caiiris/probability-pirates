@@ -239,6 +239,50 @@ describe('checkAnswer: scrub-trials', () => {
 });
 
 // ---------------------------------------------------------------------------
+// fill-text — regex match on normalized input
+// ---------------------------------------------------------------------------
+const threeFlips: Variant = {
+  id: 'test',
+  interactionKind: 'fill-text',
+  prompt: '',
+  acceptRegex: '\\s*[ht]\\s*[ht]\\s*[ht]\\s*',
+  feedbackCorrect: '',
+  feedbackDefault: '',
+};
+
+describe('checkAnswer: fill-text', () => {
+  it('accepts the eight three-flip outcomes', () => {
+    for (const outcome of ['HHH', 'HHT', 'HTH', 'HTT', 'THH', 'THT', 'TTH', 'TTT']) {
+      expect(checkAnswer(threeFlips, { text: outcome }).wasCorrect).toBe(true);
+    }
+  });
+  it('is case-insensitive', () => {
+    expect(checkAnswer(threeFlips, { text: 'hht' }).wasCorrect).toBe(true);
+    expect(checkAnswer(threeFlips, { text: 'HhT' }).wasCorrect).toBe(true);
+  });
+  it('allows whitespace between letters and around the edges', () => {
+    expect(checkAnswer(threeFlips, { text: 'H H T' }).wasCorrect).toBe(true);
+    expect(checkAnswer(threeFlips, { text: '  H  T  H  ' }).wasCorrect).toBe(true);
+  });
+  it('rejects strings with too few or too many letters', () => {
+    expect(checkAnswer(threeFlips, { text: 'HH' }).wasCorrect).toBe(false);
+    expect(checkAnswer(threeFlips, { text: 'HHTH' }).wasCorrect).toBe(false);
+  });
+  it('rejects strings with non-H/T characters', () => {
+    expect(checkAnswer(threeFlips, { text: 'HHX' }).wasCorrect).toBe(false);
+    expect(checkAnswer(threeFlips, { text: '123' }).wasCorrect).toBe(false);
+  });
+  it("uses 'empty' as the wrong-key for blank input, normalized text otherwise", () => {
+    const empty = checkAnswer(threeFlips, { text: '   ' });
+    expect(empty.wasCorrect).toBe(false);
+    if (!empty.wasCorrect) expect(empty.matchedWrongKey).toBe('empty');
+
+    const bad = checkAnswer(threeFlips, { text: 'HHTH' });
+    if (!bad.wasCorrect) expect(bad.matchedWrongKey).toBe('hhth');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // monty-hall — correct once minGames reached
 // ---------------------------------------------------------------------------
 const monty: Variant = {

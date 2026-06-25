@@ -1,0 +1,182 @@
+[
+  {
+    "id": "sum-of-two-dice-p01",
+    "instanceId": "sum-of-two-dice:3740118599",
+    "templateId": "sum-of-two-dice",
+    "topic": "counting",
+    "skills": [
+      "sample-space-enumeration",
+      "equally-likely-outcomes"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 1100,
+    "params": {
+      "k": 10
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 10?",
+    "answer": "1/12",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(sum = 10) by enumeration",
+      "steps": [
+        "Rolling two dice produces 6 × 6 = 36 equally-likely ordered outcomes.",
+        "Pairs (a, b) with a + b = 10: (4,6), (5,5), (6,4).",
+        "Favorable outcomes: 3.",
+        "P(sum = 10) = 3/36 = 1/12."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.08333333333333333,
+      "simulationEstimate": 0.08292,
+      "absoluteDifference": 0.000413333333333335,
+      "sigmaThreshold": 0.006180165405913052,
+      "passed": true
+    }
+  },
+  {
+    "id": "sum-of-two-dice-p02",
+    "instanceId": "sum-of-two-dice:1401792082",
+    "templateId": "sum-of-two-dice",
+    "topic": "counting",
+    "skills": [
+      "sample-space-enumeration",
+      "equally-likely-outcomes"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 900,
+    "params": {
+      "k": 8
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 8?",
+    "answer": "5/36",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(sum = 8) by enumeration",
+      "steps": [
+        "Rolling two dice produces 6 × 6 = 36 equally-likely ordered outcomes.",
+        "Pairs (a, b) with a + b = 8: (2,6), (3,5), (4,4), (5,3), (6,2).",
+        "Favorable outcomes: 5.",
+        "P(sum = 8) = 5/36."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.1388888888888889,
+      "simulationEstimate": 0.13912,
+      "absoluteDifference": 0.0002311111111110986,
+      "sigmaThreshold": 0.007733006059486142,
+      "passed": true
+    }
+  },
+  {
+    "id": "sum-of-two-dice-p03",
+    "instanceId": "sum-of-two-dice:1401203702",
+    "templateId": "sum-of-two-dice",
+    "topic": "counting",
+    "skills": [
+      "sample-space-enumeration",
+      "equally-likely-outcomes"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 1100,
+    "params": {
+      "k": 4
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 4?",
+    "answer": "1/12",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(sum = 4) by enumeration",
+      "steps": [
+        "Rolling two dice produces 6 × 6 = 36 equally-likely ordered outcomes.",
+        "Pairs (a, b) with a + b = 4: (1,3), (2,2), (3,1).",
+        "Favorable outcomes: 3.",
+        "P(sum = 4) = 3/36 = 1/12."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.08333333333333333,
+      "simulationEstimate": 0.08396,
+      "absoluteDifference": 0.0006266666666666781,
+      "sigmaThreshold": 0.006180165405913052,
+      "passed": true
+    }
+  },
+  {
+    "id": "sum-of-two-dice-p04",
+    "instanceId": "sum-of-two-dice:1400659249",
+    "templateId": "sum-of-two-dice",
+    "topic": "counting",
+    "skills": [
+      "sample-space-enumeration",
+      "equally-likely-outcomes"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 1200,
+    "params": {
+      "k": 3
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 3?",
+    "answer": "1/18",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(sum = 3) by enumeration",
+      "steps": [
+        "Rolling two dice produces 6 × 6 = 36 equally-likely ordered outcomes.",
+        "Pairs (a, b) with a + b = 3: (1,2), (2,1).",
+        "Favorable outcomes: 2.",
+        "P(sum = 3) = 2/36 = 1/18."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.05555555555555555,
+      "simulationEstimate": 0.05498,
+      "absoluteDifference": 0.0005755555555555514,
+      "sigmaThreshold": 0.005121969142940492,
+      "passed": true
+    }
+  },
+  {
+    "id": "sum-of-two-dice-p05",
+    "instanceId": "sum-of-two-dice:1333695868",
+    "templateId": "sum-of-two-dice",
+    "topic": "counting",
+    "skills": [
+      "sample-space-enumeration",
+      "equally-likely-outcomes"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 1300,
+    "params": {
+      "k": 2
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 2?",
+    "answer": "1/36",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(sum = 2) by enumeration",
+      "steps": [
+        "Rolling two dice produces 6 × 6 = 36 equally-likely ordered outcomes.",
+        "Pairs (a, b) with a + b = 2: (1,1).",
+        "Favorable outcomes: 1.",
+        "P(sum = 2) = 1/36."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.027777777777777776,
+      "simulationEstimate": 0.02838,
+      "absoluteDifference": 0.0006022222222222227,
+      "sigmaThreshold": 0.0036746545987008205,
+      "passed": true
+    }
+  }
+]
