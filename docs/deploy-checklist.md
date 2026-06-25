@@ -4,8 +4,8 @@
 > `docs/prd.md` §9.8 and `docs/build-order.md`. Run top to bottom; do not deploy
 > with an open ❌.
 
-**Live URL:** https://brilliant-clone-102a7.web.app
-**Host:** Firebase Hosting (project `brilliant-clone-102a7`, Spark plan)
+**Live URL:** https://probability-pirates.web.app
+**Host:** Firebase Hosting (project `brilliant-clone-102a7`, site `probability-pirates`, Spark plan)
 **Deploy command:** `npm run build && npx firebase-tools deploy --only hosting --project brilliant-clone-102a7`
 
 > Note on hosting choice: the PRD names Vercel, but the project ships on Firebase
@@ -32,13 +32,25 @@
 ## 3. Environment / Firebase console
 
 - [ ] Host env has all `VITE_FIREBASE_*` vars (see `.env.example`); `VITE_USE_EMULATOR=false`.
+- [ ] `VITE_FIREBASE_AUTH_DOMAIN` is the **serving** Hosting domain (`probability-pirates.web.app`),
+      not `<project>.firebaseapp.com`. A cross-domain auth handler breaks Google
+      sign-in on mobile with "missing initial state". Confirm in the built bundle:
+      `rg -o 'authDomain:"[^"]+"' dist/assets/index-*.js` → must show `probability-pirates.web.app`.
 - [ ] Built bundle is pointed at live Firebase, not the emulator:
       `rg -c "localhost:9099|localhost:8080" dist/assets/*.js` → `0`.
 - [ ] Firestore rules deployed: `npx firebase-tools deploy --only firestore:rules`.
 - [ ] Firebase Console → Authentication → Sign-in method: **Google provider enabled**
       and **"One account per email address"** on (required for the Google button; I031).
 - [ ] Firebase Console → Authentication → Settings → Authorized domains includes
-      `brilliant-clone-102a7.web.app` (and `.firebaseapp.com`).
+      `probability-pirates.web.app` (plus the defaults `brilliant-clone-102a7.web.app`
+      and `.firebaseapp.com`).
+- [ ] Google OAuth web client (the one auto-created by Firebase, reachable via
+      Authentication → Sign-in method → Google → Web SDK configuration) lists
+      `https://probability-pirates.web.app/__/auth/handler` under **Authorized
+      redirect URIs** and `https://probability-pirates.web.app` under **Authorized
+      JavaScript origins**. Missing the redirect URI → Google `redirect_uri_mismatch`
+      ("the app sent an invalid request"). Edit in Google Cloud Console → APIs &
+      Services → Credentials, in project `brilliant-clone-102a7` (parent org `go-alpha.org`).
 
 ## 4. Post-deploy HTTP smoke (automatable from a shell)
 
