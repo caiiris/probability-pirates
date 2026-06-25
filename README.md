@@ -1,10 +1,8 @@
-# Pascal — Probability Pirates
+# Probability Pirates
 
-A mobile-first, **learn-by-doing probability app** for high-school students.
-Each lesson is a short sequence of interactive steps — tap a die's faces, fill a
-fraction, mark cells on a 6×6 grid, run a simulation — with instant, hand-written
-feedback on every answer. No AI, no videos, no walls of text: the interaction
-_is_ the explanation.
+A mobile-first, **learn-by-doing probability app** for motivated middle and high-school students.
+Each lesson is a short sequence of interactive steps with instant, hand-written
+feedback on every answer. 
 
 **Live:** https://probability-pirates.web.app
 
