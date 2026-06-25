@@ -26,8 +26,13 @@
  *                                  (test / homework / study session / other)
  */
 
-import { logEvent as fbLogEvent } from 'firebase/analytics';
 import { getAnalyticsSafe } from './firebase';
+
+// `firebase/analytics` is intentionally NOT imported statically — that would
+// drag the whole Analytics SDK into the first-load bundle and defeat the lazy
+// loading in `getAnalyticsSafe`. `logEvent` is pulled from the dynamic import
+// inside `track` instead (it resolves from the module cache that
+// `getAnalyticsSafe` already populated, so there is no second network fetch).
 
 type PascalEventMap = {
   login: { method: 'email_password' | 'google' };
@@ -119,9 +124,10 @@ export type PascalEvent = keyof PascalEventMap;
 
 export function track<E extends PascalEvent>(event: E, params: PascalEventMap[E]): void {
   void getAnalyticsSafe()
-    .then((analytics) => {
+    .then(async (analytics) => {
       if (!analytics) return;
-      fbLogEvent(analytics, event as never, params as never);
+      const { logEvent } = await import('firebase/analytics');
+      logEvent(analytics, event as never, params as never);
     })
     .catch((err) => {
       console.warn(`[analytics] failed to log ${event}:`, err);

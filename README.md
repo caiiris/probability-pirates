@@ -6,7 +6,7 @@ fraction, mark cells on a 6×6 grid, run a simulation — with instant, hand-wri
 feedback on every answer. No AI, no videos, no walls of text: the interaction
 _is_ the explanation.
 
-**Live:** https://brilliant-clone-102a7.web.app
+**Live:** https://probability-pirates.web.app
 
 ## Stack
 

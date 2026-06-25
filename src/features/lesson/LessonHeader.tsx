@@ -38,7 +38,7 @@ export function LessonHeader({
 
   return (
     <>
-      <header className="flex items-center gap-1 px-4 h-14 border-b bg-background/95 backdrop-blur shrink-0">
+      <header className="flex items-center gap-1 px-4 h-14 border-b bg-card/95 backdrop-blur shrink-0">
         {/* Close button */}
         <Button
           variant="ghost"

@@ -49,13 +49,15 @@ export function LessonFooter({
   }, [wrongTick]);
 
   // The whole tray floods with a soft success/error wash so the result reads at
-  // a glance, not just from the small icon + text.
+  // a glance, not just from the small icon + text. The neutral default is the
+  // same fresh-paper white as the lesson body (`bg-card`), not the app-wide
+  // warm-paper background — keeps the lesson view tonally consistent.
   const flood =
     feedbackState === 'correct'
       ? 'border-[color:var(--green-base)]/40 bg-[color:var(--green-soft)]/60'
       : feedbackState === 'wrong'
         ? 'border-[color:var(--coral-base)]/40 bg-[color:var(--coral-soft)]/50'
-        : 'border-border bg-background';
+        : 'border-border bg-card';
 
   return (
     <div

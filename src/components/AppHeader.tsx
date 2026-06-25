@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Wordmark } from '@/components/Brandmark';
+import { Brandmark, Wordmark } from '@/components/Brandmark';
 import { FlameIcon } from '@/components/icons/StatIcons';
 import { CoinChip } from '@/features/economy/CoinChip';
 import { DefaultAvatar } from '@/features/profile/DefaultAvatar';
@@ -52,17 +52,19 @@ export function AppHeader() {
 
   return (
     <header
-      className="sticky top-0 z-40 flex items-center gap-3 border-b border-[color:var(--line-strong)] bg-card/90 px-4 py-3 backdrop-blur"
+      className="sticky top-0 z-40 flex items-center gap-2 border-b border-[color:var(--line-strong)] bg-card/90 px-3 py-3 backdrop-blur sm:gap-3 sm:px-4"
       style={{ boxShadow: '0 2px 8px rgb(33 28 48 / 0.04)' }}
     >
-      {/* Left: brand anchors the full-width header on every breakpoint. The
-          fixed width means the centered level bar never slides under it. */}
+      {/* Left: brand anchors the full-width header on every breakpoint. On
+          mobile, just the brandmark icon (Pascal's Triangle dots) so the level
+          bar + right cluster have room on a 390px screen; the full wordmark
+          (icon + "Probability Pirates" text) returns at sm and up. */}
       <Link
         to="/"
         aria-label="Probability Pirates home"
         className="shrink-0 rounded-md transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <Wordmark markSize={isMobile ? 20 : 24} />
+        {isMobile ? <Brandmark size={28} /> : <Wordmark markSize={24} />}
       </Link>
 
       {/* Center: the level progress bar fills the *leftover* space between the

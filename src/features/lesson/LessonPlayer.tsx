@@ -242,6 +242,26 @@ function LessonPlayerInner({
           : 2
       : 0;
 
+    // Record achievement signals for this lesson before mutating slot state.
+    if (!result.wasCorrect) {
+      allFirstTryRef.current = false; // any wrong attempt rules out 'flawless'
+    } else if (attemptNumber > 1) {
+      hadComebackRef.current = true; // correct after a wrong attempt => 'bounce-back'
+    }
+
+    // Show the verdict immediately, before any persistence. The Firestore
+    // writes below still run (and still gate the Continue/Check button via
+    // `submitting` until the attempt is saved), but the correct/wrong feedback
+    // must never wait on the network — see PRD AC 9.2.7 ("persistence never
+    // blocks feedback") and the <100ms feedback target. `attemptNumber` and
+    // `xpAwarded` are read above, before this dispatch, so the values sent to
+    // the writes are unaffected by the state transition.
+    if (result.wasCorrect) {
+      dispatch({ type: 'CORRECT', answer: currentAnswer });
+    } else {
+      dispatch({ type: 'WRONG', answer: currentAnswer });
+    }
+
     const saved = await recordAttempt({
       uid,
       lessonId: lesson.id,
@@ -278,13 +298,6 @@ function LessonPlayerInner({
       });
     }
 
-    // Record achievement signals for this lesson before mutating state.
-    if (!result.wasCorrect) {
-      allFirstTryRef.current = false; // any wrong attempt rules out 'flawless'
-    } else if (attemptNumber > 1) {
-      hadComebackRef.current = true; // correct after a wrong attempt => 'bounce-back'
-    }
-
     if (profile) {
       const habitResult = await applyAttemptOutcome(uid, profile, attemptNumber, result.wasCorrect);
       if (habitResult.ok && habitResult.result.isNewStreakDay) {
@@ -302,12 +315,6 @@ function LessonPlayerInner({
     } else {
       // profile null while authenticated — warn but continue (B044)
       toast(ERROR_COPY.progress.profileUnavailable, { id: 'no-profile' });
-    }
-
-    if (result.wasCorrect) {
-      dispatch({ type: 'CORRECT', answer: currentAnswer });
-    } else {
-      dispatch({ type: 'WRONG', answer: currentAnswer });
     }
 
     setSubmitting(false);
@@ -528,6 +535,9 @@ function LessonPlayerInner({
           case 'simulate-proportion':
             hint = variant.feedbackByWrongValue?.[key];
             break;
+          case 'scrub-trials':
+            hint = variant.feedbackByWrongValue?.[key];
+            break;
           case 'monty-hall':
             hint = variant.feedbackByWrongValue?.[key];
             break;
@@ -545,7 +555,7 @@ function LessonPlayerInner({
 
   if (progressState.status === 'loading' || progressState.status === 'empty') {
     return (
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-screen bg-card">
         <Skeleton className="h-14 w-full rounded-none" />
         <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
           <Skeleton className="h-32 w-32 rounded-xl" />
@@ -566,7 +576,11 @@ function LessonPlayerInner({
   // -------------------------------------------------------------------------
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    // Lessons sit on a fresh-paper white surface (`bg-card` = #FFFFFF) instead
+    // of the app-wide warm-paper background — the paper-grain noise + cream
+    // tint is great for Home/Profile/Schedule chrome but reads as a yellow
+    // wash inside a lesson where the learner is doing close reading.
+    <div className="flex flex-col h-screen overflow-hidden bg-card">
       <LessonHeader
         slotIndex={displayIndex}
         totalSlots={slots.length}
