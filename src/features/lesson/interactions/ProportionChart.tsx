@@ -30,7 +30,7 @@ type Props = {
 const W = 320;
 const H = 150;
 const PAD_L = 30;
-const PAD_R = 8;
+const PAD_R = 28;
 const PAD_T = 8;
 const PAD_B = 18;
 
@@ -83,17 +83,28 @@ export function ProportionChart({ series, references = [], className }: Props) {
 
       {/* reference lines (theoretical probability) */}
       {references.map((ref, i) => (
-        <line
-          key={`ref-${i}`}
-          x1={PAD_L}
-          x2={W - PAD_R}
-          y1={yAt(ref.y)}
-          y2={yAt(ref.y)}
-          stroke={ref.stroke ?? '#0f172a'}
-          strokeOpacity={0.55}
-          strokeWidth={1.5}
-          strokeDasharray="4 3"
-        />
+        <g key={`ref-${i}`}>
+          <line
+            x1={PAD_L}
+            x2={W - PAD_R}
+            y1={yAt(ref.y)}
+            y2={yAt(ref.y)}
+            stroke={ref.stroke ?? '#0f172a'}
+            strokeOpacity={0.55}
+            strokeWidth={1.5}
+            strokeDasharray="4 3"
+          />
+          <text
+            x={W - PAD_R + 4}
+            y={yAt(ref.y) + 3}
+            textAnchor="start"
+            fontSize={9}
+            fill="currentColor"
+            fillOpacity={0.55}
+          >
+            {ref.label}
+          </text>
+        </g>
       ))}
 
       {/* series polylines */}

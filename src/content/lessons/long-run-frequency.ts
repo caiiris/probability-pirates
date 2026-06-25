@@ -66,13 +66,19 @@ export const longRunFrequency: Lesson = {
           interactionKind: 'multiple-choice',
           prompt: 'You flip a fair coin 10 times and get 7 heads. Which is true?',
           options: [
-            { id: 'biased', label: 'The coin is unfair, and heads really happens about 7 times in 10' },
+            {
+              id: 'biased',
+              label: 'The coin is unfair, and heads really happens about 7 times in 10',
+            },
             { id: 'broken', label: 'The math failed. "1/2" was the wrong prediction here' },
             {
               id: 'longrun',
               label: 'Nothing is wrong. "1/2" describes many flips, not any single set of 10',
             },
-            { id: 'gambler', label: 'The coin owes us tails now, so the next flip is more likely to land tails' },
+            {
+              id: 'gambler',
+              label: 'The coin owes us tails now, so the next flip is more likely to land tails',
+            },
           ],
           correctOptionId: 'longrun',
           feedbackCorrect:
@@ -129,8 +135,7 @@ export const longRunFrequency: Lesson = {
             'Ten thousand flips, and the fraction sits almost exactly on 50%. That is what "1/2" really means.',
           feedbackDefault: 'Drag further. The fraction settles down with more flips.',
           feedbackByWrongValue: {
-            incomplete:
-              'Drag the slider to the right. The wobble dies down past a thousand flips.',
+            incomplete: 'Drag the slider to the right. The wobble dies down past a thousand flips.',
           },
           explanation:
             'Flip enough and the fraction settles on a single number. That number is the probability.',
@@ -151,8 +156,7 @@ export const longRunFrequency: Lesson = {
       title: 'Another view of probability',
       theorem: {
         name: 'Probability',
-        statement:
-          'P(event) is the fraction of times the event happens, after many, many tries.',
+        statement: 'P(event) is the fraction of times the event happens, after many, many tries.',
       },
       body: [
         'An event is something that can happen on a single try: heads on a flip, a 6 on a die, a red card from a deck of cards. On any one try, the event either happens or it does not.',
@@ -165,7 +169,8 @@ export const longRunFrequency: Lesson = {
         targetLabel: '1/2',
         trialCount: 10_000,
         seed: 0xc01d,
-        caption: 'The running fraction of heads over 10,000 flips of the coin. The probability settles near 1/2 after many flips.',
+        caption:
+          'The running fraction of heads over 10,000 flips of the coin. The probability settles near 1/2 after many flips.',
       },
     },
 
@@ -192,10 +197,8 @@ export const longRunFrequency: Lesson = {
           feedbackDefault:
             'You saw it on the slider. A few flips is unreliable, but after many flips the fraction settles.',
           feedbackByOption: {
-            half:
-              'Counting only works when every outcome is equally likely, and that is not promised here.',
-            few:
-              'Closer, but 10 flips is very little. You could see 7 heads or 3 heads by luck and walk away with the wrong answer.',
+            half: 'Counting only works when every outcome is equally likely, and that is not promised here.',
+            few: 'Closer, but 10 flips is very little. You could see 7 heads or 3 heads by luck and walk away with the wrong answer.',
           },
           explanation:
             'When you cannot count outcomes, the way to find a probability is to repeat the event many times and read off the fraction. The more flips you run, the less it wobbles and the more you can trust the answer.',
@@ -216,8 +219,7 @@ export const longRunFrequency: Lesson = {
         {
           id: 'die-six',
           interactionKind: 'simulate-proportion',
-          prompt:
-            'Roll a die and watch the probability of rolling a six.',
+          prompt: 'Roll a die and watch the probability of rolling a six.',
           scenario: 'die-six',
           targetProbability: 1 / 6,
           targetLabel: '1/6',
@@ -249,7 +251,8 @@ export const longRunFrequency: Lesson = {
         {
           id: 'five-in-a-row',
           interactionKind: 'multiple-choice',
-          prompt: 'A fair coin just landed heads five times in a row. What is P(heads) on the next flip?',
+          prompt:
+            'A fair coin just landed heads five times in a row. What is P(heads) on the next flip?',
           options: [
             { id: 'less', label: 'Less than 1/2' },
             { id: 'half', label: 'Still 1/2' },
@@ -258,8 +261,7 @@ export const longRunFrequency: Lesson = {
           correctOptionId: 'half',
           feedbackCorrect:
             'Right. The coin cannot remember the last five flips. The next one is a fresh 1/2.',
-          feedbackDefault:
-            'Think about it: does a single flip of a coin affect the flip after it?',
+          feedbackDefault: 'Think about it: does a single flip of a coin affect the flip after it?',
           feedbackByOption: {
             less: 'This is the gambler\u2019s fallacy. The coin keeps no score, so it is never "owed" a tails.',
             more: 'A coin has no hot streak. The flips before do not push the next one either way.',
@@ -325,8 +327,7 @@ export const longRunFrequency: Lesson = {
       id: 'wrap',
       kind: 'wrap',
       title: 'You found what 1/2 means',
-      body:
-        'Probability is the fraction you get from many flips. Single flips jump around. With enough flips, the fraction settles.\n\nIn the next lesson, you go back to counting, this time for an experiment with more outcomes than you can hold in your head. You will list the outcomes, name them, and use the formula again.',
+      body: 'Probability is the fraction you get from many flips. Single flips jump around. With enough flips, the fraction settles.\n\nIn the next lesson, you go back to counting, this time for an experiment with more outcomes than you can hold in your head. You will list the outcomes, name them, and use the formula again.',
       mascotLine: 'Bet on the long run, never the next flip.',
       segueToLessonId: 'sample-space',
     },

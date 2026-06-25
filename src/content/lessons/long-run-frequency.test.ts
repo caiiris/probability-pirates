@@ -94,7 +94,7 @@ describe('long-run-frequency (Unit 1.1) invariants', () => {
     }
   });
 
-  it("orders the apply MCQs after naming, then closes with the frequentist fun-fact", () => {
+  it('orders the apply MCQs after naming, then closes with the frequentist fun-fact', () => {
     const ids = longRunFrequency.slots.map((s) => s.id);
     expect(ids.indexOf('long-run-share')).toBeLessThan(ids.indexOf('unknown-coin'));
     expect(ids.indexOf('unknown-coin')).toBeLessThan(ids.indexOf('wobble-test'));

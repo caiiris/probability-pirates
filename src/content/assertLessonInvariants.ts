@@ -194,9 +194,7 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
       if (slot.figure !== undefined) {
         if (slot.figure.kind === 'settling-line') {
           if (slot.figure.targetProbability < 0 || slot.figure.targetProbability > 1) {
-            throw new Error(
-              `${basePath}.figure.targetProbability must be between 0 and 1`,
-            );
+            throw new Error(`${basePath}.figure.targetProbability must be between 0 and 1`);
           }
           assertNonEmptyString(slot.figure.targetLabel, `${basePath}.figure.targetLabel`);
           if (slot.figure.trialCount !== undefined && slot.figure.trialCount <= 0) {

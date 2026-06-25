@@ -108,11 +108,10 @@ export function ScrubTrials({ variant, feedbackState, onChange }: Props) {
 
       {/* Running stat — large, calm, the headline number for the bar below. */}
       <div className="flex flex-col items-center gap-1 text-center" aria-live="polite">
-        <p className="text-3xl font-semibold tabular-nums text-primary">
-          {sharePct}%
-        </p>
+        <p className="text-3xl font-semibold tabular-nums text-primary">{sharePct}%</p>
         <p className="text-sm text-muted-foreground tabular-nums">
-          {successes.toLocaleString()} {copy.successNoun} in {N.toLocaleString()} {copy.trialNounPlural}
+          {successes.toLocaleString()} {copy.successNoun} in {N.toLocaleString()}{' '}
+          {copy.trialNounPlural}
         </p>
       </div>
 
@@ -164,8 +163,8 @@ export function ScrubTrials({ variant, feedbackState, onChange }: Props) {
           UI doesn't keep nagging after the learner has obviously engaged. */}
       {!reached && (
         <p className="text-xs text-muted-foreground tabular-nums text-center max-w-md">
-          Drag past <span className="font-semibold">{variant.reachN.toLocaleString()}</span> {copy.trialNounPlural}{' '}
-          to keep going. The wobble dies down past then.
+          Drag past <span className="font-semibold">{variant.reachN.toLocaleString()}</span>{' '}
+          {copy.trialNounPlural} to keep going. The wobble dies down past then.
         </p>
       )}
     </div>
@@ -229,10 +228,16 @@ function BallBuckets({
           />
         </div>
         <div className="flex justify-center gap-6" style={{ width: BUCKET_W * 2 + 24 }}>
-          <span className="text-xs font-semibold tabular-nums text-primary" style={{ width: BUCKET_W, textAlign: 'center' }}>
+          <span
+            className="text-xs font-semibold tabular-nums text-primary"
+            style={{ width: BUCKET_W, textAlign: 'center' }}
+          >
             H
           </span>
-          <span className="text-xs font-semibold tabular-nums text-muted-foreground" style={{ width: BUCKET_W, textAlign: 'center' }}>
+          <span
+            className="text-xs font-semibold tabular-nums text-muted-foreground"
+            style={{ width: BUCKET_W, textAlign: 'center' }}
+          >
             T
           </span>
         </div>
@@ -250,69 +255,60 @@ function BallBuckets({
 }
 
 /** One bucket of stacked balls — grid only; labels render outside. */
-function BucketGrid({
-  count,
-  variant,
-}: {
-  count: number;
-  variant: 'success' | 'failure';
-}) {
+function BucketGrid({ count, variant }: { count: number; variant: 'success' | 'failure' }) {
   const fillColor =
-    variant === 'success' ? 'var(--primary)' : 'color-mix(in srgb, var(--foreground) 35%, transparent)';
+    variant === 'success'
+      ? 'var(--primary)'
+      : 'color-mix(in srgb, var(--foreground) 35%, transparent)';
 
   return (
-    <div
-      className="relative"
-      style={{ width: BUCKET_W, height: BUCKET_H }}
-      aria-hidden="true"
-    >
-        {/* Ghost grid: every cell drawn faintly so the empty bucket reads
+    <div className="relative" style={{ width: BUCKET_W, height: BUCKET_H }} aria-hidden="true">
+      {/* Ghost grid: every cell drawn faintly so the empty bucket reads
             as "capacity," and balls appear to fall *into* something
             rather than sitting on nothing. */}
-        {Array.from({ length: BUCKET_MAX }).map((_, i) => {
-          const row = Math.floor(i / BUCKET_COLS); // 0 = bottom row
+      {Array.from({ length: BUCKET_MAX }).map((_, i) => {
+        const row = Math.floor(i / BUCKET_COLS); // 0 = bottom row
+        const col = i % BUCKET_COLS;
+        const left = col * CELL + (CELL - BALL) / 2;
+        const bottom = row * CELL + (CELL - BALL) / 2;
+        return (
+          <div
+            key={`ghost-${i}`}
+            className="absolute rounded-full border border-foreground/8"
+            style={{ width: BALL, height: BALL, left, bottom }}
+          />
+        );
+      })}
+
+      {/* Live balls. AnimatePresence drops them in from above (y: -10 →
+            0) and lifts them out (y: -6) when the count shrinks, so
+            scrubbing the slider reads as balls settling rather than
+            snapping. */}
+      <AnimatePresence>
+        {Array.from({ length: count }).map((_, i) => {
+          const row = Math.floor(i / BUCKET_COLS);
           const col = i % BUCKET_COLS;
           const left = col * CELL + (CELL - BALL) / 2;
           const bottom = row * CELL + (CELL - BALL) / 2;
           return (
-            <div
-              key={`ghost-${i}`}
-              className="absolute rounded-full border border-foreground/8"
-              style={{ width: BALL, height: BALL, left, bottom }}
+            <motion.div
+              key={`ball-${i}`}
+              className="absolute rounded-full"
+              style={{
+                width: BALL,
+                height: BALL,
+                left,
+                bottom,
+                background: fillColor,
+              }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
             />
           );
         })}
-
-        {/* Live balls. AnimatePresence drops them in from above (y: -10 →
-            0) and lifts them out (y: -6) when the count shrinks, so
-            scrubbing the slider reads as balls settling rather than
-            snapping. */}
-        <AnimatePresence>
-          {Array.from({ length: count }).map((_, i) => {
-            const row = Math.floor(i / BUCKET_COLS);
-            const col = i % BUCKET_COLS;
-            const left = col * CELL + (CELL - BALL) / 2;
-            const bottom = row * CELL + (CELL - BALL) / 2;
-            return (
-              <motion.div
-                key={`ball-${i}`}
-                className="absolute rounded-full"
-                style={{
-                  width: BALL,
-                  height: BALL,
-                  left,
-                  bottom,
-                  background: fillColor,
-                }}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.18, ease: 'easeOut' }}
-              />
-            );
-          })}
-        </AnimatePresence>
+      </AnimatePresence>
     </div>
   );
 }
-

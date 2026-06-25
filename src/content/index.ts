@@ -40,9 +40,7 @@ const authoredRoadmapById = new Map<string, Lesson>(
   authoredRoadmapLessons.map((lesson) => [lesson.id, lesson]),
 );
 
-const liveRoadmap = roadmapStubLessons.map(
-  (stub) => authoredRoadmapById.get(stub.id) ?? stub,
-);
+const liveRoadmap = roadmapStubLessons.map((stub) => authoredRoadmapById.get(stub.id) ?? stub);
 
 export const lessons: Lesson[] = [howLikely, ...liveRoadmap].map((lesson, i) =>
   lesson.number === i + 1 ? lesson : { ...lesson, number: i + 1 },

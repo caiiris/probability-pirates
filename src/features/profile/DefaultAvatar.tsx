@@ -38,7 +38,9 @@ export function DefaultAvatar({ username, size = 96, className, styleId }: Props
   const shadows: string[] = [];
   if (style.ring) shadows.push(`0 0 0 ${Math.max(2, size * 0.04)}px ${style.ring}`);
   shadows.push('inset 0 0 0 1px rgba(255,255,255,0.22)');
-  shadows.push(`inset 0 -${Math.max(2, size * 0.05)}px ${Math.max(4, size * 0.12)}px rgba(0,0,0,0.10)`);
+  shadows.push(
+    `inset 0 -${Math.max(2, size * 0.05)}px ${Math.max(4, size * 0.12)}px rgba(0,0,0,0.10)`,
+  );
 
   return (
     <div

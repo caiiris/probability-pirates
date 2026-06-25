@@ -106,7 +106,7 @@ describe('cumulativeSuccesses', () => {
     expect(a).toEqual(b);
   });
 
-  it("converges to ~50% on coin and ~16.7% on die-six over 10,000 trials", () => {
+  it('converges to ~50% on coin and ~16.7% on die-six over 10,000 trials', () => {
     const coin = cumulativeSuccesses('coin', 10_000, 0xc0de);
     const dieSix = cumulativeSuccesses('die-six', 10_000, 0xc0de);
     const coinShare = coin[10_000] / 10_000;
@@ -115,7 +115,7 @@ describe('cumulativeSuccesses', () => {
     expect(coinShare).toBeGreaterThan(0.45);
     expect(coinShare).toBeLessThan(0.55);
     expect(dieShare).toBeGreaterThan(0.13);
-    expect(dieShare).toBeLessThan(0.20);
+    expect(dieShare).toBeLessThan(0.2);
   });
 });
 
