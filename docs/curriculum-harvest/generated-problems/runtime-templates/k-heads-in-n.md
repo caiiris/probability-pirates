@@ -12,7 +12,7 @@
 ## Problem 1 — k-heads-in-n-p01
 
 - **Instance id:** `k-heads-in-n:1404767269`
-- **Difficulty:** 1300
+- **Difficulty:** 880
 - **Params:** {"n":6,"k":5}
 - **Interaction:** `fill-fraction`
 - **Prompt:** A fair coin is flipped 6 times. What is the probability of getting exactly 5 heads?
@@ -40,7 +40,7 @@
 ## Problem 2 — k-heads-in-n-p02
 
 - **Instance id:** `k-heads-in-n:3314986074`
-- **Difficulty:** 1400
+- **Difficulty:** 900
 - **Params:** {"n":7,"k":7}
 - **Interaction:** `fill-fraction`
 - **Prompt:** A fair coin is flipped 7 times. What is the probability of getting exactly 7 heads?
@@ -68,7 +68,7 @@
 ## Problem 3 — k-heads-in-n-p03
 
 - **Instance id:** `k-heads-in-n:1404620174`
-- **Difficulty:** 1300
+- **Difficulty:** 880
 - **Params:** {"n":6,"k":6}
 - **Interaction:** `fill-fraction`
 - **Prompt:** A fair coin is flipped 6 times. What is the probability of getting exactly 6 heads?
@@ -96,7 +96,7 @@
 ## Problem 4 — k-heads-in-n-p04
 
 - **Instance id:** `k-heads-in-n:383899793`
-- **Difficulty:** 1500
+- **Difficulty:** 920
 - **Params:** {"n":8,"k":3}
 - **Interaction:** `fill-fraction`
 - **Prompt:** A fair coin is flipped 8 times. What is the probability of getting exactly 3 heads?
@@ -124,7 +124,7 @@
 ## Problem 5 — k-heads-in-n-p05
 
 - **Instance id:** `k-heads-in-n:549092248`
-- **Difficulty:** 900
+- **Difficulty:** 800
 - **Params:** {"n":2,"k":0}
 - **Interaction:** `fill-fraction`
 - **Prompt:** A fair coin is flipped 2 times. What is the probability of getting exactly 0 heads?

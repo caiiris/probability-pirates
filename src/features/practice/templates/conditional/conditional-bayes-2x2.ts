@@ -32,10 +32,10 @@ export const conditionalBayes2x2Template: Template<Params> = {
   retrievalForm: 'application',
 
   rate({ tp, fp }) {
-    // Low P(disease|test+) = tp/(tp+fp) → more surprising → harder
-    // p=1 → rate 900; p≈0 → rate 1600
+    // Current non-creative bank is intentionally labeled Easy (<950).
+    // Low P(signal|test+) is still relatively harder inside the easy band.
     const p = tp / (tp + fp);
-    return Math.round(900 + (1 - p) * 700);
+    return Math.round(760 + (1 - p) * 170);
   },
 
   sample(rng) {
@@ -62,16 +62,15 @@ export const conditionalBayes2x2Template: Template<Params> = {
       id: `conditional-bayes-2x2:${tp},${fp},${fn},${tn}`,
       interactionKind: 'fill-fraction',
       prompt:
-        `In a study, ${total} people were tested for a rare signal:\n` +
-        `- ${tp} tested positive and truly had the signal\n` +
-        `- ${fp} tested positive but did not have the signal\n` +
-        `- ${fn} tested negative but truly had the signal\n` +
-        `- ${tn} tested negative and did not have the signal\n\n` +
         `Given that a person tests positive, what is the probability they truly have the signal?`,
+      context:
+        `In a study, ${total} people were tested for a rare signal:\n` +
+        `• ${tp} tested positive and truly had the signal\n` +
+        `• ${fp} tested positive but did not have the signal\n` +
+        `• ${fn} tested negative but truly had the signal\n` +
+        `• ${tn} tested negative and did not have the signal`,
       numerator: Number(num),
       denominator: Number(den),
-      numeratorLabel: 'people who test positive and truly have the signal',
-      denominatorLabel: 'all people who test positive',
       feedbackCorrect:
         `Correct! Among the ${tp + fp} people who tested positive, ${tp} truly have the signal: P = ${Number(num)}/${Number(den)}.`,
       feedbackDefault:

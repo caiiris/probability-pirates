@@ -61,9 +61,11 @@ The brief asked us to _choose_ AI features that genuinely help, not bolt on a ch
 
 Unlimited probability problems generated client-side from in-repo **parameterized templates**. Each template ships `sample → render → solve → explain`; `solve()` is plain code and is the single source of truth for the answer. Adaptive difficulty serves problems near the learner's per-skill rating (target ~20–30% miss rate, _not_ "hardest possible").
 
-- **Unlocks** the existing "Arriving Friday" stub at [`src/features/practice/PracticePage.tsx`](../src/features/practice/PracticePage.tsx).
+- **Unlocks** the existing "Arriving Friday" stub at [`src/features/practice/PracticePage.tsx`](../src/features/practice/PracticePage.tsx). _(Built; live at `/practice`.)_
 - **No runtime LLM call.** The LLM's role was offline, authoring template prose (reviewed by a human).
 - **Correct by construction**, cross-checked at build time by Monte-Carlo simulation reusing [`src/lib/simulations.ts`](../src/lib/simulations.ts).
+- **XP scales with difficulty** — Easy 3 / Medium 5 / Hard 8 / Expert 12, daily-capped (decision D100), so harder problems pay more without grinding dwarfing the path.
+- **Stats surfaced on the page** — the learner's level + XP-to-next, the per-topic adaptive Elo rating with its live delta, session XP, correct-streak, and per-problem difficulty.
 
 This is the brief's _"generate new practice problems at the right difficulty so the course never runs dry"_ — done in the only way that satisfies the correctness rule.
 
@@ -77,16 +79,20 @@ A Vercel serverless function takes the learner's actual `answerPayload`, the slo
 
 This is the brief's _targeted hint_ + _explain a wrong answer in plain language tuned to what the learner actually did_ — collapsed into one surface because they share the same prompt shape.
 
-#### F3 — Per-learner mastery model
+#### F3 — Per-learner model (TWO ENGINES)
 
-A small Firestore-backed model tracking **per-skill mastery** (Elo + running accuracy) and **misconception counts** (reusing your existing distractor keys like `gambler`, `biased`, `broken`). Materialized from the append-only `stepAttempts` log already written by [`src/features/progress/progressService.ts`](../src/features/progress/progressService.ts). Drives:
+A small owner-only Firestore model (`users/{uid}/learnerModel/state`) with **two distinct engines** (decision D94 + the two-engine resolution):
 
-- adaptive difficulty in F1,
-- which skill F2's hints emphasize,
-- a visible "Strengths / keep working on" panel on Progress + Profile (closes the loop — _the learner can see the adaptation_),
-- (stretch) the spaced-review queue and the topic the practice loop auto-selects.
+- **Engine A — mastery (Elo).** Per-skill rating + recency-weighted accuracy, fed **only by practice** (deliberate, spaced retrieval). Drives adaptive difficulty (F1), topic auto-select, and which skill F2's hints emphasize.
+- **Engine B — exposure / struggle / misconceptions.** Fed by **lesson first-attempts** (review excluded, first committed attempt per slot only — the no-bail-out grind carries no mastery signal). **Engine B never moves the Elo.**
 
-This is the brief's _adapt the path: pick what to do next based on what the learner struggles with_, scoped sensibly: the lesson **spine** stays in its pedagogical order (each lesson earns the next), adaptivity lives in **practice difficulty + topic auto-select + hint targeting**, where it's most pedagogically defensible.
+Both materialize from the append-only `stepAttempts` log ([`progressService.ts`](../src/features/progress/progressService.ts)). Surfaced as a **"Strong / Keep working on / Introduced" panel** on `/progress` + Profile (closes the loop — the learner sees the adaptation). Details: [`spec-learner-model`](specs/spec-learner-model.md).
+
+This is the brief's _adapt the path: pick what to do next based on what the learner struggles with_, scoped sensibly: the lesson **spine** keeps its pedagogical order (each lesson earns the next); adaptivity lives in **practice difficulty + topic auto-select + hint targeting**, where it's most pedagogically defensible.
+
+#### F3b — Lesson report card (Engine B payoff)
+
+An immediate, Khan-style "what you nailed / what to watch" recap on the celebration screen, built purely from the lesson session's first-attempt results + the in-repo taxonomy labels (**no AI**). Misconceptions revealed feed Engine B. Spec: [`spec-learner-model`](specs/spec-learner-model.md) (`buildReportCard`).
 
 ### Stretch (ship if ahead)
 
@@ -103,6 +109,10 @@ This is the science-of-learning hook from the notes (protege effect, self-explan
 #### F5 — Offline vetted problem bank + session recap (smaller stretch)
 
 A `scripts/practice/` Node pipeline that asks Gemini to draft batches of problems **offline**, then gates each candidate through `solve()` + Monte-Carlo agreement; survivors land in a `practiceProblems/` Firestore collection (public-read, client-write forbidden). End-of-practice "AI recap" is one Gemini call grounded in the learner model ("complements: solid; gambler's fallacy got you twice — queued for tomorrow").
+
+#### F6 — AI difficulty annotation (offline) — planned
+
+An offline batch script that uses an LLM to **estimate problem difficulty** across the bank in one call, validated + human-reviewed, and baked in as a constant the deterministic runtime reads. Difficulty is an _estimate_ (not a correctness claim), so an LLM may produce it — but **offline only, never at runtime**. Data calibration from real attempt data is deferred until there's a user base (it then becomes the posterior on top of the LLM prior). Spec: [`spec-ai-difficulty-annotation`](specs/spec-ai-difficulty-annotation.md) (decision D101).
 
 ### Deliberately rejected
 
@@ -217,7 +227,7 @@ Each bucket below is the user-observable contract. Specs own the implementation;
 3. **Every answer is code-computed.** Every served problem's correct answer comes from `solve()` in the template, not from any model. Verified by a build-time test asserting `solve()` agrees with `simulate()` over ≥1,000 sampled parameter sets per template (and exact enumeration where feasible).
 4. **Adaptive difficulty observable.** Streak-of-correct trends difficulty up; misses trend it down. Visible signals: "rating" or "trending" indicator + measurable skill-rating delta in the learner model.
 5. **Phase 1 properties hold.** No model SDK in `package.json`; no API key in the client bundle (`git grep` clean, per PRD §9.10 AC #1, preserved literally).
-6. **XP integration matches spec.** A correct practice problem awards `PRACTICE_XP_PER_CORRECT` capped at `PRACTICE_DAILY_XP_CAP` per local day via [`grantPracticeXp`](../src/lib/practiceXp.ts). Does NOT tick the streak; does NOT count as a completed lesson.
+6. **XP integration matches spec.** A correct practice problem awards **difficulty-scaled XP** (Easy 3 / Medium 5 / Hard 8 / Expert 12, decision D100), capped at `PRACTICE_DAILY_XP_CAP` per local day via [`grantPracticeXp`](../src/lib/practiceXp.ts). Does NOT tick the streak; does NOT count as a completed lesson.
 7. **Topic auto-suggest.** Home / Practice surfaces suggest the learner's current weakest topic (driven by F3). Tapping it starts practice there.
 
 ### 9.2 AI hint / explanation (F2) — 6 ACs
@@ -289,6 +299,7 @@ Each bucket below is the user-observable contract. Specs own the implementation;
 - [`spec-practice`](specs/spec-practice.md) — extended for Phase 2 (Track 1 template schema, adaptive serving math, retrieval-in-4-forms organization, XP wiring).
 - [`spec-learner-model`](specs/spec-learner-model.md) — new. Skill + misconception taxonomy, mastery math, Firestore shape, rules.
 - [`spec-ai-assist`](specs/spec-ai-assist.md) — new. Vercel function contracts, prompts, AI-off fallback, security, env/secrets.
+- [`spec-ai-difficulty-annotation`](specs/spec-ai-difficulty-annotation.md) — new. Offline LLM difficulty estimation, baked-in constants, calibration deferred (F6 / D100–D101).
 - [`brainlift-phase2`](brainlift-phase2.md) — Phase 2 Brainlift outline (considered / shipped / left out).
 - [`alternatives`](alternatives.md) — Phase 2 entries D92+ (reverses D23; new architecture decisions).
 - [`design-iterations`](design-iterations.md) — dated Phase 2 summary entry.

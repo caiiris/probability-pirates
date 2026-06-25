@@ -16,6 +16,7 @@ the correct gate, but only the owner should mark final decisions.
 | OpenLearn probability/Bayes courses | Decide whether noncommercial/share-alike OpenLearn material is acceptable. | `inspiration-only` | Check course acknowledgements for third-party restrictions before any direct use. |
 | Harvard Stat 110 / Blitzstein-Hwang | Permission would be needed for direct problem reuse. | `inspiration-only` | Excellent problem design; do not copy problems or solutions. |
 | Mathigon | Commercial reuse requires licensing. | `inspiration-only` | Do not ingest/copy; use only as high-level interaction inspiration. |
+| NRICH probability tasks | Terms prohibit modification/republishing/text-mining without permission. | `blocked` | Do not ingest or copy; only use as a human-visible reminder of rich task categories. |
 
 ## Gate B — Candidate Idea Decisions
 
@@ -44,6 +45,11 @@ First clustered harvest batch is ready in `clusters/cluster-map.md`.
 | CL-0019 | Reverse conditional from joint and marginal | `backlog` | `pending` | Strong bridge from conditionals to Bayes. |
 | CL-0020 | Mixed strategy selector | `backlog` | `pending` | Best after several practice families exist. |
 | CL-0021 | Distribution reference guardrail | `backlog` | `pending` | Internal QA idea for future distribution templates. |
+| CL-0022 | Nonlinear payoff expected value | `build-now` | `pending` | **Hard / creative.** Expected-value family; safe via IM CC BY with new Pascal wording. |
+| CL-0023 | Last one standing streak survival | `backlog` | `pending` | **Hard / creative.** Complement/binomial extension with strong "many tries make rare events likely" intuition. |
+| CL-0024 | Odds-and-evens fairness by parity counts | `backlog` | `pending` | **Medium-hard / creative.** Strong game-fairness task, but source inspiration must be independently authored. |
+| CL-0025 | Inverse spinner from frequency chart | `needs-pedagogy-pass` | `pending` | **Hard / creative.** Model-inference task; likely needs a small chart UI. |
+| CL-0026 | Non-transitive dice strategy | `backlog` | `pending` | **Expert / creative.** Excellent challenge problem; use custom Pascal dice and exact enumeration only. |
 
 Review for:
 

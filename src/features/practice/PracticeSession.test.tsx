@@ -185,8 +185,21 @@ describe('PracticeSession', () => {
 
   afterEach(cleanup);
 
+  // Default stub props for the rating state that PracticePage normally owns
+  // (lifted out so per-topic rating can live in the page header chip). These
+  // tests don't exercise the Bounty chip — they exercise the solve loop — so
+  // the props are no-op stubs.
+  const sessionProps = {
+    topic: 'counting' as const,
+    uid: null,
+    rating: 1000,
+    recentTemplateIds: [],
+    recordResult: vi.fn(),
+    onRatingDelta: vi.fn(),
+  };
+
   it('renders the first problem with a disabled Check button before an answer is entered', () => {
-    render(<PracticeSession topic="counting" uid={null} />);
+    render(<PracticeSession {...sessionProps} />);
 
     expect(
       screen.getByText('What is the probability the sum equals 7?'),
@@ -198,7 +211,7 @@ describe('PracticeSession', () => {
   });
 
   it('correct answer → Check grades, worked solution appears, "Next problem" advances', () => {
-    render(<PracticeSession topic="counting" uid={null} />);
+    render(<PracticeSession {...sessionProps} />);
 
     fireEvent.change(screen.getByTestId('answer-input'), { target: { value: '1/6' } });
     expect(screen.getByRole('button', { name: 'Check' })).not.toBeDisabled();
@@ -219,7 +232,7 @@ describe('PracticeSession', () => {
   });
 
   it('wrong answer → worked solution revealed immediately, "Next problem" lets learner move on', () => {
-    render(<PracticeSession topic="counting" uid={null} />);
+    render(<PracticeSession {...sessionProps} />);
 
     fireEvent.change(screen.getByTestId('answer-input'), { target: { value: '2/6' } });
     fireEvent.click(screen.getByRole('button', { name: 'Check' }));

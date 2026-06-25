@@ -41,8 +41,9 @@ export const sumOfTwoDiceTemplate: Template<Params> = {
   retrievalForm: 'operation',
 
   rate({ k }) {
-    // 6 pairs at k=7 → rate 800; 1 pair at k=2/12 → rate 1300
-    return 800 + (6 - pairsForSum(k)) * 100;
+    // Current non-creative bank is intentionally labeled Easy (<950).
+    // 6 pairs at k=7 -> 760; 1 pair at k=2/12 -> 910.
+    return 760 + (6 - pairsForSum(k)) * 30;
   },
 
   sample(rng) {
@@ -65,8 +66,6 @@ export const sumOfTwoDiceTemplate: Template<Params> = {
       prompt: `You roll two fair six-sided dice. What is the probability the sum equals ${k}?`,
       numerator: Number(num),
       denominator: Number(den),
-      numeratorLabel: `ways to get sum ${k}`,
-      denominatorLabel: 'total equally-likely outcomes',
       feedbackCorrect: `Correct! There ${count === 1 ? 'is' : 'are'} ${count} pair${count !== 1 ? 's' : ''} summing to ${k} out of 36 equally-likely outcomes.`,
       feedbackDefault: `List every ordered pair (a, b) with a, b ∈ {1–6} and a+b=${k}: ${pairsList(k)}. That's ${count} out of 36.`,
       skills: ['sample-space-enumeration', 'equally-likely-outcomes'],

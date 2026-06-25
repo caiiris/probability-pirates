@@ -9,7 +9,7 @@
       "base-rate"
     ],
     "retrievalForm": "application",
-    "difficulty": 1525,
+    "difficulty": 912,
     "params": {
       "tp": 3,
       "fp": 25,
@@ -17,7 +17,8 @@
       "tn": 422
     },
     "interactionKind": "fill-fraction",
-    "prompt": "In a study, 456 people were tested for a rare signal:\n- 3 tested positive and truly had the signal\n- 25 tested positive but did not have the signal\n- 6 tested negative but truly had the signal\n- 422 tested negative and did not have the signal\n\nGiven that a person tests positive, what is the probability they truly have the signal?",
+    "prompt": "Given that a person tests positive, what is the probability they truly have the signal?",
+    "context": "In a study, 456 people were tested for a rare signal:\n• 3 tested positive and truly had the signal\n• 25 tested positive but did not have the signal\n• 6 tested negative but truly had the signal\n• 422 tested negative and did not have the signal",
     "answer": "3/28",
     "renderedCorrectness": true,
     "explanation": {
@@ -49,7 +50,7 @@
       "base-rate"
     ],
     "retrievalForm": "application",
-    "difficulty": 1518,
+    "difficulty": 910,
     "params": {
       "tp": 11,
       "fp": 83,
@@ -57,7 +58,8 @@
       "tn": 441
     },
     "interactionKind": "fill-fraction",
-    "prompt": "In a study, 549 people were tested for a rare signal:\n- 11 tested positive and truly had the signal\n- 83 tested positive but did not have the signal\n- 14 tested negative but truly had the signal\n- 441 tested negative and did not have the signal\n\nGiven that a person tests positive, what is the probability they truly have the signal?",
+    "prompt": "Given that a person tests positive, what is the probability they truly have the signal?",
+    "context": "In a study, 549 people were tested for a rare signal:\n• 11 tested positive and truly had the signal\n• 83 tested positive but did not have the signal\n• 14 tested negative but truly had the signal\n• 441 tested negative and did not have the signal",
     "answer": "11/94",
     "renderedCorrectness": true,
     "explanation": {
@@ -89,7 +91,7 @@
       "base-rate"
     ],
     "retrievalForm": "application",
-    "difficulty": 1457,
+    "difficulty": 895,
     "params": {
       "tp": 20,
       "fp": 78,
@@ -97,7 +99,8 @@
       "tn": 248
     },
     "interactionKind": "fill-fraction",
-    "prompt": "In a study, 365 people were tested for a rare signal:\n- 20 tested positive and truly had the signal\n- 78 tested positive but did not have the signal\n- 19 tested negative but truly had the signal\n- 248 tested negative and did not have the signal\n\nGiven that a person tests positive, what is the probability they truly have the signal?",
+    "prompt": "Given that a person tests positive, what is the probability they truly have the signal?",
+    "context": "In a study, 365 people were tested for a rare signal:\n• 20 tested positive and truly had the signal\n• 78 tested positive but did not have the signal\n• 19 tested negative but truly had the signal\n• 248 tested negative and did not have the signal",
     "answer": "10/49",
     "renderedCorrectness": true,
     "explanation": {
@@ -129,7 +132,7 @@
       "base-rate"
     ],
     "retrievalForm": "application",
-    "difficulty": 1338,
+    "difficulty": 866,
     "params": {
       "tp": 24,
       "fp": 40,
@@ -137,7 +140,8 @@
       "tn": 438
     },
     "interactionKind": "fill-fraction",
-    "prompt": "In a study, 512 people were tested for a rare signal:\n- 24 tested positive and truly had the signal\n- 40 tested positive but did not have the signal\n- 10 tested negative but truly had the signal\n- 438 tested negative and did not have the signal\n\nGiven that a person tests positive, what is the probability they truly have the signal?",
+    "prompt": "Given that a person tests positive, what is the probability they truly have the signal?",
+    "context": "In a study, 512 people were tested for a rare signal:\n• 24 tested positive and truly had the signal\n• 40 tested positive but did not have the signal\n• 10 tested negative but truly had the signal\n• 438 tested negative and did not have the signal",
     "answer": "3/8",
     "renderedCorrectness": true,
     "explanation": {
@@ -169,7 +173,7 @@
       "base-rate"
     ],
     "retrievalForm": "application",
-    "difficulty": 1483,
+    "difficulty": 902,
     "params": {
       "tp": 12,
       "fp": 60,
@@ -177,7 +181,8 @@
       "tn": 182
     },
     "interactionKind": "fill-fraction",
-    "prompt": "In a study, 258 people were tested for a rare signal:\n- 12 tested positive and truly had the signal\n- 60 tested positive but did not have the signal\n- 4 tested negative but truly had the signal\n- 182 tested negative and did not have the signal\n\nGiven that a person tests positive, what is the probability they truly have the signal?",
+    "prompt": "Given that a person tests positive, what is the probability they truly have the signal?",
+    "context": "In a study, 258 people were tested for a rare signal:\n• 12 tested positive and truly had the signal\n• 60 tested positive but did not have the signal\n• 4 tested negative but truly had the signal\n• 182 tested negative and did not have the signal",
     "answer": "1/6",
     "renderedCorrectness": true,
     "explanation": {

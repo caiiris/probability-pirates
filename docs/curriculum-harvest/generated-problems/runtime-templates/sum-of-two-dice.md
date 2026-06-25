@@ -12,7 +12,7 @@
 ## Problem 1 — sum-of-two-dice-p01
 
 - **Instance id:** `sum-of-two-dice:3740118599`
-- **Difficulty:** 1100
+- **Difficulty:** 850
 - **Params:** {"k":10}
 - **Interaction:** `fill-fraction`
 - **Prompt:** You roll two fair six-sided dice. What is the probability the sum equals 10?
@@ -40,7 +40,7 @@
 ## Problem 2 — sum-of-two-dice-p02
 
 - **Instance id:** `sum-of-two-dice:1401792082`
-- **Difficulty:** 900
+- **Difficulty:** 790
 - **Params:** {"k":8}
 - **Interaction:** `fill-fraction`
 - **Prompt:** You roll two fair six-sided dice. What is the probability the sum equals 8?
@@ -68,7 +68,7 @@
 ## Problem 3 — sum-of-two-dice-p03
 
 - **Instance id:** `sum-of-two-dice:1401203702`
-- **Difficulty:** 1100
+- **Difficulty:** 850
 - **Params:** {"k":4}
 - **Interaction:** `fill-fraction`
 - **Prompt:** You roll two fair six-sided dice. What is the probability the sum equals 4?
@@ -96,7 +96,7 @@
 ## Problem 4 — sum-of-two-dice-p04
 
 - **Instance id:** `sum-of-two-dice:1400659249`
-- **Difficulty:** 1200
+- **Difficulty:** 880
 - **Params:** {"k":3}
 - **Interaction:** `fill-fraction`
 - **Prompt:** You roll two fair six-sided dice. What is the probability the sum equals 3?
@@ -124,7 +124,7 @@
 ## Problem 5 — sum-of-two-dice-p05
 
 - **Instance id:** `sum-of-two-dice:1333695868`
-- **Difficulty:** 1300
+- **Difficulty:** 910
 - **Params:** {"k":2}
 - **Interaction:** `fill-fraction`
 - **Prompt:** You roll two fair six-sided dice. What is the probability the sum equals 2?

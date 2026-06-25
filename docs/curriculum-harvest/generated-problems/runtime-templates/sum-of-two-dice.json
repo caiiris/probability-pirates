@@ -9,12 +9,13 @@
       "equally-likely-outcomes"
     ],
     "retrievalForm": "operation",
-    "difficulty": 1100,
+    "difficulty": 850,
     "params": {
       "k": 10
     },
     "interactionKind": "fill-fraction",
     "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 10?",
+    "context": null,
     "answer": "1/12",
     "renderedCorrectness": true,
     "explanation": {
@@ -45,12 +46,13 @@
       "equally-likely-outcomes"
     ],
     "retrievalForm": "operation",
-    "difficulty": 900,
+    "difficulty": 790,
     "params": {
       "k": 8
     },
     "interactionKind": "fill-fraction",
     "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 8?",
+    "context": null,
     "answer": "5/36",
     "renderedCorrectness": true,
     "explanation": {
@@ -81,12 +83,13 @@
       "equally-likely-outcomes"
     ],
     "retrievalForm": "operation",
-    "difficulty": 1100,
+    "difficulty": 850,
     "params": {
       "k": 4
     },
     "interactionKind": "fill-fraction",
     "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 4?",
+    "context": null,
     "answer": "1/12",
     "renderedCorrectness": true,
     "explanation": {
@@ -117,12 +120,13 @@
       "equally-likely-outcomes"
     ],
     "retrievalForm": "operation",
-    "difficulty": 1200,
+    "difficulty": 880,
     "params": {
       "k": 3
     },
     "interactionKind": "fill-fraction",
     "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 3?",
+    "context": null,
     "answer": "1/18",
     "renderedCorrectness": true,
     "explanation": {
@@ -153,12 +157,13 @@
       "equally-likely-outcomes"
     ],
     "retrievalForm": "operation",
-    "difficulty": 1300,
+    "difficulty": 910,
     "params": {
       "k": 2
     },
     "interactionKind": "fill-fraction",
     "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 2?",
+    "context": null,
     "answer": "1/36",
     "renderedCorrectness": true,
     "explanation": {

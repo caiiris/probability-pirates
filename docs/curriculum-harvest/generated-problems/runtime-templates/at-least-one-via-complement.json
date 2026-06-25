@@ -9,13 +9,14 @@
       "independence"
     ],
     "retrievalForm": "procedural",
-    "difficulty": 1250,
+    "difficulty": 890,
     "params": {
       "m": 4,
       "n": 5
     },
     "interactionKind": "fill-fraction",
     "prompt": "A fair 4-sided die is rolled 5 times independently. What is the probability of getting a 1 at least once?",
+    "context": null,
     "answer": "781/1024",
     "renderedCorrectness": true,
     "explanation": {
@@ -46,13 +47,14 @@
       "independence"
     ],
     "retrievalForm": "procedural",
-    "difficulty": 950,
+    "difficulty": 785,
     "params": {
       "m": 4,
       "n": 2
     },
     "interactionKind": "fill-fraction",
     "prompt": "A fair 4-sided die is rolled 2 times independently. What is the probability of getting a 1 at least once?",
+    "context": null,
     "answer": "7/16",
     "renderedCorrectness": true,
     "explanation": {
@@ -83,13 +85,14 @@
       "independence"
     ],
     "retrievalForm": "procedural",
-    "difficulty": 1100,
+    "difficulty": 845,
     "params": {
       "m": 6,
       "n": 3
     },
     "interactionKind": "fill-fraction",
     "prompt": "A fair six-sided die is rolled 3 times independently. What is the probability of getting a 6 at least once?",
+    "context": null,
     "answer": "91/216",
     "renderedCorrectness": true,
     "explanation": {
@@ -120,13 +123,14 @@
       "independence"
     ],
     "retrievalForm": "procedural",
-    "difficulty": 1100,
+    "difficulty": 830,
     "params": {
       "m": 2,
       "n": 4
     },
     "interactionKind": "fill-fraction",
     "prompt": "A fair coin is flipped 4 times independently. What is the probability of getting heads at least once?",
+    "context": null,
     "answer": "15/16",
     "renderedCorrectness": true,
     "explanation": {
@@ -157,13 +161,14 @@
       "independence"
     ],
     "retrievalForm": "procedural",
-    "difficulty": 900,
+    "difficulty": 760,
     "params": {
       "m": 2,
       "n": 2
     },
     "interactionKind": "fill-fraction",
     "prompt": "A fair coin is flipped 2 times independently. What is the probability of getting heads at least once?",
+    "context": null,
     "answer": "3/4",
     "renderedCorrectness": true,
     "explanation": {

@@ -116,7 +116,7 @@ export function FillFraction({ variant, feedbackState, onChange }: Props) {
     <div className="flex flex-col items-center gap-8 px-4 py-6">
       <p className="text-xl font-medium text-center">{variant.prompt}</p>
       {variant.context && (
-        <p className="text-sm text-muted-foreground text-center max-w-md text-balance">
+        <p className="text-sm text-muted-foreground text-center max-w-md whitespace-pre-line">
           {variant.context}
         </p>
       )}

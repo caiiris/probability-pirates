@@ -344,7 +344,7 @@ export const sampleSpace: Lesson = {
           interactionKind: 'fill-fraction',
           prompt: 'You draw one card from a standard 52-card deck. What is the probability of drawing a club?',
           context:
-            'A club is a suit, like hearts or spades. Each suit has 13 cards. The sample space is all 52 cards.',
+            'A club is a suit, like hearts or spades. Each suit has 13 cards.',
           numerator: 13,
           denominator: 52,
           numeratorLabel: 'k = clubs in the deck',
@@ -357,9 +357,9 @@ export const sampleSpace: Lesson = {
             '1/4':
               'That is the simplified value, and it is correct. The grader is looking for k/N in its raw form first: count of clubs on top, count of all cards on bottom.',
             '4/52':
-              'There are 4 suits in a deck, but here k counts clubs, not suits. How many cards are clubs?',
+              'There are 4 suits in a deck, but here you want clubs, not suits. How many cards are clubs?',
             '13/13':
-              'N is the size of the whole sample space, not just the event. The denominator should count every card you could draw.',
+              'The denominator is the size of the whole sample space, not just the event.',
             '52/13':
               'You flipped the fraction. k goes on top (clubs in the event), N goes on bottom (cards in the sample space).',
             '52/52':
@@ -408,7 +408,7 @@ export const sampleSpace: Lesson = {
       kind: 'wrap',
       title: 'You named the toolkit',
       body:
-        'You can write down the outcome, the sample space, and the event for any experiment with a finite list of results. That is the whole vocabulary of basic probability. The rest is questions about subsets and counting.\n\nIn the next lesson, we hold up the formula favorable / total to the light. It works in lots of cases, but not all. Telling the difference is the whole point.',
+        'You can now write down the outcome, the sample space, and the event for any experiment with a finite list of results. That is the whole idea of basic probability! \n\nIn the next lesson, we will investigate how our previous definition of probability works in lots of cases, but not all. What happens then?',
       mascotLine: 'First the list. Then the math.',
       segueToLessonId: 'equally-likely-outcomes',
     },

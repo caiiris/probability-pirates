@@ -80,6 +80,26 @@
     "notes": "Use first-edition materials only; newer v.360 materials are noncommercial."
   },
   {
+    "id": "illustrative-mathematics-bobs-bagel-shop",
+    "title": "Illustrative Mathematics: Bob's Bagel Shop",
+    "url": "https://tasks.illustrativemathematics.org/content-standards/HSS/MD/A/2/tasks/1023",
+    "retrieval": {
+      "kind": "public-url",
+      "url": "https://tasks.illustrativemathematics.org/content-standards/HSS/MD/A/2/tasks/1023"
+    },
+    "license": {
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "commercialOk": true,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "adapt-ok-with-attribution",
+    "status": "approved",
+    "targetTopics": ["expected-value", "long-run-average", "payoff"],
+    "notes": "Expected-value task with a non-linear payoff/discount trap. Use Pascal-authored contexts and wording."
+  },
+  {
     "id": "grinstead-snell",
     "title": "Introduction to Probability by Grinstead and Snell",
     "url": "https://chance.dartmouth.edu/teaching_aids/books_articles/probability_book/book.html",
@@ -378,6 +398,25 @@
     "status": "approved",
     "targetTopics": ["counting", "conditional", "bayes", "expected-value", "challenge"],
     "notes": "Excellent problem design, but not open-licensed. Extract only high-level themes; do not copy problems, solutions, or wording."
+  },
+  {
+    "id": "nrich-probability",
+    "title": "NRICH Probability Tasks",
+    "url": "https://nrich.maths.org/probability-stage-4-0",
+    "retrieval": {
+      "kind": "none"
+    },
+    "license": {
+      "name": "University of Cambridge copyright / no text-and-data mining without permission",
+      "url": "https://nrich.maths.org/terms-and-conditions",
+      "commercialOk": false,
+      "shareAlike": false,
+      "requiresAttribution": true
+    },
+    "reuseMode": "blocked",
+    "status": "blocked",
+    "targetTopics": ["games", "fairness", "spinners", "creative-probability"],
+    "notes": "Do not ingest, scrape, or copy. Useful only as a human-visible reminder that rich game/fairness tasks exist."
   },
   {
     "id": "mathigon-probability",

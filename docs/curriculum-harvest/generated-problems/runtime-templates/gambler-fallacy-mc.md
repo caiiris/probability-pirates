@@ -12,7 +12,7 @@
 ## Problem 1 — gambler-fallacy-mc-p01
 
 - **Instance id:** `gambler-fallacy-mc:1068915428`
-- **Difficulty:** 950
+- **Difficulty:** 860
 - **Params:** {"streakLen":8,"flavor":2}
 - **Interaction:** `multiple-choice`
 - **Prompt:** A basketball player has made 8 free throws in a row. Assuming each free throw is an independent 50/50 shot, what is the probability the next attempt is a miss?
@@ -38,7 +38,7 @@
 ## Problem 2 — gambler-fallacy-mc-p02
 
 - **Instance id:** `gambler-fallacy-mc:2128681955`
-- **Difficulty:** 830
+- **Difficulty:** 780
 - **Params:** {"streakLen":4,"flavor":1}
 - **Interaction:** `multiple-choice`
 - **Prompt:** A fair six-sided die has been rolled and landed on sixes 4 times in a row. What is the probability the next roll is also a 6?
@@ -64,7 +64,7 @@
 ## Problem 3 — gambler-fallacy-mc-p03
 
 - **Instance id:** `gambler-fallacy-mc:4126551075`
-- **Difficulty:** 800
+- **Difficulty:** 760
 - **Params:** {"streakLen":3,"flavor":0}
 - **Interaction:** `multiple-choice`
 - **Prompt:** A fair coin has been flipped and landed on heads 3 times in a row. What is the probability the next flip lands tails?
@@ -90,7 +90,7 @@
 ## Problem 4 — gambler-fallacy-mc-p04
 
 - **Instance id:** `gambler-fallacy-mc:891047577`
-- **Difficulty:** 920
+- **Difficulty:** 840
 - **Params:** {"streakLen":7,"flavor":2}
 - **Interaction:** `multiple-choice`
 - **Prompt:** A basketball player has made 7 free throws in a row. Assuming each free throw is an independent 50/50 shot, what is the probability the next attempt is a miss?
@@ -116,7 +116,7 @@
 ## Problem 5 — gambler-fallacy-mc-p05
 
 - **Instance id:** `gambler-fallacy-mc:791400800`
-- **Difficulty:** 890
+- **Difficulty:** 820
 - **Params:** {"streakLen":6,"flavor":0}
 - **Interaction:** `multiple-choice`
 - **Prompt:** A fair coin has been flipped and landed on heads 6 times in a row. What is the probability the next flip lands tails?

@@ -12,7 +12,7 @@
 ## Problem 1 — at-least-one-via-complement-p01
 
 - **Instance id:** `at-least-one-via-complement:2175510829`
-- **Difficulty:** 1250
+- **Difficulty:** 890
 - **Params:** {"m":4,"n":5}
 - **Interaction:** `fill-fraction`
 - **Prompt:** A fair 4-sided die is rolled 5 times independently. What is the probability of getting a 1 at least once?
@@ -40,7 +40,7 @@
 ## Problem 2 — at-least-one-via-complement-p02
 
 - **Instance id:** `at-least-one-via-complement:2174672186`
-- **Difficulty:** 950
+- **Difficulty:** 785
 - **Params:** {"m":4,"n":2}
 - **Interaction:** `fill-fraction`
 - **Prompt:** A fair 4-sided die is rolled 2 times independently. What is the probability of getting a 1 at least once?
@@ -68,7 +68,7 @@
 ## Problem 3 — at-least-one-via-complement-p03
 
 - **Instance id:** `at-least-one-via-complement:4048150833`
-- **Difficulty:** 1100
+- **Difficulty:** 845
 - **Params:** {"m":6,"n":3}
 - **Interaction:** `fill-fraction`
 - **Prompt:** A fair six-sided die is rolled 3 times independently. What is the probability of getting a 6 at least once?
@@ -96,7 +96,7 @@
 ## Problem 4 — at-least-one-via-complement-p04
 
 - **Instance id:** `at-least-one-via-complement:956615306`
-- **Difficulty:** 1100
+- **Difficulty:** 830
 - **Params:** {"m":2,"n":4}
 - **Interaction:** `fill-fraction`
 - **Prompt:** A fair coin is flipped 4 times independently. What is the probability of getting heads at least once?
@@ -124,7 +124,7 @@
 ## Problem 5 — at-least-one-via-complement-p05
 
 - **Instance id:** `at-least-one-via-complement:890490568`
-- **Difficulty:** 900
+- **Difficulty:** 760
 - **Params:** {"m":2,"n":2}
 - **Interaction:** `fill-fraction`
 - **Prompt:** A fair coin is flipped 2 times independently. What is the probability of getting heads at least once?

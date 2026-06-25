@@ -68,9 +68,10 @@ export const atLeastOneViaComplementTemplate: Template<Params> = {
   retrievalForm: 'procedural',
 
   rate({ m, n }) {
-    // Base ~900; harder for more trials (n) and larger denominator (m)
-    const mBonus = m === 2 ? 0 : m === 4 ? 50 : 100;
-    return 900 + (n - 2) * 100 + mBonus;
+    // Current non-creative bank is intentionally labeled Easy (<950), while
+    // preserving relative difficulty for adaptive ordering.
+    const mBonus = m === 2 ? 0 : m === 4 ? 25 : 50;
+    return 760 + (n - 2) * 35 + mBonus;
   },
 
   sample(rng) {
@@ -101,8 +102,6 @@ export const atLeastOneViaComplementTemplate: Template<Params> = {
         `What is the probability of getting ${sc.eventPrompt} at least once?`,
       numerator: Number(num),
       denominator: Number(den),
-      numeratorLabel: 'favorable outcomes',
-      denominatorLabel: 'total equally-likely outcomes',
       feedbackCorrect:
         `Correct! Using the complement: 1 − (${m - 1}/${m})^${n} = ${Number(num)}/${Number(den)}.`,
       feedbackDefault:

@@ -46,7 +46,19 @@ export function InteractionDispatch({
       interaction = <TapOutcomes {...sharedProps} variant={variant} />;
       break;
     case 'fill-fraction':
-      interaction = <FillFraction {...sharedProps} variant={variant} />;
+      interaction = (
+        <FillFraction
+          {...sharedProps}
+          variant={{
+            ...variant,
+            // Lesson fraction labels are helpful scaffolds, but in practice they
+            // can give away the structure of the answer. Keep them out of the
+            // practice renderer even if a generated/stale variant includes them.
+            numeratorLabel: undefined,
+            denominatorLabel: undefined,
+          }}
+        />
+      );
       break;
     case 'tap-event':
       interaction = <TapEvent {...sharedProps} variant={variant} />;
@@ -55,7 +67,17 @@ export function InteractionDispatch({
       interaction = <GridEvent {...sharedProps} variant={variant} />;
       break;
     case 'multiple-choice':
-      interaction = <MultipleChoice {...sharedProps} variant={variant} />;
+      interaction = (
+        <MultipleChoice
+          {...sharedProps}
+          variant={{
+            ...variant,
+            // Practice options should not explain the misconception before the
+            // learner commits. Feedback belongs after Check.
+            options: variant.options.map(({ subtext: _subtext, ...option }) => option),
+          }}
+        />
+      );
       break;
     case 'simulate-proportion':
       interaction = <SimulateProportion {...sharedProps} variant={variant} />;

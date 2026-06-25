@@ -1,18 +1,25 @@
 /**
- * PracticeSession — adaptive Alcumus-style solve loop (WP-6b).
+ * PracticeSession — adaptive Alcumus-style solve loop.
  *
- * WP-6b changes vs WP-6a:
- * - Uses pickNextTemplate({ topic, ratingForTopic, recentTemplateIds, rng }) for
- *   adaptive difficulty instead of a fixed safe template.
- * - Accepts `topic` and `uid` props from PracticePage (TopicPicker drives topic).
- * - After each graded answer calls BOTH:
- *     1. usePracticeState.recordResult(wasCorrect, difficulty, templateId)
- *        — updates per-topic Elo rating + recent template list (C8 doc).
- *     2. recordPracticeAttempt(uid, { skills, wasCorrect, difficulty, misconceptionKey })
- *        — Engine A: moves per-skill Elo in learnerModel/state.
- * - misconceptionKey is derived from variant.misconceptionByOption?.[chosenOptionId]
- *   when the answer was wrong and the variant is multiple-choice.
- * - Switching topic (topic prop change) resets the loop to a fresh instance.
+ * Owns the per-problem state (current instance, learner's pending answer,
+ * solution-revealed flag, session signals) and the daily-capped XP grant.
+ *
+ * Does NOT own:
+ *   - The per-topic adaptive rating (`usePracticeState`) — that lives on
+ *     PracticePage so the rating can render in the page header (the "Bounty"
+ *     chip). PracticeSession receives `rating` + `recordResult` as props and
+ *     reports each per-answer delta back up via `onRatingDelta` for the chip's
+ *     +/- indicator.
+ *
+ * After each graded answer:
+ *   1. recordResult(wasCorrect, difficulty, templateId) — updates per-topic
+ *      Elo rating + recent template list (C8 doc).
+ *   2. recordPracticeAttempt(uid, …) — Engine A: moves per-skill Elo in
+ *      learnerModel/state.
+ *   3. awardXp(true) — daily-capped XP grant (WP-6c), background write.
+ *
+ * misconceptionKey is derived from variant.misconceptionByOption?.[chosenOptionId]
+ * when the answer was wrong and the variant is multiple-choice.
  *
  * Footer note: LessonFooter is NOT reused here. See WP-6a comment.
  */
@@ -30,9 +37,10 @@ import { useSlotState } from '@/features/lesson/useSlotState';
 import { DerivationCard } from '@/features/lesson/DerivationCard';
 import { Button } from '@/components/ui/button';
 import { MOTION, SHAKE_KEYFRAMES } from '@/lib/motion';
-import { usePracticeState } from '@/features/practice/usePracticeState';
+import { applyElo } from '@/features/practice/usePracticeState';
 import { usePracticeXp } from '@/features/practice/usePracticeXp';
 import { SessionSignals } from '@/features/practice/SessionSignals';
+import { difficultyLabel } from '@/features/practice/practiceDifficulty';
 import { recordPracticeAttempt } from '@/features/learner/learnerModelService';
 import type { AttemptPayload } from '@/features/progress/progressService';
 import type { PracticeInstance } from '@/features/practice/practiceEngine';
@@ -45,15 +53,27 @@ import { InteractionDispatch } from '@/features/practice/InteractionDispatch';
 type Props = {
   topic: Topic;
   uid: string | null | undefined;
+  /** Current per-topic Elo rating, owned by PracticePage. */
+  rating: number;
+  /** Last 3 templateIds served in this topic (for anti-repeat). */
+  recentTemplateIds: string[];
+  /** Apply one Elo update + persist to Firestore (background). */
+  recordResult: (wasCorrect: boolean, difficulty: number, templateId: string) => void;
+  /** Reports the most recent rating change up so the header chip can flash. */
+  onRatingDelta: (delta: number) => void;
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function PracticeSession({ topic, uid }: Props) {
+export function PracticeSession({
+  topic,
+  uid,
+  rating,
+  recentTemplateIds,
+  recordResult,
+  onRatingDelta,
+}: Props) {
   const counterRef = useRef(0);
-
-  // Per-topic adaptive state (Firestore-backed, optimistic local updates).
-  const { rating, recentTemplateIds, recordResult } = usePracticeState(uid, topic);
 
   // Daily-capped XP for practice (WP-6c).
   const { award: awardXp, capReached: xpCapReached } = usePracticeXp(uid);
@@ -136,6 +156,10 @@ export function PracticeSession({ topic, uid }: Props) {
       setCorrectStreak(0);
     }
 
+    // Surface the per-topic Elo change up to PracticePage (the Bounty chip
+    // flashes this). recordResult applies the same formula internally.
+    onRatingDelta(applyElo(rating, instance.difficulty, wasCorrect) - rating);
+
     // WP-6c: daily-capped practice XP — optimistic, background Firestore writes.
     // award() only writes xp/weeklyXp/weekKey; never touches streak or lessonsCompleted.
     if (wasCorrect) {
@@ -175,6 +199,16 @@ export function PracticeSession({ topic, uid }: Props) {
       <SessionSignals solved={solved} correctStreak={correctStreak} recentResults={recentResults} />
 
       <div className="flex-1 overflow-y-auto">
+        {/* Per-problem difficulty + XP-on-offer badge. */}
+        <div className="flex items-center justify-center gap-2 pt-3 text-xs">
+          <span className="rounded-full bg-muted px-2.5 py-1 font-medium text-muted-foreground">
+            {difficultyLabel(instance.difficulty)}
+          </span>
+          <span className="num rounded-full bg-[color:var(--primary-soft)] px-2.5 py-1 font-semibold text-primary">
+            +5 XP
+          </span>
+        </div>
+
         <InteractionDispatch
           variant={instance.variant}
           attemptNumber={state.attemptNumber}

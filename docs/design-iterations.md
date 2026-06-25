@@ -1346,3 +1346,42 @@ Topic folders make the bank easier to review and safer for parallel agents:
 - Update `spec-practice.md` to match.
 - If any flat WP-4 files already exist, move them into topic folders and update
   only imports/registry paths. Preserve behavior and tests.
+
+---
+
+## Runtime practice bank loaded — 2026-06-25
+
+> The WP-4 template families are now usable as the live Track 1 practice bank.
+> Reproducible workflow: [`runtime-generation-workflow.md`](curriculum-harvest/runtime-generation-workflow.md).
+
+### What changed
+
+- `/practice` now loads from the registered runtime template bank (`TEMPLATES`)
+  via `pickNextTemplate` + `generateInstance`.
+- `TopicPicker` lets the learner choose a topic and can default to the weakest
+  practiced topic once the learner model exists.
+- `PracticeSession` renders the generated `Variant` through `InteractionDispatch`,
+  grades with `checkAnswer`, shows the worked solution, then generates another
+  instance on "Next problem."
+- Correct answers write the intended practice signals: per-topic practice state,
+  daily-capped practice XP, and per-skill learner-model Engine A mastery.
+- Review artifacts for all six templates are generated under
+  `docs/curriculum-harvest/generated-problems/runtime-templates/`.
+
+### Verification workflow
+
+Each review problem is generated from the actual runtime template and verified by:
+
+- `answerToPayload` + `checkAnswer`,
+- exact `solve()`,
+- Monte Carlo simulation for numeric probability templates,
+- structural verification for conceptual / multiple-choice templates,
+- source-wording audit against harvested chunks.
+
+### Copy fixes from review
+
+- Removed Markdown emphasis markers from runtime prompts because the existing
+  renderers display prompt strings as plain text.
+- Changed `conditional-bayes-2x2` from a medical disease scenario to a neutral
+  "rare signal" scenario.
+- Fixed `gambler-fallacy-mc` so die streaks use `1/6` rather than `1/2`.

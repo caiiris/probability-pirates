@@ -82,8 +82,9 @@ export const pickKOfNUnorderedTemplate: Template<Params> = {
   retrievalForm: 'definition',
 
   rate({ n, k }) {
-    // n=3,k=2 → ~940; n=8,k=5 → ~1460
-    return 900 + (n - 3) * 80 + (k - 1) * 40;
+    // Current non-creative bank is intentionally labeled Easy (<950).
+    // Preserve relative difficulty while keeping all generated cases easy.
+    return 760 + (n - 3) * 20 + (k - 1) * 15;
   },
 
   sample(rng) {

@@ -53,8 +53,9 @@ export const gamblerFallacyMcTemplate: Template<Params> = {
   retrievalForm: 'definition',
 
   rate({ streakLen }) {
-    // Longer streaks feel more convincing, making the fallacy harder to reject
-    return 800 + (streakLen - 3) * 30;
+    // Current non-creative bank is intentionally labeled Easy (<950).
+    // Longer streaks still feel slightly more convincing.
+    return 760 + (streakLen - 3) * 20;
   },
 
   sample(rng) {
@@ -84,14 +85,12 @@ export const gamblerFallacyMcTemplate: Template<Params> = {
           flavor === 1
             ? 'Less than 1/6 — a non-six is "due" after so many sixes'
             : 'Greater than 1/2 — the opposite outcome is "due"',
-        subtext: "Gambler's fallacy: past outcomes do not change future probabilities",
       },
       {
         id: 'hot',
         label: flavor === 2
           ? 'Greater than 1/2 — the player is "on a roll" (hot hand)'
           : 'Greater than 1/2 — the streak will continue',
-        subtext: 'Hot-hand belief: each trial is still independent',
       },
       {
         id: 'unknown',

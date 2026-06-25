@@ -30,7 +30,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 | J       | Project Structure & Tooling   | D38–D48, D64, D74, D81                                                                |
 | K       | PRD Acceptance Criteria Style | D49–D54, D57–D62                                                                      |
 | L       | Platform & Responsive         | D63, D65, D66                                                                         |
-| M       | Phase 2 — AI                  | D92–D98                                                                               |
+| M       | Phase 2 — AI                  | D92–D101                                                                              |
 
 ---
 
@@ -1353,6 +1353,35 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Do **not** change learner-model, XP, Firestore, or practice UI responsibilities. This is layout only.
   - Use exact taxonomy topic ids (`counting`, `long-run`, `complement`, `conditional`, `distributions`) for folder names where possible.
 - **See also:** [`wp-4-layout-handoff`](specs/wp/wp-4-layout-handoff.md), [`problem-bank-layout-proposal`](curriculum-harvest/problem-bank-layout-proposal.md), [`spec-practice`](specs/spec-practice.md) §"First template families".
+
+### D100 — Practice XP scales with difficulty (supersedes flat 5)
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** A correct practice problem awards **difficulty-scaled XP** — Easy 3 / Medium 5 / Hard 8 / Expert 12 (`PRACTICE_XP_BY_DIFFICULTY`), bucketed from the problem's Elo difficulty (`difficultyBucket`) — still bounded by the existing `PRACTICE_DAILY_XP_CAP = 100`. Supersedes the original flat `PRACTICE_XP_PER_CORRECT = 5`.
+- **Trigger:** the practice page showed a difficulty label next to a flat "+5 XP" badge — harder and easier problems paid the same, which read as broken and under-motivated challenge.
+- **Considered:**
+  - **Keep flat 5/correct** (original spec). Rejected: doesn't reward harder problems; the difficulty label next to it is misleading. (Alternative kept available: drop the per-problem XP badge instead — owner chose scaling.)
+  - **Continuous XP as a function of Elo** (e.g. `round(elo/200)`). Rejected for v1: bucketed values are legible to learners and easy to reason about; revisit if buckets feel coarse.
+  - **Remove the daily cap so hard grinding pays unbounded.** Rejected: the cap is what stops practice from dwarfing the lesson path (D43 rationale); scaling within the cap keeps both properties.
+- **Gaps / risks:**
+  - Difficulty buckets depend on each template's hand-rated `rate(params)`; a mis-rated template would mis-pay. Mitigated by the existing monotonicity/range tests and (later) D101 annotation + data calibration.
+  - `grantPracticeXp` changes from a `wasCorrect: boolean` arg to an explicit `award: number` (caller computes `xpForDifficulty(elo)`); its tests update accordingly.
+- **See also:** [`spec-practice`](specs/spec-practice.md) §"XP integration", D43 (practice XP cap policy), D101 (difficulty annotation), [`prd-phase2`](prd-phase2.md) F1.
+
+### D101 — AI difficulty annotation is offline + baked-in (LLM as estimator, not runtime oracle)
+
+- **Status:** resolved as a design choice (planned; not yet implemented) (2026-06-25)
+- **Chose:** When we use an LLM to rate problem difficulty, it runs **offline in batch** (a `scripts/` job), is validated + human-reviewed, and the result is **baked in as a constant** the deterministic runtime reads. The LLM is an _estimator_ only; it never rates difficulty at request time.
+- **Why allowed (vs. the "no LLM-served numbers" rule):** difficulty is an _estimate_, not a _correctness claim_. Served answers must come from `solve()` (verifiable); difficulty has no single verifiable truth, so an LLM prior is legitimate — provided it's offline, bounded (Elo `[700,2000]` + monotonicity), and human-gated.
+- **Considered:**
+  - **Runtime LLM difficulty call.** Rejected: non-deterministic serving, latency/cost, a model in the hot path — breaks the app's "no live model at runtime" posture.
+  - **Data calibration first (IRT / item-Elo from attempt data).** Deferred, not rejected: the most principled approach, but it needs a user base we don't have yet. It becomes the _posterior_ on top of the LLM prior once usage grows. _(Owner: "I don't have many users, so #3 doesn't work yet — future work.")_
+  - **Keep hand-written `rate()` only.** Fine for six families; doesn't scale or stay consistent as the harvested bank grows.
+  - **Annotate the `rate()` formula instead of rendered instances.** Kept as a secondary option; primary is rating concrete instances (more reliable, transfers to the static bank).
+- **Gaps / risks:**
+  - LLM ratings can be miscalibrated/inconsistent; mitigated by single-batch relative rating + range/monotonicity guardrails + human spot-check.
+  - Lives in the offline pipeline currently owned by the curriculum-harvest workstream — must be coordinated to avoid concurrent edits to the same files.
+- **See also:** [`spec-ai-difficulty-annotation`](specs/spec-ai-difficulty-annotation.md), [`spec-practice`](specs/spec-practice.md) §"Adaptive serving", D100, [`prd-phase2`](prd-phase2.md) F6.
 
 ---
 

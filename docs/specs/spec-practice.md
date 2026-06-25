@@ -166,15 +166,20 @@ Only candidates passing **1–5** (and sampled into 6) are written to the vetted
   "Next problem". Endless until the learner stops.
 - Lightweight session signals: streak of correct-in-a-row, count solved, current
   topic rating trend.
-- **XP integration (decided):** a correct practice problem awards a small, flat
-  amount of XP (`PRACTICE_XP_PER_CORRECT = 5`, vs. a lesson's first-try 10),
-  **capped per local day** (`PRACTICE_DAILY_XP_CAP = 100`, ~one lesson / ~20
-  problems). Practice XP feeds **total XP (levels) and weekly XP (leaderboard)**
-  so XP keeps paying off between content drops, but it does **not** tick the daily
-  streak and is **not** counted as a completed lesson — the streak stays tied to
-  the core daily goal so practice can't substitute for the path. The cap policy
-  is pure, tested logic in `src/lib/practiceXp.ts` (`grantPracticeXp`); the solve
-  loop calls it and persists the returned per-day state.
+- **XP integration (decided):** a correct practice problem awards **difficulty-scaled
+  XP** — Easy 3 / Medium 5 / Hard 8 / Expert 12 (`PRACTICE_XP_BY_DIFFICULTY`),
+  bucketed from the problem's Elo (`difficultyBucket`) — **capped per local day**
+  (`PRACTICE_DAILY_XP_CAP = 100`). Harder problems pay more so grinding easy ones
+  can't out-earn real challenge, while the daily cap still keeps practice from
+  dwarfing the path. _(Supersedes the original flat `PRACTICE_XP_PER_CORRECT = 5`;
+  decision D100.)_ Practice XP feeds **total XP (levels) and weekly XP
+  (leaderboard)** but does **not** tick the daily streak and is **not** counted as
+  a completed lesson — the streak stays tied to the core daily goal. The cap policy
+  is pure, tested logic in `src/lib/practiceXp.ts` (`grantPracticeXp`, now taking
+  an explicit award amount); the solve loop calls it and persists the per-day state.
+  Difficulty itself is hand-rated per template today (`rate(params)`), with an
+  optional offline LLM annotation pass planned — see
+  [`spec-ai-difficulty-annotation`](spec-ai-difficulty-annotation.md) (D101).
 - Empty/again-later states handled like the rest of the app.
 
 ## Security & safety

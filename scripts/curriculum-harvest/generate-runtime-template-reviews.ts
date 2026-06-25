@@ -40,6 +40,7 @@ type SerializableProblem = {
   params: unknown;
   interactionKind: string;
   prompt: string;
+  context: string | null;
   answer: string;
   renderedCorrectness: boolean;
   explanation: { title: string; steps: string[] };
@@ -145,6 +146,7 @@ function generateForTemplate<P>(template: Template<P>, templateIndex: number): S
       params,
       interactionKind: variant.interactionKind,
       prompt: variant.prompt,
+      context: 'context' in variant && typeof variant.context === 'string' ? variant.context : null,
       answer: serializeAnswer(answer),
       renderedCorrectness,
       explanation: template.explain(params),
@@ -179,6 +181,7 @@ function renderTemplateMarkdown(template: Template, problems: SerializableProble
       `- **Params:** ${JSON.stringify(problem.params)}`,
       `- **Interaction:** \`${problem.interactionKind}\``,
       `- **Prompt:** ${problem.prompt}`,
+      ...(problem.context ? [`- **Context:**\n\n${problem.context}`] : []),
       `- **Answer:** ${problem.answer}`,
       `- **Rendered answer grades correct:** ${problem.renderedCorrectness ? 'yes' : 'no'}`,
       '',

@@ -9,13 +9,14 @@
       "independence"
     ],
     "retrievalForm": "operation",
-    "difficulty": 1300,
+    "difficulty": 880,
     "params": {
       "n": 6,
       "k": 5
     },
     "interactionKind": "fill-fraction",
     "prompt": "A fair coin is flipped 6 times. What is the probability of getting exactly 5 heads?",
+    "context": null,
     "answer": "3/32",
     "renderedCorrectness": true,
     "explanation": {
@@ -46,13 +47,14 @@
       "independence"
     ],
     "retrievalForm": "operation",
-    "difficulty": 1400,
+    "difficulty": 900,
     "params": {
       "n": 7,
       "k": 7
     },
     "interactionKind": "fill-fraction",
     "prompt": "A fair coin is flipped 7 times. What is the probability of getting exactly 7 heads?",
+    "context": null,
     "answer": "1/128",
     "renderedCorrectness": true,
     "explanation": {
@@ -83,13 +85,14 @@
       "independence"
     ],
     "retrievalForm": "operation",
-    "difficulty": 1300,
+    "difficulty": 880,
     "params": {
       "n": 6,
       "k": 6
     },
     "interactionKind": "fill-fraction",
     "prompt": "A fair coin is flipped 6 times. What is the probability of getting exactly 6 heads?",
+    "context": null,
     "answer": "1/64",
     "renderedCorrectness": true,
     "explanation": {
@@ -120,13 +123,14 @@
       "independence"
     ],
     "retrievalForm": "operation",
-    "difficulty": 1500,
+    "difficulty": 920,
     "params": {
       "n": 8,
       "k": 3
     },
     "interactionKind": "fill-fraction",
     "prompt": "A fair coin is flipped 8 times. What is the probability of getting exactly 3 heads?",
+    "context": null,
     "answer": "7/32",
     "renderedCorrectness": true,
     "explanation": {
@@ -157,13 +161,14 @@
       "independence"
     ],
     "retrievalForm": "operation",
-    "difficulty": 900,
+    "difficulty": 800,
     "params": {
       "n": 2,
       "k": 0
     },
     "interactionKind": "fill-fraction",
     "prompt": "A fair coin is flipped 2 times. What is the probability of getting exactly 0 heads?",
+    "context": null,
     "answer": "1/4",
     "renderedCorrectness": true,
     "explanation": {

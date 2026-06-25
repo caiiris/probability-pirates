@@ -137,6 +137,10 @@ so copied textbook wording is caught before content ships.
 
 ## Known Review Notes
 
+- Current runtime templates are the non-creative starter bank and are intentionally
+  rated inside the `Easy` bucket (`difficulty < 950`). Creative/harder harvested
+  families are tagged separately in `review-queue.md` and should use higher Elo
+  ranges when implemented.
 - `conditional-bayes-2x2` now uses a neutral "rare signal" context rather than a
   medical disease context. This keeps the math structure while avoiding sensitive
   learner-facing copy.

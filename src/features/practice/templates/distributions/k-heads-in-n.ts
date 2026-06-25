@@ -21,8 +21,9 @@ export const kHeadsInNTemplate: Template<Params> = {
   retrievalForm: 'operation',
 
   rate({ n }) {
-    // n=2 → ~900 (easy), n=8 → ~1500 (hard)
-    return 700 + n * 100;
+    // Current non-creative bank is intentionally labeled Easy (<950).
+    // Larger n still ranks slightly harder inside the easy band.
+    return 760 + n * 20;
   },
 
   sample(rng) {
@@ -49,8 +50,6 @@ export const kHeadsInNTemplate: Template<Params> = {
       prompt: `A fair coin is flipped ${n} times. What is the probability of getting exactly ${k} ${headsWord}?`,
       numerator: Number(num),
       denominator: Number(den),
-      numeratorLabel: `ways to get exactly ${k} ${headsWord}`,
-      denominatorLabel: `total equally-likely outcomes (2^${n})`,
       feedbackCorrect: `Correct! C(${n},${k}) = ${Number(nCr(n, k))} favorable sequences out of 2^${n} = ${Number(1n << BigInt(n))}.`,
       feedbackDefault:
         `Use the binomial formula: C(n,k) / 2^n. ` +

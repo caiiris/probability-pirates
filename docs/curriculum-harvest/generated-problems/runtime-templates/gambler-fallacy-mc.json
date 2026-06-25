@@ -9,13 +9,14 @@
       "independence"
     ],
     "retrievalForm": "definition",
-    "difficulty": 950,
+    "difficulty": 860,
     "params": {
       "streakLen": 8,
       "flavor": 2
     },
     "interactionKind": "multiple-choice",
     "prompt": "A basketball player has made 8 free throws in a row. Assuming each free throw is an independent 50/50 shot, what is the probability the next attempt is a miss?",
+    "context": null,
     "answer": "choice:independent",
     "renderedCorrectness": true,
     "explanation": {
@@ -44,13 +45,14 @@
       "independence"
     ],
     "retrievalForm": "definition",
-    "difficulty": 830,
+    "difficulty": 780,
     "params": {
       "streakLen": 4,
       "flavor": 1
     },
     "interactionKind": "multiple-choice",
     "prompt": "A fair six-sided die has been rolled and landed on sixes 4 times in a row. What is the probability the next roll is also a 6?",
+    "context": null,
     "answer": "choice:independent",
     "renderedCorrectness": true,
     "explanation": {
@@ -79,13 +81,14 @@
       "independence"
     ],
     "retrievalForm": "definition",
-    "difficulty": 800,
+    "difficulty": 760,
     "params": {
       "streakLen": 3,
       "flavor": 0
     },
     "interactionKind": "multiple-choice",
     "prompt": "A fair coin has been flipped and landed on heads 3 times in a row. What is the probability the next flip lands tails?",
+    "context": null,
     "answer": "choice:independent",
     "renderedCorrectness": true,
     "explanation": {
@@ -114,13 +117,14 @@
       "independence"
     ],
     "retrievalForm": "definition",
-    "difficulty": 920,
+    "difficulty": 840,
     "params": {
       "streakLen": 7,
       "flavor": 2
     },
     "interactionKind": "multiple-choice",
     "prompt": "A basketball player has made 7 free throws in a row. Assuming each free throw is an independent 50/50 shot, what is the probability the next attempt is a miss?",
+    "context": null,
     "answer": "choice:independent",
     "renderedCorrectness": true,
     "explanation": {
@@ -149,13 +153,14 @@
       "independence"
     ],
     "retrievalForm": "definition",
-    "difficulty": 890,
+    "difficulty": 820,
     "params": {
       "streakLen": 6,
       "flavor": 0
     },
     "interactionKind": "multiple-choice",
     "prompt": "A fair coin has been flipped and landed on heads 6 times in a row. What is the probability the next flip lands tails?",
+    "context": null,
     "answer": "choice:independent",
     "renderedCorrectness": true,
     "explanation": {

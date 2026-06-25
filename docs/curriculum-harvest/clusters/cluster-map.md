@@ -272,3 +272,73 @@ Sources processed:
   for CL-0003 and CL-0018.
 - `reference-inspiration-batch-0008` CAND-0005 strengthens CL-0016.
 
+---
+
+# Cluster Map — Batch 0004 Creative / Harder
+
+Source notes:
+
+- `creative-hard-batch-0009.md` records harder families from safe sources and
+  inspiration-only sources.
+- NRICH is explicitly blocked for ingestion/copying; related ideas below must be
+  independently authored from general probability structures or safe sources.
+
+## Recommended Additions
+
+### CL-0022 — Nonlinear payoff expected value
+
+- **Candidate refs:** `creative-hard-batch-0009` CAND-0001
+- **Roadmap target:** Unit 7 — Expected value
+- **Difficulty tag:** Hard / creative
+- **Why keep:** Harder than a plain prize table because students must transform
+  outcomes into payoffs before averaging.
+- **Template fit:** Strong. Exact cents arithmetic, table builder, good
+  misconception traps.
+- **Suggested status:** `build-now`
+
+### CL-0023 — Last one standing streak survival
+
+- **Candidate refs:** `creative-hard-batch-0009` CAND-0006
+- **Roadmap target:** Unit 7 / distributions extension
+- **Difficulty tag:** Hard / creative
+- **Why keep:** A creative extension of CL-0001: "at least one person gets a rare
+  streak" over many independent players.
+- **Template fit:** Strong. Exact `1 - (1 - 2^-k)^N` plus simulation.
+- **Suggested status:** `backlog`
+
+### CL-0024 — Odds-and-evens fairness by parity counts
+
+- **Candidate refs:** `creative-hard-batch-0009` CAND-0004
+- **Roadmap target:** Unit 5 — Fair games and compound events
+- **Difficulty tag:** Medium-hard / creative
+- **Why keep:** Tactile game framing, exact combinatorics, strong fairness hook.
+- **Template fit:** Strong if independently authored with generated token counts.
+- **Suggested status:** `backlog`
+
+### CL-0025 — Inverse spinner from frequency chart
+
+- **Candidate refs:** `creative-hard-batch-0009` CAND-0005
+- **Roadmap target:** Long-run frequency / model selection
+- **Difficulty tag:** Hard / creative
+- **Why keep:** Reverses the usual direction: infer the probability model from
+  simulated data.
+- **Template fit:** Medium. Needs chart or table UI; good future interaction.
+- **Suggested status:** `needs-pedagogy-pass`
+
+### CL-0026 — Non-transitive dice strategy
+
+- **Candidate refs:** `creative-hard-batch-0009` CAND-0007
+- **Roadmap target:** Challenge practice
+- **Difficulty tag:** Expert / creative
+- **Why keep:** High "wait, what?" value and exact 36-outcome enumeration.
+- **Template fit:** Strong as a challenge template, not core path.
+- **Suggested status:** `backlog`
+
+## Parked For Later
+
+- `creative-hard-batch-0009` CAND-0002 — Coupon collector small-set challenge.
+  Good idea, but expected-value/geometric waiting time may be too advanced for the
+  first probability course.
+- `creative-hard-batch-0009` CAND-0003 — Ballot lead probability. Elegant but too
+  proof-like unless kept as a challenge-only simulation/exact-enumeration puzzle.
+

@@ -12,16 +12,17 @@
 ## Problem 1 — conditional-bayes-2x2-p01
 
 - **Instance id:** `conditional-bayes-2x2:2258743503`
-- **Difficulty:** 1525
+- **Difficulty:** 912
 - **Params:** {"tp":3,"fp":25,"fn":6,"tn":422}
 - **Interaction:** `fill-fraction`
-- **Prompt:** In a study, 456 people were tested for a rare signal:
-- 3 tested positive and truly had the signal
-- 25 tested positive but did not have the signal
-- 6 tested negative but truly had the signal
-- 422 tested negative and did not have the signal
+- **Prompt:** Given that a person tests positive, what is the probability they truly have the signal?
+- **Context:**
 
-Given that a person tests positive, what is the probability they truly have the signal?
+In a study, 456 people were tested for a rare signal:
+• 3 tested positive and truly had the signal
+• 25 tested positive but did not have the signal
+• 6 tested negative but truly had the signal
+• 422 tested negative and did not have the signal
 - **Answer:** 3/28
 - **Rendered answer grades correct:** yes
 
@@ -47,16 +48,17 @@ Given that a person tests positive, what is the probability they truly have the 
 ## Problem 2 — conditional-bayes-2x2-p02
 
 - **Instance id:** `conditional-bayes-2x2:2230768738`
-- **Difficulty:** 1518
+- **Difficulty:** 910
 - **Params:** {"tp":11,"fp":83,"fn":14,"tn":441}
 - **Interaction:** `fill-fraction`
-- **Prompt:** In a study, 549 people were tested for a rare signal:
-- 11 tested positive and truly had the signal
-- 83 tested positive but did not have the signal
-- 14 tested negative but truly had the signal
-- 441 tested negative and did not have the signal
+- **Prompt:** Given that a person tests positive, what is the probability they truly have the signal?
+- **Context:**
 
-Given that a person tests positive, what is the probability they truly have the signal?
+In a study, 549 people were tested for a rare signal:
+• 11 tested positive and truly had the signal
+• 83 tested positive but did not have the signal
+• 14 tested negative but truly had the signal
+• 441 tested negative and did not have the signal
 - **Answer:** 11/94
 - **Rendered answer grades correct:** yes
 
@@ -82,16 +84,17 @@ Given that a person tests positive, what is the probability they truly have the 
 ## Problem 3 — conditional-bayes-2x2-p03
 
 - **Instance id:** `conditional-bayes-2x2:2837935584`
-- **Difficulty:** 1457
+- **Difficulty:** 895
 - **Params:** {"tp":20,"fp":78,"fn":19,"tn":248}
 - **Interaction:** `fill-fraction`
-- **Prompt:** In a study, 365 people were tested for a rare signal:
-- 20 tested positive and truly had the signal
-- 78 tested positive but did not have the signal
-- 19 tested negative but truly had the signal
-- 248 tested negative and did not have the signal
+- **Prompt:** Given that a person tests positive, what is the probability they truly have the signal?
+- **Context:**
 
-Given that a person tests positive, what is the probability they truly have the signal?
+In a study, 365 people were tested for a rare signal:
+• 20 tested positive and truly had the signal
+• 78 tested positive but did not have the signal
+• 19 tested negative but truly had the signal
+• 248 tested negative and did not have the signal
 - **Answer:** 10/49
 - **Rendered answer grades correct:** yes
 
@@ -117,16 +120,17 @@ Given that a person tests positive, what is the probability they truly have the 
 ## Problem 4 — conditional-bayes-2x2-p04
 
 - **Instance id:** `conditional-bayes-2x2:2390938879`
-- **Difficulty:** 1338
+- **Difficulty:** 866
 - **Params:** {"tp":24,"fp":40,"fn":10,"tn":438}
 - **Interaction:** `fill-fraction`
-- **Prompt:** In a study, 512 people were tested for a rare signal:
-- 24 tested positive and truly had the signal
-- 40 tested positive but did not have the signal
-- 10 tested negative but truly had the signal
-- 438 tested negative and did not have the signal
+- **Prompt:** Given that a person tests positive, what is the probability they truly have the signal?
+- **Context:**
 
-Given that a person tests positive, what is the probability they truly have the signal?
+In a study, 512 people were tested for a rare signal:
+• 24 tested positive and truly had the signal
+• 40 tested positive but did not have the signal
+• 10 tested negative but truly had the signal
+• 438 tested negative and did not have the signal
 - **Answer:** 3/8
 - **Rendered answer grades correct:** yes
 
@@ -152,16 +156,17 @@ Given that a person tests positive, what is the probability they truly have the 
 ## Problem 5 — conditional-bayes-2x2-p05
 
 - **Instance id:** `conditional-bayes-2x2:2100122985`
-- **Difficulty:** 1483
+- **Difficulty:** 902
 - **Params:** {"tp":12,"fp":60,"fn":4,"tn":182}
 - **Interaction:** `fill-fraction`
-- **Prompt:** In a study, 258 people were tested for a rare signal:
-- 12 tested positive and truly had the signal
-- 60 tested positive but did not have the signal
-- 4 tested negative but truly had the signal
-- 182 tested negative and did not have the signal
+- **Prompt:** Given that a person tests positive, what is the probability they truly have the signal?
+- **Context:**
 
-Given that a person tests positive, what is the probability they truly have the signal?
+In a study, 258 people were tested for a rare signal:
+• 12 tested positive and truly had the signal
+• 60 tested positive but did not have the signal
+• 4 tested negative but truly had the signal
+• 182 tested negative and did not have the signal
 - **Answer:** 1/6
 - **Rendered answer grades correct:** yes
 

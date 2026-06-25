@@ -12,7 +12,7 @@
 ## Problem 1 — pick-k-of-n-unordered-p01
 
 - **Instance id:** `pick-k-of-n-unordered:1337803888`
-- **Difficulty:** 1260
+- **Difficulty:** 865
 - **Params:** {"n":6,"k":4}
 - **Interaction:** `multiple-choice`
 - **Prompt:** A committee of 4 people is chosen from a group of 6. How many different committees are possible? (Order does not matter.)
@@ -38,7 +38,7 @@
 ## Problem 2 — pick-k-of-n-unordered-p02
 
 - **Instance id:** `pick-k-of-n-unordered:316936412`
-- **Difficulty:** 1340
+- **Difficulty:** 875
 - **Params:** {"n":8,"k":2}
 - **Interaction:** `multiple-choice`
 - **Prompt:** A committee of 2 people is chosen from a group of 8. How many different committees are possible? (Order does not matter.)
@@ -64,7 +64,7 @@
 ## Problem 3 — pick-k-of-n-unordered-p03
 
 - **Instance id:** `pick-k-of-n-unordered:3248169788`
-- **Difficulty:** 1380
+- **Difficulty:** 900
 - **Params:** {"n":7,"k":5}
 - **Interaction:** `multiple-choice`
 - **Prompt:** A committee of 5 people is chosen from a group of 7. How many different committees are possible? (Order does not matter.)
@@ -90,7 +90,7 @@
 ## Problem 4 — pick-k-of-n-unordered-p04
 
 - **Instance id:** `pick-k-of-n-unordered:1403928626`
-- **Difficulty:** 1180
+- **Difficulty:** 835
 - **Params:** {"n":6,"k":2}
 - **Interaction:** `multiple-choice`
 - **Prompt:** A committee of 2 people is chosen from a group of 6. How many different committees are possible? (Order does not matter.)
@@ -116,7 +116,7 @@
 ## Problem 5 — pick-k-of-n-unordered-p05
 
 - **Instance id:** `pick-k-of-n-unordered:1404767269`
-- **Difficulty:** 1300
+- **Difficulty:** 880
 - **Params:** {"n":6,"k":5}
 - **Interaction:** `multiple-choice`
 - **Prompt:** A committee of 5 people is chosen from a group of 6. How many different committees are possible? (Order does not matter.)
