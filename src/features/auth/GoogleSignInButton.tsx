@@ -27,6 +27,12 @@ export function GoogleSignInButton({
   async function handleClick() {
     setSubmitting(true);
     const result = await signInWithGoogle();
+
+    if (result.ok && result.redirecting) {
+      // Page is navigating to Google — stay in loading state until unload.
+      return;
+    }
+
     setSubmitting(false);
 
     if (!result.ok) {

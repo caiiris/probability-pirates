@@ -54,6 +54,8 @@ export const ERROR_COPY = {
     signinCancelled: 'Sign-in was cancelled.',
     popupBlocked:
       'Your browser blocked the sign-in popup. Allow popups for this site, then try again.',
+    redirectStateLost:
+      'Google sign-in could not finish in this browser tab. Open the app in Safari or Chrome and try again.',
     accountExistsDifferentCredential:
       'An account already uses this email. Sign in with your email and password instead.',
     notSignedIn: 'You are not signed in. Sign in and try again.',
@@ -126,4 +128,14 @@ export function authErrorFromFirebaseCode(rawCode: string | undefined): AuthErro
     default:
       return { code: 'unknown', message: ERROR_COPY.auth.unknown };
   }
+}
+
+/** Map a caught Firebase Auth error (code + message) to a learner-facing AuthError. */
+export function authErrorFromFirebase(err: unknown): AuthError {
+  const code = (err as { code?: string }).code;
+  const message = err instanceof Error ? err.message : String(err ?? '');
+  if (message.includes('missing the initial state')) {
+    return { code: 'unknown', message: ERROR_COPY.auth.redirectStateLost };
+  }
+  return authErrorFromFirebaseCode(code);
 }

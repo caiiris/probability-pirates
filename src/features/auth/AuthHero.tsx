@@ -8,8 +8,8 @@ import { OceanScene } from '@/features/course/OceanScene';
  */
 export function AuthHero() {
   return (
-    <OceanScene>
-      <div className="flex flex-col items-center gap-1.5 py-3 text-center">
+    <OceanScene shipsOnly>
+      <div className="flex w-full flex-col items-center justify-center gap-1.5 text-center">
         <Brandmark size={48} />
         <h1 className="font-display text-2xl font-bold tracking-tight text-[color:var(--ink)]">
           Probability Pirates

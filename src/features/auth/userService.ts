@@ -2,6 +2,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   signOut,
   deleteUser,
@@ -10,8 +12,9 @@ import {
 import { doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { track } from '@/lib/analytics';
+import { prefersAuthRedirect, setAuthRedirectError } from '@/features/auth/authRedirect';
 import { publicProfileSeed } from '@/features/social/publicProfile';
-import { ERROR_COPY, authErrorFromFirebaseCode } from '@/lib/errors';
+import { ERROR_COPY, authErrorFromFirebaseCode, authErrorFromFirebase } from '@/lib/errors';
 import type { AuthError, AuthResult } from '@/lib/errors';
 
 // ---------------------------------------------------------------------------
@@ -314,8 +317,35 @@ export async function updateProfile(
 // ---------------------------------------------------------------------------
 
 export type GoogleSignInResult =
-  | { ok: true; isFirstTime: boolean }
+  | { ok: true; isFirstTime: boolean; redirecting?: false }
+  | { ok: true; redirecting: true }
   | { ok: false; error: AuthError };
+
+async function trackGoogleReturnIfReturning(firebaseUser: { uid: string }): Promise<boolean> {
+  const userRef = doc(db, 'users', firebaseUser.uid);
+  const userSnap = await getDoc(userRef);
+  const isFirstTime = !userSnap.exists();
+  if (!isFirstTime) {
+    track('login', { method: 'google' });
+  }
+  return isFirstTime;
+}
+
+/**
+ * Call once on app load to finish a mobile Google redirect sign-in.
+ * Safe to call when no redirect is pending — resolves to null.
+ */
+export async function processGoogleRedirectResult(): Promise<void> {
+  try {
+    const credential = await getRedirectResult(auth);
+    if (!credential?.user) return;
+    await trackGoogleReturnIfReturning(credential.user);
+  } catch (err) {
+    console.error('[processGoogleRedirectResult]', err);
+    const { message } = authErrorFromFirebase(err);
+    setAuthRedirectError(message);
+  }
+}
 
 export async function signInWithGoogle(): Promise<GoogleSignInResult> {
   try {
@@ -324,24 +354,21 @@ export async function signInWithGoogle(): Promise<GoogleSignInResult> {
     // only one Google session exists. Better UX on shared/family devices.
     provider.setCustomParameters({ prompt: 'select_account' });
 
+    if (prefersAuthRedirect()) {
+      await signInWithRedirect(auth, provider);
+      // Page navigates away — caller should keep the button in a loading state.
+      return { ok: true, redirecting: true };
+    }
+
     const credential = await signInWithPopup(auth, provider);
     const firebaseUser = credential.user;
-
-    const userRef = doc(db, 'users', firebaseUser.uid);
-    const userSnap = await getDoc(userRef);
-    const isFirstTime = !userSnap.exists();
-
-    if (!isFirstTime) {
-      track('login', { method: 'google' });
-    }
-    // First-time users get `sign_up` fired from claimUsername, not here —
-    // signup isn't complete until they have a username.
+    const isFirstTime = await trackGoogleReturnIfReturning(firebaseUser);
 
     return { ok: true, isFirstTime };
   } catch (err) {
     const code = (err as { code?: string }).code;
     console.error('[signInWithGoogle]', code, err);
-    return { ok: false, error: authErrorFromFirebaseCode(code) };
+    return { ok: false, error: authErrorFromFirebase(err) };
   }
 }
 

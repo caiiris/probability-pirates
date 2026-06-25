@@ -3,6 +3,7 @@ import type { User } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { processGoogleRedirectResult } from '@/features/auth/userService';
 import { ensurePublicProfile } from '@/features/social/publicProfile';
 
 // ---------------------------------------------------------------------------
@@ -78,68 +79,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // onAuthStateChanged) so we only blow away cached profile data when the
     // identity actually changes.
     let activeUid: string | null = null;
+    let unsubAuth: (() => void) | null = null;
+    let cancelled = false;
 
-    const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
-      const nextUid = firebaseUser?.uid ?? null;
-      const userChanged = nextUid !== activeUid;
+    function wireAuthListener() {
+      unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
+        const nextUid = firebaseUser?.uid ?? null;
+        const userChanged = nextUid !== activeUid;
 
-      // Always tear down the previous profile listener before starting a new one
-      if (unsubProfile) {
-        unsubProfile();
-        unsubProfile = null;
-      }
+        // Always tear down the previous profile listener before starting a new one
+        if (unsubProfile) {
+          unsubProfile();
+          unsubProfile = null;
+        }
 
-      if (!firebaseUser) {
-        activeUid = null;
-        setState({ status: 'unauthenticated' });
-        return;
-      }
+        if (!firebaseUser) {
+          activeUid = null;
+          setState({ status: 'unauthenticated' });
+          return;
+        }
 
-      // On a real account switch, immediately drop the previous user's profile
-      // so their XP / achievements / streak can never bleed onto the new
-      // account's screen during the window before the new snapshot lands (or if
-      // that snapshot errors). Without this, signing in as B while A's profile
-      // is cached in state would render A's progress under B's session.
-      if (userChanged) {
-        activeUid = nextUid;
-        setState({ status: 'authenticated', user: firebaseUser, profile: null });
-      }
-
-      // Authenticated: subscribe to the user's profile doc.
-      // For Google sign-in the profile doc may not exist yet — we treat that
-      // case as `needs_username` (RequireAuth routes them to /setup-username).
-      // For email signup the doc is written transactionally in registerUser,
-      // so we only branch on `needs_username` when the provider is Google.
-      // This avoids a flicker during email signup's brief auth-then-create
-      // window.
-      const isGoogleUser = firebaseUser.providerData.some((p) => p.providerId === 'google.com');
-      const userRef = doc(db, 'users', firebaseUser.uid);
-      unsubProfile = onSnapshot(
-        userRef,
-        (snap) => {
-          if (!snap.exists() && isGoogleUser) {
-            setState({ status: 'needs_username', user: firebaseUser });
-            return;
-          }
-          const profile = snap.exists() ? (snap.data() as UserProfile) : null;
-          setState({ status: 'authenticated', user: firebaseUser, profile });
-          // Backfill/repair the public projection for accounts that predate it.
-          // One-shot per session, best-effort (never blocks auth).
-          if (profile) {
-            void ensurePublicProfile(firebaseUser.uid, profile);
-          }
-        },
-        (err) => {
-          // Never leave the previous user's profile on screen if the read fails.
-          // Surface the current user with no profile rather than stale data.
-          console.error('[AuthProvider] profile snapshot error:', err);
+        // On a real account switch, immediately drop the previous user's profile
+        // so their XP / achievements / streak can never bleed onto the new
+        // account's screen during the window before the new snapshot lands (or if
+        // that snapshot errors). Without this, signing in as B while A's profile
+        // is cached in state would render A's progress under B's session.
+        if (userChanged) {
+          activeUid = nextUid;
           setState({ status: 'authenticated', user: firebaseUser, profile: null });
-        },
-      );
+        }
+
+        // Authenticated: subscribe to the user's profile doc.
+        // For Google sign-in the profile doc may not exist yet — we treat that
+        // case as `needs_username` (RequireAuth routes them to /setup-username).
+        // For email signup the doc is written transactionally in registerUser,
+        // so we only branch on `needs_username` when the provider is Google.
+        // This avoids a flicker during email signup's brief auth-then-create
+        // window.
+        const isGoogleUser = firebaseUser.providerData.some((p) => p.providerId === 'google.com');
+        const userRef = doc(db, 'users', firebaseUser.uid);
+        unsubProfile = onSnapshot(
+          userRef,
+          (snap) => {
+            if (!snap.exists() && isGoogleUser) {
+              setState({ status: 'needs_username', user: firebaseUser });
+              return;
+            }
+            const profile = snap.exists() ? (snap.data() as UserProfile) : null;
+            setState({ status: 'authenticated', user: firebaseUser, profile });
+            // Backfill/repair the public projection for accounts that predate it.
+            // One-shot per session, best-effort (never blocks auth).
+            if (profile) {
+              void ensurePublicProfile(firebaseUser.uid, profile);
+            }
+          },
+          (err) => {
+            // Never leave the previous user's profile on screen if the read fails.
+            // Surface the current user with no profile rather than stale data.
+            console.error('[AuthProvider] profile snapshot error:', err);
+            setState({ status: 'authenticated', user: firebaseUser, profile: null });
+          },
+        );
+      });
+    }
+
+    // Finish mobile Google OAuth redirects before wiring the auth listener.
+    void processGoogleRedirectResult().then(() => {
+      if (cancelled) return;
+      wireAuthListener();
     });
 
     return () => {
-      unsubAuth();
+      cancelled = true;
+      unsubAuth?.();
       if (unsubProfile) unsubProfile();
     };
   }, []);

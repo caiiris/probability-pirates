@@ -12,7 +12,7 @@ export type CaptainContext = 'welcome' | 'allCaught' | 'courseComplete' | 'lesso
 /** `{name}` and `{title}` are replaced when present (with safe fallbacks). */
 export const CAPTAIN_LINES: Record<CaptainContext, string[]> = {
   welcome: [
-    "Ahoy, {name}! I'm Captain Pascal. Chance is a strange sea, but we'll learn to read it together.",
+    "Ahoy, {name}! I'm Captain Pascal. Probability is a strange sea, but we'll learn to sail it together.",
     'Welcome aboard, {name}. Every great navigator started with one lesson. Shall we?',
     "Glad to have you, {name}. Probability looks choppy from shore, but it's calmer once we're sailing.",
   ],

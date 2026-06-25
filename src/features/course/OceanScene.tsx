@@ -10,11 +10,18 @@ import type { AccentName } from '@/lib/theme';
  * is decorative and reduced-motion-safe via the global MotionConfig.
  */
 /**
- * `calm` trims the busiest decoration (the flying dice) for the small identity
- * banners (profile, friends) where the full sky reads as clutter. The course
- * path keeps the full scene.
+ * Decoration modes (cumulative trim, busy → bare):
+ *
+ *  - default — the full treasure-map sea: sun, clouds, gulls, flying dice,
+ *    sailing ships, wave bands. Used by the home course path.
+ *  - `calm` — drops the flying dice for small identity banners (profile,
+ *    friends) where the full sky reads as clutter.
+ *  - `shipsOnly` — drops everything in the sky (sun, clouds, gulls, dice) and
+ *    the wave bands too, leaving just the sea gradient and the sailing fleet.
+ *    Used by the auth banner where the chrome should be quiet.
  */
-export function OceanScene({ children, calm = false }: { children: ReactNode; calm?: boolean }) {
+type Props = { children: ReactNode; calm?: boolean; shipsOnly?: boolean };
+export function OceanScene({ children, calm = false, shipsOnly = false }: Props) {
   return (
     <div
       className="relative overflow-hidden rounded-3xl border border-[color:var(--info)]/15 shadow-soft"
@@ -23,36 +30,42 @@ export function OceanScene({ children, calm = false }: { children: ReactNode; ca
       }}
     >
       {/* sun */}
-      <div
-        className="pointer-events-none absolute right-6 top-6 h-12 w-12 rounded-full"
-        style={{ background: '#FCD988', boxShadow: '0 0 0 8px rgb(252 217 136 / 0.3)' }}
-        aria-hidden="true"
-      />
+      {!shipsOnly && (
+        <div
+          className="pointer-events-none absolute right-6 top-6 h-12 w-12 rounded-full"
+          style={{ background: '#FCD988', boxShadow: '0 0 0 8px rgb(252 217 136 / 0.3)' }}
+          aria-hidden="true"
+        />
+      )}
 
       {/* drifting clouds */}
-      <Cloud className="absolute left-6 top-10 w-20 opacity-90" duration={26} drift={40} />
-      <Cloud
-        className="absolute right-10 top-24 w-14 opacity-80"
-        duration={32}
-        drift={-30}
-        delay={4}
-      />
-      <Cloud
-        className="absolute left-1/4 top-44 w-16 opacity-75"
-        duration={38}
-        drift={50}
-        delay={8}
-      />
+      {!shipsOnly && (
+        <>
+          <Cloud className="absolute left-6 top-10 w-20 opacity-90" duration={26} drift={40} />
+          <Cloud
+            className="absolute right-10 top-24 w-14 opacity-80"
+            duration={32}
+            drift={-30}
+            delay={4}
+          />
+          <Cloud
+            className="absolute left-1/4 top-44 w-16 opacity-75"
+            duration={38}
+            drift={50}
+            delay={8}
+          />
+        </>
+      )}
 
       {/* seagulls */}
-      <Gulls className="absolute left-1/2 top-16 -translate-x-1/2" />
+      {!shipsOnly && <Gulls className="absolute left-1/2 top-16 -translate-x-1/2" />}
 
       {/* flying dice up in the sky band (above the first banner), spread out and
           clear of the sun (top-right) and gulls (top-center). Dice further down
           the voyage live in the path itself (see CoursePath) so they stay
           visible at any width rather than hiding in the margins. Dropped in
-          `calm` mode (identity banners) to declutter the small card. */}
-      {!calm && (
+          `calm` mode (identity banners) and `shipsOnly` mode (auth) to declutter. */}
+      {!calm && !shipsOnly && (
         <>
           <SkyDie
             className="absolute left-[13%]"
@@ -81,40 +94,52 @@ export function OceanScene({ children, calm = false }: { children: ReactNode; ca
         </>
       )}
 
-      {/* pirate fleet sailing the sea: kept to the side margins (behind the path)
-          so the ships sit on open water and never sail across the lesson islands.
-          Distributed down the voyage so the longer course still feels populated. */}
-      {SHIPS.map((s, i) => (
+      {/* pirate fleet — auth banner keeps ships low in the water so the centered
+          logo/wordmark stays clear; course path spreads them down the voyage. */}
+      {(shipsOnly ? SHIPS_AUTH : SHIPS).map((s, i) => (
         <Ship key={i} {...s} />
       ))}
 
-      {/* foam wave bands */}
-      <WaveBand
-        className="absolute left-0 right-0"
-        style={{ top: '38%' }}
-        color="#FFFFFF"
-        opacity={0.4}
-        duration={18}
-      />
-      <WaveBand
-        className="absolute left-0 right-0"
-        style={{ top: '64%' }}
-        color="#FFFFFF"
-        opacity={0.32}
-        duration={22}
-        reverse
-      />
-      <WaveBand
-        className="absolute left-0 right-0"
-        style={{ top: '86%' }}
-        color="#FFFFFF"
-        opacity={0.28}
-        duration={26}
-      />
+      {/* foam wave bands — also dropped in shipsOnly so the auth banner reads
+          as a quiet sea, not a full kinetic scene. */}
+      {!shipsOnly && (
+        <>
+          <WaveBand
+            className="absolute left-0 right-0"
+            style={{ top: '38%' }}
+            color="#FFFFFF"
+            opacity={0.4}
+            duration={18}
+          />
+          <WaveBand
+            className="absolute left-0 right-0"
+            style={{ top: '64%' }}
+            color="#FFFFFF"
+            opacity={0.32}
+            duration={22}
+            reverse
+          />
+          <WaveBand
+            className="absolute left-0 right-0"
+            style={{ top: '86%' }}
+            color="#FFFFFF"
+            opacity={0.28}
+            duration={26}
+          />
+        </>
+      )}
 
-      {/* the path itself — extra top room keeps the first chapter banner clear
-          of the sky decorations (sun, clouds, gulls, flying dice) above it */}
-      <div className="relative z-10 px-2 pt-24 pb-8">{children}</div>
+      {/* Content slot. Course path needs top padding to clear sky art; the auth
+          banner (`shipsOnly`) centers its logo + wordmark in the sea instead. */}
+      <div
+        className={
+          shipsOnly
+            ? 'relative z-10 flex min-h-44 flex-col items-center justify-center px-4 py-6'
+            : 'relative z-10 px-2 pt-24 pb-8'
+        }
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -136,6 +161,12 @@ const SHIPS: ShipConfig[] = [
   { top: '34%', side: 'left', inset: 6, size: 54, duration: 22, delay: 0 },
   { top: '58%', side: 'right', inset: 5, size: 46, duration: 26, delay: 3 },
   { top: '82%', side: 'left', inset: 9, size: 58, duration: 24, delay: 1.5 },
+];
+
+/** Lower, smaller fleet for the compact auth banner — stays out of the centered logo. */
+const SHIPS_AUTH: ShipConfig[] = [
+  { top: '68%', side: 'left', inset: 4, size: 44, duration: 22, delay: 0 },
+  { top: '74%', side: 'right', inset: 4, size: 40, duration: 26, delay: 2 },
 ];
 
 function Ship({ top, side, inset, size, duration, delay }: ShipConfig) {

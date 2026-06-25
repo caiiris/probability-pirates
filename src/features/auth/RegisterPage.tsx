@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CaptainPascal } from '@/features/captain/CaptainPascal';
 import { AuthHero } from './AuthHero';
 import { registerUser } from './userService';
+import { takeAuthRedirectError } from './authRedirect';
+import { useAuth } from './AuthProvider';
 import { GoogleSignInButton } from './GoogleSignInButton';
 
 type FieldErrors = {
@@ -21,6 +23,7 @@ const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const auth = useAuth();
   const [fields, setFields] = useState({
     email: '',
     username: '',
@@ -29,6 +32,15 @@ export function RegisterPage() {
   });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const redirectError = takeAuthRedirectError();
+    if (redirectError) setErrors({ form: redirectError });
+  }, []);
+
+  if (auth.status === 'loading') return null;
+  if (auth.status === 'needs_username') return <Navigate to="/setup-username" replace />;
+  if (auth.status === 'authenticated') return <Navigate to="/" replace />;
 
   function validate(): FieldErrors {
     const errs: FieldErrors = {};
