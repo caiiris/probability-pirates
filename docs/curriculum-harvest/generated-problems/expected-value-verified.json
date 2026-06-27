@@ -1,0 +1,374 @@
+{
+  "generatedBy": "scripts/curriculum-harvest/verify-expected-value.ts",
+  "expands": "CL-0022 - Nonlinear payoff expected value, broadened into fair price, net gain, and strategy-choice variants.",
+  "noModelOrApiCalls": true,
+  "problemCount": 7,
+  "verifiedCount": 7,
+  "missingTaxonomyIds": [
+    "algebraic-payoff",
+    "expected-net-gain",
+    "expected-value",
+    "fair-game",
+    "nonlinear-payoff",
+    "payoff-modeling",
+    "probability-distribution",
+    "strategy-choice",
+    "weighted-average"
+  ],
+  "blockers": [
+    "Runtime taxonomy is missing these proposed skill IDs: algebraic-payoff, expected-net-gain, expected-value, fair-game, nonlinear-payoff, payoff-modeling, probability-distribution, strategy-choice, weighted-average.",
+    "In particular, `expected-value` is not present in `src/content/skills.ts`; this lane records it without editing taxonomy."
+  ],
+  "problems": [
+    {
+      "id": "expected-value-0001",
+      "candidateId": "EV-CAND-0001",
+      "title": "Spinner payoff table average",
+      "category": "simple payoff table expected value",
+      "difficultyTag": "medium",
+      "prompt": "A carnival spinner lands on red with probability 1/2, blue with probability 1/3, and gray with probability 1/6. Red pays $2.00, blue pays $0.50, and gray loses $1.00. What is the long-run average payoff per spin?",
+      "answer": "$1.00 (100/1 cents)",
+      "solver": "E = 200(1/2) + 50(1/3) - 100(1/6) cents",
+      "skills": [
+        "expected-value",
+        "weighted-average",
+        "long-run-vs-single-trial",
+        "probability-distribution"
+      ],
+      "misconceptions": [
+        "chooses-most-likely-outcome-as-average",
+        "ignores-negative-payoff",
+        "adds-payoffs-without-probability-weights"
+      ],
+      "coreTrick": "Treat each payoff as a signed number of cents before taking the weighted average.",
+      "templateSketch": "Generate a 3- or 4-row payoff table with rational probabilities and signed cent payoffs.",
+      "interactionFit": "Payoff table plus fill-currency answer.",
+      "solverFeasibility": "Exact rational cents arithmetic over a short outcome table.",
+      "outcomes": [
+        {
+          "label": "Red sector",
+          "probability": "1/2",
+          "payoffCents": "200/1"
+        },
+        {
+          "label": "Blue sector",
+          "probability": "1/3",
+          "payoffCents": "50/1"
+        },
+        {
+          "label": "Gray sector",
+          "probability": "1/6",
+          "payoffCents": "-100/1"
+        }
+      ],
+      "verification": [
+        "Probability mass sums to 1/1.",
+        "Exact expected payoff is $1.00 (100/1 cents).",
+        "Negative gray spins are included as negative cents, not ignored."
+      ],
+      "passed": true,
+      "recognizedSkillIds": [
+        "long-run-vs-single-trial"
+      ],
+      "missingTaxonomyIds": [
+        "expected-value",
+        "weighted-average",
+        "probability-distribution"
+      ]
+    },
+    {
+      "id": "expected-value-0002",
+      "candidateId": "EV-CAND-0002",
+      "title": "Fair entry price for a prize wheel",
+      "category": "fair entry price",
+      "difficultyTag": "medium",
+      "prompt": "A prize wheel pays $7.00 on the top stripe, $1.00 on a small stripe, and $0 on the blank area. The probabilities are 1/4, 1/8, and 5/8. What exact entry price, in cents, would make this game fair in the long run?",
+      "answer": "Fair price = 375/2 cents (15/8 dollars)",
+      "solver": "Fair entry price equals the expected gross prize.",
+      "skills": [
+        "expected-value",
+        "fair-game",
+        "weighted-average",
+        "long-run-vs-single-trial"
+      ],
+      "misconceptions": [
+        "sets-fair-price-to-most-common-prize",
+        "rounds-before-computing",
+        "confuses-gross-prize-with-net-gain"
+      ],
+      "coreTrick": "A fair price is the break-even long-run average prize before rounding.",
+      "templateSketch": "Generate prize-wheel probabilities and ask for the exact fair entry price in cents.",
+      "interactionFit": "Fill-fraction cents answer, optionally followed by a fair/unfair comparison.",
+      "solverFeasibility": "Exact rational cents arithmetic; no decimal rounding required.",
+      "outcomes": [
+        {
+          "label": "Top stripe",
+          "probability": "1/4",
+          "payoffCents": "700/1"
+        },
+        {
+          "label": "Small stripe",
+          "probability": "1/8",
+          "payoffCents": "100/1"
+        },
+        {
+          "label": "Blank stripe",
+          "probability": "5/8",
+          "payoffCents": "0/1"
+        }
+      ],
+      "verification": [
+        "Probability mass sums to 1/1.",
+        "Expected gross prize is 375/2 cents (15/8 dollars).",
+        "The answer is intentionally a rational number of cents, so rounding is not part of verification."
+      ],
+      "passed": true,
+      "recognizedSkillIds": [
+        "long-run-vs-single-trial"
+      ],
+      "missingTaxonomyIds": [
+        "expected-value",
+        "fair-game",
+        "weighted-average"
+      ]
+    },
+    {
+      "id": "expected-value-0003",
+      "candidateId": "EV-CAND-0003",
+      "title": "Bonus stars with nonlinear payoff",
+      "category": "nonlinear payoff rule",
+      "difficultyTag": "hard",
+      "prompt": "An arcade card reveals 0, 1, 2, 3, or 5 stars with probabilities 1/5, 3/10, 1/4, 1/5, and 1/20. The first two stars pay 60 cents each, but every star after the second pays 150 cents. What is the long-run average payoff per card?",
+      "answer": "261/2 cents (261/200 dollars)",
+      "solver": "Convert each star count to its rule-based payoff first, then weight those payoffs.",
+      "skills": [
+        "expected-value",
+        "payoff-modeling",
+        "weighted-average",
+        "nonlinear-payoff"
+      ],
+      "misconceptions": [
+        "multiplies-expected-count-by-unit-price",
+        "ignores-bonus-threshold",
+        "uses-most-likely-count-as-average"
+      ],
+      "coreTrick": "Expected star count times 60 cents is wrong because the payoff rule changes after two stars.",
+      "templateSketch": "Generate a count distribution with a threshold bonus, discount, or penalty rule.",
+      "interactionFit": "Rule interpretation card, payoff-table builder, then exact cents entry.",
+      "solverFeasibility": "Exact cents per outcome; verify the nonlinear shortcut gives a different value.",
+      "outcomes": [
+        {
+          "label": "0 stars",
+          "probability": "1/5",
+          "payoffCents": "0/1"
+        },
+        {
+          "label": "1 star",
+          "probability": "3/10",
+          "payoffCents": "60/1"
+        },
+        {
+          "label": "2 stars",
+          "probability": "1/4",
+          "payoffCents": "120/1"
+        },
+        {
+          "label": "3 stars",
+          "probability": "1/5",
+          "payoffCents": "270/1"
+        },
+        {
+          "label": "5 stars",
+          "probability": "1/20",
+          "payoffCents": "570/1"
+        }
+      ],
+      "verification": [
+        "Probability mass sums to 1/1.",
+        "Exact expected payoff is 261/2 cents (261/200 dollars).",
+        "Expected stars are 33/20.",
+        "Naive 60-cent shortcut gives $0.99 (99/1 cents), so the trap is active."
+      ],
+      "passed": true,
+      "recognizedSkillIds": [],
+      "missingTaxonomyIds": [
+        "expected-value",
+        "payoff-modeling",
+        "weighted-average",
+        "nonlinear-payoff"
+      ]
+    },
+    {
+      "id": "expected-value-0004",
+      "candidateId": "EV-CAND-0004",
+      "title": "Choose the better long-run game",
+      "category": "choose between two games by expected value",
+      "difficultyTag": "hard",
+      "prompt": "You can play one of two games many times. Game A pays $7.00 with probability 1/5 and loses $0.50 otherwise. Game B pays $2.40 with probability 1/2 and pays $0 otherwise. Which game has the better long-run average payoff?",
+      "answer": "Choose Game B; its expected payoff is higher by $0.20 (20/1 cents) per play.",
+      "solver": "Compute each game EV separately, then compare.",
+      "skills": [
+        "expected-value",
+        "strategy-choice",
+        "weighted-average",
+        "long-run-vs-single-trial"
+      ],
+      "misconceptions": [
+        "chooses-largest-jackpot",
+        "ignores-loss-frequency",
+        "compares-win-probability-without-payoff-size"
+      ],
+      "coreTrick": "The bigger jackpot is not enough; long-run choice depends on probability-weighted payoff.",
+      "templateSketch": "Generate two games with competing jackpot size and win frequency.",
+      "interactionFit": "Two-card comparison with multiple-choice strategy and exact EV reveal.",
+      "solverFeasibility": "Two exact EV computations and a rational comparison.",
+      "verification": [
+        "Game A expected payoff is $1.00 (100/1 cents).",
+        "Game B expected payoff is $1.20 (120/1 cents).",
+        "Game B edge is $0.20 (20/1 cents)."
+      ],
+      "passed": true,
+      "recognizedSkillIds": [
+        "long-run-vs-single-trial"
+      ],
+      "missingTaxonomyIds": [
+        "expected-value",
+        "strategy-choice",
+        "weighted-average"
+      ]
+    },
+    {
+      "id": "expected-value-0005",
+      "candidateId": "EV-CAND-0005",
+      "title": "Raffle ticket expected net gain",
+      "category": "expected net gain after cost",
+      "difficultyTag": "medium",
+      "prompt": "A raffle ticket costs $2.75. It wins $20 with probability 1/20, $5 with probability 3/20, and $0 otherwise. What is the expected net gain per ticket over the long run?",
+      "answer": "-$1.00 (-100/1 cents) per ticket",
+      "solver": "Expected net gain = expected gross prize - ticket cost.",
+      "skills": [
+        "expected-value",
+        "expected-net-gain",
+        "weighted-average",
+        "long-run-vs-single-trial"
+      ],
+      "misconceptions": [
+        "reports-gross-prize-instead-of-net",
+        "forgets-ticket-cost",
+        "treats-rare-large-prize-as-typical"
+      ],
+      "coreTrick": "Subtract the certain cost after computing the expected gross prize.",
+      "templateSketch": "Generate a raffle or insurance table with a fixed entry cost.",
+      "interactionFit": "Prize table plus signed currency entry for net gain.",
+      "solverFeasibility": "Exact integer cents arithmetic; cost is a deterministic subtraction.",
+      "outcomes": [
+        {
+          "label": "$20 prize",
+          "probability": "1/20",
+          "payoffCents": "2000/1"
+        },
+        {
+          "label": "$5 prize",
+          "probability": "3/20",
+          "payoffCents": "500/1"
+        },
+        {
+          "label": "No prize",
+          "probability": "4/5",
+          "payoffCents": "0/1"
+        }
+      ],
+      "verification": [
+        "Prize probabilities sum to 1/1.",
+        "Expected gross prize is $1.75 (175/1 cents).",
+        "After subtracting $2.75 (275/1 cents), expected net gain is -$1.00 (-100/1 cents)."
+      ],
+      "passed": true,
+      "recognizedSkillIds": [
+        "long-run-vs-single-trial"
+      ],
+      "missingTaxonomyIds": [
+        "expected-value",
+        "expected-net-gain",
+        "weighted-average"
+      ]
+    },
+    {
+      "id": "expected-value-0006",
+      "candidateId": "EV-CAND-0006",
+      "title": "Set the jackpot to make a die game fair",
+      "category": "fair game payoff design",
+      "difficultyTag": "hard",
+      "prompt": "A die game costs $3.00. Rolling a 6 wins a jackpot, rolling 4 or 5 returns $3.00, and rolling 1, 2, or 3 pays $0. What jackpot makes the expected net gain exactly $0?",
+      "answer": "The fair jackpot is $12.00 (1200/1 cents).",
+      "solver": "Set jackpot(1/6) + 300(2/6) - 300 = 0 and solve exactly.",
+      "skills": [
+        "expected-value",
+        "fair-game",
+        "payoff-modeling",
+        "algebraic-payoff"
+      ],
+      "misconceptions": [
+        "sets-jackpot-equal-to-entry-cost",
+        "forgets-refund-outcomes",
+        "solves-for-gross-payoff-instead-of-net-zero"
+      ],
+      "coreTrick": "Fair means expected net gain is zero, so the known refund outcomes reduce the jackpot needed.",
+      "templateSketch": "Generate a cost, a partial-refund event, and solve for the fair jackpot or penalty.",
+      "interactionFit": "Equation-building step followed by fill-currency answer.",
+      "solverFeasibility": "Single linear equation over rational cents.",
+      "verification": [
+        "Expected refund contribution is $1.00 (100/1 cents).",
+        "Required jackpot solves to $12.00 (1200/1 cents).",
+        "Expected net gain with that jackpot is $0.00 (0/1 cents)."
+      ],
+      "passed": true,
+      "recognizedSkillIds": [],
+      "missingTaxonomyIds": [
+        "expected-value",
+        "fair-game",
+        "payoff-modeling",
+        "algebraic-payoff"
+      ]
+    },
+    {
+      "id": "expected-value-0007",
+      "candidateId": "EV-CAND-0007",
+      "title": "Two-dice booth strategy",
+      "category": "payoff strategy choice",
+      "difficultyTag": "extreme",
+      "prompt": "Two arcade booths each cost $3.00 and use two fair dice. Safe Booth pays $1.00 times the higher die. Risky Booth pays $10.00 for doubles, $2.00 when the dice differ by 1, and charges a $1.00 penalty otherwise. Which booth has the better long-run net payoff?",
+      "answer": "Choose Safe Booth; its expected net payoff is higher by 2525/9 cents (101/36 dollars).",
+      "solver": "Enumerate the 36 ordered dice outcomes and compute net EV for each booth.",
+      "skills": [
+        "expected-value",
+        "strategy-choice",
+        "sample-space-enumeration",
+        "payoff-modeling"
+      ],
+      "misconceptions": [
+        "chooses-largest-possible-prize",
+        "ignores-ordered-dice-outcomes",
+        "forgets-entry-cost-or-penalty"
+      ],
+      "coreTrick": "The risky booth has a bigger top prize, but its many penalty outcomes dominate the average.",
+      "templateSketch": "Generate two dice-based payoff strategies and verify by exact 36-outcome enumeration.",
+      "interactionFit": "Outcome-grid comparison plus choose-strategy multiple choice.",
+      "solverFeasibility": "Exact enumeration over 36 ordered outcomes with rational cents comparison.",
+      "verification": [
+        "Safe Booth gross EV is 4025/9 cents (161/36 dollars); net EV is 1325/9 cents (53/36 dollars).",
+        "Risky Booth gross EV is 500/3 cents (5/3 dollars); net EV is -400/3 cents (-4/3 dollars).",
+        "Safe Booth edge is 2525/9 cents (101/36 dollars)."
+      ],
+      "passed": true,
+      "recognizedSkillIds": [
+        "sample-space-enumeration"
+      ],
+      "missingTaxonomyIds": [
+        "expected-value",
+        "strategy-choice",
+        "payoff-modeling"
+      ]
+    }
+  ]
+}

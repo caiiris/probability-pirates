@@ -15,10 +15,9 @@ type LessonVisual = { accent: AccentName; glyph: GlyphName };
 
 const VISUALS: Record<string, LessonVisual> = {
   'what-is-probability': { accent: 'violet', glyph: 'die' },
-  // The course opener is dice-themed; long-run-frequency lives next to it on
-  // the path, so we hand it the cards glyph (instead of falling through to the
-  // default coin) to avoid two heads/tails-y lesson nodes back-to-back.
-  'long-run-frequency': { accent: 'blue', glyph: 'cards' },
+  // Long-run-frequency uses the coin glyph — the lesson IS coin-flipping; the
+  // concentric circles read clearly as a coin and match the lesson's content.
+  'long-run-frequency': { accent: 'blue', glyph: 'coin' },
   'law-of-large-numbers': { accent: 'blue', glyph: 'coin' },
   'counting-carefully': { accent: 'green', glyph: 'tree' },
   'counting-gets-hard': { accent: 'teal', glyph: 'cards' },

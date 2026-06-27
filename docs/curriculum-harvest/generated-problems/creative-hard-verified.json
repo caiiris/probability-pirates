@@ -1,0 +1,110 @@
+[
+  {
+    "id": "creative-0001",
+    "candidateId": "CAND-0001",
+    "title": "Nonlinear payoff expected value",
+    "difficultyTag": "hard / creative",
+    "prompt": "A shop sells gem packs. A 12-pack has a discount, so payoff is not just count times unit price. What is the expected revenue per customer?",
+    "answer": "$2.01 (201/1 cents)",
+    "solver": "sum payoffCents(outcome) * P(outcome)",
+    "verification": [
+      "Probability mass sums to 1/1.",
+      "Exact expected revenue is 201/1 cents.",
+      "Naive unit-price shortcut gives 204/1 cents, so the trap is real."
+    ],
+    "passed": true
+  },
+  {
+    "id": "creative-0002",
+    "candidateId": "CAND-0002",
+    "title": "Coupon collector small-set challenge",
+    "difficultyTag": "hard / creative",
+    "prompt": "There are 4 sticker types. Each pack has one random sticker. What is the expected number of packs to complete the set?",
+    "answer": "25/3 packs (8.333)",
+    "solver": "k * (1 + 1/2 + ... + 1/k)",
+    "verification": [
+      "Exact expectation is 25/3.",
+      "Simulation mean over 80,000 runs is 8.314.",
+      "Absolute difference is 0.020."
+    ],
+    "passed": true
+  },
+  {
+    "id": "creative-0003",
+    "candidateId": "CAND-0003",
+    "title": "Ballot lead probability",
+    "difficultyTag": "expert / creative",
+    "prompt": "A finishes with 5 votes and B with 3. If the votes are revealed in random order, what is the chance A is always ahead?",
+    "answer": "1/4",
+    "solver": "exact enumeration for small totals; formula check (a-b)/(a+b)",
+    "verification": [
+      "14 favorable sequences out of 56.",
+      "Enumeration gives 1/4.",
+      "Ballot formula gives 1/4."
+    ],
+    "passed": true
+  },
+  {
+    "id": "creative-0004",
+    "candidateId": "CAND-0004",
+    "title": "Odds-and-evens fairness by parity counts",
+    "difficultyTag": "medium-hard / creative",
+    "prompt": "A bag has 3 even tokens and 4 odd tokens. Two tokens are drawn. You win if their sum is even. Is this fair?",
+    "answer": "3/7. Not fair.",
+    "solver": "(C(even,2) + C(odd,2)) / C(total,2)",
+    "verification": [
+      "Same-parity pairs: C(3,2) + C(4,2) = 9.",
+      "All pairs: C(7,2) = 21.",
+      "Win probability is 3/7."
+    ],
+    "passed": true
+  },
+  {
+    "id": "creative-0005",
+    "candidateId": "CAND-0005",
+    "title": "Inverse spinner from frequency chart",
+    "difficultyTag": "hard / creative",
+    "prompt": "A spinner produced counts 24, 17, and 9 over 50 spins. Which candidate spinner most likely generated it?",
+    "answer": "Spinner A",
+    "solver": "choose largest multinomial log likelihood",
+    "verification": [
+      "Spinner A: log likelihood -51.438",
+      "Spinner B: log likelihood -54.931",
+      "Spinner C: log likelihood -56.317"
+    ],
+    "passed": true
+  },
+  {
+    "id": "creative-0006",
+    "candidateId": "CAND-0006",
+    "title": "Last one standing streak survival",
+    "difficultyTag": "hard / creative",
+    "prompt": "30 players each try for 5 heads in a row. What is the probability at least one player succeeds?",
+    "answer": "876629172360049043683749097544355950703884223/1427247692705959881058285969449495136382746624 (0.614)",
+    "solver": "1 - (1 - 1/2^5)^30",
+    "verification": [
+      "Exact complement is 550618520345910837374536871905139185678862401/1427247692705959881058285969449495136382746624.",
+      "Simulation estimate over 80,000 runs is 0.615.",
+      "Absolute difference is 0.001."
+    ],
+    "passed": true
+  },
+  {
+    "id": "creative-0007",
+    "candidateId": "CAND-0007",
+    "title": "Non-transitive dice strategy",
+    "difficultyTag": "expert / creative",
+    "prompt": "Three custom dice form a cycle: A tends to beat B, B tends to beat C, and C tends to beat A. Verify the cycle.",
+    "answer": "A beats B: 5/9; B beats C: 5/9; C beats A: 5/9",
+    "solver": "exact enumeration over 36 pair outcomes for each matchup",
+    "verification": [
+      "Die A: 2, 2, 4, 4, 9, 9",
+      "Die B: 1, 1, 6, 6, 8, 8",
+      "Die C: 3, 3, 5, 5, 7, 7",
+      "A over B: 5/9",
+      "B over C: 5/9",
+      "C over A: 5/9"
+    ],
+    "passed": true
+  }
+]

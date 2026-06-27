@@ -16,7 +16,7 @@
  */
 
 import type { Template } from '../types';
-import { frac } from '@/lib/probability/exact';
+import { frac, eqF } from '@/lib/probability/exact';
 
 type Params = {
   tp: number; // true positives
@@ -58,6 +58,11 @@ export const conditionalBayes2x2Template: Template<Params> = {
     if (answer.kind !== 'fraction') throw new Error('solve returned unexpected kind');
     const { num, den } = answer.value;
     const total = tp + fp + fn + tn;
+    // Trap: sensitivity = tp/(tp+fn) — the base_rate_neglect error (confusing PPV with sensitivity)
+    const trap = frac(tp, tp + fn);
+    const misconceptionByFraction = !eqF(trap, answer.value)
+      ? [{ num: Number(trap.num), den: Number(trap.den), key: 'base_rate_neglect' as const }]
+      : [];
     return {
       id: `conditional-bayes-2x2:${tp},${fp},${fn},${tn}`,
       interactionKind: 'fill-fraction',
@@ -74,9 +79,9 @@ export const conditionalBayes2x2Template: Template<Params> = {
       feedbackCorrect:
         `Correct! Among the ${tp + fp} people who tested positive, ${tp} truly have the signal: P = ${Number(num)}/${Number(den)}.`,
       feedbackDefault:
-        `Condition on the event "test positive": only look at the ${tp + fp} people with a positive result. ` +
-        `Of those, ${tp} truly have the signal, so P(signal | test+) = ${tp}/${tp + fp}.`,
+        `The phrase "given that a person tests positive" tells you which group belongs in the denominator. Start there before choosing the numerator.`,
       skills: ['conditional-probability', 'base-rate'],
+      ...(misconceptionByFraction.length > 0 ? { misconceptionByFraction } : {}),
     };
   },
 

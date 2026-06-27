@@ -16,6 +16,9 @@ const FEEDBACK_FIELDS_BY_KIND: Record<
 > = {
   'tap-outcomes': [{ field: 'feedbackByWrongValue', requirement: 'required' }],
   'fill-fraction': [{ field: 'feedbackByWrongAnswer', requirement: 'required' }],
+  // Practice-only free-response integer; per-key feedback is optional (the
+  // 3-try AI hint ladder + feedbackDefault carry the explanation).
+  'number-fill': [{ field: 'feedbackByWrongAnswer', requirement: 'optional' }],
   'tap-event': [{ field: 'feedbackByWrongOutcome', requirement: 'required' }],
   'grid-event': [{ field: 'feedbackByCell', requirement: 'optional' }],
   'multiple-choice': [{ field: 'feedbackByOption', requirement: 'required' }],
@@ -45,7 +48,8 @@ function getVariantFeedbackRecord(
         : undefined;
     case 'feedbackByWrongAnswer':
       return variant.interactionKind === 'fill-fraction' ||
-        variant.interactionKind === 'fill-text'
+        variant.interactionKind === 'fill-text' ||
+        variant.interactionKind === 'number-fill'
         ? variant.feedbackByWrongAnswer
         : undefined;
     case 'feedbackByWrongOutcome':

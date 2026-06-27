@@ -1,0 +1,40 @@
+[
+  {
+    "id": "verified-at-least-one-via-complement-p05-p01",
+    "instanceId": "verified-at-least-one-via-complement-p05:890490568",
+    "templateId": "verified-at-least-one-via-complement-p05",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 760,
+    "params": {
+      "m": 2,
+      "n": 2
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair coin is flipped 2 times independently. What is the probability of getting heads at least once?",
+    "context": null,
+    "answer": "3/4",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(at least one head in 2 flips)",
+      "steps": [
+        "Complement rule: P(at least one) = 1 − P(zero occurrences).",
+        "P(miss on a single trial) = 1 − 1/2 = 1/2.",
+        "Trials are independent, so P(miss all 2) = (1/2)^2 = 1/4.",
+        "P(at least one) = 1 − 1/4 = 3/4."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.75,
+      "simulationEstimate": 0.75138,
+      "absoluteDifference": 0.0013800000000000479,
+      "sigmaThreshold": 0.009682458365518542,
+      "passed": true
+    }
+  }
+]

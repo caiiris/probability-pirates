@@ -1,0 +1,421 @@
+{
+  "laneId": "without-replacement-casework-probability",
+  "reviewOnly": true,
+  "sourceCopying": "none",
+  "generatedBy": "scripts/curriculum-harvest/verify-without-replacement.ts",
+  "artifacts": {
+    "markdown": "docs/curriculum-harvest/generated-problems/without-replacement-verified.md",
+    "json": "docs/curriculum-harvest/generated-problems/without-replacement-verified.json",
+    "candidates": "docs/curriculum-harvest/candidates/without-replacement-batch.md"
+  },
+  "taxonomy": {
+    "usedExistingSkillIds": [
+      "addition-principle",
+      "combinations",
+      "complement-rule",
+      "conditional-probability",
+      "favorable-over-total",
+      "independence",
+      "multiplication-principle",
+      "sample-space-enumeration"
+    ],
+    "missingSuggestedSkillIds": [
+      "without-replacement",
+      "casework-probability"
+    ]
+  },
+  "examples": [
+    {
+      "id": "wr-0001",
+      "candidateId": "CAND-WR-0001",
+      "title": "One red and two blue enamel pins",
+      "difficultyTag": "medium-hard",
+      "prompt": "A craft box has 5 red pins, 4 blue pins, and 3 silver pins. You grab 3 pins without looking and do not put any back. What is the probability you get exactly 1 red pin and exactly 2 blue pins?",
+      "answer": "3/22",
+      "exactValues": [
+        {
+          "label": "P(exactly 1 red and 2 blue)",
+          "fraction": {
+            "text": "3/22",
+            "numerator": "3",
+            "denominator": "22",
+            "decimalApprox": 0.136364
+          }
+        }
+      ],
+      "skills": [
+        "combinations",
+        "favorable-over-total",
+        "multiplication-principle"
+      ],
+      "misconceptions": [
+        "uses-with-replacement-denominators",
+        "counts-only-one-order",
+        "treats-exactly-as-at-least"
+      ],
+      "solver": {
+        "primaryMethod": "combinations over unordered 3-pin hands",
+        "formula": "C(5,1) * C(4,2) / C(12,3)",
+        "steps": [
+          "Choose the one red pin: C(5,1).",
+          "Choose the two blue pins: C(4,2).",
+          "Divide by all 3-pin hands from 12 pins: C(12,3)."
+        ]
+      },
+      "verificationResult": {
+        "passed": true,
+        "checks": [
+          {
+            "label": "ordered sequential casework",
+            "method": "RBB + BRB + BBR sequential products",
+            "actual": "3/22",
+            "expected": "3/22",
+            "passed": true,
+            "details": [
+              "Combination count gives 3/22.",
+              "Summing the three possible orders gives 3/22."
+            ]
+          }
+        ]
+      },
+      "provenance": {
+        "promptAuthorship": "original",
+        "sourceCopying": "none",
+        "reviewOnly": true
+      }
+    },
+    {
+      "id": "wr-0002",
+      "candidateId": "CAND-WR-0002",
+      "title": "Two matching hardware tokens",
+      "difficultyTag": "medium",
+      "prompt": "A workshop drawer has 6 brass tokens, 5 steel tokens, and 4 copper tokens. Two tokens are drawn without replacement. What is the probability the two tokens are made of the same metal?",
+      "answer": "31/105",
+      "exactValues": [
+        {
+          "label": "P(same metal)",
+          "fraction": {
+            "text": "31/105",
+            "numerator": "31",
+            "denominator": "105",
+            "decimalApprox": 0.295238
+          }
+        }
+      ],
+      "skills": [
+        "combinations",
+        "favorable-over-total",
+        "addition-principle"
+      ],
+      "misconceptions": [
+        "assumes-same-and-different-are-equally-likely",
+        "forgets-one-category-case",
+        "multiplies-counts-across-categories"
+      ],
+      "solver": {
+        "primaryMethod": "casework by metal category",
+        "formula": "(C(6,2) + C(5,2) + C(4,2)) / C(15,2)",
+        "steps": [
+          "Same-metal pairs can be brass-brass, steel-steel, or copper-copper.",
+          "Add the three same-category counts.",
+          "Divide by all unordered pairs of tokens."
+        ]
+      },
+      "verificationResult": {
+        "passed": true,
+        "checks": [
+          {
+            "label": "sequential category sum",
+            "method": "sum c/15 * (c-1)/14 across metals",
+            "actual": "31/105",
+            "expected": "31/105",
+            "passed": true,
+            "details": [
+              "Same-metal pair count is 31.",
+              "Sequential probability sum gives 31/105."
+            ]
+          }
+        ]
+      },
+      "provenance": {
+        "promptAuthorship": "original",
+        "sourceCopying": "none",
+        "reviewOnly": true
+      }
+    },
+    {
+      "id": "wr-0003",
+      "candidateId": "CAND-WR-0003",
+      "title": "At least one mystery book",
+      "difficultyTag": "medium",
+      "prompt": "A librarian sets aside 4 mystery novels and 8 other novels. A student randomly takes 3 novels without replacement. What is the probability that at least one of the 3 novels is a mystery?",
+      "answer": "41/55",
+      "exactValues": [
+        {
+          "label": "P(at least one mystery)",
+          "fraction": {
+            "text": "41/55",
+            "numerator": "41",
+            "denominator": "55",
+            "decimalApprox": 0.745455
+          }
+        },
+        {
+          "label": "P(no mystery)",
+          "fraction": {
+            "text": "14/55",
+            "numerator": "14",
+            "denominator": "55",
+            "decimalApprox": 0.254545
+          }
+        }
+      ],
+      "skills": [
+        "complement-rule",
+        "combinations",
+        "favorable-over-total"
+      ],
+      "misconceptions": [
+        "adds-overlapping-at-least-one-cases",
+        "answers-the-complement",
+        "treats-draws-as-with-replacement"
+      ],
+      "solver": {
+        "primaryMethod": "complement rule with combinations",
+        "formula": "1 - C(8,3) / C(12,3)",
+        "steps": [
+          "The complement of at least one mystery is no mysteries.",
+          "No mysteries means all 3 books come from the 8 other novels.",
+          "Subtract that probability from 1."
+        ]
+      },
+      "verificationResult": {
+        "passed": true,
+        "checks": [
+          {
+            "label": "direct casework",
+            "method": "exactly 1 mystery + exactly 2 mysteries + exactly 3 mysteries",
+            "actual": "41/55",
+            "expected": "41/55",
+            "passed": true,
+            "details": [
+              "Complement gives 41/55.",
+              "Direct casework gives 41/55."
+            ]
+          }
+        ]
+      },
+      "provenance": {
+        "promptAuthorship": "original",
+        "sourceCopying": "none",
+        "reviewOnly": true
+      }
+    },
+    {
+      "id": "wr-0004",
+      "candidateId": "CAND-WR-0004",
+      "title": "Sticker draw with replacement comparison",
+      "difficultyTag": "medium-hard",
+      "prompt": "A sticker pouch has 3 star stickers and 7 plain stickers. You draw 2 stickers. Compare the probability of getting 2 stars if you put the first sticker back before drawing again versus if you do not put it back.",
+      "answer": "With replacement: 9/100. Without replacement: 1/15. With replacement is higher by 7/300.",
+      "exactValues": [
+        {
+          "label": "P(2 stars with replacement)",
+          "fraction": {
+            "text": "9/100",
+            "numerator": "9",
+            "denominator": "100",
+            "decimalApprox": 0.09
+          }
+        },
+        {
+          "label": "P(2 stars without replacement)",
+          "fraction": {
+            "text": "1/15",
+            "numerator": "1",
+            "denominator": "15",
+            "decimalApprox": 0.066667
+          }
+        },
+        {
+          "label": "with-replacement minus without-replacement",
+          "fraction": {
+            "text": "7/300",
+            "numerator": "7",
+            "denominator": "300",
+            "decimalApprox": 0.023333
+          }
+        }
+      ],
+      "skills": [
+        "multiplication-principle",
+        "independence",
+        "conditional-probability"
+      ],
+      "misconceptions": [
+        "treats-without-replacement-as-independent",
+        "forgets-the-first-star-is-removed",
+        "compares-decimals-without-common-denominators"
+      ],
+      "solver": {
+        "primaryMethod": "sequential products for both sampling rules",
+        "formula": "with replacement: (3/10)(3/10); without replacement: (3/10)(2/9)",
+        "steps": [
+          "With replacement, the bag resets before the second draw.",
+          "Without replacement, one star and one total sticker are gone after a first star.",
+          "Compare the exact fractions by subtracting without-replacement from with-replacement."
+        ]
+      },
+      "verificationResult": {
+        "passed": true,
+        "checks": [
+          {
+            "label": "without-replacement combination check",
+            "method": "C(3,2) / C(10,2) equals (3/10)(2/9)",
+            "actual": "1/15",
+            "expected": "1/15",
+            "passed": true,
+            "details": [
+              "Sequential without-replacement probability is 1/15.",
+              "Combination without-replacement probability is 1/15."
+            ]
+          },
+          {
+            "label": "with-replacement square check",
+            "method": "(3/10)^2 equals 9/100",
+            "actual": "9/100",
+            "expected": "9/100",
+            "passed": true,
+            "details": [
+              "Independent with-replacement product is 9/100.",
+              "Direct square is 9/100."
+            ]
+          }
+        ]
+      },
+      "provenance": {
+        "promptAuthorship": "original",
+        "sourceCopying": "none",
+        "reviewOnly": true
+      }
+    },
+    {
+      "id": "wr-0005",
+      "candidateId": "CAND-WR-0005",
+      "title": "Exactly two prizes with at least one gold",
+      "difficultyTag": "hard",
+      "prompt": "A carnival bowl holds 3 gold prize slips, 5 silver prize slips, and 4 blank slips. Four slips are drawn without replacement. What is the probability that exactly 2 of the slips are prize slips and at least 1 of those prize slips is gold?",
+      "answer": "12/55",
+      "exactValues": [
+        {
+          "label": "P(exactly 2 prizes and at least 1 gold)",
+          "fraction": {
+            "text": "12/55",
+            "numerator": "12",
+            "denominator": "55",
+            "decimalApprox": 0.218182
+          }
+        }
+      ],
+      "skills": [
+        "combinations",
+        "addition-principle",
+        "favorable-over-total"
+      ],
+      "misconceptions": [
+        "misses-the-two-gold-case",
+        "counts-at-least-one-gold-without-exactly-two-prizes",
+        "double-counts-one-gold-one-silver"
+      ],
+      "solver": {
+        "primaryMethod": "disjoint casework over prize composition",
+        "formula": "[C(3,1)C(5,1)C(4,2) + C(3,2)C(5,0)C(4,2)] / C(12,4)",
+        "steps": [
+          "Exactly 2 prize slips means the other 2 slips must be blank.",
+          "At least one gold leaves two disjoint prize cases: 1 gold + 1 silver, or 2 gold.",
+          "Add those favorable cases and divide by all 4-slip hands."
+        ]
+      },
+      "verificationResult": {
+        "passed": true,
+        "checks": [
+          {
+            "label": "alternate prize-complement count",
+            "method": "[C(8,2) - C(5,2)]C(4,2) / C(12,4)",
+            "actual": "12/55",
+            "expected": "12/55",
+            "passed": true,
+            "details": [
+              "Direct disjoint cases give 12/55.",
+              "All two-prize choices except all-silver choices give 12/55."
+            ]
+          }
+        ]
+      },
+      "provenance": {
+        "promptAuthorship": "original",
+        "sourceCopying": "none",
+        "reviewOnly": true
+      }
+    },
+    {
+      "id": "wr-0006",
+      "candidateId": "CAND-WR-0006",
+      "title": "All different color badges",
+      "difficultyTag": "medium",
+      "prompt": "A badge tray has 2 red badges, 2 blue badges, and 1 green badge. Three badges are drawn without replacement. What is the probability the three badges are all different colors?",
+      "answer": "2/5",
+      "exactValues": [
+        {
+          "label": "P(all different colors)",
+          "fraction": {
+            "text": "2/5",
+            "numerator": "2",
+            "denominator": "5",
+            "decimalApprox": 0.4
+          }
+        }
+      ],
+      "skills": [
+        "sample-space-enumeration",
+        "combinations",
+        "favorable-over-total"
+      ],
+      "misconceptions": [
+        "counts-color-patterns-instead-of-labeled-badges",
+        "forgets-the-single-green-badge",
+        "assumes-each-color-is-equally-likely"
+      ],
+      "solver": {
+        "primaryMethod": "combination count checked by exact enumeration",
+        "formula": "C(2,1) * C(2,1) * C(1,1) / C(5,3)",
+        "steps": [
+          "All different means one red, one blue, and one green badge.",
+          "Choose the labeled badge from each color group.",
+          "Divide by all labeled 3-badge hands."
+        ]
+      },
+      "verificationResult": {
+        "passed": true,
+        "checks": [
+          {
+            "label": "exact labeled-hand enumeration",
+            "method": "enumerate all C(5,3) labeled hands and filter all-different categories",
+            "actual": "2/5",
+            "expected": "2/5",
+            "passed": true,
+            "details": [
+              "Enumeration listed 10 total labeled hands.",
+              "Enumeration found 4 all-different hands."
+            ]
+          }
+        ]
+      },
+      "provenance": {
+        "promptAuthorship": "original",
+        "sourceCopying": "none",
+        "reviewOnly": true
+      }
+    }
+  ]
+}

@@ -12,11 +12,13 @@
  *   Default: the authored lessons on the live path. `how-likely` is the course
  *   opener (D88); `long-run-frequency` is the long-run / frequentist lesson
  *   (D92); `sample-space` names the toolkit and introduces events as subsets
- *   (D93). Every other unit lesson is still a blank, locked stub. Flip a
- *   lesson on or off by updating Remote Config (no redeploy required); the
- *   empty-slots safety net in `useLessons` still prevents a contentless
- *   lesson from going live, so only lessons that have authored content can
- *   be enabled.
+ *   (D93); `equally-likely-outcomes` stress-tests the k/N formula (D94);
+ *   `multiplication-principle` is the first scalable counting tool (D94);
+ *   `addition-principle` pairs with multiplication as the OR-rule (D95).
+ *   Every other unit lesson is still a blank, locked stub. Flip a lesson on
+ *   or off by updating Remote Config (no redeploy required); the empty-slots
+ *   safety net in `useLessons` still prevents a contentless lesson from
+ *   going live, so only lessons that have authored content can be enabled.
  */
 
 export const REMOTE_CONFIG_DEFAULTS = {
@@ -24,6 +26,9 @@ export const REMOTE_CONFIG_DEFAULTS = {
     'how-likely',
     'long-run-frequency',
     'sample-space',
+    'equally-likely-outcomes',
+    'multiplication-principle',
+    'addition-principle',
   ]),
 } as const;
 

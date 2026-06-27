@@ -1,0 +1,38 @@
+[
+  {
+    "id": "verified-pick-k-of-n-unordered-p01-p01",
+    "instanceId": "verified-pick-k-of-n-unordered-p01:1337803888",
+    "templateId": "verified-pick-k-of-n-unordered-p01",
+    "topic": "counting",
+    "skills": [
+      "ordered-vs-unordered",
+      "combinations"
+    ],
+    "retrievalForm": "definition",
+    "difficulty": 865,
+    "params": {
+      "n": 6,
+      "k": 4
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "A committee of 4 people is chosen from a group of 6. How many different committees are possible? (Order does not matter.)",
+    "context": null,
+    "answer": "choice:combo",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Choosing 4 from 6 (unordered)",
+      "steps": [
+        "We want to count subsets of size 4 from 6 elements.",
+        "Order does not matter. {A,B} and {B,A} count as one committee.",
+        "Ordered selections (permutations): P(6,4) = 6!/(6−4)! = 360.",
+        "Each unordered subset appears in 4! = 24 orderings, so divide by 4!.",
+        "C(6,4) = P(6,4) / 4! = 360 / 24 = 15."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

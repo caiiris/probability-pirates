@@ -5,9 +5,11 @@ export const SKILLS = {
   'long-run-vs-single-trial': { label: 'Long-run vs single trial',  topic: 'long-run' },
   'frequentist-view':         { label: 'Probability as a share',    topic: 'long-run' },
   'multiplication-principle': { label: 'Multiplication principle',  topic: 'counting' },
-  'ordered-vs-unordered':     { label: 'Ordered vs unordered',      topic: 'counting' },
-  'permutations':             { label: 'Permutations',              topic: 'counting' },
-  'combinations':             { label: 'Combinations',              topic: 'counting' },
+  'addition-principle':       { label: 'Addition principle',        topic: 'counting' },
+  'inclusion-exclusion':      { label: 'Inclusion-exclusion',       topic: 'inclusion-exclusion' },
+  'ordered-vs-unordered':     { label: 'Ordered vs unordered',      topic: 'permutations-combinations' },
+  'permutations':             { label: 'Permutations',              topic: 'permutations-combinations' },
+  'combinations':             { label: 'Combinations',              topic: 'permutations-combinations' },
   'complement-rule':          { label: 'Complement rule',           topic: 'complement' },
   'independence':             { label: 'Independence',              topic: 'complement' },
   'birthday-paradox':         { label: 'Birthday paradox',          topic: 'counting' },
@@ -19,4 +21,12 @@ export const SKILLS = {
 
 export type SkillId = keyof typeof SKILLS;
 export type Topic = (typeof SKILLS)[SkillId]['topic'];
-export const TOPICS = ['counting', 'long-run', 'complement', 'conditional', 'distributions'] as const;
+export const TOPICS = [
+  'counting',
+  'permutations-combinations',
+  'inclusion-exclusion',
+  'long-run',
+  'complement',
+  'conditional',
+  'distributions',
+] as const;

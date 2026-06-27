@@ -23,6 +23,8 @@ import { subscribeLearnerModel } from '@/features/learner/learnerModelService';
 
 const TOPIC_LABELS: Record<Topic, string> = {
   counting: 'Counting',
+  'permutations-combinations': 'Permutations & Combinations',
+  'inclusion-exclusion': 'Inclusion-Exclusion',
   'long-run': 'Long-run',
   complement: 'Complement',
   conditional: 'Conditional',
@@ -38,11 +40,18 @@ type Props = {
   onSelect: (topic: Topic) => void;
   /** Firebase UID — used to read the learner model for default selection. */
   uid: string | null | undefined;
+  /**
+   * When false, the model-based default selection is disabled. Used when the
+   * parent already chose a topic explicitly (e.g. a `?topic=` deep link from a
+   * "Watch out for" misconception card) so that choice is not overridden.
+   * Defaults to true.
+   */
+  autoSuggest?: boolean;
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function TopicPicker({ selectedTopic, onSelect, uid }: Props) {
+export function TopicPicker({ selectedTopic, onSelect, uid, autoSuggest = true }: Props) {
   // Track whether we have already applied the model-based default. We only do
   // this once at mount so a user's explicit selection is never overridden.
   const defaultApplied = useRef(false);
@@ -55,6 +64,7 @@ export function TopicPicker({ selectedTopic, onSelect, uid }: Props) {
   const [suggestedTopic, setSuggestedTopic] = useState<Topic | null>(null);
 
   useEffect(() => {
+    if (!autoSuggest) return;
     if (!uid) return;
     const unsub = subscribeLearnerModel(uid, (model) => {
       if (defaultApplied.current) return;
@@ -66,17 +76,18 @@ export function TopicPicker({ selectedTopic, onSelect, uid }: Props) {
       }
     });
     return unsub;
-  }, [uid]);
+  }, [uid, autoSuggest]);
 
   // Apply the suggestion exactly once, only if the parent hasn't already set a
   // non-default topic (we compare against the ref to avoid stale state).
   useEffect(() => {
+    if (!autoSuggest) return;
     if (defaultApplied.current) return;
     if (suggestedTopic === null) return;
     defaultApplied.current = true;
     // Only override if the parent is still on the initial default.
     onSelect(suggestedTopic);
-  }, [suggestedTopic, onSelect]);
+  }, [suggestedTopic, onSelect, autoSuggest]);
 
   return (
     <div

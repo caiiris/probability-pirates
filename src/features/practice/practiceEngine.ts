@@ -45,6 +45,7 @@ export type PracticeInstance = {
 //   ------------------|------------------------------|-----------------------------------
 //   'choice'          | any                          | { optionId: answer.optionId }
 //   'fraction'        | any                          | { numerator: Number(num), denominator: Number(den) }
+//   'int'             | 'number-fill'                | { value: v }
 //   'int'             | 'fill-fraction'              | { numerator: v, denominator: 1 }
 //   'int'             | 'multiple-choice'            | throws — templates MUST use 'choice' for MC
 //   'int'             | anything else                | throws — unsupported combination
@@ -67,6 +68,10 @@ export function answerToPayload(answer: ExactAnswer, variant: Variant): AttemptP
       };
 
     case 'int': {
+      if (variant.interactionKind === 'number-fill') {
+        // Free-response integer input — graded by exact equality.
+        return { value: answer.value };
+      }
       if (variant.interactionKind === 'fill-fraction') {
         // An integer count v maps to the fraction v/1 for the fill-fraction renderer.
         return { numerator: answer.value, denominator: 1 };

@@ -8,6 +8,8 @@ import { DerivationCard } from './DerivationCard';
 import { SettlingLineFigure } from './SettlingLineFigure';
 import { TwoCoinsGridFigure } from './TwoCoinsGridFigure';
 import { SubsetPickerFigure } from './SubsetPickerFigure';
+import { TreeDiagramFigure } from './TreeDiagramFigure';
+import { RoadForkFigure } from './RoadForkFigure';
 
 type Props = { slot: ConceptSlot };
 
@@ -142,6 +144,8 @@ export function ConceptSlotView({ slot }: Props) {
         {slot.figure?.kind === 'settling-line' && <SettlingLineFigure {...slot.figure} />}
         {slot.figure?.kind === 'two-coins-grid' && <TwoCoinsGridFigure {...slot.figure} />}
         {slot.figure?.kind === 'subset-picker' && <SubsetPickerFigure {...slot.figure} />}
+        {slot.figure?.kind === 'tree-diagram' && <TreeDiagramFigure {...slot.figure} />}
+        {slot.figure?.kind === 'road-fork' && <RoadForkFigure {...slot.figure} />}
 
         {slot.example && (
           <div className="rounded-xl border bg-muted/30 px-4 py-4 space-y-2 text-left">

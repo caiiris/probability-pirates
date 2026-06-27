@@ -18,7 +18,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 
 | Section | Topic                         | Entries                                                                               |
 | ------- | ----------------------------- | ------------------------------------------------------------------------------------- |
-| A       | Product & Pedagogy            | D1–D8, D55, D56, D69, D70, D73, D75, D76, D77, D78, D84, D85, D86, D88, D89, D90, D91 |
+| A       | Product & Pedagogy            | D1–D8, D55, D56, D69, D70, D73, D75–D78, D84–D86, D88–D91, D103                        |
 | B       | Stack                         | D9–D12                                                                                |
 | C       | Data & Persistence            | D13–D16                                                                               |
 | D       | Auth & Identity               | D17–D18                                                                               |
@@ -30,7 +30,7 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
 | J       | Project Structure & Tooling   | D38–D48, D64, D74, D81                                                                |
 | K       | PRD Acceptance Criteria Style | D49–D54, D57–D62                                                                      |
 | L       | Platform & Responsive         | D63, D65, D66                                                                         |
-| M       | Phase 2 — AI                  | D92–D101                                                                              |
+| M       | Phase 2 — AI                  | D92–D102                                                                              |
 
 ---
 
@@ -412,9 +412,9 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - 27/27 test files, 206/206 tests still green.
 - **See also:** D86 / D88 / D90 (the catalog/scope decisions this builds on), D58 (PRD §9.6 acceptance — the "course progress" AC; the visible-on-path denominator is consistent with what the user can see), D55 (no bail-out — celebration only fires on real completion).
 
-### D100 — Content-aware problem helpers, not a generic scratchpad
+### D103 — Content-aware problem helpers, not a generic scratchpad
 
-- **Status:** resolved (2026-06-25)
+- **Status:** resolved (2026-06-25). **Renumbered from a duplicate `D100` → `D103` on 2026-06-25** — a concurrent workstream had also used `D100`; this entry moved because the other `D100` ("Practice XP scales with difficulty") is cross-referenced across several docs.
 - **Chose:** Skip a generic per-lesson "scratchpad" / "logbook" surface. Instead, extend the existing pattern of small, problem-shaped helpers embedded in the interaction itself — ungraded, ignorable, scoped to the question they help with. The d6 reference behind `showDieContext: true` on fill-fraction problems (`how-likely.ts`) is the canonical example: tap faces to highlight, count, then enter the fraction. It never affects progress and disappears with the slot.
 - **Why:** Content-aware helpers have no discoverability problem (the tool is in the problem), no mode-switching friction (no open/close), and scaffold the right move per question rather than a generic textarea that's passable at everything and great at nothing. They also read as bespoke ("made on purpose") rather than "we added a notes feature," consistent with the anti-vibe-coded direction.
 - **Considered:**
@@ -436,6 +436,44 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Risk of over-scaffolding — if a helper does too much of the counting for the learner, it weakens the retrieval/effort that makes the practice stick. Each helper should reveal *what to count*, not *the count*. (D8 / D55 mindset: never bail the learner out.)
   - Possible inconsistency if helpers diverge stylistically across problem types. Mitigation: shared shell (size, tap-affordance, color of "highlighted" state) defined once and reused.
 - **See also:** `how-likely.ts` (existing `showDieContext` usage), D55 (no-bail-out rule that constrains helper behavior).
+
+### D107 — Practice progress = mastery (correct/loaded), not exposure (attempted/loaded)
+
+- **Status:** resolved (2026-06-26)
+- **Chose:** The `/practice` page's Progress popup measures **mastery** (problems gotten right out of templates loaded), not **exposure** (problems attempted out of templates loaded). Three changes in `ProgressDialog`:
+  - Per-band progress bar fill: `correct / available` (was `attempted / available`)
+  - Topic-header chip: `correct / loaded` (was `correct / attempted`)
+  - Topic subtext: `"X correct of Y"` (was `"X tried out of Y"`)
+- **Why:** a tester noted: *"progress should be based on how many you get right, not how many you tried."* Attempted-as-progress inflates the headline number (try 3 problems wrong → the bar moves) and rewards exposure over learning. Mastery is the metric the learner cares about; the practice loop already records both attempts and correct counts, so this is a presentation change only — no data-model shift.
+- **Considered:**
+  - **Attempted/loaded as the progress metric.** Rejected per tester feedback (and per learning-science: exposure ≠ learning).
+  - **Correct/attempted as the headline ratio** (the previous "2/3" format). Reads as accuracy, not progress — ambiguous about whether the learner has worked through the bank or just gotten lucky on three tries. Rejected.
+  - **Two bars per band** (one for exposure, one for mastery). Information-dense but visually noisy, and the popup already had a wrapping problem at the previous width.
+- **Side-effect:** popup widened from `sm:max-w-lg` (512px) → `sm:max-w-2xl` (672px), right column from 8.5rem → 12rem so the full "X correct, Y tried out of Z" annotation fits on one line. Dialog description copy updated to: *"Mastery by topic and difficulty. Bars fill as you get problems right."*
+- **Gaps / risks:**
+  - "Mastery" here means "got it right at least once" — which doesn't prove durable mastery (a lucky-guess correct fills the bar). The Elo rating + spaced-review system (when it lands) is the real mastery signal; this popup is a coarse exposure-and-result summary, not a learning model.
+  - Empty-bank bands still appear as "0 loaded" so unauthored content is visibly planned-but-not-ready. Acceptable for now; revisit if it reads as over-promising.
+- **Refined 2026-06-26 (D111):** the per-band *detail* annotation now reads "X correct out of Y(tried)" with **N/A** for untried bands (accuracy-on-tries), while the bar fill + topic subtext keep the mastery-vs-bank metric from this entry.
+- **See also:** D42 (level/rank progression — the deeper mastery signal), D104 (Bounty chip — the per-topic rating that's the actual adaptive-difficulty handle), D55 (no bail-out — the bar metric must reflect real performance), D111 (per-band detail refinement + `/progress` legibility).
+
+### D116 — Practice progress popup: chip = accuracy, bar = mastery, empty bands = N/A
+
+> **D-number collision note (2026-06-26):** a concurrent workstream had also taken `D109/D110/D111` (misconception capture, in Section M). Since those entries are cross-referenced across `spec-misconception-capture.md` and several specs, this group of UI passes was renumbered to **D113–D116**. The originally-drafted numbers `D109/D110/D111` (UI passes) are NOT used in this doc; if you see references to them in commit messages from 2026-06-26, the canonical numbers are D113/D114/D115/D116.
+
+- **Status:** resolved (2026-06-26)
+- **Chose:** The Progress popup in `/practice` now tells three coherent stories per topic, each using a different metric:
+  - **Per-band progress bar fill** = `correct / loaded` (mastery — only getting a problem right fills the bar; try-but-wrong doesn't).
+  - **Topic chip** = `correct / attempted` (accuracy on tries — e.g. "2/3" means "got 2 right out of the 3 you tried").
+  - **Topic subtext** under the name = `"X correct of Y"` (verbal restatement of the bar).
+  - **Empty bands and empty-bank topics** show **`N/A`** wherever the metric would be undefined (was `"0 loaded"`).
+- **Why:** refines D107. Tester feedback after D107 shipped: *"progress should be based on how many you get right ... we can just say 2/3 if you tried 3 and got 2 right."* D107 had set the chip to `correct / loaded`, which made it redundant with the bar. The new split surfaces both stories — mastery against the bank (bar) AND accuracy on attempts (chip). `"0 loaded"` read like a stat ("zero is a number"); `"N/A"` reads correctly as "this band isn't authored yet."
+- **Considered:**
+  - **Single metric for all three slots.** Rejected — collapsing them loses information; learners want both mastery and accuracy.
+  - **Hide empty bands entirely.** Rejected — the empty bands quietly signal "this content is planned," useful for setting roadmap expectations.
+  - **Chip = `correct / attempted / loaded` (three-part).** Rejected — too dense for a chip; the popup's per-band annotation already carries the full story for the curious.
+- **Gaps / risks:**
+  - "Mastery" still means "got it right at least once" — a lucky-guess correct fills the bar. The Elo rating (D104 Bounty chip) is the real adaptive-difficulty signal; this popup is a coarse summary, not a learning model.
+- **See also:** D107 (the original mastery-not-exposure decision; this refines its chip rule), D104 (Bounty chip — the deeper adaptive signal), D55 (no-bail-out — the metric has to reflect real performance).
 
 ---
 
@@ -625,6 +663,87 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - On very narrow viewports the side-margin ships are largely occluded behind the path (acceptable: they're purely ambient and the in-path fish/flying dice carry the theme).
   - All motion is decorative and reduced-motion-safe via the global `MotionConfig`; dice remain `aria-hidden` and non-focusable, tappable only as an easter-egg tumble.
 - **See also:** D81 (Probability Pirates brand + Captain Pascal), D86 (multi-chapter curriculum that made the longer path need filling), D83 (coin economy — the treasure chest's 250-coin payout), D19 (palette the gem/gold colors draw from)
+
+### D104 — Practice page de-dashboarded: Bounty chip + centered problem area
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** Replace the two-tile `PracticeStatsBar` (Level on the left + Rating on the right, with a sub-description) with a single compact **Bounty** chip in the page header beside "Practice." The XP/level tile was redundant with the global header level bar; the rating tile sat in a heavy card; the explanatory sub-description was filler. The problem area itself was given the standard `min-h-full + my-auto` centering so the question + answer input lives in the vertical middle instead of pinned to the top with white space below it.
+- **Why:** the two-tile bar made Practice feel like an analytics dashboard, not a solve loop. Brilliant/Khan put the problem in the visual center; Pascal should too. The Bounty chip keeps the adaptive-rating signal (the part that actually mattered) without the dashboard furniture.
+- **Considered:**
+  - **Keep the two-tile bar.** Rejected — Level duplicated the global header bar, Rating was lost in the visual weight of its card, sub-description was textbook filler.
+  - **Move the bar to the side of the problem.** Rejected — would compete with the answer input for attention and rot on mobile.
+  - **Inline the bar above the problem with no card.** Better than tiles but still pulls attention away from the question; chip in the header is the quietest option that still surfaces the data.
+  - **Drop the rating entirely.** Tempting (the adaptive logic still runs without it), but the +/- delta after each grade is genuinely motivating and gives learners a sense of "did I get harder?". Cheap to keep as a chip.
+- **Naming:** "Bounty" instead of "Rating" / "Elo." Pirate-native, single word, reads naturally as a number ("Bounty 1240"). The underlying Elo math is unchanged; just the label.
+- **Architecture side-effect:** `usePracticeState` lifted from `PracticeSession` to `PracticePage` so the rating can render in the header. `PracticeSession` now receives `rating` + `recordResult` as props and reports per-answer deltas back via `onRatingDelta`. `PracticeStatsBar` deleted; `difficultyLabel` moved to its own small util (`practiceDifficulty.ts`).
+- **Gaps / risks:**
+  - Header is denser on Practice than on other pages (wordmark + page heading + Progress button + Bounty chip). Tested at iPhone 17 width; currently fits without wrap.
+  - The +/- delta chip's color flash (green up / coral down) is tied to "the last graded answer" — switching topics resets it to null so a learner doesn't see a stale +5 from a different topic.
+- **See also:** D42 (level/rank progression — the system the level-tile duplicated), D44 (radius + elevation convention — the deleted tiles violated "one hero per page"), D55 (no bail-out — rating must reflect real performance).
+
+### D105 — Captain's Log: tone-down to a quiet aside (not a hero card)
+
+- **Status:** resolved (2026-06-26)
+- **Chose:** The Home `CaptainsLog` card (daily learning-science tip from Captain Pascal) was rendered as a hero-style surface: full violet wash (`bg-primary-soft`), primary-tinted border, `rounded-2xl`, mascot at 48px. Toned down to a supporting card: neutral background (`bg-muted/30`), neutral hairline border, inner-card `rounded-xl`, mascot at 40px. The small violet "CAPTAIN'S LOG" eyebrow stays — brand signature, tiny dose of color.
+- **Why:** a kid tester read the card as a notification or quest card because it was the shiniest thing on Home, clicked expecting something interactive, and got a static tip. Their note: *"kids click whatever's shiniest first … the captain's log was disingenuous."* The card has a real job (daily spacing nudge, brand voice, habit cue) and is dismissable, so removing it would lose value. The fix is to stop the visual prominence from making promises the content doesn't keep.
+- **Considered:**
+  - **Keep as-is.** Defensible (one tester is one data point; the X mitigates), but the broader principle "shiny without payoff = lost trust" is worth honoring and the cost is trivial.
+  - **Make the shine earned** — clicking the captain expands to a tip archive or eventually links to an AI tutor. The version that vindicates the prominence. ~half day of work; deferred until the AI tutor work catches up so the affordance isn't a stub.
+  - **Move the card off Home entirely** (to Profile or Tips). Rejected — Home is where daily-habit nudges belong; moving it would kill the spacing-tip mission.
+- **Gaps / risks:**
+  - One violet dot (the eyebrow) in an otherwise neutral container. Acceptable signature, but worth flagging on the next visual audit.
+  - This is a small contradiction of an earlier "shiny invites attention" instinct — going forward, calibrate shiny surfaces against "is there a payoff?", not "would this look better with color?"
+- **See also:** D81 (Captain Pascal as the brand mascot), D44 (radius / elevation conventions for supporting cards).
+
+### D106 — FillFraction prompt + context typography parity
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** When `fill-fraction` problems include a `context` field, render the context at the same size and color as the prompt (`text-lg sm:text-xl text-foreground`, was `text-sm text-muted-foreground`). Hierarchy between question and supporting data comes from font weight (prompt `font-medium`, context regular), not size.
+- **Why:** the practice template `conditional-bayes-2x2` uses `context` to render a multi-bullet 2×2 count table — that's problem data, not commentary. The user pointed out: *"this formatting is bad. the text should all be the same size, because they're all part of the same problem."* Demoting the data to subtitle size made it read as a footnote instead of part of the problem statement.
+- **Considered:**
+  - **Bump the data, keep the prompt at its size.** Chosen. Both at `text-lg sm:text-xl`; prompt stays bolder via `font-medium`.
+  - **Drop the prompt to match the smaller context.** Rejected — would lose the question's visual emphasis as the headline.
+  - **Render the context inside a muted callout box** (like `MultipleChoice`'s `context`). Rejected here: MC's `context` is typically hint commentary ("Pick what feels right"), where a muted callout is appropriate. FillFraction's `context` is data — different content, different treatment.
+- **Gaps / risks:**
+  - Future templates that use `context` for *short* hint text (rather than data) would get more weight than the hint deserves. Currently no such FillFraction templates exist; if one appears, either rewrite into the prompt or split `context` into `context` (data) and `hint` (commentary) on the variant type.
+- **See also:** D56 (mono numerals reserved for comparative data — same "treatment matches role" principle), D45 (left-align concept body, also a typography-vs-role decision).
+
+### D113 — Home is a full-bleed ocean: page gradient + seamless OceanScene
+
+- **Status:** resolved (2026-06-26)
+- **Chose:** On Home, the page background paints the same sky→sea gradient that `OceanScene` uses, and `OceanScene` gained a `seamless` prop that drops its own container chrome (rounded corners, border, shadow, explicit background) so the path's blue extends edge-to-edge instead of sitting in a parchment "frame." Other `OceanScene` consumers (Profile / Friends / Store / Auth banners) keep their default rounded-card boundary because they sit on non-blue page backgrounds and need the visible frame.
+- **Why:** the previous treatment had the blue ocean as a smaller card sitting on a parchment page — read as "the ocean is a decorative panel," not "you're sailing through this place." Going full-bleed makes Home feel like a world; the path lives in the sea rather than being framed by it.
+- **Considered:**
+  - **Keep the parchment border on Home.** Rejected — a frame around a frame that wasn't earning its keep.
+  - **Different gradients for page bg vs. OceanScene card.** Tried first (page bg gentler, card more saturated); rejected because a visible seam appeared at the card boundary.
+  - **Same gradient for both, OceanScene keeps its card chrome.** Rejected — even with matching colors the rounded card border + shadow read as a redundant frame.
+  - **Same gradient + seamless OceanScene on Home only.** Chosen. Two visual modes diverge per-page; the `seamless` prop is the explicit opt-in.
+- **Gaps / risks:**
+  - The lighter unified gradient (chosen to keep lesson labels legible) drained contrast from the white foam waves — bumped wave opacity in the same pass (D111).
+  - Two visual modes for the same component: explicit prop + comment in `OceanScene.tsx` mitigates "next agent picks the wrong one." Worth re-verifying on each new banner site.
+- **See also:** D115 (the breathing-room pass that capitalized on the new horizontal space), D44 (radius + elevation convention — `seamless` is a deliberate exception, not a violation).
+
+### D115 — Course path breathing-room pass
+
+- **Status:** resolved (2026-06-26)
+- **Chose:** A coordinated rebalance of the Home course path's decoration + spacing, motivated by the new full-bleed ocean (D109) giving the path real horizontal room and a clearer "sea backdrop." Eight small moves, no single one of which is a "decision" on its own — together they're a coherent visual pass:
+  - Path container: `max-w-md` (448px) → `max-w-xl` (576px). Path uses percent-based WEAVE fractions so it still shrinks fluidly on narrow viewports.
+  - Islands: 164/188 → 208/236 px wide. Disc no longer looks pasted on top of the sand.
+  - Palm tree: shifted 13 SVG units right inside the Island SVG so the trunk + canopy sit on the island's right shoulder, well past the disc edge instead of being covered by it.
+  - Island hangover below disc: `-bottom-5` (20px) → `-bottom-2` (8px). Foam ring stops drifting into the label area below the disc.
+  - Label spacing: `mt-2` (8px) → `mt-5` (20px). 12+ pixel buffer between foam and title text so labels sit cleanly on the page bg, not over the wet-sand band.
+  - Wave-band opacity: 0.4/0.32/0.28 → 0.75/0.65/0.55. The lighter unified gradient drained the previous opacity; the bump restores foam visibility.
+  - Ships: inset 6/5/9 → 2/2/4 (hugging page edges), sizes 54/46/58 → 64/56/68. Ambient decor — shouldn't pull attention from the route, but should still read at the larger distance.
+  - In-path dice: offset `mid ± 0.3` → `mid ± 0.42` from each curve bend. Further from the route.
+  - Clouds: existing top three sized up (w-20/14/16 → w-28/20/24). Three new clouds added at pixel offsets 220/360/520 with longer drift durations, populating the upper sky band rather than clustering at top-only. Pixel-offset (not percent) so they stay clustered in the upper visible area regardless of total page height.
+  - Fish swimming amplitude: x ±5→±12, y ±2→±6, rotate ±5→±12. Visibly swimming through the gaps in the path bends instead of bobbing in place.
+- **Why:** post-D109 the ocean had real room to breathe. Each ambient element had to be re-balanced so the path felt populated without being crowded, with the lesson nodes still the clear focal points. The previous sizing/positioning was tuned for a narrower OceanScene card; that tuning didn't hold up at full-bleed.
+- **Considered:**
+  - **Leave decoration sizes/positions unchanged.** Rejected — the wider canvas left previous ambient stuff cramped and overpacked near the path.
+  - **Move ambient stuff to specific "decoration lanes"** (e.g. ships in margin lane, clouds in upper-sky lane, dice in gap lane). Rejected as overkill for a route this small; per-element insets/offsets were enough.
+- **Gaps / risks:**
+  - Cloud pixel offsets (220/360/520) don't scale with very-tall pages; clouds cluster in the top ~520px regardless of total page height. Acceptable — clouds are a "sky" element, not "throughout the page" decor. If the path becomes much shorter (fewer chapters), lower clouds may overlap chapter banners — also fine, clouds are decoration and `pointer-events-none`.
+- **See also:** D113 (the full-bleed ocean this pass capitalized on), D105 (Captain's Log tone-down — same principle of "shiny without payoff = lost trust" applied to decoration vs. focus).
 
 ---
 
@@ -827,6 +946,21 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - `localStorage` dismissal is best-effort (private mode / cleared storage re-shows the popup — harmless).
   - Decision logic (`pendingToday`, dismissal) is pure + unit-tested in `reminderRules.ts`.
 
+### D114 — Daily-goal pill is celebration-only and dismissable
+
+- **Status:** resolved (2026-06-26)
+- **Chose:** Home no longer renders an always-on "Today's goal" pill in either state. Instead, when the learner completes today's daily goal (one lesson today), a green **"Done today ✕"** pill appears with a dismiss button. The dismissal persists in `localStorage` keyed to today's local date, so closing it hides it for the rest of the day, but tomorrow's accomplishment surfaces fresh. The streak-freeze chip (when freezes are owned) still rides along — it's a status indicator, not a celebration, so it stays.
+- **Why:** the previous always-on pill was filler in both states. Undone ("Today's goal" / "Finish 1 lesson today") just labeled the section — the path's current node already calls the learner to action. Done ("Done today") stayed forever once met, becoming a permanent victory lap on Home. The new pattern: show the celebration, let it be acknowledged, get out of the way.
+- **Considered:**
+  - **Remove the pill entirely.** Rejected — loses the small celebratory beat when the daily goal is met, which is genuinely motivating.
+  - **Keep always-on done pill, ditch the undone pill.** Rejected because the done pill stayed all day even after acknowledgement — a victory lap that became visual noise.
+  - **Auto-hide after N seconds with no dismiss button.** Rejected — fragile (depends on whether the user is looking) and removes the user's agency.
+  - **Dismiss persistence keyed to a boolean instead of today's date.** Rejected — boolean would hide tomorrow's celebration too. Keying by date means each day's accomplishment is its own one-shot.
+- **Gaps / risks:**
+  - Dismissal is local-only (per device/browser). A learner who clears storage will see today's pill again — harmless.
+  - Home's empty state on Home (pre-completion) is now even quieter; if the path's current node ever becomes hard to spot, this is a re-evaluation point.
+- **See also:** D49 ("Today's goal" pill stated the goal — this supersedes that decision; the pill was the wrong UX entirely), D27 (in-app reminders only; this daily-goal pill is an in-app celebration, not a push notification).
+
 ---
 
 ## I. UI Stack
@@ -1026,6 +1160,25 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - Probability feedback is largely factual, but voice calibration is the owner's call; the copy is flagged for review in I029 and is editable in `src/content/lessons/0{2,3,4}-*.ts`.
   - This sets a precedent; keep it scoped. §12.6 still governs by default, and any future agent-authored copy should be logged the same way (issue + decision entry) so it stays auditable.
 - **See also:** D73 (the lessons this copy belongs to), I023 / I024 (Lesson 1 copy review pattern), architecture §12.6 (the guardrail this scopes an exception to)
+
+### D108 — Dual-host deploys: Vercel + Firebase Hosting
+
+- **Status:** resolved (2026-06-26)
+- **Chose:** Production deploys push to **both** Vercel (`brilliant-clone-gilt.vercel.app` and project aliases) and Firebase Hosting (`probability-pirates.web.app`) on every release. Both URLs serve the same `dist/` build artifact. Vercel additionally serves the `/api/hint` serverless function (Phase 2 AI assist); Firebase Hosting serves only the static SPA.
+- **Why:**
+  - Firebase Hosting was the existing prod URL — already in `deploy-checklist.md`, project linked, learners may have it bookmarked. Removing it would break links.
+  - Vercel is required for the Phase 2 `/api/hint` function (Firebase Cloud Functions are gated by the Blaze plan; we're on Spark).
+  - Running both costs nothing extra (both free tiers cover this app's traffic) and gives a fallback if either provider has an outage.
+- **Considered:**
+  - **Vercel only.** Simpler, but breaks any bookmarks pointing at the Firebase URL and loses the redundancy.
+  - **Firebase only.** Forfeits the AI-assist endpoint (would need to migrate to Cloud Functions on Blaze).
+  - **Vercel only with a Firebase Hosting → Vercel redirect.** Tidy long-term answer; deferred until Vercel is the unambiguous canonical host.
+- **Process:** every release runs `npm run build && npx firebase-tools deploy --only hosting --project brilliant-clone-102a7 && npx vercel --prod --yes`. Both must succeed to consider the deploy done.
+- **Gaps / risks:**
+  - Build drift between hosts is impossible (same `dist/`), but **env-var drift is possible** — both providers bake env vars into the bundle at build time, sourced separately. Risk: changing a `VITE_*` var in one provider's dashboard but not the other and shipping mismatched bundles. Mitigation: `.env.example` is authoritative; re-deploy both whenever it changes.
+  - The `/api/hint` Vercel function has no Firebase equivalent. Any feature that depends on it works on the Vercel URL only; document for testers who get a Firebase share link.
+  - Two dashboards to monitor (analytics, logs). Acceptable for the redundancy gain.
+- **See also:** [`spec-ai-assist`](specs/spec-ai-assist.md) (the `/api/hint` function that necessitates Vercel), [`deploy-checklist`](deploy-checklist.md) (needs updating to include the Vercel step), D92 (AI runtime on Vercel decision).
 
 ---
 
@@ -1382,6 +1535,63 @@ D-numbers are **stable IDs**, not section indices: once assigned, an entry keeps
   - LLM ratings can be miscalibrated/inconsistent; mitigated by single-batch relative rating + range/monotonicity guardrails + human spot-check.
   - Lives in the offline pipeline currently owned by the curriculum-harvest workstream — must be coordinated to avoid concurrent edits to the same files.
 - **See also:** [`spec-ai-difficulty-annotation`](specs/spec-ai-difficulty-annotation.md), [`spec-practice`](specs/spec-practice.md) §"Adaptive serving", D100, [`prd-phase2`](prd-phase2.md) F6.
+
+### D102 — F2 chosen build: free-response everywhere + two-part conceptual + 3-try hint ladder; provider = OpenAI
+
+- **Status:** resolved (2026-06-25)
+- **Chose:** The live hint feature (F2) ships as: **all practice problems free-response** — computational = numeric fill-in (code-graded); conceptual = **two-part "answer + why"** where part 1 is a concrete code-verified answer and part 2 is a free-response justification judged against a hand-authored rubric + known misconceptions. A **3-try hint ladder** (nudge → bigger nudge → reveal) gives an LLM hint per wrong try that **never reveals the answer**; after 3 wrong tries the canonical solution is shown **from a bank** (not the model). **Provider switched to OpenAI (GPT-5.x)** — same pattern (server-side key, no SDK in bundle, `fetch` from the function). XP per try: full / half / quarter / 0-on-reveal (D100 difficulty scaling + daily cap unchanged). Full design: [`spec-ai-assist`](specs/spec-ai-assist.md) §"Refinement … the chosen F2 build".
+- **Why two-part conceptual:** a single number can be right for the wrong reason (answer "1/2" justified by "the coin is due"); the answer+why form gives a **code-verified anchor (part 1)** AND catches **right-answer-wrong-reasoning** via the rubric (part 2). Reuses the F4 rubric engine (D96) — the LLM classifies free text against a fixed bank, never an open judge.
+- **Considered:**
+  - **Keep multiple-choice practice.** Rejected: MC allows guessing and the wrong options are enumerable (no need for an LLM); free-response is where a live hint is genuinely necessary and retrieval is real.
+  - **One-attempt-then-solution (the prior practice loop).** Rejected: replaced by 3-try productive struggle with scaffolded hints + bounded reveal (better learning, bounded frustration + cost).
+  - **Pure free-text conceptual (no part-1 answer).** Rejected: leaves the model judging in a vacuum (D96 risk); the two-part form restores a verifiable anchor.
+  - **Stay on Gemini free tier (D95).** Superseded: owner has an OpenAI key; GPT-5.x reasoning materially lowers conversational risk. D95's free-tier rationale is retired for F2; the no-SDK/server-key property (D93) still holds.
+- **Gaps / risks:**
+  - Conceptual "why" correctness is **model-judged (best-effort, rubric-anchored)**, not code-verified — accepted because it's formative and the revealed answer always comes from the bank. The graded *answer* is still code-verified.
+  - Loop + free-response conversion + two-part UI touch `PracticeSession` + template/content files the practice-redesign workstream currently owns — coordinate (see build plan).
+  - OpenAI is paid (latency/cost per wrong try); bounded by the ≤3-call cap + a server-side key + (optional) spend cap.
+- **See also:** [`spec-ai-assist`](specs/spec-ai-assist.md) §Refinement, D93 (fetch-not-SDK), D95 (superseded provider), D96 (rubric engine), D100 (difficulty-scaled XP), [`wp/f2-build-plan`](specs/wp/f2-build-plan.md).
+- **NOTE — D-number collision RESOLVED (2026-06-25):** a concurrent workstream had also used `D100` ("Content-aware problem helpers"). Since this doc's `D100` ("Practice XP scales with difficulty") is cross-referenced across several docs, the *other* entry was renumbered to **D103** (D101/D102 were already taken). See D103 in Section A.
+
+### D109 — Misconception detection is behavior-first; reasoning elicitation serves learning, not measurement
+
+- **Status:** resolved (2026-06-26)
+- **Chose:** Split two concerns we had been conflating and feed each a different signal. **Measurement** (which misconception does the learner hold?) is **behavior-first**: a wrong answer that matches a code-computed *trap* value maps deterministically to a misconception — a Brown & Burton (1978) "bug library" entry — needing **no words**. **Learning** (help them reason better) is where elicited reasoning belongs, captured **recognition-first** ("which statement is closest to your thinking?" chips → closed-set keys), with optional free text classified against the **closed** taxonomy by the LLM (never open clustering). Signal reliability, high→low: *trap answer → cross-item pattern → recognition chip → free text*; the least reliable leg (words) is the least load-bearing. Full design + the multi-turn dialogue that produced it: [`spec-misconception-capture`](specs/spec-misconception-capture.md) (D-MC1–D-MC4).
+- **Trigger:** a tester found the `/progress` "Watch out for" section empty and asked how misconceptions are even generated — surfacing that the only signals were 3 hand-tagged templates + the conceptual LLM path.
+- **Considered:**
+  - **LLM-generated misconceptions with automatic bucketing** of free text into emergent categories. Rejected: clustering open text is the drift-prone, unreliable part (needs embeddings + thresholds + human cluster review). Constrained closed-set classification is reliable and we already do it. Extends D97.
+  - **Force a reasoning sentence on every problem.** Rejected: cognitive load on fluency drills (Sweller), expertise-reversal for strong learners (Kalyuga), and flow/motivation collapse — especially on mobile. Reasoning is *triggered + mastery-faded*, not universal.
+  - **Make articulation the primary signal.** Rejected: articulation ability is itself unreliable — verbal overshadowing (Schooler, 1990), tacit/intuitive (System-1) knowledge, and a language/age confound that would mislabel weak *writers* as weak *reasoners* (unfair to a young/ESL audience). Hence behavior-first.
+  - **Retrospective "why were you wrong?" as data.** Rejected: hindsight reconstruction (Nisbett & Wilson, 1977) + a failure frame; the valid form is **concurrent** capture (with the answer, pre-verdict). Retrospective prompts are reflection-only, shown after the worked solution.
+- **Gaps / risks:** coverage depends on authoring trap tags per template family; genuinely novel misconceptions are handled by **offline** taxonomy curation (the runtime set stays closed). 
+- **See also:** [`spec-misconception-capture`](specs/spec-misconception-capture.md), D96 (LLM-as-student-not-judge), D97 (no embeddings/clustering), D94 (learner model), D110 (the slip threshold), D111 (surfacing UI).
+
+### D110 — A single observation never asserts a misconception (slip vs. bug): repetition/corroboration threshold + record-time mastery slip guard
+
+- **Status:** resolved (2026-06-26)
+- **Chose:** A misconception surfaces only past a **weighted confidence threshold**, never from one event. Source weights `trap 0.7 / chip 0.6 / llm 0.5`, `SURFACE_THRESHOLD 1.0` — so even the strongest single signal (a deterministic trap) is **below** threshold; surfacing requires **repetition** (2 traps = 1.4) or **corroboration** (trap + chip = 1.3). A **record-time mastery slip guard** halves a trap's weight (→0.35) when the learner is already strong on the problem's skill, read from the **pre-attempt** snapshot. And a misconception is recorded **only on the final answer** of the 3-try ladder, so a trap entered then self-corrected never reaches the model.
+- **Trigger:** a tester asked *"what if the user just made a dumb calculation error?"* — under single-trap surfacing, a slip that happens to land on the (most-natural) trap value would falsely assert a misconception.
+- **Why grounded:** slips vs. mistakes (Norman, 1981) — a wrong answer can be a careless slip, not a stable faulty rule; one observation can't separate them, only repetition can (Brown & Burton; VanLehn). Precision over recall: a false "you have the gambler's fallacy" is worse than a miss.
+- **Considered:**
+  - **Single trap surfaces (`trap = 1.0`)** — the original tuning (and what the first QA pass validated as a feature). Rejected once the slip case was raised.
+  - **Raw `count ≥ 1`.** Rejected: ignores signal quality; same over-claim.
+  - **Surface-time mastery gate** (check `recentCorrect` at read). Rejected as **self-defeating**: the EMA accuracy (α=0.2) is dragged down by the very miss being judged, so a previously-strong learner no longer reads as strong exactly when the guard should fire. Chose **record-time** (accurate pre-miss snapshot the code already holds).
+  - **Rating-based gate.** Deferred: Elo is stickier but climbs slowly at K=24, so a "strong" band is hard to calibrate without data.
+- **Gaps / risks:** weights/threshold are first-cut — tune with data. The record-time discount bakes policy into the stored `score` (not re-tunable post-hoc) — accepted, because the miss's mastery context is legitimately part of the evidence. The eventual definitive slip/bug disambiguator is the reasoning layer (answer + why), tracked as D-MC7 in the spec.
+- **See also:** [`spec-misconception-capture`](specs/spec-misconception-capture.md) (D-MC5/6/7), D94 (learner model + Elo), D109.
+
+### D111 — Progress made legible: labeled mastery + volume/accuracy + per-topic rollup; practice popup per-band shows "correct out of tried" (refines D107)
+
+- **Status:** resolved (2026-06-26)
+- **Chose:** On **`/progress`**, each practiced skill shows a plain-language level (**Learning / Developing / Mastered**) plus **"N of M correct · X%"** instead of a bare 1–3 pip, and a new **"By topic"** rollup lists solved-count + accuracy per category — all derived from the already-loaded learner model (`summarizeByTopic`), **no new storage**. In the **`/practice`** Progress popup, the per-difficulty detail now reads **"X correct out of Y(tried)"** with **"N/A"** until a first try in that band.
+- **Trigger:** tester feedback — *"the little filled-in circles don't tell us anything,"* then *"just do 2 correct out of 3 … if you didn't try anything, put N/A."*
+- **Considered:**
+  - **Keep bare pips.** Rejected: a dot with no legend, no volume, and no trend is opaque.
+  - **Build the trajectory-over-time graph now** (the "watch yourself improve" line). Deferred: it's the highest-motivation surface but needs a new append-only `practiceAttempts` event log + a Firestore rule; legibility-from-existing-data ships first (a few lines, zero new infra).
+  - **Per-band "X correct, Y tried out of Z(bank)"** (the prior wording). Replaced per tester: at the band-DETAIL level, accuracy-on-tries is what they want; the bar still encodes mastery-vs-bank.
+- **Relationship to D107:** D107 set the topic-level metric to **mastery** (correct/loaded) for the bar + subtext; this **refines the per-band detail annotation** to accuracy-on-tries (correct/attempted) + N/A, and adds the `/progress` skill-row + by-topic legibility. The bar and topic subtext stay mastery-vs-bank.
+- **Gaps / risks:** "Mastered" = `recentCorrect > 0.7`, a coarse snapshot, not durable mastery (same caveat as D107); the trajectory graph remains the real over-time signal.
+- **See also:** [`spec-progress-insights`](specs/spec-progress-insights.md) (S2/S5/S6), D107 (the mastery metric this refines), D94 (learner model).
 
 ---
 

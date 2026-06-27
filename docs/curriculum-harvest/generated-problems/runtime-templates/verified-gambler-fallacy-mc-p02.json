@@ -1,0 +1,38 @@
+[
+  {
+    "id": "verified-gambler-fallacy-mc-p02-p01",
+    "instanceId": "verified-gambler-fallacy-mc-p02:2128681955",
+    "templateId": "verified-gambler-fallacy-mc-p02",
+    "topic": "long-run",
+    "skills": [
+      "long-run-vs-single-trial",
+      "independence"
+    ],
+    "retrievalForm": "definition",
+    "difficulty": 780,
+    "params": {
+      "streakLen": 4,
+      "flavor": 1
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "A fair six-sided die has been rolled and landed on sixes 4 times in a row. What is the probability the next roll is also a 6?",
+    "context": null,
+    "answer": "choice:independent",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Independence and the gambler's fallacy",
+      "steps": [
+        "A fair six-sided die has P(outcome) = 1/6 on every trial.",
+        "Each trial is independent: the outcome does not depend on previous results.",
+        "A streak of 4 sixes is surprising, but it doesn't \"use up\" probability.",
+        "P(next outcome) = 1/6, exactly as before the streak began.",
+        "The gambler's fallacy is the mistaken belief that a streak makes the opposite outcome \"due.\""
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

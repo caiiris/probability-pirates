@@ -110,6 +110,17 @@ vi.mock('@/features/practice/SessionSignals', () => ({
   SessionSignals: () => null,
 }));
 
+// ---------------------------------------------------------------------------
+// Mock useAiHint — deterministic fallback (no network / no Firebase in tests).
+// fallbackUsed:true means PracticeSession shows the authored feedbackDefault.
+// ---------------------------------------------------------------------------
+
+vi.mock('@/features/ai/useAiHint', () => ({
+  useAiHint: () => ({
+    requestHint: vi.fn(() => Promise.resolve({ text: '', fallbackUsed: true })),
+  }),
+}));
+
 // Import PracticeSession AFTER all mocks are declared.
 import { PracticeSession } from './PracticeSession';
 
@@ -196,6 +207,7 @@ describe('PracticeSession', () => {
     recentTemplateIds: [],
     recordResult: vi.fn(),
     onRatingDelta: vi.fn(),
+    onAnswered: vi.fn(),
   };
 
   it('renders the first problem with a disabled Check button before an answer is entered', () => {
@@ -231,24 +243,45 @@ describe('PracticeSession', () => {
     ).toBeInTheDocument();
   });
 
-  it('wrong answer → worked solution revealed immediately, "Next problem" lets learner move on', () => {
+  it('3-try ladder: wrong answers show a hint and only reveal the solution after the 3rd miss', async () => {
     render(<PracticeSession {...sessionProps} />);
+    const input = screen.getByTestId('answer-input');
+    const feedbackDefault =
+      'Not quite. Enumerate the ordered pairs (a,b) with a+b=7.';
 
-    fireEvent.change(screen.getByTestId('answer-input'), { target: { value: '2/6' } });
+    // Try 1 — wrong. Hint appears (authored fallback), solution stays hidden, Check stays.
+    fireEvent.change(input, { target: { value: '2/6' } });
     fireEvent.click(screen.getByRole('button', { name: 'Check' }));
+    expect(await screen.findByText(feedbackDefault)).toBeInTheDocument();
+    expect(screen.getByText('Try 2 of 3')).toBeInTheDocument();
+    expect(screen.queryByText('P(sum = 7) by enumeration')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Next problem' })).not.toBeInTheDocument();
 
-    expect(
-      screen.getByText('Not quite. Enumerate the ordered pairs (a,b) with a+b=7.'),
-    ).toBeInTheDocument();
+    // Try 2 — wrong. Still no reveal; still on the Check button.
+    fireEvent.change(input, { target: { value: '3/6' } });
+    fireEvent.click(screen.getByRole('button', { name: /Check/ }));
+    expect(await screen.findByText('Try 3 of 3')).toBeInTheDocument();
+    expect(screen.queryByText('P(sum = 7) by enumeration')).not.toBeInTheDocument();
 
-    expect(screen.getByText('P(sum = 7) by enumeration')).toBeInTheDocument();
+    // Try 3 — wrong. Now the canonical solution is revealed and the learner moves on.
+    fireEvent.change(input, { target: { value: '4/6' } });
+    fireEvent.click(screen.getByRole('button', { name: /Check/ }));
+    expect(await screen.findByText('P(sum = 7) by enumeration')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Next problem' })).toBeInTheDocument();
 
     vi.mocked(generateInstance).mockReturnValueOnce(instance2);
     fireEvent.click(screen.getByRole('button', { name: 'Next problem' }));
+    expect(screen.getByText('What is the probability the sum equals 2?')).toBeInTheDocument();
+  });
 
-    expect(
-      screen.getByText('What is the probability the sum equals 2?'),
-    ).toBeInTheDocument();
+  it('correct on the first try resolves immediately without a hint', () => {
+    render(<PracticeSession {...sessionProps} />);
+
+    fireEvent.change(screen.getByTestId('answer-input'), { target: { value: '1/6' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Check' }));
+
+    // No ladder hint shown for a first-try correct answer.
+    expect(screen.queryByText(/Try \d of 3/)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next problem' })).toBeInTheDocument();
   });
 });

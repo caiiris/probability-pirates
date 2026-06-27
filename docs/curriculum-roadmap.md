@@ -84,15 +84,19 @@ both the long-run interpretation and the equally-likely-outcomes formula._
 
 ### Unit 2 — Compound experiments (counting outcomes)
 
-_Goal: how the sample space grows when experiments combine._ (Anchor: dice.)
+_Goal: how the sample space grows when experiments combine, and the two
+fundamental counting principles that handle it._ (Anchor: dice.)
 
 1. **Two coins** — HH, HT, TH, TT. The easy starter.
 2. **Two dice** — The 6×6 grid; sums.
 3. **Tree diagrams** — Visualizing branching choices (new interaction).
 4. **The multiplication principle** — Theorem; why 6 × 6 = 36 (the existing
-   two-dice flashcard slots here).
-5. **Practice — counting outcomes.**
-6. **Level review.**
+   two-dice flashcard slots here). **AND** = multiply.
+5. **The addition principle** — Disjoint cases combine by addition.
+   **OR** = add. Moved into Unit 2 from the old Unit 4 (D95) so the
+   AND/OR pair is taught together as a single counting toolkit.
+6. **Practice — counting outcomes.**
+7. **Level review.**
 
 ### Unit 3 — Events
 
@@ -108,13 +112,13 @@ _Goal: events as subsets, not as numbers._
 
 _Goal: tools when listing every outcome stops working._ (Anchor: cards.)
 
-1. **The addition principle** — Disjoint choices.
-2. **Inclusion–exclusion** — Overlap correction.
-3. **Permutations** — Order matters.
-4. **Combinations** — Order doesn't.
-5. **Why divide by k!** — The current L3 derivation, on its own page.
-6. **Practice — counting word problems.**
-7. **Level review.**
+1. **Inclusion–exclusion** — Overlap correction. The follow-up to Unit 2's
+   addition principle, for the case where cases are NOT disjoint.
+2. **Permutations** — Order matters.
+3. **Combinations** — Order doesn't.
+4. **Why divide by k!** — The current L3 derivation, on its own page.
+5. **Practice — counting word problems.**
+6. **Level review.**
 
 ### Unit 5 — Probabilities of multiple events
 

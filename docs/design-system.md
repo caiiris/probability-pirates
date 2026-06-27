@@ -522,3 +522,69 @@ defaults. Three coordinated passes addressed the loudest tells.
     `features/social/Leaderboard.tsx`, `features/habit/CelebrationScreen.tsx`,
     `features/course/ChapterBanner.tsx`, `features/profile/Medallion.tsx`,
     `features/economy/StorePage.tsx`)
+
+## 18. Home as world — 2026-06-26
+
+The Home page graduated from "ocean inside a parchment frame" to a full
+sky-and-sea world. Three coordinated changes plus a separate practice-popup
+metrics refinement.
+
+- **D57 — Home is full-bleed ocean.** The page wrapper paints the same
+  sky→sea gradient (`#EAF5FF → #CCE6FB → #9DCDF0 → #74B5E0`) as `OceanScene`,
+  and `OceanScene` got a new `seamless` prop that drops its container chrome
+  (rounded corners, border, shadow, own background) so the path's blue
+  extends edge to edge. Other `OceanScene` consumers (Profile, Friends,
+  Store, Auth banners) sit on non-blue pages and keep their default rounded
+  card boundary — the `seamless` mode is explicit opt-in.
+  _Rejected:_ keeping the parchment border on Home (a redundant frame
+  around a frame); different gradients for page bg vs. OceanScene card
+  (created a visible seam at the boundary).
+  (`features/course/HomePage.tsx`, `features/course/OceanScene.tsx`,
+  `features/course/CoursePath.tsx`)
+- **D58 — Course path breathing-room pass.** Now that the ocean had real
+  horizontal room, a coordinated rebalance kept the lesson nodes the clear
+  focal points while letting decor feel populated:
+  - Path container: `max-w-md → max-w-xl` (still fluid on narrow viewports).
+  - Islands: `164/188 → 208/236` px; palm tree shifted 13 SVG units right
+    so it sits on the island's right shoulder instead of being covered by
+    the disc; island vertical hangover `-bottom-5 → -bottom-2` so the foam
+    ring stops drifting into the label area; title `mt-2 → mt-5` for a 12+
+    pixel buffer between foam and text.
+  - Wave-band opacity: `0.4/0.32/0.28 → 0.75/0.65/0.55` (the lighter
+    unified gradient drained the prior opacity).
+  - Ships pushed to page edges (inset `6/5/9 → 2/2/4`) and sized up
+    (`54/46/58 → 64/56/68`).
+  - In-path dice offset from each bend bumped `mid ± 0.3 → mid ± 0.42`.
+  - Clouds: existing top three sized up; three new at pixel offsets
+    `220/360/520` populating the upper sky band; pixel offsets (not %) so
+    they stay clustered in the visible top area regardless of total page
+    height.
+  - Fish swimming amplitude: `x ±5→±12`, `y ±2→±6`, `rotate ±5→±12`.
+  (`features/course/CoursePath.tsx`, `features/course/LessonNode.tsx`,
+  `components/illustrations/Island.tsx`, `features/course/OceanScene.tsx`,
+  `features/course/FlyingDie.tsx`)
+- **D59 — Daily-goal pill is celebration-only and dismissable.** Home no
+  longer renders an always-on "Today's goal" pill in either state. When the
+  learner completes today's daily goal, a green **"Done today ✕"** pill
+  appears with a dismiss button; the dismissal persists in `localStorage`
+  keyed to today's local date, so it hides for the rest of the day but
+  tomorrow's accomplishment surfaces fresh. The streak-freeze chip still
+  rides along (it's a status indicator, not a celebration). Supersedes D49.
+  _Rejected:_ remove entirely (loses celebratory beat); auto-hide on timer
+  (fragile + removes user agency); boolean dismissal key (hides tomorrow's
+  celebration too).
+  (`features/course/HomePage.tsx`)
+- **D60 — Practice progress popup: chip accuracy, bar mastery, N/A empty.**
+  Three slots, three coherent stories per topic:
+  - **Bar** = `correct / loaded` (mastery — only correct answers fill it).
+  - **Chip** = `correct / attempted` (accuracy on tries — "2/3" reads as
+    "got 2 right out of 3 you tried").
+  - **Subtext** under the topic name = `"X correct of Y"` (verbal
+    restatement of the bar).
+  - Empty bands and empty-bank topics show **`N/A`** wherever the metric
+    would be undefined (was `"0 loaded"`, which read as a stat).
+  Refines `alternatives.md` D107 (which had set chip = correct/loaded too,
+  making it identical to the bar — tester feedback flagged it as redundant).
+  _Rejected:_ single metric for all three slots (loses information); hide
+  empty bands (loses roadmap signal).
+  (`features/practice/PracticePage.tsx`)

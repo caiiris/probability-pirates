@@ -1,0 +1,38 @@
+[
+  {
+    "id": "creative-last-one-standing-streak-p01",
+    "instanceId": "creative-last-one-standing-streak:2052249575",
+    "templateId": "creative-last-one-standing-streak",
+    "topic": "distributions",
+    "skills": [
+      "independence",
+      "complement-rule",
+      "binomial-pmf"
+    ],
+    "retrievalForm": "application",
+    "difficulty": 1370,
+    "params": {
+      "players": 30,
+      "streak": 5
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "30 players each try for 5 heads in a row. What is the probability at least one player succeeds?",
+    "context": null,
+    "answer": "choice:correct",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Use the complement across players",
+      "steps": [
+        "One player gets 5 heads in a row with probability 1/32.",
+        "One player misses that streak with probability 31/32.",
+        "All 30 players miss with probability (31/32)^30.",
+        "At least one succeeds with probability 1 - (31/32)^30, about 0.61."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

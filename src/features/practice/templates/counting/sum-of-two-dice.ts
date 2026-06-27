@@ -67,7 +67,7 @@ export const sumOfTwoDiceTemplate: Template<Params> = {
       numerator: Number(num),
       denominator: Number(den),
       feedbackCorrect: `Correct! There ${count === 1 ? 'is' : 'are'} ${count} pair${count !== 1 ? 's' : ''} summing to ${k} out of 36 equally-likely outcomes.`,
-      feedbackDefault: `List every ordered pair (a, b) with a, b ∈ {1–6} and a+b=${k}: ${pairsList(k)}. That's ${count} out of 36.`,
+      feedbackDefault: `Think of the two dice as ordered pairs. Start by finding the first die values that could still make a sum of ${k}.`,
       skills: ['sample-space-enumeration', 'equally-likely-outcomes'],
     };
   },

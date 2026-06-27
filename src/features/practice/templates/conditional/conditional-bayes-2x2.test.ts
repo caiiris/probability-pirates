@@ -11,6 +11,7 @@ import { conditionalBayes2x2Template as t } from './conditional-bayes-2x2';
 import { expectTemplateAgrees } from '../testUtils';
 import { checkAnswer } from '@/lib/checkAnswer';
 import { answerToPayload } from '@/features/practice/practiceEngine';
+import { frac, eqF } from '@/lib/probability/exact';
 
 describe('conditional-bayes-2x2', () => {
   it('passes expectTemplateAgrees (Monte-Carlo + render-consistency)', () => {
@@ -76,5 +77,35 @@ describe('conditional-bayes-2x2', () => {
       expect(Number(variant.numerator) * Number(answer.value.den))
         .toBe(Number(answer.value.num) * Number(variant.denominator));
     }
+  });
+
+  it('misconceptionByFraction: base_rate_neglect trap equals sensitivity tp/(tp+fn) for tp=10,fp=10,fn=5', () => {
+    // correct = 10/(10+10) = 1/2
+    // trap    = 10/(10+5)  = 2/3  — must differ from correct
+    const params = { tp: 10, fp: 10, fn: 5, tn: 100 };
+    const variant = t.render(params);
+    if (variant.interactionKind !== 'fill-fraction') throw new Error('expected fill-fraction');
+    const tags = variant.misconceptionByFraction ?? [];
+    const trapTag = tags.find(e => e.key === 'base_rate_neglect');
+    expect(trapTag).toBeDefined();
+    if (!trapTag) return;
+
+    const expectedTrap = frac(10, 15); // 2/3
+    expect(eqF({ num: BigInt(trapTag.num), den: BigInt(trapTag.den) }, expectedTrap)).toBe(true);
+
+    const correct = t.solve(params); // 1/2
+    if (correct.kind !== 'fraction') throw new Error('expected fraction');
+    expect(eqF({ num: BigInt(trapTag.num), den: BigInt(trapTag.den) }, correct.value)).toBe(false);
+  });
+
+  it('misconceptionByFraction: no trap when sensitivity equals PPV', () => {
+    // tp/(tp+fp) = tp/(tp+fn) when fp === fn
+    // tp=6, fp=4, fn=4, tn=50 → correct=6/10=3/5; trap=6/10=3/5 — same, so tag omitted
+    const params = { tp: 6, fp: 4, fn: 4, tn: 50 };
+    const variant = t.render(params);
+    if (variant.interactionKind !== 'fill-fraction') throw new Error('expected fill-fraction');
+    const tags = variant.misconceptionByFraction ?? [];
+    const trapTag = tags.find(e => e.key === 'base_rate_neglect');
+    expect(trapTag).toBeUndefined();
   });
 });

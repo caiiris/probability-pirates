@@ -82,11 +82,19 @@ export function LessonNode({ lesson, progress, index, isCurrent }: Props) {
       {/* Disc on top, label centered beneath — sits on a weaving path column. */}
       <div className="flex flex-col items-center text-center">
         <div className="relative">
-          {/* sandy island the marker rests on */}
+          {/* Sandy island the marker rests on. Sized so the disc sits squarely
+              on the sand crown without looking like it's been pasted on top —
+              the palm tree (when present) has room to peek out beyond the
+              disc's edge instead of being covered by it.
+
+              `-bottom-2` (was -5) keeps the foam from drifting down into the
+              label area below the disc; the text labels gain extra `mt`
+              breathing room (see the <p className="mt-5"> below) so the foam
+              and the text never touch. */}
           <Island
             palm={index % 2 === 0}
-            className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -bottom-4 ${
-              isCurrent ? 'w-[188px]' : 'w-[164px]'
+            className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -bottom-2 ${
+              isCurrent ? 'w-[236px]' : 'w-[208px]'
             }`}
           />
           {isCurrent ? (
@@ -133,9 +141,11 @@ export function LessonNode({ lesson, progress, index, isCurrent }: Props) {
           </motion.button>
         </div>
 
-        {/* Label (the disc is the interactive target) */}
+        {/* Label (the disc is the interactive target). `mt-5` (was mt-2) keeps
+            the text well clear of the island's foam ring so the title and meta
+            sit cleanly on the page bg, not over the wet-sand band. */}
         <p
-          className={`mt-2 font-display font-bold tracking-tight leading-snug line-clamp-2 ${
+          className={`mt-5 font-display font-bold tracking-tight leading-snug line-clamp-2 ${
             locked ? 'text-muted-foreground' : 'text-foreground'
           }`}
           style={{ fontSize: isCurrent ? '1.02rem' : '0.95rem' }}

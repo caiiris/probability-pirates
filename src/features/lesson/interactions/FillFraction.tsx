@@ -113,10 +113,16 @@ export function FillFraction({ variant, feedbackState, onChange }: Props) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-8 px-4 py-6">
-      <p className="text-xl font-medium text-center">{variant.prompt}</p>
+    <div className="flex flex-col items-center gap-6 px-4 py-5">
+      <p className="max-w-2xl text-lg font-medium leading-snug text-center sm:text-xl">
+        {variant.prompt}
+      </p>
       {variant.context && (
-        <p className="text-sm text-muted-foreground text-center max-w-md whitespace-pre-line">
+        // Same size as the prompt — the context is part of the problem
+        // (a data table or scenario list), not a subtitle. The prompt still
+        // reads as the headline via `font-medium` while the context stays
+        // regular weight; size and color match so the two read as one block.
+        <p className="max-w-lg whitespace-pre-line text-center text-lg leading-relaxed sm:text-xl">
           {variant.context}
         </p>
       )}
@@ -135,7 +141,7 @@ export function FillFraction({ variant, feedbackState, onChange }: Props) {
             onChange={(e) => handleNum(e.target.value)}
             disabled={locked}
             aria-label={variant.numeratorLabel ?? 'Numerator'}
-            className="w-24 text-center text-2xl font-semibold h-14 border-b-0 rounded-b-none"
+            className="w-24 text-center text-xl font-semibold h-14 border-b-0 rounded-b-none"
           />
           <div className="h-0.5 w-24 bg-foreground" role="presentation" />
           <Input
@@ -147,7 +153,7 @@ export function FillFraction({ variant, feedbackState, onChange }: Props) {
             onChange={(e) => handleDen(e.target.value)}
             disabled={locked}
             aria-label={variant.denominatorLabel ?? 'Denominator'}
-            className="w-24 text-center text-2xl font-semibold h-14 border-t-0 rounded-t-none"
+            className="w-24 text-center text-xl font-semibold h-14 border-t-0 rounded-t-none"
           />
         </div>
 

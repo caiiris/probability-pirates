@@ -30,6 +30,7 @@ export type LessonProgress = {
 export type AttemptPayload =
   | { collected: string[] }
   | { numerator: number; denominator: number }
+  | { value: number }
   | { selected: string[] }
   | { selectedCells: Array<[number, number]> }
   | { optionId: string }

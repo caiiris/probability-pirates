@@ -65,8 +65,16 @@ export function CoursePath({ lessons, progressMap, currentLessonId, uid, claimed
   const trophyGroupIdx = groups.length - 1;
 
   return (
-    <OceanScene>
-      <div className="mx-auto max-w-md flex flex-col gap-3">
+    // `seamless` because Home paints the same sky→sea gradient on its page bg
+    // and a card boundary here would read as a redundant frame around the path.
+    // Other OceanScene consumers (Profile, Friends, Store, Auth banners) sit on
+    // non-blue pages and keep their default rounded card chrome.
+    <OceanScene seamless>
+      {/* max-w-xl gives the path real breathing room now that there's no card
+          boundary cropping it. WEAVE fractions are percent-based, so on narrow
+          viewports (mobile) the path naturally shrinks with the container; the
+          islands and labels never clip at the track edges. */}
+      <div className="mx-auto max-w-xl flex flex-col gap-3">
         {groups.map(({ chapter, lessons: chapterLessons }, groupIdx) => {
           const isFinalChapter = groupIdx === trophyGroupIdx;
           const availableLessons = chapterLessons.filter((l) => !l.comingSoon);
@@ -175,8 +183,10 @@ function CurveConnector({
   // Treasure-map dashed route: bold colored dashes once sailed, faint ahead.
   const stroke = done && color ? color : '#FFFFFF';
   // Park the flying die across the path from the bend, in the roomy side.
+  // Bumped offset from 0.3 → 0.42 so the dice sit further from the route and
+  // don't compete with the lesson nodes for visual focus.
   const mid = (fromFrac + toFrac) / 2;
-  const dieLeft = mid < 0.5 ? mid + 0.3 : mid - 0.3;
+  const dieLeft = mid < 0.5 ? mid + 0.42 : mid - 0.42;
   // Per-connector unique filter id so the ink-wobble filters don't collide
   // across SVGs (some browsers treat SVG filter ids as document-global).
   const inkId = useId().replace(/:/g, '');

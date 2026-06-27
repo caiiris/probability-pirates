@@ -19,16 +19,48 @@ import type { AccentName } from '@/lib/theme';
  *  - `shipsOnly` — drops everything in the sky (sun, clouds, gulls, dice) and
  *    the wave bands too, leaving just the sea gradient and the sailing fleet.
  *    Used by the auth banner where the chrome should be quiet.
+ *
+ * Container chrome:
+ *
+ *  - default — rounded card with border, shadow, and an explicit sea gradient.
+ *    Used for the small standalone banners (Profile, Friends, Store, Auth)
+ *    that sit on a non-blue page bg and need a visible card boundary.
+ *  - `seamless` — drops the border, shadow, rounded corners, and explicit
+ *    background so the scene blends directly into the surrounding page bg.
+ *    Used by the Home course path where the page itself already paints the
+ *    same gradient and a card boundary would read as a redundant frame.
  */
-type Props = { children: ReactNode; calm?: boolean; shipsOnly?: boolean };
-export function OceanScene({ children, calm = false, shipsOnly = false }: Props) {
+type Props = {
+  children: ReactNode;
+  calm?: boolean;
+  shipsOnly?: boolean;
+  seamless?: boolean;
+};
+export function OceanScene({
+  children,
+  calm = false,
+  shipsOnly = false,
+  seamless = false,
+}: Props) {
+  // Seamless mode: inherit the parent's gradient (no own background, no card
+  // chrome). All the decorative absolute-positioned elements below stay
+  // anchored to this relative container regardless of mode.
+  const containerClass = seamless
+    ? 'relative overflow-hidden'
+    : 'relative overflow-hidden rounded-3xl border border-[color:var(--info)]/15 shadow-soft';
+  const containerStyle: React.CSSProperties | undefined = seamless
+    ? undefined
+    : {
+        // Unified sky→sea gradient — matches the HomePage page-bg gradient
+        // so the OceanScene card and the page background read as one continuous
+        // ocean (no visible seam between them). Slightly lighter than the
+        // earlier "deep ocean" version so the bottom doesn't compete with
+        // legibility of lesson nodes/labels.
+        background:
+          'linear-gradient(180deg, #EAF5FF 0%, #CCE6FB 30%, #9DCDF0 65%, #74B5E0 100%)',
+      };
   return (
-    <div
-      className="relative overflow-hidden rounded-3xl border border-[color:var(--info)]/15 shadow-soft"
-      style={{
-        background: 'linear-gradient(180deg, #EAF5FF 0%, #CFE9FF 26%, #B3DDFF 60%, #9ED2FB 100%)',
-      }}
-    >
+    <div className={containerClass} style={containerStyle}>
       {/* sun */}
       {!shipsOnly && (
         <div
@@ -38,21 +70,50 @@ export function OceanScene({ children, calm = false, shipsOnly = false }: Props)
         />
       )}
 
-      {/* drifting clouds */}
+      {/* Drifting clouds — bigger and spread down the whole sea (was three
+          clouds clustered at the top, all small). Top three keep absolute-pixel
+          positioning so they anchor near the sky; the lower three use percent
+          offsets so they distribute through the tall scroll area. Clouds are
+          pointer-events-none and aria-hidden — fine for them to drift behind
+          lesson nodes and chapter banners; they're clouds. */}
       {!shipsOnly && (
         <>
-          <Cloud className="absolute left-6 top-10 w-20 opacity-90" duration={26} drift={40} />
+          <Cloud className="absolute left-6 top-10 w-28 opacity-90" duration={26} drift={40} />
           <Cloud
-            className="absolute right-10 top-24 w-14 opacity-80"
+            className="absolute right-10 top-24 w-20 opacity-85"
             duration={32}
             drift={-30}
             delay={4}
           />
           <Cloud
-            className="absolute left-1/4 top-44 w-16 opacity-75"
+            className="absolute left-1/4 top-44 w-24 opacity-80"
             duration={38}
             drift={50}
             delay={8}
+          />
+          {/* Lower clouds — use pixel offsets (not percentages) so they sit a
+              short distance below the top sky band rather than spreading
+              proportionally through a very tall page. */}
+          <Cloud
+            className="absolute right-[8%] w-32 opacity-70"
+            style={{ top: 220 }}
+            duration={44}
+            drift={-45}
+            delay={2}
+          />
+          <Cloud
+            className="absolute left-[10%] w-28 opacity-65"
+            style={{ top: 360 }}
+            duration={36}
+            drift={55}
+            delay={6}
+          />
+          <Cloud
+            className="absolute right-[20%] w-36 opacity-60"
+            style={{ top: 520 }}
+            duration={50}
+            drift={-40}
+            delay={1}
           />
         </>
       )}
@@ -101,21 +162,23 @@ export function OceanScene({ children, calm = false, shipsOnly = false }: Props)
       ))}
 
       {/* foam wave bands — also dropped in shipsOnly so the auth banner reads
-          as a quiet sea, not a full kinetic scene. */}
+          as a quiet sea, not a full kinetic scene. Opacity bumped since the
+          unified lighter page gradient (D109) gave white waves much less
+          contrast to play with than the deeper-bottom OceanScene card. */}
       {!shipsOnly && (
         <>
           <WaveBand
             className="absolute left-0 right-0"
             style={{ top: '38%' }}
             color="#FFFFFF"
-            opacity={0.4}
+            opacity={0.75}
             duration={18}
           />
           <WaveBand
             className="absolute left-0 right-0"
             style={{ top: '64%' }}
             color="#FFFFFF"
-            opacity={0.32}
+            opacity={0.65}
             duration={22}
             reverse
           />
@@ -123,7 +186,7 @@ export function OceanScene({ children, calm = false, shipsOnly = false }: Props)
             className="absolute left-0 right-0"
             style={{ top: '86%' }}
             color="#FFFFFF"
-            opacity={0.28}
+            opacity={0.55}
             duration={26}
           />
         </>
@@ -157,10 +220,13 @@ type ShipConfig = {
   delay: number;
 };
 
+// Inset values shrunk (was 6/5/9) so the ships hug the page edges further
+// from the path — they're ambient decor, shouldn't pull attention from the
+// route. Sizes bumped (was 54/46/58) so they read at the larger distance.
 const SHIPS: ShipConfig[] = [
-  { top: '34%', side: 'left', inset: 6, size: 54, duration: 22, delay: 0 },
-  { top: '58%', side: 'right', inset: 5, size: 46, duration: 26, delay: 3 },
-  { top: '82%', side: 'left', inset: 9, size: 58, duration: 24, delay: 1.5 },
+  { top: '34%', side: 'left', inset: 2, size: 64, duration: 22, delay: 0 },
+  { top: '58%', side: 'right', inset: 2, size: 56, duration: 26, delay: 3 },
+  { top: '82%', side: 'left', inset: 4, size: 68, duration: 24, delay: 1.5 },
 ];
 
 /** Lower, smaller fleet for the compact auth banner — stays out of the centered logo. */
@@ -216,11 +282,13 @@ function SkyDie({
 
 function Cloud({
   className,
+  style,
   duration,
   drift,
   delay = 0,
 }: {
   className?: string;
+  style?: React.CSSProperties;
   duration: number;
   drift: number;
   delay?: number;
@@ -229,6 +297,7 @@ function Cloud({
     <motion.svg
       viewBox="0 0 64 28"
       className={className}
+      style={style}
       fill="#FFFFFF"
       aria-hidden="true"
       animate={{ x: [0, drift, 0] }}

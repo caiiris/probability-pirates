@@ -1,4 +1,4 @@
-import type { Lesson, ProblemSlot, Variant } from './types';
+import type { CombinationPickerConfig, Lesson, ProblemSlot, Variant } from './types';
 import { SKILLS } from '@/content/skills';
 import { MISCONCEPTIONS } from '@/content/misconceptions';
 
@@ -8,6 +8,68 @@ const _warnedMissingSkills = new Set<string>();
 function assertNonEmptyString(value: string, path: string): void {
   if (value.trim().length === 0) {
     throw new Error(`${path}: required string must not be empty`);
+  }
+}
+
+function assertTwoStageBranchFigure(
+  figure: {
+    stageA: { label: string; count: number };
+    stageB: { label: string; count: number };
+    stepMs?: number;
+    holdMs?: number;
+    caption?: string;
+  },
+  basePath: string,
+): void {
+  assertNonEmptyString(figure.stageA.label, `${basePath}.stageA.label`);
+  assertNonEmptyString(figure.stageB.label, `${basePath}.stageB.label`);
+  if (figure.stageA.count < 1 || figure.stageA.count > 6) {
+    throw new Error(
+      `${basePath}.stageA.count must be between 1 and 6 (got ${figure.stageA.count})`,
+    );
+  }
+  if (figure.stageB.count < 1 || figure.stageB.count > 6) {
+    throw new Error(
+      `${basePath}.stageB.count must be between 1 and 6 (got ${figure.stageB.count})`,
+    );
+  }
+  if (figure.stepMs !== undefined && figure.stepMs <= 0) {
+    throw new Error(`${basePath}.stepMs must be positive`);
+  }
+  if (figure.holdMs !== undefined && figure.holdMs <= 0) {
+    throw new Error(`${basePath}.holdMs must be positive`);
+  }
+  if (figure.caption !== undefined) {
+    assertNonEmptyString(figure.caption, `${basePath}.caption`);
+  }
+}
+
+function assertCombinationPicker(
+  picker: CombinationPickerConfig,
+  basePath: string,
+): void {
+  assertNonEmptyString(picker.stageALabel, `${basePath}.combinationPicker.stageALabel`);
+  assertNonEmptyString(picker.stageBLabel, `${basePath}.combinationPicker.stageBLabel`);
+  if (picker.stageAOptions.length < 2 || picker.stageAOptions.length > 6) {
+    throw new Error(`${basePath}.combinationPicker.stageAOptions must have 2–6 items`);
+  }
+  if (picker.stageBOptions.length < 2 || picker.stageBOptions.length > 6) {
+    throw new Error(`${basePath}.combinationPicker.stageBOptions must have 2–6 items`);
+  }
+  for (let i = 0; i < picker.stageAOptions.length; i++) {
+    assertNonEmptyString(
+      picker.stageAOptions[i],
+      `${basePath}.combinationPicker.stageAOptions[${i}]`,
+    );
+  }
+  for (let i = 0; i < picker.stageBOptions.length; i++) {
+    assertNonEmptyString(
+      picker.stageBOptions[i],
+      `${basePath}.combinationPicker.stageBOptions[${i}]`,
+    );
+  }
+  if (picker.addButtonLabel !== undefined) {
+    assertNonEmptyString(picker.addButtonLabel, `${basePath}.combinationPicker.addButtonLabel`);
   }
 }
 
@@ -49,6 +111,15 @@ function assertVariantInvariants(lesson: Lesson, slot: ProblemSlot, variant: Var
       }
       if (variant.context !== undefined) {
         assertNonEmptyString(variant.context, `${basePath}.context`);
+      }
+      break;
+    }
+    case 'number-fill': {
+      if (!Number.isInteger(variant.answer)) {
+        throw new Error(`${basePath}: number-fill answer must be an integer`);
+      }
+      if (variant.answerLabel !== undefined) {
+        assertNonEmptyString(variant.answerLabel, `${basePath}.answerLabel`);
       }
       break;
     }
@@ -107,6 +178,12 @@ function assertVariantInvariants(lesson: Lesson, slot: ProblemSlot, variant: Var
           }
         }
       }
+      if (variant.strategyHint !== undefined) {
+        assertNonEmptyString(variant.strategyHint, `${basePath}.strategyHint`);
+      }
+      if (variant.combinationPicker !== undefined) {
+        assertCombinationPicker(variant.combinationPicker, basePath);
+      }
       break;
     }
     case 'simulate-proportion': {
@@ -158,6 +235,9 @@ function assertVariantInvariants(lesson: Lesson, slot: ProblemSlot, variant: Var
       }
       if (variant.context !== undefined) {
         assertNonEmptyString(variant.context, `${basePath}.context`);
+      }
+      if (variant.combinationPicker !== undefined) {
+        assertCombinationPicker(variant.combinationPicker, basePath);
       }
       break;
     }
@@ -289,6 +369,14 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
             if (slot.figure.caption !== undefined) {
               assertNonEmptyString(slot.figure.caption, `${basePath}.figure.caption`);
             }
+            break;
+          }
+          case 'tree-diagram': {
+            assertTwoStageBranchFigure(slot.figure, `${basePath}.figure`);
+            break;
+          }
+          case 'road-fork': {
+            assertTwoStageBranchFigure(slot.figure, `${basePath}.figure`);
             break;
           }
           default: {

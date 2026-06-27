@@ -77,32 +77,40 @@ const unit1: Lesson[] = [
 ];
 
 // Unit 2 — Compound experiments (counting outcomes).
-// `two-dice` is the authored demo lesson, swapped in for this stub by
-// `content/index.ts` (D88).
+//
+// D95: `addition-principle` moved here from Unit 4, directly after
+// `multiplication-principle` (AND/OR twin pair).
+//
+// D98: dropped the `two-coins` and `two-dice` intro stubs and moved
+// `tree-diagrams` to the conditional-probability unit. The 2-coin and
+// 2-dice compound sample spaces are already built concretely in
+// `equally-likely-outcomes` (HT/TH trap, the 6×6 = 36 grid), and
+// `multiplication-principle` is discovery-first (outfit puzzle + road
+// fork) so it does not need three warm-up lessons re-teaching the same
+// ground. Tree diagrams earn their own lesson later, where branches
+// actually change between stages (dependent draws, conditioning).
 const unit2: Lesson[] = [
-  stub(6, 'two-coins', 'Two coins', 'Combine two experiments and watch the outcomes multiply.'),
-  stub(7, 'two-dice', 'Two dice', 'The 6×6 grid and the sums it hides.'),
   stub(
-    8,
-    'tree-diagrams',
-    'Tree diagrams',
-    'Draw branching choices to count them without missing any.',
-  ),
-  stub(
-    9,
+    6,
     'multiplication-principle',
     'The multiplication principle',
     'Why independent choices multiply.',
   ),
   stub(
-    10,
+    7,
+    'addition-principle',
+    'The addition principle',
+    "Add the ways when choices don't overlap.",
+  ),
+  stub(
+    8,
     'practice-counting-outcomes',
     'Practice: counting outcomes',
     'Count compound outcomes with confidence.',
     3,
   ),
   stub(
-    11,
+    9,
     'review-compound',
     'Compound experiments review',
     'Mixed practice on combining experiments.',
@@ -113,58 +121,55 @@ const unit2: Lesson[] = [
 // Unit 3 — Events
 const unit3: Lesson[] = [
   stub(
-    12,
+    10,
     'event-as-set',
     'An event is a set',
     'Events are subsets of the sample space, not single outcomes.',
   ),
   stub(
-    13,
+    11,
     'p-event-by-counting',
     'P(event) by counting',
     'Apply favorable-over-total to whole events.',
   ),
   stub(
-    14,
+    12,
     'complement-rule',
     'The complement rule',
     'When counting the opposite is the faster path.',
   ),
-  stub(15, 'practice-events', 'Practice: events', 'Events on dice and cards.', 3),
-  stub(16, 'review-events', 'Events review', 'Mixed practice on events and complements.', 5),
+  stub(13, 'practice-events', 'Practice: events', 'Events on dice and cards.', 3),
+  stub(14, 'review-events', 'Events review', 'Mixed practice on events and complements.', 5),
 ];
 
-// Unit 4 — Counting techniques
+// Unit 4 — Counting techniques. D95 moved `addition-principle` out to
+// Unit 2 (paired with multiplication-principle); inclusion-exclusion
+// is now the unit opener as the meaningful "what if cases overlap?"
+// follow-up.
 const unit4: Lesson[] = [
   stub(
-    17,
-    'addition-principle',
-    'The addition principle',
-    "Add the ways when choices don't overlap.",
-  ),
-  stub(
-    18,
+    15,
     'inclusion-exclusion',
     'Inclusion and exclusion',
     'Fix double-counting when choices overlap.',
   ),
-  stub(19, 'permutations', 'Permutations', 'Count arrangements where order matters.'),
-  stub(20, 'combinations', 'Combinations', "Count selections where order doesn't matter."),
+  stub(16, 'permutations', 'Permutations', 'Count arrangements where order matters.'),
+  stub(17, 'combinations', 'Combinations', "Count selections where order doesn't matter."),
   stub(
-    21,
+    18,
     'divide-by-k-factorial',
     'Why divide by k!',
     'The derivation behind the combinations formula.',
   ),
   stub(
-    22,
+    19,
     'practice-counting-techniques',
     'Practice: counting techniques',
     'Permutations and combinations word problems.',
     3,
   ),
   stub(
-    23,
+    20,
     'review-counting-techniques',
     'Counting techniques review',
     'Mixed practice on advanced counting.',
@@ -175,33 +180,33 @@ const unit4: Lesson[] = [
 // Unit 5 — Probabilities of multiple events
 const unit5: Lesson[] = [
   stub(
-    24,
+    21,
     'independent-events',
     'Independent events',
     "Multiply probabilities when events don't affect each other.",
   ),
   stub(
-    25,
+    22,
     'mutually-exclusive',
     'Mutually exclusive events',
     "Add probabilities when events can't both happen.",
   ),
-  stub(26, 'at-least-one', 'At least one', "Use the complement to handle 'at least one' cleanly."),
+  stub(23, 'at-least-one', 'At least one', "Use the complement to handle 'at least one' cleanly."),
   stub(
-    27,
+    24,
     'birthday-paradox',
     'The birthday paradox',
     'A surprising collision that counting explains.',
   ),
   stub(
-    28,
+    25,
     'practice-multi-event',
     'Practice: multiple events',
     'Multi-step compound probability.',
     3,
   ),
   stub(
-    29,
+    26,
     'review-combining',
     'Combining probabilities review',
     'Mixed practice on multi-event probability.',
@@ -209,32 +214,41 @@ const unit5: Lesson[] = [
   ),
 ];
 
-// Unit 6 — Conditional probability
+// Unit 6 — Conditional probability. D98 placed `tree-diagrams` here:
+// branching diagrams are the natural tool for sequential, dependent
+// choices, where the branches change at each stage (the conditional
+// setting), not for the independent compound experiments of Unit 2.
 const unit6: Lesson[] = [
   stub(
-    30,
+    27,
     'conditional-intuition',
     'Given that X happened',
     'How new information reshapes the sample space.',
   ),
-  stub(31, 'conditional-formula', 'The conditional formula', 'P(A given B), made precise.'),
+  stub(28, 'conditional-formula', 'The conditional formula', 'P(A given B), made precise.'),
   stub(
-    32,
+    29,
+    'tree-diagrams',
+    'Tree diagrams',
+    'Draw branching choices to track probabilities stage by stage.',
+  ),
+  stub(
+    30,
     'independence-revisited',
     'Independence revisited',
     'When conditioning changes nothing.',
   ),
-  stub(33, 'bayes-theorem', "Bayes' theorem", 'Flip a conditional probability around.'),
-  stub(34, 'monty-hall', 'Monty Hall', 'The switch-or-stay puzzle, settled by simulation.'),
+  stub(31, 'bayes-theorem', "Bayes' theorem", 'Flip a conditional probability around.'),
+  stub(32, 'monty-hall', 'Monty Hall', 'The switch-or-stay puzzle, settled by simulation.'),
   stub(
-    35,
+    33,
     'practice-conditional',
     'Practice: conditional probability',
     'Trees and Bayes problems.',
     3,
   ),
   stub(
-    36,
+    34,
     'review-conditional',
     'Conditional probability review',
     'Mixed practice on conditioning.',
@@ -252,27 +266,27 @@ const unit6: Lesson[] = [
 // probability, what payoff do you expect?"
 const unit7: Lesson[] = [
   stub(
-    37,
+    35,
     'expected-value-intuition',
     'Expected value',
     'The long-run average payoff of a chance event.',
   ),
   stub(
-    38,
+    36,
     'computing-expected-value',
     'Computing E(X)',
     'Weighted sums on dice, spinners, and cards.',
   ),
-  stub(39, 'fair-games', 'Fair games', 'When is a bet fair? E(X) = 0 says break-even.'),
+  stub(37, 'fair-games', 'Fair games', 'When is a bet fair? E(X) = 0 says break-even.'),
   stub(
-    40,
+    38,
     'practice-expected-value',
     'Practice: gambles and insurance',
     'Lotteries, casinos, and insurance, settled by expected value.',
     3,
   ),
   stub(
-    41,
+    39,
     'review-expected-value',
     'Expected value review',
     'Mixed practice on expected value.',

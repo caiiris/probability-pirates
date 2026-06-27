@@ -1,0 +1,40 @@
+[
+  {
+    "id": "verified-k-heads-in-n-p02-p01",
+    "instanceId": "verified-k-heads-in-n-p02:3314986074",
+    "templateId": "verified-k-heads-in-n-p02",
+    "topic": "distributions",
+    "skills": [
+      "binomial-pmf",
+      "independence"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 900,
+    "params": {
+      "n": 7,
+      "k": 7
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair coin is flipped 7 times. What is the probability of getting exactly 7 heads?",
+    "context": null,
+    "answer": "1/128",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(exactly 7 heads in 7 flips)",
+      "steps": [
+        "Each flip is independent with P(heads) = 1/2.",
+        "Total equally-likely sequences: 2^7 = 128.",
+        "Sequences with exactly 7 heads: C(7, 7) = 1.",
+        "P(exactly 7 heads) = 1/128 = 1/128."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.0078125,
+      "simulationEstimate": 0.00798,
+      "absoluteDifference": 0.00016749999999999925,
+      "sigmaThreshold": 0.0019686879950553365,
+      "passed": true
+    }
+  }
+]

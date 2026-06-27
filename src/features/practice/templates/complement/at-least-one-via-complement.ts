@@ -93,7 +93,7 @@ export const atLeastOneViaComplementTemplate: Template<Params> = {
     const answer = this.solve(params);
     if (answer.kind !== 'fraction') throw new Error('solve returned unexpected kind');
     const { num, den } = answer.value;
-    const missAll = powF(frac(m - 1, m), n);
+    const trap = powF(frac(m - 1, m), n);
     return {
       id: `at-least-one-via-complement:m=${m},n=${n}`,
       interactionKind: 'fill-fraction',
@@ -105,9 +105,11 @@ export const atLeastOneViaComplementTemplate: Template<Params> = {
       feedbackCorrect:
         `Correct! Using the complement: 1 − (${m - 1}/${m})^${n} = ${Number(num)}/${Number(den)}.`,
       feedbackDefault:
-        `Use the complement rule: P(at least one) = 1 − P(none). ` +
-        `P(miss on one trial) = ${m - 1}/${m}, so P(miss all ${n}) = (${m - 1}/${m})^${n} = ${Number(missAll.num)}/${Number(missAll.den)}.`,
+        `Try naming the opposite event first. "At least once" is often easier if you think about what it means for the event to happen zero times.`,
       skills: ['complement-rule', 'independence'],
+      misconceptionByFraction: [
+        { num: Number(trap.num), den: Number(trap.den), key: 'complement_inversion' },
+      ],
     };
   },
 

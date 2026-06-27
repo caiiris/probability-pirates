@@ -68,6 +68,29 @@ describe('checkAnswer: fill-fraction', () => {
 });
 
 // ---------------------------------------------------------------------------
+// number-fill
+// ---------------------------------------------------------------------------
+const numberFill: Variant = {
+  id: 'test',
+  interactionKind: 'number-fill',
+  prompt: '',
+  answer: 10,
+  feedbackCorrect: '',
+  feedbackDefault: '',
+};
+
+describe('checkAnswer: number-fill', () => {
+  it('correct for the exact integer', () => {
+    expect(checkAnswer(numberFill, { value: 10 }).wasCorrect).toBe(true);
+  });
+  it('wrong for a different integer, keyed by the stringified value', () => {
+    const r = checkAnswer(numberFill, { value: 60 });
+    expect(r.wasCorrect).toBe(false);
+    if (!r.wasCorrect) expect(r.matchedWrongKey).toBe('60');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // tap-event
 // ---------------------------------------------------------------------------
 const tapEvent: Variant = {

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "verified-gambler-fallacy-mc-p01-p01",
+    "instanceId": "verified-gambler-fallacy-mc-p01:1068915428",
+    "templateId": "verified-gambler-fallacy-mc-p01",
+    "topic": "long-run",
+    "skills": [
+      "long-run-vs-single-trial",
+      "independence"
+    ],
+    "retrievalForm": "definition",
+    "difficulty": 860,
+    "params": {
+      "streakLen": 8,
+      "flavor": 2
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "A basketball player has made 8 free throws in a row. Assuming each free throw is an independent 50/50 shot, what is the probability the next attempt is a miss?",
+    "context": null,
+    "answer": "choice:independent",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Independence and the gambler's fallacy",
+      "steps": [
+        "A fair shot has P(outcome) = 1/2 on every trial.",
+        "Each trial is independent: the outcome does not depend on previous results.",
+        "A streak of 8 free throws in a row is surprising, but it doesn't \"use up\" probability.",
+        "P(next outcome) = 1/2, exactly as before the streak began.",
+        "The gambler's fallacy is the mistaken belief that a streak makes the opposite outcome \"due.\""
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

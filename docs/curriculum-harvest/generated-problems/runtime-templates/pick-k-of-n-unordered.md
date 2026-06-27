@@ -24,7 +24,7 @@
 **Choosing 4 from 6 (unordered)**
 
 - We want to count subsets of size 4 from 6 elements.
-- Order doesn't matter — {A,B} and {B,A} count as one committee.
+- Order does not matter. {A,B} and {B,A} count as one committee.
 - Ordered selections (permutations): P(6,4) = 6!/(6−4)! = 360.
 - Each unordered subset appears in 4! = 24 orderings, so divide by 4!.
 - C(6,4) = P(6,4) / 4! = 360 / 24 = 15.
@@ -50,7 +50,7 @@
 **Choosing 2 from 8 (unordered)**
 
 - We want to count subsets of size 2 from 8 elements.
-- Order doesn't matter — {A,B} and {B,A} count as one committee.
+- Order does not matter. {A,B} and {B,A} count as one committee.
 - Ordered selections (permutations): P(8,2) = 8!/(8−2)! = 56.
 - Each unordered subset appears in 2! = 2 orderings, so divide by 2!.
 - C(8,2) = P(8,2) / 2! = 56 / 2 = 28.
@@ -76,7 +76,7 @@
 **Choosing 5 from 7 (unordered)**
 
 - We want to count subsets of size 5 from 7 elements.
-- Order doesn't matter — {A,B} and {B,A} count as one committee.
+- Order does not matter. {A,B} and {B,A} count as one committee.
 - Ordered selections (permutations): P(7,5) = 7!/(7−5)! = 2520.
 - Each unordered subset appears in 5! = 120 orderings, so divide by 5!.
 - C(7,5) = P(7,5) / 5! = 2520 / 120 = 21.
@@ -102,7 +102,7 @@
 **Choosing 2 from 6 (unordered)**
 
 - We want to count subsets of size 2 from 6 elements.
-- Order doesn't matter — {A,B} and {B,A} count as one committee.
+- Order does not matter. {A,B} and {B,A} count as one committee.
 - Ordered selections (permutations): P(6,2) = 6!/(6−2)! = 30.
 - Each unordered subset appears in 2! = 2 orderings, so divide by 2!.
 - C(6,2) = P(6,2) / 2! = 30 / 2 = 15.
@@ -128,7 +128,7 @@
 **Choosing 5 from 6 (unordered)**
 
 - We want to count subsets of size 5 from 6 elements.
-- Order doesn't matter — {A,B} and {B,A} count as one committee.
+- Order does not matter. {A,B} and {B,A} count as one committee.
 - Ordered selections (permutations): P(6,5) = 6!/(6−5)! = 720.
 - Each unordered subset appears in 5! = 120 orderings, so divide by 5!.
 - C(6,5) = P(6,5) / 5! = 720 / 120 = 6.

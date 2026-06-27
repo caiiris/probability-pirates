@@ -138,11 +138,17 @@ describe('course catalog', () => {
   it('opens on the authored lessons as the playable head of the catalog', () => {
     const playable = lessons.filter((l) => !l.comingSoon);
     // Authored, in catalog order. Add ids here as new roadmap lessons are
-    // authored (D88, D92, D93, …). Every other lesson is a blank, locked stub.
+    // authored (D88, D92, D93, D94, D95, …). Every other lesson is a
+    // blank, locked stub. Note (D95): `addition-principle` was moved
+    // from Unit 4 into Unit 2 right after `multiplication-principle`,
+    // so it appears immediately after it on the path.
     expect(playable.map((l) => l.id)).toEqual([
       'how-likely',
       'long-run-frequency',
       'sample-space',
+      'equally-likely-outcomes',
+      'multiplication-principle',
+      'addition-principle',
     ]);
     expect(playable.every((l) => l.slots.length > 0)).toBe(true);
     const locked = lessons.filter((l) => l.comingSoon);

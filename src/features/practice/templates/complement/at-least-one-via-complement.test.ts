@@ -11,7 +11,15 @@ import { atLeastOneViaComplementTemplate as t } from './at-least-one-via-complem
 import { expectTemplateAgrees } from '../testUtils';
 import { checkAnswer } from '@/lib/checkAnswer';
 import { answerToPayload } from '@/features/practice/practiceEngine';
-import { toNumber } from '@/lib/probability/exact';
+import { frac, mulF, eqF, toNumber } from '@/lib/probability/exact';
+import type { FillFractionVariant } from '@/content/types';
+
+/** Local powF for test assertions. */
+function powF(base: ReturnType<typeof frac>, exp: number): ReturnType<typeof frac> {
+  let result = frac(1);
+  for (let i = 0; i < exp; i++) result = mulF(result, base);
+  return result;
+}
 
 describe('at-least-one-via-complement', () => {
   it('passes expectTemplateAgrees (Monte-Carlo + render-consistency)', () => {
@@ -74,5 +82,17 @@ describe('at-least-one-via-complement', () => {
         expect(p).toBeLessThan(1);
       }
     }
+  });
+
+  it('misconceptionByFraction: trap = P(all miss) with key complement_inversion, differs from correct answer', () => {
+    const params = { m: 6, n: 4 };
+    const variant = t.render(params) as FillFractionVariant;
+    expect(variant.misconceptionByFraction).toBeDefined();
+    const trap = frac(variant.misconceptionByFraction![0].num, variant.misconceptionByFraction![0].den);
+    const expectedTrap = powF(frac(params.m - 1, params.m), params.n);
+    expect(eqF(trap, expectedTrap)).toBe(true);
+    expect(variant.misconceptionByFraction![0].key).toBe('complement_inversion');
+    const correct = frac(variant.numerator, variant.denominator);
+    expect(eqF(trap, correct)).toBe(false);
   });
 });

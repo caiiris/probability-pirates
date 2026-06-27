@@ -98,6 +98,39 @@ Import fixes: family files `./types` -> `../types`; test files `./testUtils` -> 
 - **What:** this family's `solve` returns `{ kind: 'int', value: nCr(n,k) }`, but it renders as `multiple-choice`, and `answerToPayload` throws on `int` + `multiple-choice` (by C6 design). So WP-6 cannot grade this family via the normal `generateInstance` -> `answerToPayload` -> `checkAnswer` path. The vetting test deliberately uses `expectExactEnumeration` (which never calls `answerToPayload`) to sidestep this.
 - **Status:** OPEN. Logged as README risk R2. **Recommended fix when WP-6 lands:** change this family's `solve` to return `{ kind: 'choice', optionId }` (the graded answer is the chosen option, not a typed integer), keeping the displayed count as the option label. WP-6 must not ship this family until resolved.
 
+## F2 Stage 2 — free-response + 3-try AI hint ladder + scaled XP (LANDED)
+
+Built directly on main after the practice-redesign agent landed (tree quiescent; no live collision). All additive; MVP still works with AI off.
+
+- **S2.1 — XP (D100 + F2 decay).** `src/lib/practiceXp.ts`: difficulty-scaled base (`PRACTICE_XP_BY_BAND` Easy 3 / Medium 5 / Hard 8 / Extreme 12, cutoffs mirror `difficultyLabel`) + per-try decay (`practiceTryMultiplier`: 1 / ½ / ¼ / 0). `grantPracticeXp`/`practiceXpForResult` gained an optional `opts` (back-compat: no opts → flat 5, full credit, so all prior tests stand). `usePracticeXp.award(wasCorrect, opts?)` threads it through. Badge now shows the scaled base. **+12 tests.**
+- **S2.3 — 3-try ladder.** `PracticeSession.tsx`: wrong on try 1–2 calls `useAiHint.requestHint` (computational), shows an escalating hint, lets the learner retry **without revealing**; the 3rd miss (or any correct answer) `resolve()`s — reveals the `DerivationCard` and records signals once. XP awarded only on a correct solve, decayed by the solving try (reveal = 0). `ground` = code-verified answer (MC → correct option label) + canonical steps. Degrades to authored `feedbackDefault` when AI off / any failure. **Test rewritten for the ladder.**
+- **S2.2 — `number-fill` interaction kind (dormant, additive).** Added to the shared `InteractionKind`/`Variant` union + `NumberFillVariant`; grading in `checkAnswer` (exact int eq); validation in `assertLessonInvariants`; `{ value:number }` added to `AttemptPayload`; `answerToPayload` int → `{ value }`; `audit-feedback.ts` Record entry; new keyed dispatch adapter `renderers/NumberFillInteraction.tsx` wrapping F2-D's `NumberFill`. No template emits it yet → fully dormant. **Resolves I-WP-H's spirit:** count problems can now be free-response instead of MC. **+3 tests.**
+- **Hosting scaffolding.** `vercel.json` (whole-app Vercel: `npm run build` → `dist`, SPA rewrite excluding `/api/`, `api/hint.ts` maxDuration 30) + `.env.example` AI vars (`VITE_AI_ENABLED`, `VITE_AI_API_BASE`, `OPENAI_MODEL`, `FIREBASE_PROJECT_ID`).
+
+- **S2.4 — conceptual two-part serving (interleave).** Tagged the C-4 bank with `topic` + `skills`. New pure `conceptual.ts`: `parseAnswerString`/`gradeConceptualAnswer` (Part 1 graded in code, accepts any equivalent form — 1/2 = 2/4 = 0.5), `pickConceptualProblem` (topic-matched, anti-repeat), and `reasoningMultiplier` (flagged "why" halves XP; `REASONING_PENALTY` = 0.5; never penalizes on no signal / AI off). `PracticeXpOpts` gained `reasoningMultiplier` (clamped [0,1], only reduces). New `ConceptualRound.tsx` — self-contained two-part loop: code-grades the answer with the same 3-try ladder, sends `{answer, why}` to the conceptual `/api/hint` for reasoning-aware no-reveal hints, reveals the hand-authored `canonicalWhy`, and on resolve awards (penalty-adjusted) XP + records the per-skill/misconception signal. **Concept-checks do NOT move per-topic Elo** (stays anchored to the template stream). `PracticeSession` interleaves one matching-topic concept-check after every 4 template problems (falls back to templates when a topic has none). **Per the user's calls:** right-answer-but-flagged-reasoning earns partial XP; the "why" is required; answers accept any equivalent form. **+16 tests.**
+
+**Verify (cumulative Stage 2):** `tsc` clean · `tsc --project api/tsconfig.json` clean · **643/643 tests** · `npm run build` clean.
+
+**Still open:** Stage 3 (owner deploy + secrets + flip flag). Possible follow-up: convert select MC count templates to `number-fill` now that the kind exists; rate conceptual problems individually instead of the fixed Medium nominal.
+
+## F2 Wave 2 — fallback no-reveal polish, free-response conversion, +6 families (LANDED)
+
+- **No-reveal fallback:** audited every template `feedbackDefault`; all are already no-reveal (the `= 21` leak the user saw was a stale deployed bundle, not current code).
+- **pick-k-of-n-unordered → free-response:** converted from multiple-choice to `number-fill` (solve now `{kind:'int'}`). Added `misconceptionByValue` to `NumberFillVariant` + a derivation branch in `PracticeSession.resolve`, so typing the permutation count `nPr(n,k)` still flags `ordered_vs_unordered` — the misconception signal the MC distractor used to provide. Test rewritten.
+- **6 new code-verified families** (broaden topics + add Medium→Extreme difficulty so the adaptive engine has room above Easy):
+  | family | topic | difficulty | interaction | vetting |
+  |---|---|---|---|---|
+  | `single-event-prob` | counting | Easy | fill-fraction | MC 5σ |
+  | `permutations-arrange-k-of-n` | counting | Medium | number-fill | exact enumeration + render round-trip |
+  | `without-replacement-two-draws` | conditional | Hard | fill-fraction | MC 5σ |
+  | `geometric-first-success` | distributions | Med→Hard | fill-fraction | MC 5σ |
+  | `binomial-at-least-k` | distributions | Hard→Extreme | fill-fraction | MC 5σ |
+  | `expected-value-die-game` | long-run | Medium | fill-fraction | sample-mean vs exact E |
+  Registered in `templates/index.ts` (now 12 base families + 30 verified seeds + 7 creative).
+- **Deploy fixes (production):** `/api` import specifiers → `.js` (Vercel Node ESM transpiles per-file; `.ts`/extensionless crash at module load) + `vitest.workspace.ts` `extensionAlias` so tests still resolve. **JWKS URL fix** — Firebase ID tokens are verified against `securetoken@system.gserviceaccount.com` keys, not `oauth2/v3/certs` (the wrong set caused 401s). All env vars set in Vercel; OpenAI funded. AI hints confirmed live end-to-end.
+
+**Verify (cumulative):** `tsc` + api `tsc` clean · **657/657 tests** · `npm run build` clean.
+
 ## Follow-ups / TODO
 
 - [x] Merge **WP-2** once fill-text settles — DONE (additive 3-way; fill-text preserved; 312 tests green).

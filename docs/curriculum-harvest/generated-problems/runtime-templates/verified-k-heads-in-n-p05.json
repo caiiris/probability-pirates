@@ -1,0 +1,40 @@
+[
+  {
+    "id": "verified-k-heads-in-n-p05-p01",
+    "instanceId": "verified-k-heads-in-n-p05:549092248",
+    "templateId": "verified-k-heads-in-n-p05",
+    "topic": "distributions",
+    "skills": [
+      "binomial-pmf",
+      "independence"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 800,
+    "params": {
+      "n": 2,
+      "k": 0
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair coin is flipped 2 times. What is the probability of getting exactly 0 heads?",
+    "context": null,
+    "answer": "1/4",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(exactly 0 heads in 2 flips)",
+      "steps": [
+        "Each flip is independent with P(heads) = 1/2.",
+        "Total equally-likely sequences: 2^2 = 4.",
+        "Sequences with exactly 0 heads: C(2, 0) = 1.",
+        "P(exactly 0 heads) = 1/4 = 1/4."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.25,
+      "simulationEstimate": 0.2489,
+      "absoluteDifference": 0.0010999999999999899,
+      "sigmaThreshold": 0.009682458365518542,
+      "passed": true
+    }
+  }
+]

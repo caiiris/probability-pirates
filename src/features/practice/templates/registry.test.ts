@@ -70,7 +70,7 @@ describe('TEMPLATES registry', () => {
       'sum-of-two-dice':             'counting',
       'at-least-one-via-complement': 'complement',
       'k-heads-in-n':                'distributions',
-      'pick-k-of-n-unordered':       'counting',
+      'pick-k-of-n-unordered':       'permutations-combinations',
       'conditional-bayes-2x2':       'conditional',
       'gambler-fallacy-mc':          'long-run',
     };

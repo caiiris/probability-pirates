@@ -1,0 +1,43 @@
+[
+  {
+    "id": "verified-conditional-bayes-2x2-p03-p01",
+    "instanceId": "verified-conditional-bayes-2x2-p03:2837935584",
+    "templateId": "verified-conditional-bayes-2x2-p03",
+    "topic": "conditional",
+    "skills": [
+      "conditional-probability",
+      "base-rate"
+    ],
+    "retrievalForm": "application",
+    "difficulty": 895,
+    "params": {
+      "tp": 20,
+      "fp": 78,
+      "fn": 19,
+      "tn": 248
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "Given that a person tests positive, what is the probability they truly have the signal?",
+    "context": "In a study, 365 people were tested for a rare signal:\n• 20 tested positive and truly had the signal\n• 78 tested positive but did not have the signal\n• 19 tested negative but truly had the signal\n• 248 tested negative and did not have the signal",
+    "answer": "10/49",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(signal | test positive)",
+      "steps": [
+        "Total people: 365. Test-positive people: 20 + 78 = 98.",
+        "Among test-positive, 20 truly have the signal.",
+        "Condition on test+: P(signal | test+) = 20 / 98.",
+        "Reduced: 10 / 49.",
+        "Note: even a sensitive test can have a low true-signal rate among positives when the signal is rare (base-rate neglect)."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.20408163265306123,
+      "simulationEstimate": 0.2015,
+      "absoluteDifference": 0.0025816326530612166,
+      "sigmaThreshold": 0.009012000884008008,
+      "passed": true
+    }
+  }
+]

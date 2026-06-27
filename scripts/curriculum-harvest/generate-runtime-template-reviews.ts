@@ -107,12 +107,16 @@ function generateForTemplate<P>(template: Template<P>, templateIndex: number): S
   const rng = mulberry32(0xa11ce + templateIndex * 10_000);
   const problems: SerializableProblem[] = [];
   const seen = new Set<string>();
+  const targetCount =
+    template.id.startsWith('verified-') || template.id.startsWith('creative-')
+      ? 1
+      : PROBLEMS_PER_TEMPLATE;
 
   let guard = 0;
-  while (problems.length < PROBLEMS_PER_TEMPLATE) {
+  while (problems.length < targetCount) {
     guard += 1;
     if (guard > 500) {
-      throw new Error(`${template.id}: could not generate ${PROBLEMS_PER_TEMPLATE} unique instances`);
+      throw new Error(`${template.id}: could not generate ${targetCount} unique instances`);
     }
 
     const params = template.sample(rng);
@@ -239,7 +243,11 @@ function renderSummary(allProblems: Array<{ template: Template; problems: Serial
     );
   }
 
-  lines.push('', 'All files in this folder are review artifacts, not product seed content.', '');
+  lines.push(
+    '',
+    'These Markdown/JSON files are review artifacts. Verified seed params are loaded into the app from `src/content/practiceProblems/verifiedTemplateSeeds.ts`.',
+    '',
+  );
   return `${lines.join('\n')}`;
 }
 

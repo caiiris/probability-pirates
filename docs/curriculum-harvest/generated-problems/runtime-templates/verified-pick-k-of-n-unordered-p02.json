@@ -1,0 +1,38 @@
+[
+  {
+    "id": "verified-pick-k-of-n-unordered-p02-p01",
+    "instanceId": "verified-pick-k-of-n-unordered-p02:316936412",
+    "templateId": "verified-pick-k-of-n-unordered-p02",
+    "topic": "counting",
+    "skills": [
+      "ordered-vs-unordered",
+      "combinations"
+    ],
+    "retrievalForm": "definition",
+    "difficulty": 875,
+    "params": {
+      "n": 8,
+      "k": 2
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "A committee of 2 people is chosen from a group of 8. How many different committees are possible? (Order does not matter.)",
+    "context": null,
+    "answer": "choice:combo",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Choosing 2 from 8 (unordered)",
+      "steps": [
+        "We want to count subsets of size 2 from 8 elements.",
+        "Order does not matter. {A,B} and {B,A} count as one committee.",
+        "Ordered selections (permutations): P(8,2) = 8!/(8−2)! = 56.",
+        "Each unordered subset appears in 2! = 2 orderings, so divide by 2!.",
+        "C(8,2) = P(8,2) / 2! = 56 / 2 = 28."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

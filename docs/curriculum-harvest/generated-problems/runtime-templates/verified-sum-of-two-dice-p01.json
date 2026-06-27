@@ -1,0 +1,39 @@
+[
+  {
+    "id": "verified-sum-of-two-dice-p01-p01",
+    "instanceId": "verified-sum-of-two-dice-p01:3740118599",
+    "templateId": "verified-sum-of-two-dice-p01",
+    "topic": "counting",
+    "skills": [
+      "sample-space-enumeration",
+      "equally-likely-outcomes"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 850,
+    "params": {
+      "k": 10
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 10?",
+    "context": null,
+    "answer": "1/12",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(sum = 10) by enumeration",
+      "steps": [
+        "Rolling two dice produces 6 × 6 = 36 equally-likely ordered outcomes.",
+        "Pairs (a, b) with a + b = 10: (4,6), (5,5), (6,4).",
+        "Favorable outcomes: 3.",
+        "P(sum = 10) = 3/36 = 1/12."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.08333333333333333,
+      "simulationEstimate": 0.0838,
+      "absoluteDifference": 0.0004666666666666708,
+      "sigmaThreshold": 0.006180165405913052,
+      "passed": true
+    }
+  }
+]

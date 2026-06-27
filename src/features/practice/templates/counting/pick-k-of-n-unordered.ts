@@ -2,82 +2,26 @@
  * Template family: pick-k-of-n-unordered
  *
  * Topic: counting | Skills: ordered-vs-unordered, combinations
- * Retrieval form: definition | Interaction: multiple-choice | No simulate
+ * Retrieval form: definition | Interaction: number-fill (free response) | No simulate
  *
  * Parameters: n ∈ {3..8}, k ∈ {2..min(n-1, 5)}
- * Solve:      { kind: 'choice', optionId: 'combo' } — the option whose label is nCr(n,k)
+ * Solve:      { kind: 'int', value: nCr(n,k) } — the count of unordered committees
  *
- * I-WP-H fix (WP-6b, risk R2): changed from { kind:'int' } to { kind:'choice' } so
- * answerToPayload + checkAnswer round-trip correctly for this multiple-choice family.
- * nCr(n,k) remains the numeric source of truth; render derives correctOptionId from solve.
- *
- * Distractors include nPr(n,k) (the ordered-count trap, mapped to the
- * `ordered_vs_unordered` misconception) plus two other plausible wrong answers.
+ * F2: converted from multiple-choice to free-response `number-fill` so the
+ * learner computes the count instead of picking from options (no guessing).
+ * The ordered-count trap nPr(n,k) is still captured: if the learner types that
+ * value, `misconceptionByValue` flags `ordered_vs_unordered` for the learner
+ * model — preserving the pedagogy the old MC distractor provided.
  */
 
 import type { Template } from '../types';
 import { nCr, nPr, factorial } from '@/lib/probability/exact';
-import type { MisconceptionKey } from '@/content/misconceptions';
 
 type Params = { n: number; k: number };
 
-type OptionSpec = { id: string; label: string; misconception?: MisconceptionKey };
-
-/**
- * Build exactly 3 distinct distractors for the given (n,k).
- * Always tries nPr(n,k) first as the ordered-count trap.
- * Falls back through several candidates to guarantee 3 unique values.
- */
-function buildDistractors(n: number, k: number, correct: number): OptionSpec[] {
-  const seen = new Set<number>([correct]);
-  const result: OptionSpec[] = [];
-
-  const candidates: OptionSpec[] = [
-    { id: 'perm', label: '', misconception: 'ordered_vs_unordered' as MisconceptionKey },
-    { id: 'd1', label: '' },
-    { id: 'd2', label: '' },
-    { id: 'd3', label: '' },
-    { id: 'd4', label: '' },
-  ];
-
-  const rawValues = [
-    Number(nPr(n, k)),                     // ordered count trap
-    correct + 1,                            // off-by-one high
-    n * k,                                  // product (common wrong guess)
-    correct - 1 > 0 ? correct - 1 : -1,    // off-by-one low (skip if ≤ 0)
-    k >= 2 ? Number(nCr(n, k - 1)) : -1,   // one fewer selection
-    Number(nCr(n, k + 1 <= n ? k + 1 : k)), // one more selection
-  ];
-
-  for (let i = 0; i < rawValues.length && result.length < 3; i++) {
-    const v = rawValues[i];
-    if (v > 0 && !seen.has(v)) {
-      seen.add(v);
-      const spec = { ...candidates[result.length] };
-      if (i === 0) {
-        spec.misconception = 'ordered_vs_unordered';
-        spec.id = 'perm';
-      }
-      spec.label = String(v);
-      result.push(spec);
-    }
-  }
-
-  // Guarantee 3 distractors with arbitrary fallback values
-  let fallback = correct + 10;
-  while (result.length < 3) {
-    while (seen.has(fallback)) fallback++;
-    seen.add(fallback);
-    result.push({ id: `d${result.length}`, label: String(fallback) });
-    fallback++;
-  }
-
-  return result;
-}
-
 export const pickKOfNUnorderedTemplate: Template<Params> = {
   id: 'pick-k-of-n-unordered',
-  topic: 'counting',
+  topic: 'permutations-combinations',
   skills: ['ordered-vs-unordered', 'combinations'],
   retrievalForm: 'definition',
 
@@ -94,56 +38,32 @@ export const pickKOfNUnorderedTemplate: Template<Params> = {
     return { n, k };
   },
 
-  solve(_params: Params) {
-    // The correct option id is always 'combo'; the numeric value nCr(n,k) lives
-    // in render() as the option label. answerToPayload maps { kind:'choice' } to
-    // { optionId } so checkAnswer round-trips correctly for this MC family.
-    return { kind: 'choice' as const, optionId: 'combo' };
+  solve({ n, k }) {
+    // nCr(n,k) is the single source of truth for the count.
+    return { kind: 'int' as const, value: Number(nCr(n, k)) };
   },
 
   render(params) {
     const { n, k } = params;
-    // nCr(n,k) is the numeric source of truth; solve references 'combo' (the option
-    // whose label is this count), keeping solve/render in sync.
     const correct = Number(nCr(n, k));
-
-    const distractors = buildDistractors(n, k, correct);
-    const options = [
-      { id: 'combo', label: String(correct) },
-      ...distractors.map(({ id, label }) => ({ id, label })),
-    ];
-
-    const misconceptionByOption: Record<string, MisconceptionKey> = {};
-    for (const d of distractors) {
-      if (d.misconception) misconceptionByOption[d.id] = d.misconception;
-    }
-
-    const feedbackByOption: Record<string, string> = {
-      combo: 'Correct! Order does not matter here, so we use combinations C(n,k) = n!/(k!(n−k)!).',
-    };
-    for (const d of distractors) {
-      if (d.id === 'perm') {
-        feedbackByOption[d.id] =
-          `That's the number of ordered selections P(${n},${k}) = ${d.label}. ` +
-          `Since the committee has no ranking, order doesn't matter — use C(${n},${k}) instead.`;
-      } else {
-        feedbackByOption[d.id] =
-          `Not quite. The correct count is C(${n},${k}) = ${correct}, which counts unordered subsets.`;
-      }
-    }
+    const ordered = Number(nPr(n, k)); // the ordered-count trap (always > correct for k ≥ 2)
 
     return {
       id: `pick-k-of-n-unordered:n=${n},k=${k}`,
-      interactionKind: 'multiple-choice',
+      interactionKind: 'number-fill',
       prompt:
         `A committee of ${k} people is chosen from a group of ${n}. ` +
         `How many different committees are possible? (Order does not matter.)`,
-      options,
-      correctOptionId: 'combo',
-      feedbackByOption,
-      misconceptionByOption,
+      answer: correct,
+      answerLabel: 'committees',
+      // Typing the permutation count reveals the ordered-vs-unordered misconception.
+      misconceptionByValue: { [ordered]: 'ordered_vs_unordered' },
+      feedbackByWrongAnswer: {
+        [String(ordered)]:
+          'That counts ordered selections (permutations). Swapping the same people into a different order does not make a new committee.',
+      },
       feedbackCorrect: `Correct! C(${n},${k}) = ${correct} unordered committees.`,
-      feedbackDefault: `Use combinations: C(${n},${k}) = ${n}!/(${k}!·${n - k}!) = ${correct}.`,
+      feedbackDefault: `Order does not matter here. Watch out for counting the same committee more than once.`,
       skills: ['ordered-vs-unordered', 'combinations'],
     };
   },
@@ -156,7 +76,7 @@ export const pickKOfNUnorderedTemplate: Template<Params> = {
       title: `Choosing ${k} from ${n} (unordered)`,
       steps: [
         `We want to count subsets of size ${k} from ${n} elements.`,
-        `Order doesn't matter — {A,B} and {B,A} count as one committee.`,
+        `Order does not matter. {A,B} and {B,A} count as one committee.`,
         `Ordered selections (permutations): P(${n},${k}) = ${n}!/(${n}−${k})! = ${ordered}.`,
         `Each unordered subset appears in ${k}! = ${kFact} orderings, so divide by ${k}!.`,
         `C(${n},${k}) = P(${n},${k}) / ${k}! = ${ordered} / ${kFact} = ${correct}.`,

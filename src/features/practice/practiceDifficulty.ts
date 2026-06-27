@@ -9,5 +9,5 @@ export function difficultyLabel(elo: number): string {
   if (elo < 950) return 'Easy';
   if (elo < 1250) return 'Medium';
   if (elo < 1500) return 'Hard';
-  return 'Expert';
+  return 'Extreme';
 }

@@ -43,8 +43,8 @@ export function MultipleChoice({ variant, feedbackState, onChange }: Props) {
   const grid = variant.gridReference;
 
   return (
-    <div className="flex flex-col gap-6 px-4 py-6 max-w-sm mx-auto w-full">
-      <p className="text-xl font-medium text-center">{variant.prompt}</p>
+    <div className="flex flex-col gap-4 px-4 py-5 max-w-md mx-auto w-full">
+      <p className="text-lg font-medium leading-snug text-center sm:text-xl">{variant.prompt}</p>
       {hintVisible && <InteractionHint text={AFFORDANCE} onDismiss={dismissHint} />}
 
       {(variant.context || grid || variant.showDiceRoller) && (
@@ -96,7 +96,7 @@ export function MultipleChoice({ variant, feedbackState, onChange }: Props) {
               }}
               type="button"
               className={`
-                w-full px-5 py-4 rounded-xl border-2 text-left
+                w-full px-4 py-3 rounded-xl border-2 text-left
                 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
                 ${
                   isSelected
@@ -114,7 +114,7 @@ export function MultipleChoice({ variant, feedbackState, onChange }: Props) {
               transition={MOTION.pop}
             >
               <span
-                className={`font-medium text-base block ${isSelected ? 'text-primary' : 'text-foreground'}`}
+                className={`font-medium text-base leading-snug block ${isSelected ? 'text-primary' : 'text-foreground'}`}
               >
                 {option.label}
               </span>

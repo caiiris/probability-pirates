@@ -19,11 +19,15 @@
  * (used in the Profile compact section).
  */
 
-import { BookOpen, Dumbbell, Flame, TrendingUp } from 'lucide-react';
+import { BookOpen, Dumbbell, Flame, TriangleAlert, TrendingUp, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SKILLS } from '@/content/skills';
-import type { SkillId } from '@/content/skills';
+import type { SkillId, Topic } from '@/content/skills';
+import { MISCONCEPTIONS } from '@/content/misconceptions';
+import type { MisconceptionKey } from '@/content/misconceptions';
 import type { LearnerModel, SkillStat, ExposureStat } from './learnerModel';
+import { surfacedMisconceptions } from './learnerModel';
 
 // ─── Mastery pip ─────────────────────────────────────────────────────────────
 
@@ -33,6 +37,17 @@ function masteryPip(recentCorrect: number): PipLevel {
   if (recentCorrect < 0.4) return 1;
   if (recentCorrect <= 0.7) return 2;
   return 3;
+}
+
+/**
+ * Plain-language mastery level for the skill row. Same thresholds as the pip,
+ * but labelled so the dots actually mean something. Labels are chosen NOT to
+ * collide with the group headings ("Strong" / "Keep working on").
+ */
+function masteryLevel(recentCorrect: number): { label: string; className: string } {
+  if (recentCorrect < 0.4) return { label: 'Learning', className: 'text-muted-foreground' };
+  if (recentCorrect <= 0.7) return { label: 'Developing', className: 'text-amber-600' };
+  return { label: 'Mastered', className: 'text-[color:var(--green-deep)]' };
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -62,19 +77,40 @@ function SkillRow({
   hint?: string;
 }) {
   const label = SKILLS[skillId]?.label ?? skillId;
-  const pip = stat ? masteryPip(stat.recentCorrect) : undefined;
 
-  return (
-    <li className="flex items-center justify-between gap-3 py-1.5">
-      <span className="min-w-0 flex-1 truncate text-sm text-foreground">{label}</span>
-      <div className="flex shrink-0 items-center gap-2">
+  // Introduced / lesson-only rows have no practice stats: keep the lightweight
+  // single-line shape with the optional "worth a practice" nudge.
+  if (!stat) {
+    return (
+      <li className="flex items-center justify-between gap-3 py-1.5">
+        <span className="min-w-0 flex-1 truncate text-sm text-foreground">{label}</span>
         {hint && (
-          <span className="text-[10px] font-medium uppercase tracking-wide text-amber-600">
+          <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-amber-600">
             {hint}
           </span>
         )}
-        {pip !== undefined && <MasteryPips level={pip} />}
+      </li>
+    );
+  }
+
+  // Practiced rows: show what the dots mean (a level) plus the volume +
+  // accuracy behind them, so the row is legible on its own.
+  const pip = masteryPip(stat.recentCorrect);
+  const level = masteryLevel(stat.recentCorrect);
+  const accuracy = stat.attempts > 0 ? Math.round((stat.correct / stat.attempts) * 100) : 0;
+
+  return (
+    <li className="py-1.5">
+      <div className="flex items-center justify-between gap-3">
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{label}</span>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className={`text-[11px] font-semibold ${level.className}`}>{level.label}</span>
+          <MasteryPips level={pip} />
+        </div>
       </div>
+      <p className="num mt-0.5 text-xs text-muted-foreground">
+        {stat.correct} of {stat.attempts} correct · {accuracy}%
+      </p>
     </li>
   );
 }
@@ -89,6 +125,38 @@ function ExposureRow({
   const worthPractice = stat.lessonFirstTryStruggles > 0;
   return (
     <SkillRow skillId={skillId} hint={worthPractice ? 'worth a practice' : undefined} />
+  );
+}
+
+/**
+ * One tracked misconception: its name, the corrective takeaway, and a deep
+ * link into the practice category that targets the related skill. This is the
+ * "close the loop" affordance — the learner model records the slip, and this
+ * turns it into a one-tap path back to relevant practice.
+ */
+function MisconceptionRow({ keyId }: { keyId: MisconceptionKey }) {
+  const meta = MISCONCEPTIONS[keyId];
+  const relatedSkill = meta.relatedSkills[0] as SkillId;
+  const topic = SKILLS[relatedSkill]?.topic as Topic | undefined;
+
+  return (
+    <li className="py-2">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-foreground">{meta.label}</p>
+          <p className="mt-0.5 text-xs leading-snug text-muted-foreground">{meta.fix}</p>
+        </div>
+        {topic && (
+          <Link
+            to={`/practice?topic=${topic}`}
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/15"
+          >
+            Practice
+            <ArrowRight className="h-3 w-3" aria-hidden="true" />
+          </Link>
+        )}
+      </div>
+    </li>
   );
 }
 
@@ -185,7 +253,9 @@ export function StrengthsPanel({ model, loading, compact }: StrengthsPanelProps)
 
   const hasAnyData =
     model !== null &&
-    (Object.keys(model.skills).length > 0 || Object.keys(model.exposure).length > 0);
+    (Object.keys(model.skills).length > 0 ||
+      Object.keys(model.exposure).length > 0 ||
+      Object.keys(model.misconceptions ?? {}).length > 0);
 
   if (!hasAnyData) {
     return <EmptyState compact={compact} />;
@@ -204,8 +274,14 @@ export function StrengthsPanel({ model, loading, compact }: StrengthsPanelProps)
   const maxIntroduced = compact ? 3 : 5;
   const introduced = introducedEntries.slice(0, maxIntroduced);
 
+  // Misconceptions — threshold-gated, scored, sorted by score desc then recency.
+  // Only keys in the closed content set are surfaced (guards stale persisted keys).
+  const maxMisconceptions = compact ? 2 : 4;
+  const misconceptions = surfacedMisconceptions(model).slice(0, maxMisconceptions);
+
   const hasPracticed = strongest.length > 0 || weakest.length > 0;
   const hasIntroduced = introduced.length > 0;
+  const hasMisconceptions = misconceptions.length > 0;
 
   return (
     <div
@@ -256,8 +332,22 @@ export function StrengthsPanel({ model, loading, compact }: StrengthsPanelProps)
         </GroupSection>
       )}
 
+      {/* Group 4: Watch out for — surfaced misconceptions + targeted practice */}
+      {hasMisconceptions && (
+        <GroupSection
+          icon={<TriangleAlert className="h-4 w-4" aria-hidden="true" />}
+          title="Watch out for"
+          subtitle="Slips we've spotted — tap Practice to shore them up"
+          compact={compact}
+        >
+          {misconceptions.map((key) => (
+            <MisconceptionRow key={key} keyId={key} />
+          ))}
+        </GroupSection>
+      )}
+
       {/* Fallback if we have model but zero items in any group */}
-      {!hasPracticed && !hasIntroduced && <EmptyState compact={compact} />}
+      {!hasPracticed && !hasIntroduced && !hasMisconceptions && <EmptyState compact={compact} />}
     </div>
   );
 }

@@ -8,6 +8,9 @@ import { lesson6 } from './lessons/06-distributions';
 import { howLikely } from './lessons/how-likely';
 import { longRunFrequency } from './lessons/long-run-frequency';
 import { sampleSpace } from './lessons/sample-space';
+import { equallyLikelyOutcomes } from './lessons/equally-likely-outcomes';
+import { multiplicationPrinciple } from './lessons/multiplication-principle';
+import { additionPrinciple } from './lessons/addition-principle';
 import { roadmapStubLessons } from './lessons/roadmapStubs';
 import type { Lesson } from './types';
 
@@ -36,7 +39,17 @@ import type { Lesson } from './types';
 // list). To author another one: write the file, import it, add it here.
 // `how-likely` is excluded — it's the dedicated course opener (no roadmap
 // stub mirrors it; it sits ahead of Unit 1 in the path).
-const authoredRoadmapLessons: Lesson[] = [longRunFrequency, sampleSpace];
+//
+// `additionPrinciple` is authored but intentionally NOT included here, so the
+// path renders its locked roadmap stub instead. To unlock it later, just add
+// `additionPrinciple` back to this array — the import + re-export below stay
+// so the file is one edit away from going live.
+const authoredRoadmapLessons: Lesson[] = [
+  longRunFrequency,
+  sampleSpace,
+  equallyLikelyOutcomes,
+  multiplicationPrinciple,
+];
 const authoredRoadmapById = new Map<string, Lesson>(
   authoredRoadmapLessons.map((lesson) => [lesson.id, lesson]),
 );
@@ -77,6 +90,9 @@ export {
   howLikely,
   longRunFrequency,
   sampleSpace,
+  equallyLikelyOutcomes,
+  multiplicationPrinciple,
+  additionPrinciple,
 };
 export type { Lesson } from './types';
 export * from './types';

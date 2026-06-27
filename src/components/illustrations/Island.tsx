@@ -48,7 +48,11 @@ export function Island({ className, palm = false }: Props) {
       />
 
       {palm ? (
-        <g>
+        // Palm shifted ~13 SVG units to the right so the trunk + leaf canopy
+        // sit at the island's right shoulder instead of near the center. At
+        // the rendered island width the leaves now clearly extend past the
+        // lesson disc's right edge, no longer obscured by it.
+        <g transform="translate(13 0)">
           <path
             d="M98 50 C 95 32 98 24 101 18"
             stroke={TRUNK}

@@ -1,0 +1,39 @@
+[
+  {
+    "id": "verified-sum-of-two-dice-p04-p01",
+    "instanceId": "verified-sum-of-two-dice-p04:1400659249",
+    "templateId": "verified-sum-of-two-dice-p04",
+    "topic": "counting",
+    "skills": [
+      "sample-space-enumeration",
+      "equally-likely-outcomes"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 880,
+    "params": {
+      "k": 3
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "You roll two fair six-sided dice. What is the probability the sum equals 3?",
+    "context": null,
+    "answer": "1/18",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(sum = 3) by enumeration",
+      "steps": [
+        "Rolling two dice produces 6 × 6 = 36 equally-likely ordered outcomes.",
+        "Pairs (a, b) with a + b = 3: (1,2), (2,1).",
+        "Favorable outcomes: 2.",
+        "P(sum = 3) = 2/36 = 1/18."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.05555555555555555,
+      "simulationEstimate": 0.05384,
+      "absoluteDifference": 0.0017155555555555535,
+      "sigmaThreshold": 0.005121969142940492,
+      "passed": true
+    }
+  }
+]

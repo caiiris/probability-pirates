@@ -77,20 +77,15 @@ export const gamblerFallacyMcTemplate: Template<Params> = {
     const options = [
       {
         id: 'independent',
-        label: `${unchangedProbability(flavor)} — each outcome is independent of previous results`,
+        label: `${unchangedProbability(flavor)}`,
       },
       {
         id: 'due',
-        label:
-          flavor === 1
-            ? 'Less than 1/6 — a non-six is "due" after so many sixes'
-            : 'Greater than 1/2 — the opposite outcome is "due"',
+        label: flavor === 1 ? 'Less than 1/6' : 'Greater than 1/2',
       },
       {
         id: 'hot',
-        label: flavor === 2
-          ? 'Greater than 1/2 — the player is "on a roll" (hot hand)'
-          : 'Greater than 1/2 — the streak will continue',
+        label: flavor === 2 ? 'Greater than 1/2' : `Greater than ${unchangedProbability(flavor)}`,
       },
       {
         id: 'unknown',
@@ -104,13 +99,13 @@ export const gamblerFallacyMcTemplate: Template<Params> = {
 
     const feedbackByOption: Record<string, string> = {
       independent:
-        'Correct! Each trial is independent — past outcomes have no effect on future probabilities.',
+        'Correct. The trials are independent, so the probability stays the same.',
       due:
-        "This is the gambler's fallacy. An independent random process has no \"memory\" — the coin/die doesn't know it's been on a streak.",
+        'Careful: a streak does not make the opposite result more likely in an independent process.',
       hot:
-        'This is the hot-hand belief. For truly independent events, streaks don\'t change the probability of any single outcome.',
+        'Careful: a streak does not make the same result more likely in an independent process.',
       unknown:
-        `We do know! The key information is that each trial is independent with P = ${unchangedProbability(flavor)}, so the next-outcome probability stays ${unchangedProbability(flavor)} regardless of history.`,
+        'We do know enough. The prompt says the next trial is governed by the same independent process.',
     };
 
     return {
@@ -125,9 +120,9 @@ export const gamblerFallacyMcTemplate: Template<Params> = {
       feedbackByOption,
       misconceptionByOption,
       feedbackCorrect:
-        'Correct! Independent events have no memory — the probability stays the same no matter what came before.',
+        'Correct. Independent events have no memory, so the probability stays the same.',
       feedbackDefault:
-        "The key is independence: past results don't change the probability of future outcomes for a fair coin, die, or any independent process.",
+        'The key word is independent. Ask whether the previous outcomes can affect the next trial.',
       skills: ['long-run-vs-single-trial', 'independence'],
     };
   },

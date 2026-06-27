@@ -71,9 +71,12 @@ export function FlyingDie({ accent, pips = 5, size = 34, delay = 0, variant = 'f
     });
   }
 
-  // Sky creatures bob straight up; sea creatures wiggle side-to-side like a fish.
+  // Sky creatures bob straight up; sea creatures wiggle side-to-side like a
+  // fish. Swimming amplitudes bumped (x ±5→±12, y ±2→±6, rotate ±5→±12) so
+  // the fish-dice swim more visibly through the path's gaps instead of just
+  // gently bobbing in place.
   const drift = swimming
-    ? { x: [0, 5, 0, -5, 0], y: [0, -2, 0, 2, 0], rotate: [-5, 0, 5, 0, -5] }
+    ? { x: [0, 12, 0, -12, 0], y: [0, -6, 0, 6, 0], rotate: [-12, 0, 12, 0, -12] }
     : { y: [0, -7, 0], x: [0, 3, 0] };
 
   return (
@@ -83,7 +86,7 @@ export function FlyingDie({ accent, pips = 5, size = 34, delay = 0, variant = 'f
       className="relative cursor-pointer select-none"
       style={{ width: size, height: size, lineHeight: 0 }}
       animate={drift}
-      transition={{ duration: swimming ? 5 : 4, repeat: Infinity, ease: 'easeInOut', delay }}
+      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay }}
       whileHover={{ scale: 1.15 }}
     >
       {/* glow aura */}

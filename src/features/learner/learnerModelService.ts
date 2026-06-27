@@ -15,7 +15,7 @@ import {
   applyPracticeAttempt,
   applyLessonExposure,
 } from './learnerModel';
-import type { LearnerModel } from './learnerModel';
+import type { LearnerModel, MisconceptionSource } from './learnerModel';
 import type { SkillId } from '@/content/skills';
 import type { MisconceptionKey } from '@/content/misconceptions';
 
@@ -37,7 +37,10 @@ export async function recordPracticeAttempt(
     skills: SkillId[];
     wasCorrect: boolean;
     difficulty?: number;
+    /** Legacy back-compat field — treated as source 'trap'. */
     misconceptionKey?: MisconceptionKey | null;
+    /** Preferred C-MC3 field. If present, overrides misconceptionKey. */
+    misconceptionSignal?: { key: MisconceptionKey; source: MisconceptionSource } | null;
   },
 ): Promise<void> {
   try {

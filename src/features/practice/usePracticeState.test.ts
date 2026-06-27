@@ -31,11 +31,9 @@ describe('applyElo', () => {
     expect(newRating).toBeLessThan(1000 + ELO_K);
   });
 
-  it('large decrease on incorrect answer vs much easier problem', () => {
-    // difficulty << rating → expected ≈ 1 → delta ≈ ELO_K * (0-1) for wrong
+  it('does not lower rating on an incorrect answer to an easier problem', () => {
     const newRating = applyElo(1000, 100, false);
-    expect(newRating).toBeLessThan(1000);
-    expect(newRating).toBeGreaterThan(1000 - ELO_K);
+    expect(newRating).toBe(1000);
   });
 
   it('applies ELO_K constant as the scaling factor', () => {

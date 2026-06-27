@@ -4,6 +4,7 @@ import type { FillTextVariant } from '@/content/types';
 import type { InteractionProps } from './InteractionProps';
 import { useInteractionHint } from './useInteractionHint';
 import { InteractionHint } from './InteractionHint';
+import { CombinationPicker } from './CombinationPicker';
 
 const AFFORDANCE = 'Type your answer in the box. Tap Check when ready.';
 
@@ -45,16 +46,27 @@ export function FillText({ variant, feedbackState, wrongTick, onChange }: Props)
   }
 
   return (
-    <div className="flex flex-col items-center gap-5 px-4 py-6">
+    <div className="flex flex-col items-center gap-5 px-4 py-6 max-w-md mx-auto w-full">
       <p className="text-xl font-medium text-center max-w-md text-balance">
         {variant.prompt}
       </p>
-      {variant.context && (
+      {hintVisible && <InteractionHint text={AFFORDANCE} onDismiss={dismissHint} />}
+
+      {variant.combinationPicker && variant.context && (
+        <p className="w-full text-sm text-center text-foreground/90 bg-[color:var(--blue-soft)]/60 border border-[color:var(--blue-base)]/30 rounded-lg px-4 py-2.5 leading-snug">
+          {variant.context}
+        </p>
+      )}
+
+      {variant.combinationPicker && (
+        <CombinationPicker {...variant.combinationPicker} locked={locked} />
+      )}
+
+      {variant.context && !variant.combinationPicker && (
         <p className="text-sm text-muted-foreground text-center max-w-md text-balance">
           {variant.context}
         </p>
       )}
-      {hintVisible && <InteractionHint text={AFFORDANCE} onDismiss={dismissHint} />}
 
       <Input
         value={value}

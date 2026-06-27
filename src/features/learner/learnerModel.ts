@@ -6,6 +6,7 @@
  *   Engine B — applyLessonExposure:  tracks exposure/struggle. NEVER moves Elo.
  */
 
+import { MISCONCEPTIONS } from '@/content/misconceptions';
 import type { SkillId } from '@/content/skills';
 import type { MisconceptionKey } from '@/content/misconceptions';
 
@@ -16,6 +17,62 @@ export const ELO_K = 24;
 export const ACC_ALPHA = 0.2;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+// ─── C-MC3 — Misconception confidence model ───────────────────────────────────
+
+export type MisconceptionSource = 'trap' | 'chip' | 'llm';
+
+/**
+ * Source weights for a single misconception observation, by signal reliability.
+ *
+ * Tuning rationale — slip vs. systematic error (see spec-misconception-capture
+ * §10 D-MC5/D-MC6): a SINGLE observation of ANY kind must not assert a
+ * misconception. A wrong answer can be a careless *slip* (Norman, 1981) rather
+ * than a stable faulty rule, so even the strongest single signal — a
+ * deterministic code-`trap` match — contributes 0.7 < SURFACE_THRESHOLD (1.0).
+ * Surfacing therefore requires REPETITION (≥2 trap hits = 1.4) or CORROBORATION
+ * (trap + recognition `chip` = 1.3; chip + chip = 1.2; …). A misconception is by
+ * definition systematic; a one-off is treated as a slip and stays latent.
+ */
+export const SOURCE_WEIGHT: Record<MisconceptionSource, number> = {
+  trap: 0.7,
+  chip: 0.6,
+  llm: 0.5,
+};
+
+/** A misconception surfaces once its accumulated score reaches this bar. */
+export const SURFACE_THRESHOLD = 1.0;
+
+/**
+ * Mastery-aware slip guard. When the learner is ALREADY strong on the skill a
+ * problem exercises, a wrong answer landing on the trap is far more likely a
+ * slip than a stable bug, so the `trap` weight is multiplied by this discount
+ * (0.7 → 0.35) at RECORD time.
+ *
+ * Why record-time, not surface-time: mastery is read from the model BEFORE this
+ * attempt's update. Judging it at surface time would be self-defeating — the
+ * recency-weighted accuracy (`recentCorrect`) is dragged down by the very miss
+ * we are evaluating, so a previously-strong learner would no longer read as
+ * strong exactly when the guard should fire.
+ */
+export const SLIP_DISCOUNT = 0.5;
+/** recentCorrect at/above which a practiced skill counts as "strong". */
+export const MASTERY_STRONG_ACC = 0.8;
+/** Minimum practice attempts before the mastery signal is trusted. */
+export const MASTERY_MIN_ATTEMPTS = 3;
+
+/**
+ * Per-key misconception record. `score` is optional to support back-compat:
+ * persisted Firestore docs written before C-MC3 will lack `score`.
+ * The normalizer reads `score ?? count * SOURCE_WEIGHT.trap` wherever the
+ * computed score is needed.
+ */
+export type MisconceptionStat = {
+  count: number;
+  /** Weighted accumulator (Σ source weights). Optional for back-compat. */
+  score?: number;
+  lastSeenAt: number;
+};
 
 // ─── Types (C7) ───────────────────────────────────────────────────────────────
 
@@ -44,7 +101,7 @@ export type LearnerModel = {
   /** Engine B (lessons — owns exposure). */
   exposure: Partial<Record<SkillId, ExposureStat>>;
   /** Bumped by either engine. */
-  misconceptions: Partial<Record<MisconceptionKey, { count: number; lastSeenAt: number }>>;
+  misconceptions: Partial<Record<MisconceptionKey, MisconceptionStat>>;
   /** Top 3 Engine-A practiced skills by lowest rating. Never includes lesson-only skills. */
   weakestSkills: SkillId[];
   /** Top 3 Engine-A practiced skills by highest rating. Never includes lesson-only skills. */
@@ -98,16 +155,42 @@ function computeTopSkills(skills: Partial<Record<SkillId, SkillStat>>): {
   };
 }
 
-/** Bump a misconception counter. */
+/**
+ * Bump a misconception counter, accumulating a weighted score.
+ * Back-compat: if the existing record has no `score`, seeds it from
+ * `count * SOURCE_WEIGHT.trap` before adding the new weight.
+ */
+/**
+ * True if the learner is already "strong" on ANY of the given skills, judged
+ * from the model BEFORE the current attempt is applied (slip guard). A wrong
+ * answer on a skill the learner reliably gets right is treated as a likely slip.
+ */
+function isStrongBefore(model: LearnerModel, skillIds: SkillId[]): boolean {
+  return skillIds.some((s) => {
+    const stat = model.skills[s];
+    return (
+      stat !== undefined &&
+      stat.attempts >= MASTERY_MIN_ATTEMPTS &&
+      stat.recentCorrect >= MASTERY_STRONG_ACC
+    );
+  });
+}
+
 function bumpMisconception(
-  misconceptions: Partial<Record<MisconceptionKey, { count: number; lastSeenAt: number }>>,
+  misconceptions: Partial<Record<MisconceptionKey, MisconceptionStat>>,
   key: MisconceptionKey,
   now: number,
-): Partial<Record<MisconceptionKey, { count: number; lastSeenAt: number }>> {
+  weight: number,
+): Partial<Record<MisconceptionKey, MisconceptionStat>> {
   const existing = misconceptions[key];
+  const priorScore = existing?.score ?? ((existing?.count ?? 0) * SOURCE_WEIGHT.trap);
   return {
     ...misconceptions,
-    [key]: { count: (existing?.count ?? 0) + 1, lastSeenAt: now },
+    [key]: {
+      count: (existing?.count ?? 0) + 1,
+      score: priorScore + weight,
+      lastSeenAt: now,
+    },
   };
 }
 
@@ -129,6 +212,10 @@ export function emptyModel(now: number): LearnerModel {
 /**
  * Engine A — apply one PRACTICE attempt.
  * Moves the Elo rating for each tagged skill. Pure; deterministic given `now`.
+ *
+ * Accepts either the new `misconceptionSignal` field (C-MC3) or the legacy
+ * `misconceptionKey` field (back-compat, treated as source `'trap'`). When
+ * both are supplied, `misconceptionSignal` takes precedence.
  */
 export function applyPracticeAttempt(
   model: LearnerModel,
@@ -136,11 +223,21 @@ export function applyPracticeAttempt(
     skills: SkillId[];
     wasCorrect: boolean;
     difficulty?: number;
+    /** Legacy back-compat field — treated as source 'trap'. */
     misconceptionKey?: MisconceptionKey | null;
+    /** Preferred C-MC3 field. If present, overrides misconceptionKey. */
+    misconceptionSignal?: { key: MisconceptionKey; source: MisconceptionSource } | null;
     now: number;
   },
 ): LearnerModel {
-  const { skills: skillIds, wasCorrect, difficulty = DEFAULT_RATING, misconceptionKey, now } = input;
+  const {
+    skills: skillIds,
+    wasCorrect,
+    difficulty = DEFAULT_RATING,
+    misconceptionKey,
+    misconceptionSignal,
+    now,
+  } = input;
   const actual = wasCorrect ? 1 : 0;
 
   const newSkills = { ...model.skills };
@@ -177,9 +274,22 @@ export function applyPracticeAttempt(
     };
   }
 
+  // Resolve the effective signal: misconceptionSignal takes precedence over
+  // the legacy misconceptionKey (back-compat).
+  const effectiveSignal: { key: MisconceptionKey; source: MisconceptionSource } | null =
+    misconceptionSignal ??
+    (misconceptionKey ? { key: misconceptionKey, source: 'trap' } : null);
+
   let newMisconceptions = { ...model.misconceptions };
-  if (misconceptionKey) {
-    newMisconceptions = bumpMisconception(newMisconceptions, misconceptionKey, now);
+  if (effectiveSignal) {
+    let weight = SOURCE_WEIGHT[effectiveSignal.source];
+    // Slip guard: a trap match from a learner already strong on this problem's
+    // skill (measured from the pre-attempt model) is more likely a slip than a
+    // stable bug, so its weight is discounted.
+    if (effectiveSignal.source === 'trap' && isStrongBefore(model, skillIds)) {
+      weight *= SLIP_DISCOUNT;
+    }
+    newMisconceptions = bumpMisconception(newMisconceptions, effectiveSignal.key, now, weight);
   }
 
   const { weakestSkills, strongestSkills } = computeTopSkills(newSkills);
@@ -202,6 +312,9 @@ export function applyPracticeAttempt(
  * NEVER touches `skills` (Engine A) or moves the Elo rating.
  * NEVER recomputes weakestSkills / strongestSkills (those are Engine A only).
  * Pure; deterministic given `now`.
+ *
+ * Lesson misconceptions are treated as source 'trap' (weight 1.0) for
+ * back-compat with existing behaviour; score is written on every bump.
  */
 export function applyLessonExposure(
   model: LearnerModel,
@@ -237,7 +350,12 @@ export function applyLessonExposure(
 
   let newMisconceptions = { ...model.misconceptions };
   if (misconceptionKey) {
-    newMisconceptions = bumpMisconception(newMisconceptions, misconceptionKey, now);
+    newMisconceptions = bumpMisconception(
+      newMisconceptions,
+      misconceptionKey,
+      now,
+      SOURCE_WEIGHT.trap,
+    );
   }
 
   // Do NOT touch model.skills, model.weakestSkills, model.strongestSkills.
@@ -247,6 +365,35 @@ export function applyLessonExposure(
     misconceptions: newMisconceptions,
     updatedAt: now,
   };
+}
+
+// ─── C-MC3: surfacedMisconceptions ────────────────────────────────────────────
+
+/**
+ * Returns misconception keys whose (normalised) score >= threshold, sorted by
+ * score descending then lastSeenAt descending. Only keys that exist in the
+ * closed MISCONCEPTIONS taxonomy are included (guards against stale keys in
+ * old Firestore docs).
+ *
+ * Back-compat normalisation: a stored record without `score` is treated as
+ * `score = count * SOURCE_WEIGHT.trap`.
+ */
+export function surfacedMisconceptions(
+  model: LearnerModel,
+  threshold = SURFACE_THRESHOLD,
+): MisconceptionKey[] {
+  return (
+    Object.entries(model.misconceptions ?? {}) as [MisconceptionKey, MisconceptionStat][]
+  )
+    .filter(([key]) => key in MISCONCEPTIONS)
+    .map(([key, stat]) => ({
+      key,
+      score: stat.score ?? stat.count * SOURCE_WEIGHT.trap,
+      lastSeenAt: stat.lastSeenAt,
+    }))
+    .filter(({ score }) => score >= threshold)
+    .sort((a, b) => b.score - a.score || b.lastSeenAt - a.lastSeenAt)
+    .map(({ key }) => key);
 }
 
 // ─── C7b: buildReportCard ─────────────────────────────────────────────────────

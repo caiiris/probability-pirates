@@ -93,7 +93,12 @@ export type ConceptSlot = {
   figure?: ConceptFigure;
 };
 
-export type ConceptFigure = SettlingLineFigure | TwoCoinsGridFigure | SubsetPickerFigure;
+export type ConceptFigure =
+  | SettlingLineFigure
+  | TwoCoinsGridFigure
+  | SubsetPickerFigure
+  | TreeDiagramFigure
+  | RoadForkFigure;
 
 /**
  * Long-run convergence chart. Shows the running fraction of successes over
@@ -157,6 +162,68 @@ export type SubsetPickerFigure = {
   caption?: string;
 };
 
+/**
+ * Autonomous looping tree-diagram animation for the multiplication
+ * principle. Renders a two-stage branching tree (e.g. 3 shirts × 2 pants)
+ * with a root, `stageA.count` first-stage nodes that fan out from it,
+ * and `stageB.count` second-stage nodes that fan out from each
+ * first-stage node — `stageA.count * stageB.count` leaves total. The
+ * animation reveals the levels in sequence (root → stage A → stage B),
+ * holds when the tree is full, then clears and replays.
+ *
+ * Limited to two stages on purpose: the multiplication principle is
+ * taught on two stages because that is the case the eye can hold all
+ * at once. Three-stage trees get visually hairy and live in later
+ * lessons via fill-text counting problems instead.
+ *
+ * Authors specify the two stages (label + count) and an optional
+ * caption. Sample-space size is read by the component as
+ * `stageA.count * stageB.count`; if the lesson needs to show that
+ * product on screen, set `showProduct: true`.
+ */
+export type TreeDiagramFigure = {
+  kind: 'tree-diagram';
+  /** First-stage choice — e.g. { label: 'shirt', count: 3 }. */
+  stageA: { label: string; count: number };
+  /** Second-stage choice — e.g. { label: 'pants', count: 2 }. */
+  stageB: { label: string; count: number };
+  /** Optional caption shown beneath the tree. */
+  caption?: string;
+  /** When true, animates "stageA.count × stageB.count = N" beneath the tree once full. */
+  showProduct?: boolean;
+  /** Milliseconds between level reveals. Default 900ms. */
+  stepMs?: number;
+  /** Milliseconds the full tree stays before looping. Default 2400ms. */
+  holdMs?: number;
+};
+
+/**
+ * Autonomous looping road-fork animation for the multiplication principle.
+ * Same two-stage shape as `tree-diagram` but drawn as a left-to-right road
+ * that splits at each decision. The classic "fork in the road" metaphor:
+ * first intersection fans into `stageA.count` routes, each route hits a
+ * second fork into `stageB.count` endpoints. Pure observation (no input).
+ */
+export type RoadForkFigure = {
+  kind: 'road-fork';
+  stageA: { label: string; count: number };
+  stageB: { label: string; count: number };
+  caption?: string;
+  showProduct?: boolean;
+  stepMs?: number;
+  holdMs?: number;
+};
+
+/** Two-stage combination picker embedded in a multiple-choice slot. */
+export type CombinationPickerConfig = {
+  stageALabel: string;
+  stageAOptions: string[];
+  stageBLabel: string;
+  stageBOptions: string[];
+  /** Label on the button that registers the current pair. Default "Add outfit". */
+  addButtonLabel?: string;
+};
+
 export type WrapSlot = {
   id: string;
   kind: 'wrap';
@@ -190,6 +257,7 @@ export type ProblemSlot = {
 export type InteractionKind =
   | 'tap-outcomes'
   | 'fill-fraction'
+  | 'number-fill'
   | 'tap-event'
   | 'grid-event'
   | 'multiple-choice'
@@ -201,6 +269,7 @@ export type InteractionKind =
 export type Variant =
   | TapOutcomesVariant
   | FillFractionVariant
+  | NumberFillVariant
   | TapEventVariant
   | GridEventVariant
   | MultipleChoiceVariant
@@ -237,6 +306,15 @@ export type FillFractionVariant = BaseVariant & {
   numerator: number;
   denominator: number;
   feedbackByWrongAnswer?: Record<string, string>;
+  /**
+   * Maps a specific wrong fraction (the diagnostic "trap" answer) to a
+   * misconception key for the learner model. Each entry's `num`/`den` are
+   * matched against the learner's submitted fraction by exact value (reduced),
+   * so `2/4` matches a `1/2` trap. Number-fill uses `misconceptionByValue` and
+   * multiple-choice uses `misconceptionByOption`; this is the fraction analogue.
+   * See spec-misconception-capture.md (C-MC2/C-MC4).
+   */
+  misconceptionByFraction?: { num: number; den: number; key: MisconceptionKey }[];
   /** When true, renders an interactive d6 reference above the inputs (tap to highlight faces). */
   showDieContext?: boolean;
   /** Optional label beside the numerator input, e.g. "ways to roll even". */
@@ -249,6 +327,27 @@ export type FillFractionVariant = BaseVariant & {
    * has 13 cards") without bloating the prompt.
    */
   context?: string;
+};
+
+/**
+ * Single-integer free-response input (F2). The learner types a whole number
+ * (e.g. a count) and it is graded by exact integer equality against `answer`.
+ *
+ * Used by the practice engine for count-style problems where multiple-choice
+ * would let the learner guess; the renderer is `NumberFill`. Lessons do not
+ * currently author this kind (it is practice-only), but the type lives in the
+ * shared union so `checkAnswer` can grade it.
+ */
+export type NumberFillVariant = BaseVariant & {
+  interactionKind: 'number-fill';
+  /** The exact correct integer answer. Derived from the template's solver. */
+  answer: number;
+  /** Optional label above the input, e.g. "study groups". Defaults to "Answer". */
+  answerLabel?: string;
+  /** Keyed by the stringified wrong integer. The default covers the rest. */
+  feedbackByWrongAnswer?: Record<string, string>;
+  /** Maps a specific wrong integer answer to a misconception key (learner model). */
+  misconceptionByValue?: Record<number, MisconceptionKey>;
 };
 
 export type TapEventVariant = BaseVariant & {
@@ -298,6 +397,18 @@ export type MultipleChoiceVariant = BaseVariant & {
     highlightCells?: Array<[number, number]>;
     label?: string;
   };
+  /**
+   * Optional strategy hint shown above the prompt (D96). Use when the learner
+   * should try a concrete listing strategy before committing to an answer —
+   * e.g. "build every outfit in the picker below."
+   */
+  strategyHint?: string;
+  /**
+   * Optional two-stage combination picker (D96). Lets the learner register
+   * (stageA, stageB) pairs and see a running count. Does not affect grading;
+   * the MCQ answer is still what gets checked.
+   */
+  combinationPicker?: CombinationPickerConfig;
 };
 
 /**
@@ -389,10 +500,15 @@ export type FillTextVariant = BaseVariant & {
   acceptRegex: string;
   /** Short hint shown inside the empty input. Optional. */
   placeholder?: string;
-  /** Optional context blurb shown above the input. */
+  /** Optional context blurb shown above the input (or above the combination picker when present). */
   context?: string;
   /** Approximate max length for the input. UI hint only, not validation. */
   maxLength?: number;
+  /**
+   * Optional two-stage combination picker (D96). Lets the learner register
+   * (stageA, stageB) pairs and see a running count. Does not affect grading.
+   */
+  combinationPicker?: CombinationPickerConfig;
   /** Keyed by normalized wrong input. The default covers the rest. */
   feedbackByWrongAnswer?: Record<string, string>;
 };

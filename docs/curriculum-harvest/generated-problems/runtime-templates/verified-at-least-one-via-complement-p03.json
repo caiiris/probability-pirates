@@ -1,0 +1,40 @@
+[
+  {
+    "id": "verified-at-least-one-via-complement-p03-p01",
+    "instanceId": "verified-at-least-one-via-complement-p03:4048150833",
+    "templateId": "verified-at-least-one-via-complement-p03",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 845,
+    "params": {
+      "m": 6,
+      "n": 3
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair six-sided die is rolled 3 times independently. What is the probability of getting a 6 at least once?",
+    "context": null,
+    "answer": "91/216",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(at least one 6 in 3 rolls)",
+      "steps": [
+        "Complement rule: P(at least one) = 1 − P(zero occurrences).",
+        "P(miss on a single trial) = 1 − 1/6 = 5/6.",
+        "Trials are independent, so P(miss all 3) = (5/6)^3 = 125/216.",
+        "P(at least one) = 1 − 125/216 = 91/216."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.4212962962962963,
+      "simulationEstimate": 0.42274,
+      "absoluteDifference": 0.0014437037037037248,
+      "sigmaThreshold": 0.011040962979362797,
+      "passed": true
+    }
+  }
+]

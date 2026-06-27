@@ -1,0 +1,36 @@
+[
+  {
+    "id": "creative-non-transitive-dice-p01",
+    "instanceId": "creative-non-transitive-dice:3874896336",
+    "templateId": "creative-non-transitive-dice",
+    "topic": "counting",
+    "skills": [
+      "sample-space-enumeration",
+      "favorable-over-total"
+    ],
+    "retrievalForm": "application",
+    "difficulty": 1650,
+    "params": {
+      "dice": "A-B-C"
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "Three custom dice have this cycle: A beats B, B beats C, and C beats A. What is the pairwise win probability in each matchup?",
+    "context": null,
+    "answer": "choice:correct",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Enumerate the 36 pair outcomes",
+      "steps": [
+        "Compare each pair of dice by listing the 36 possible rolls.",
+        "A beats B in 20 of 36 outcomes.",
+        "The same count holds for B over C and C over A.",
+        "20/36 = 5/9."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

@@ -46,6 +46,12 @@ export function checkAnswer(variant: Variant, payload: AttemptPayload): CheckRes
       return { wasCorrect: false, matchedWrongKey: `${p.numerator}/${p.denominator}` };
     }
 
+    case 'number-fill': {
+      const p = payload as { value: number };
+      if (p.value === variant.answer) return { wasCorrect: true };
+      return { wasCorrect: false, matchedWrongKey: String(p.value) };
+    }
+
     case 'tap-event': {
       const p = payload as { selected: string[] };
       const correct = new Set(variant.correctOutcomes);

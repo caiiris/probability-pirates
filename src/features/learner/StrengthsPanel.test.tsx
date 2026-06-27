@@ -16,6 +16,7 @@
 
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { StrengthsPanel } from './StrengthsPanel';
 import type { LearnerModel, SkillStat, ExposureStat } from './learnerModel';
 
@@ -182,6 +183,71 @@ describe('StrengthsPanel', () => {
       expect(
         screen.getByText(/do a lesson or some practice to see your strengths/i),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe('Watch out for group (misconceptions)', () => {
+    // Explicit `score` values above SURFACE_THRESHOLD so the fixture is robust
+    // to source-weight tuning (the panel renders whatever surfacedMisconceptions
+    // returns; the scoring/threshold semantics are unit-tested in learnerModel).
+    const modelWithMisconceptions: LearnerModel = {
+      ...sampleModel,
+      misconceptions: {
+        ordered_vs_unordered: { count: 3, score: 2.1, lastSeenAt: NOW },
+        gambler: { count: 2, score: 1.4, lastSeenAt: NOW - 1000 },
+      },
+    };
+
+    it('renders the section with each misconception label and its fix', () => {
+      render(
+        <MemoryRouter>
+          <StrengthsPanel model={modelWithMisconceptions} loading={false} />
+        </MemoryRouter>,
+      );
+      expect(screen.getByText('Watch out for')).toBeInTheDocument();
+      expect(screen.getByText('Treats unordered as ordered')).toBeInTheDocument();
+      expect(screen.getByText("Gambler's fallacy")).toBeInTheDocument();
+      // Fix copy is shown
+      expect(screen.getByText(/use combinations \(nCr\)/i)).toBeInTheDocument();
+    });
+
+    it('each misconception links into the related practice topic', () => {
+      render(
+        <MemoryRouter>
+          <StrengthsPanel model={modelWithMisconceptions} loading={false} />
+        </MemoryRouter>,
+      );
+      const links = screen.getAllByRole('link', { name: /practice/i });
+      const hrefs = links.map((l) => l.getAttribute('href'));
+      // ordered_vs_unordered → permutations-combinations; gambler → long-run
+      expect(hrefs).toContain('/practice?topic=permutations-combinations');
+      expect(hrefs).toContain('/practice?topic=long-run');
+    });
+
+    it('does not render the section when there are no misconceptions', () => {
+      render(
+        <MemoryRouter>
+          <StrengthsPanel model={sampleModel} loading={false} />
+        </MemoryRouter>,
+      );
+      expect(screen.queryByText('Watch out for')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('skill row legibility (labels + volume/accuracy)', () => {
+    it('renders a plain-language mastery level per practiced skill', () => {
+      render(<StrengthsPanel model={sampleModel} loading={false} />);
+      // combinations recentCorrect 0.85 → Mastered; permutations 0.55 → Developing;
+      // complement-rule 0.25 → Learning. None collide with the group headings.
+      expect(screen.getByText('Mastered')).toBeInTheDocument();
+      expect(screen.getByText('Developing')).toBeInTheDocument();
+      expect(screen.getByText('Learning')).toBeInTheDocument();
+    });
+
+    it('shows volume + accuracy for each practiced skill', () => {
+      render(<StrengthsPanel model={sampleModel} loading={false} />);
+      // makeStat → attempts 5, correct 3 → "3 of 5 correct · 60%"
+      expect(screen.getAllByText(/3 of 5 correct · 60%/).length).toBeGreaterThanOrEqual(1);
     });
   });
 

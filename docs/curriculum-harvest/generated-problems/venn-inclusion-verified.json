@@ -1,0 +1,235 @@
+[
+  {
+    "id": "venn-inclusion-0001",
+    "candidateId": "CAND-VENN-0001",
+    "title": "Club signup overlap",
+    "prompt": "In a class of 30 students, 14 signed up for robotics, 11 signed up for art club, and 5 signed up for both. If one student is picked at random, what is the probability they signed up for robotics or art club?",
+    "exactAnswer": {
+      "display": "2/3",
+      "fraction": "2/3",
+      "count": 20
+    },
+    "skills": [
+      "inclusion-exclusion",
+      "favorable-over-total"
+    ],
+    "requiredMissingSkills": [
+      "venn-region-translation"
+    ],
+    "difficultyTag": "easy",
+    "misconceptionTraps": [
+      "adds both groups without subtracting overlap",
+      "subtracts the overlap twice"
+    ],
+    "verificationMethod": "Compute the union count with |A or B| = |A| + |B| - |A and B|, then reduce union/total.",
+    "verification": {
+      "passed": true,
+      "arithmetic": [
+        "14 + 11 - 5 = 20 in robotics or art club.",
+        "30 - 20 = 10 in neither group.",
+        "Union probability reduces to 2/3."
+      ]
+    }
+  },
+  {
+    "id": "venn-inclusion-0002",
+    "candidateId": "CAND-VENN-0002",
+    "title": "Neither lunch choice",
+    "prompt": "A lunch survey has 40 students. 18 would choose tacos, 15 would choose noodles, and 6 would choose both if they could. What is the probability that a randomly chosen student chose neither tacos nor noodles?",
+    "exactAnswer": {
+      "display": "13/40",
+      "fraction": "13/40",
+      "count": 13
+    },
+    "skills": [
+      "inclusion-exclusion",
+      "complement-rule",
+      "favorable-over-total"
+    ],
+    "requiredMissingSkills": [
+      "venn-region-translation"
+    ],
+    "difficultyTag": "medium",
+    "misconceptionTraps": [
+      "treats neither as the overlap",
+      "uses total minus A minus B without adding the overlap back"
+    ],
+    "verificationMethod": "Find the union by inclusion-exclusion, then compute neither as total - union and reduce neither/total.",
+    "verification": {
+      "passed": true,
+      "arithmetic": [
+        "18 + 15 - 6 = 27 in tacos or noodles.",
+        "40 - 27 = 13 in neither group.",
+        "Union probability reduces to 27/40.",
+        "Neither probability reduces to 13/40."
+      ]
+    }
+  },
+  {
+    "id": "venn-inclusion-0003",
+    "candidateId": "CAND-VENN-0003",
+    "title": "Disjoint commute choices",
+    "prompt": "In a homeroom of 28 students, 9 usually walk to school and 6 usually bike. No student is counted in both groups. What is the probability a randomly chosen student usually walks or bikes?",
+    "exactAnswer": {
+      "display": "15/28",
+      "fraction": "15/28",
+      "count": 15
+    },
+    "skills": [
+      "addition-principle",
+      "favorable-over-total"
+    ],
+    "requiredMissingSkills": [
+      "disjoint-events"
+    ],
+    "difficultyTag": "easy",
+    "misconceptionTraps": [
+      "looks for an overlap even though the events are disjoint",
+      "divides by the counted students instead of the class size"
+    ],
+    "verificationMethod": "Verify the overlap count is 0, so the union count is the direct sum |A| + |B|.",
+    "verification": {
+      "passed": true,
+      "arithmetic": [
+        "9 + 6 - 0 = 15 in walks or bikes.",
+        "28 - 15 = 13 in neither group.",
+        "Union probability reduces to 15/28.",
+        "Because the overlap is 0, 9 + 6 = 15."
+      ]
+    }
+  },
+  {
+    "id": "venn-inclusion-0004",
+    "candidateId": "CAND-VENN-0004",
+    "title": "Overlapping game booths",
+    "prompt": "At a school fair, 50 students tried at least one activity or skipped both. 32 tried the VR booth, 27 tried the puzzle booth, and 14 tried both. What is the probability a randomly chosen student tried at least one of those two booths?",
+    "exactAnswer": {
+      "display": "9/10",
+      "fraction": "9/10",
+      "count": 45
+    },
+    "skills": [
+      "inclusion-exclusion",
+      "favorable-over-total"
+    ],
+    "requiredMissingSkills": [
+      "overlapping-events"
+    ],
+    "difficultyTag": "hard",
+    "misconceptionTraps": [
+      "accepts 32 + 27 as 59 students out of 50",
+      "forgets that both-booth students were counted twice"
+    ],
+    "verificationMethod": "Use inclusion-exclusion and confirm the union does not exceed the total population.",
+    "verification": {
+      "passed": true,
+      "arithmetic": [
+        "32 + 27 - 14 = 45 in VR booth or puzzle booth.",
+        "50 - 45 = 5 in neither group.",
+        "Union probability reduces to 9/10."
+      ]
+    }
+  },
+  {
+    "id": "venn-inclusion-0005",
+    "candidateId": "CAND-VENN-0005",
+    "title": "Two-way table to Venn",
+    "prompt": "A club survey of 60 students is shown as a two-way table: 12 are in both drama and band, 9 are in drama but not band, 15 are in band but not drama, and 24 are in neither. Translate the table to a Venn diagram. How many students are in drama or band, and what is the probability?",
+    "exactAnswer": {
+      "display": "36 students; probability 3/5",
+      "fraction": "3/5",
+      "count": 36
+    },
+    "skills": [
+      "sample-space-enumeration",
+      "inclusion-exclusion",
+      "favorable-over-total"
+    ],
+    "requiredMissingSkills": [
+      "two-way-table-to-venn"
+    ],
+    "difficultyTag": "medium",
+    "misconceptionTraps": [
+      "adds row and column totals plus the overlap",
+      "confuses the neither cell with the overlap cell"
+    ],
+    "verificationMethod": "Translate table regions into A only, B only, both, and neither; verify union = A only + B only + both.",
+    "verification": {
+      "passed": true,
+      "arithmetic": [
+        "21 + 27 - 12 = 36 in drama or band.",
+        "60 - 36 = 24 in neither group.",
+        "Union probability reduces to 3/5.",
+        "A only is 9; B only is 15; both is 12."
+      ]
+    }
+  },
+  {
+    "id": "venn-inclusion-0006",
+    "candidateId": "CAND-VENN-0006",
+    "title": "Recover the overlap",
+    "prompt": "A survey has 78 students. 41 follow the esports team, 33 follow the puzzle newsletter, and 18 follow neither. How many students follow both, and what is the probability a randomly chosen student follows both?",
+    "exactAnswer": {
+      "display": "14 students; probability 7/39",
+      "fraction": "7/39",
+      "count": 14
+    },
+    "skills": [
+      "inclusion-exclusion",
+      "complement-rule",
+      "favorable-over-total"
+    ],
+    "requiredMissingSkills": [
+      "solve-overlap-from-union"
+    ],
+    "difficultyTag": "hard",
+    "misconceptionTraps": [
+      "subtracts neither from both groups directly",
+      "forgets that total - neither gives the union"
+    ],
+    "verificationMethod": "Compute union as total - neither, then solve |A and B| = |A| + |B| - |A or B|.",
+    "verification": {
+      "passed": true,
+      "arithmetic": [
+        "41 + 33 - 14 = 60 in esports team or puzzle newsletter.",
+        "78 - 60 = 18 in neither group.",
+        "Union probability reduces to 10/13.",
+        "41 + 33 - 60 = 14 in both groups."
+      ]
+    }
+  },
+  {
+    "id": "venn-inclusion-0007",
+    "candidateId": "CAND-VENN-0007",
+    "title": "Exactly one badge",
+    "prompt": "In a camp app, 36 students can earn a creator badge, a helper badge, both badges, or neither badge. 20 earned creator, 18 earned helper, and 8 earned neither. What is the probability a randomly chosen student earned exactly one of the two badges?",
+    "exactAnswer": {
+      "display": "18 students; probability 1/2",
+      "fraction": "1/2",
+      "count": 18
+    },
+    "skills": [
+      "inclusion-exclusion",
+      "complement-rule",
+      "favorable-over-total"
+    ],
+    "requiredMissingSkills": [
+      "exactly-one-of-two-events"
+    ],
+    "difficultyTag": "extreme",
+    "misconceptionTraps": [
+      "answers at least one instead of exactly one",
+      "counts the both region as part of exactly one"
+    ],
+    "verificationMethod": "Recover the overlap from the complement, then compute exactly one as A only + B only.",
+    "verification": {
+      "passed": true,
+      "arithmetic": [
+        "20 + 18 - 10 = 28 in creator badge or helper badge.",
+        "36 - 28 = 8 in neither group.",
+        "Union probability reduces to 7/9.",
+        "Exactly one count is (20 - 10) + (18 - 10) = 18."
+      ]
+    }
+  }
+]

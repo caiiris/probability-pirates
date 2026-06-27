@@ -18,7 +18,11 @@
  * Firestore write) can call it once it's built; it owns no I/O.
  */
 
-/** XP for one correct practice problem (flat — smaller than a lesson first-try). */
+/**
+ * Default base XP for one correct practice problem when no difficulty is known.
+ * Equals the Medium band so callers that don't pass a difficulty keep the
+ * original flat-5 behaviour (and all existing tests stay valid).
+ */
 export const PRACTICE_XP_PER_CORRECT = 5;
 
 /** Max practice XP that can count toward levels/leaderboard in a single local
@@ -26,9 +30,83 @@ export const PRACTICE_XP_PER_CORRECT = 5;
  *  real progress, bounded so it can't dwarf the path. */
 export const PRACTICE_DAILY_XP_CAP = 100;
 
-/** Base XP a correct/incorrect practice answer is *worth* before the daily cap. */
-export function practiceXpForResult(wasCorrect: boolean): number {
-  return wasCorrect ? PRACTICE_XP_PER_CORRECT : 0;
+// ── Difficulty-scaled base (D100) ──────────────────────────────────────────────
+
+/** Coarse difficulty bands, shared with the learner-facing label. */
+export type DifficultyBand = 'Easy' | 'Medium' | 'Hard' | 'Extreme';
+
+/**
+ * Base XP per difficulty band. Harder problems are worth more so the reward
+ * tracks the effort. Capped at the daily ceiling like everything else.
+ * (Spec D100; "Extreme" is the expert tier.)
+ */
+export const PRACTICE_XP_BY_BAND: Record<DifficultyBand, number> = {
+  Easy: 3,
+  Medium: 5,
+  Hard: 8,
+  Extreme: 12,
+};
+
+/**
+ * Map a problem's Elo difficulty (~700–2000) to a band.
+ *
+ * IMPORTANT: these cutoffs MUST stay in sync with `difficultyLabel()` in
+ * src/features/practice/practiceDifficulty.ts so the on-screen badge and the
+ * XP award always agree. Duplicated here (rather than imported) to keep this
+ * lib module free of any feature-layer dependency.
+ */
+export function practiceBandForElo(elo: number): DifficultyBand {
+  if (elo < 950) return 'Easy';
+  if (elo < 1250) return 'Medium';
+  if (elo < 1500) return 'Hard';
+  return 'Extreme';
+}
+
+/** Difficulty-scaled base XP for a problem at the given Elo. */
+export function practiceXpBaseForDifficulty(elo: number): number {
+  return PRACTICE_XP_BY_BAND[practiceBandForElo(elo)];
+}
+
+/**
+ * Per-try XP multiplier for the 3-try hint ladder (F2):
+ *   try 1 → full, try 2 → half, try 3 → quarter, reveal/4+ → nothing.
+ * Solving it yourself sooner is worth more; a reveal earns no XP.
+ */
+export function practiceTryMultiplier(tryNumber: number): number {
+  if (tryNumber <= 1) return 1;
+  if (tryNumber === 2) return 0.5;
+  if (tryNumber === 3) return 0.25;
+  return 0;
+}
+
+/** Options that scale a single award: difficulty band base × per-try decay. */
+export type PracticeXpOpts = {
+  /** Problem Elo difficulty; selects the band base. Omit → Medium base (5). */
+  difficulty?: number;
+  /** 1-based try the answer was solved on; decays the award. Omit → 1 (full). */
+  tryNumber?: number;
+  /**
+   * Extra multiplier in [0,1] for conceptual problems whose reasoning was
+   * flagged (F2). Omit → 1 (no reasoning penalty). Only ever reduces.
+   */
+  reasoningMultiplier?: number;
+};
+
+/**
+ * Base XP a correct practice answer is *worth* before the daily cap.
+ * With no opts this returns the flat default (5) for back-compat; with a
+ * difficulty and/or tryNumber it applies the band base and per-try decay, and
+ * an optional reasoning multiplier for conceptual problems.
+ */
+export function practiceXpForResult(wasCorrect: boolean, opts: PracticeXpOpts = {}): number {
+  if (!wasCorrect) return 0;
+  const base =
+    opts.difficulty === undefined
+      ? PRACTICE_XP_PER_CORRECT
+      : practiceXpBaseForDifficulty(opts.difficulty);
+  const reasoning = Math.min(1, Math.max(0, opts.reasoningMultiplier ?? 1));
+  const granted = base * practiceTryMultiplier(opts.tryNumber ?? 1) * reasoning;
+  return Math.round(granted);
 }
 
 /** Per-day practice-XP accounting, keyed by local date (YYYY-MM-DD). */
@@ -56,17 +134,22 @@ export type PracticeXpGrant = {
  * @param today  the current local date string (YYYY-MM-DD); the caller resolves
  *               the timezone so this stays pure/testable
  * @param wasCorrect whether the answer was correct
+ * @param opts   optional difficulty/tryNumber scaling (D100, F2) and `cap`
+ *               override. Omitting opts preserves the original flat-5,
+ *               full-credit behaviour.
  */
 export function grantPracticeXp(
   prev: PracticeXpState | undefined,
   today: string,
   wasCorrect: boolean,
-  cap: number = PRACTICE_DAILY_XP_CAP,
+  opts: PracticeXpOpts & { cap?: number } = {},
 ): PracticeXpGrant {
+  const cap = opts.cap ?? PRACTICE_DAILY_XP_CAP;
+
   // Reset the counter when the day rolls over (or there's no prior state).
   const earnedToday = prev && prev.date === today ? Math.max(0, prev.earnedToday) : 0;
 
-  const award = practiceXpForResult(wasCorrect);
+  const award = practiceXpForResult(wasCorrect, opts);
   const room = Math.max(0, cap - earnedToday);
   const granted = Math.min(award, room);
 

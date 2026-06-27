@@ -1,0 +1,40 @@
+[
+  {
+    "id": "verified-at-least-one-via-complement-p02-p01",
+    "instanceId": "verified-at-least-one-via-complement-p02:2174672186",
+    "templateId": "verified-at-least-one-via-complement-p02",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 785,
+    "params": {
+      "m": 4,
+      "n": 2
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair 4-sided die is rolled 2 times independently. What is the probability of getting a 1 at least once?",
+    "context": null,
+    "answer": "7/16",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(at least one 1 in 2 rolls)",
+      "steps": [
+        "Complement rule: P(at least one) = 1 − P(zero occurrences).",
+        "P(miss on a single trial) = 1 − 1/4 = 3/4.",
+        "Trials are independent, so P(miss all 2) = (3/4)^2 = 9/16.",
+        "P(at least one) = 1 − 9/16 = 7/16."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.4375,
+      "simulationEstimate": 0.43966,
+      "absoluteDifference": 0.0021599999999999953,
+      "sigmaThreshold": 0.011092649593311781,
+      "passed": true
+    }
+  }
+]

@@ -1385,3 +1385,147 @@ Each review problem is generated from the actual runtime template and verified b
 - Changed `conditional-bayes-2x2` from a medical disease scenario to a neutral
   "rare signal" scenario.
 - Fixed `gambler-fallacy-mc` so die streaks use `1/6` rather than `1/2`.
+
+---
+
+## D94: Lessons 4 and 5 — Equally likely outcomes + Multiplication principle — 2026-06-25
+
+First-draft authoring of two playable lessons in one pass, with the design
+pattern locked from the start instead of converged across iterations. The
+goal: every choice the earlier lessons converged to (commit-once discovery
+trap, theorem vs definition split, k/N variables, ≤2 paragraphs per
+concept slot, no AI-isms, no em dashes, autonomous figures over passive
+text) is in place on the first draft.
+
+### Lesson 4: Equally likely outcomes (`equally-likely-outcomes`)
+
+**Pedagogical job**: stress-test P(event) = k/N. The L3 definition has a
+quiet precondition — every outcome in the sample space must be equally
+likely — and the rest of probability is full of traps where that
+precondition fails by accident. This lesson surfaces the trap up front so
+the rule lands as a fix, not a fact.
+
+**Arc** (7 slots, ~6 min):
+
+```
+welcome      → frame the hidden assumption
+the-puzzle   → commit-once MCQ: 2 coins, P(exactly 1 head)? Trap = 1/3
+resolve      → concept + two-coins-grid figure: why {0H, 1H, 2H} fails
+the-rule     → theorem callout: "Equally likely is required"
+sum-of-seven → fill-fraction: P(sum=7) = 6/36 = 1/6. The 36 pairs are
+                the equally-likely space; the 11 sums are not.
+spotting     → MCQ: pick where k/N is safe. Distractors = biased object,
+                area-not-count, sum-of-dice.
+wrap         → segue to multiplication-principle
+```
+
+**Design choices** (locked first try):
+- **Discovery, not statement.** The HT-vs-TH trap is the canonical
+  granularity miss, and 1/3 is what most learners actually pick. Putting
+  the commit-once MCQ before the rule (same pattern as L2's "the-puzzle"
+  and the gambler-fallacy slot) means the rule reads as a fix for a
+  position they just committed to, not a fact handed down.
+- **Theorem callout, not definition.** "P = k/N requires equally likely
+  outcomes" is a derivable claim about WHEN the L3 definition applies,
+  not a new term. So it lives in the violet `theorem` callout, not the
+  blue `definition` callout. The L3 "Probability of an event" definition
+  is being conditioned, not renamed.
+- **Reuse the two-coins-grid figure** from `sample-space` on the
+  resolve slot. The four equally-likely pairs are exactly what makes
+  the granularity miss visible. Recycling the figure also means the
+  visual reads as continuity with L3, not a fresh demo.
+- **k and N labels carry into the sum-of-seven fill-fraction.** L3
+  introduced the letters; L4 keeps them. Five tailored wrong-answer
+  hints cover the canonical misses (1/11 "counted sums," 6/11 "wrong
+  N," 1/36 "k = 1," 1/6 "simplified prematurely," 11/36).
+- **Recognition MCQ at the end with three failure modes** (biased
+  thumbtack, area-weighted spinner, sum-of-dice). The point is not just
+  to apply the rule but to recognize when NOT to.
+
+### Lesson 5: Multiplication principle (`multiplication-principle`)
+
+**Pedagogical job**: introduce the first scalable counting tool. Until
+now sample spaces have been small enough to list by hand. From here on
+they will not be. The multiplication principle says: when a sample
+space is built by a sequence of independent choices, count the choices
+instead of the outcomes.
+
+**Arc** (7 slots, ~6 min):
+
+```
+welcome           → frame: sample spaces get too big to list
+outfit-puzzle     → commit-once MCQ: 3 shirts × 2 pants = ? Trap = 5
+resolve-with-tree → concept + tree-diagram figure (NEW figure kind):
+                     autonomous 3×2 tree builds in phases and prints
+                     "3 × 2 = 6" once full.
+the-rule          → theorem callout: "Multiplication principle"
+bicycle-lock      → fill-text: 4 dials × 10 digits = 10,000. Scales
+                     the principle so it reads as a tool, not a tree.
+diner-meal        → MCQ: 4 sandwiches × 3 sides × 2 drinks = 24.
+                     Three stages so the principle reads as general,
+                     not two-stage.
+wrap              → close, preview dependent choices (no segue — next
+                     stubs are unauthored)
+```
+
+**Design choices** (locked first try):
+- **Tree as visual proof, not just illustration.** A new
+  `TreeDiagramFigure` ConceptFigure variant: SVG, 2-stage, autonomous
+  loop. The reveal happens in four phases (root → stage A nodes →
+  stage B leaves → optional "a × b = N" caption) so the multiplication
+  is felt, not asserted. Validator caps stages at 6 branches each
+  (canvas geometry), and the component scales the SVG with
+  `preserveAspectRatio` for any container width.
+- **Commit-once add-vs-multiply trap.** 3 + 2 = 5 is the misconception
+  on this lesson. Same discovery-first pattern as L4: MCQ commits the
+  learner, then the tree shows why outfits multiply.
+- **Two practice problems, two interaction kinds.** `bicycle-lock` is
+  fill-text (the learner has to commit to the actual count, 10,000);
+  `diner-meal` is MCQ. Mixing keeps the lesson from going monotone and
+  tests transfer (lock has 4 stages × 10 options; meal has 3 stages of
+  different sizes).
+- **Three-stage MCQ at the end.** The tree showed 2 stages, the lock
+  used 4 stages of the same size, and the meal uses 3 stages of
+  different sizes. So the principle reads as scalable to any number
+  of stages, not a two-stage trick.
+- **No segueToLessonId on the wrap.** The next four roadmap stubs
+  (two-coins, two-dice, tree-diagrams, practice-counting-outcomes)
+  are not yet authored. Leaving the segue undefined keeps the home
+  page from offering a locked next-lesson card. The wrap body still
+  previews the next conceptual move (dependent choices) so the
+  learner understands the course continues.
+
+### Shared infrastructure built in this pass
+
+- **`TreeDiagramFigure` type, validator, component, and renderer**:
+  added to the same triple of files (`types.ts`,
+  `assertLessonInvariants.ts`, `ConceptSlotView.tsx`) as the previous
+  three figures. SVG-based for clean geometry; framer-motion for the
+  per-node spring-in.
+- **Remote Config defaults expanded** to include both new lesson IDs.
+  The bundled default is now the floor for what is playable, so even
+  if the live RC template lags, both lessons play on a cold load.
+- **Catalog test updated** to expect 5 playable lessons (was 3). The
+  no-empty-slots and only-stubs-locked invariants still hold.
+
+### Tests delta
+
+- New file `equally-likely-outcomes.test.ts`: 12 tests. Slot order,
+  commit-once discipline, theorem-vs-definition discipline, k/N labels
+  on the fill-fraction, the granularity-trap distractor on the puzzle,
+  the three failure-mode distractors on the recognition MCQ,
+  no-spoiler check on prompt/context/default-feedback, figure caption
+  validation, problem-type mix.
+- New file `multiplication-principle.test.ts`: 12 tests. Slot order,
+  commit-once discipline, tree-figure config (3 × 2 with
+  `showProduct: true`), theorem-not-definition, m and n in the
+  statement, fine-print mention in the body, all four off-by-factor
+  wrong-answer hints on the lock fill-text, no-spoiler on
+  prompt/context/default-feedback, three-stage MCQ shape with all
+  three trap distractors, no segueToLessonId on the wrap, tree-stage
+  count bounds at validation time.
+
+**Numbers update**: 49 test files, **486 tests** (+24 from the two new
+lesson tests; the rest is parallel-branch test growth).
+
+---

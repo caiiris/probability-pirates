@@ -1,0 +1,38 @@
+[
+  {
+    "id": "verified-pick-k-of-n-unordered-p04-p01",
+    "instanceId": "verified-pick-k-of-n-unordered-p04:1403928626",
+    "templateId": "verified-pick-k-of-n-unordered-p04",
+    "topic": "counting",
+    "skills": [
+      "ordered-vs-unordered",
+      "combinations"
+    ],
+    "retrievalForm": "definition",
+    "difficulty": 835,
+    "params": {
+      "n": 6,
+      "k": 2
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "A committee of 2 people is chosen from a group of 6. How many different committees are possible? (Order does not matter.)",
+    "context": null,
+    "answer": "choice:combo",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Choosing 2 from 6 (unordered)",
+      "steps": [
+        "We want to count subsets of size 2 from 6 elements.",
+        "Order does not matter. {A,B} and {B,A} count as one committee.",
+        "Ordered selections (permutations): P(6,2) = 6!/(6−2)! = 30.",
+        "Each unordered subset appears in 2! = 2 orderings, so divide by 2!.",
+        "C(6,2) = P(6,2) / 2! = 30 / 2 = 15."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

@@ -16,7 +16,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { grantPracticeXp } from '@/lib/practiceXp';
-import type { PracticeXpState } from '@/lib/practiceXp';
+import type { PracticeXpState, PracticeXpOpts } from '@/lib/practiceXp';
 import { todayLocalDate } from '@/lib/streak';
 import { awardPracticeXp } from '@/features/habit/habitService';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -33,11 +33,11 @@ export type PracticeXpAward = {
 export type PracticeXpHookResult = {
   /**
    * Call once per graded answer.
-   * Applies the daily cap, persists practiceXp/today, and increments xp/weeklyXp
-   * in the background (never throws to UI). Returns the grant result synchronously
-   * from optimistic local state.
+   * Applies difficulty/try scaling (opts) and the daily cap, persists
+   * practiceXp/today, and increments xp/weeklyXp in the background (never throws
+   * to UI). Returns the grant result synchronously from optimistic local state.
    */
-  award: (wasCorrect: boolean) => PracticeXpAward;
+  award: (wasCorrect: boolean, opts?: PracticeXpOpts) => PracticeXpAward;
   /** Whether the cap was reached on the most recent award call (for UI display). */
   capReached: boolean;
 };
@@ -79,8 +79,8 @@ export function usePracticeXp(uid: string | null | undefined): PracticeXpHookRes
   }, [uid]);
 
   const award = useCallback(
-    (wasCorrect: boolean): PracticeXpAward => {
-      const grant = grantPracticeXp(xpStateRef.current, todayLocalDate(), wasCorrect);
+    (wasCorrect: boolean, opts: PracticeXpOpts = {}): PracticeXpAward => {
+      const grant = grantPracticeXp(xpStateRef.current, todayLocalDate(), wasCorrect, opts);
 
       // Optimistic: update local state immediately so the next call sees the new cap.
       setXpState(grant.state);

@@ -47,10 +47,13 @@ export type PracticeStateResult = {
 // ─── Elo helper (same formula as applyPracticeAttempt in learnerModel.ts) ────
 
 /**
- * Apply one Elo update and return the new rating.
+ * Apply one Bounty/Elo update and return the new rating.
  * Formula: r' = r + K * (actual - expected), where expected = 1/(1+10^((d-r)/400)).
  * No delayed-retrieval bonus here — that bonus applies to per-skill model updates
  * (Engine A); topic-level rating uses the simpler form.
+ *
+ * Product rule: below-level problems cannot reduce Bounty. Learners may use
+ * easier practice to warm up without risking a visible rating loss.
  */
 export function applyElo(
   currentRating: number,
@@ -59,7 +62,8 @@ export function applyElo(
 ): number {
   const actual = wasCorrect ? 1 : 0;
   const expected = 1 / (1 + Math.pow(10, (difficulty - currentRating) / 400));
-  return currentRating + ELO_K * (actual - expected);
+  const nextRating = currentRating + ELO_K * (actual - expected);
+  return difficulty < currentRating ? Math.max(currentRating, nextRating) : nextRating;
 }
 
 /**

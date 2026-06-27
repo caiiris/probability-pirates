@@ -1,0 +1,40 @@
+[
+  {
+    "id": "verified-k-heads-in-n-p04-p01",
+    "instanceId": "verified-k-heads-in-n-p04:383899793",
+    "templateId": "verified-k-heads-in-n-p04",
+    "topic": "distributions",
+    "skills": [
+      "binomial-pmf",
+      "independence"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 920,
+    "params": {
+      "n": 8,
+      "k": 3
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair coin is flipped 8 times. What is the probability of getting exactly 3 heads?",
+    "context": null,
+    "answer": "7/32",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(exactly 3 heads in 8 flips)",
+      "steps": [
+        "Each flip is independent with P(heads) = 1/2.",
+        "Total equally-likely sequences: 2^8 = 256.",
+        "Sequences with exactly 3 heads: C(8, 3) = 56.",
+        "P(exactly 3 heads) = 56/256 = 7/32."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.21875,
+      "simulationEstimate": 0.21834,
+      "absoluteDifference": 0.0004099999999999937,
+      "sigmaThreshold": 0.00924387466109315,
+      "passed": true
+    }
+  }
+]

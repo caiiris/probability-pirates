@@ -1,0 +1,40 @@
+[
+  {
+    "id": "verified-k-heads-in-n-p03-p01",
+    "instanceId": "verified-k-heads-in-n-p03:1404620174",
+    "templateId": "verified-k-heads-in-n-p03",
+    "topic": "distributions",
+    "skills": [
+      "binomial-pmf",
+      "independence"
+    ],
+    "retrievalForm": "operation",
+    "difficulty": 880,
+    "params": {
+      "n": 6,
+      "k": 6
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair coin is flipped 6 times. What is the probability of getting exactly 6 heads?",
+    "context": null,
+    "answer": "1/64",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(exactly 6 heads in 6 flips)",
+      "steps": [
+        "Each flip is independent with P(heads) = 1/2.",
+        "Total equally-likely sequences: 2^6 = 64.",
+        "Sequences with exactly 6 heads: C(6, 6) = 1.",
+        "P(exactly 6 heads) = 1/64 = 1/64."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.015625,
+      "simulationEstimate": 0.01502,
+      "absoluteDifference": 0.0006049999999999996,
+      "sigmaThreshold": 0.0027731623983279453,
+      "passed": true
+    }
+  }
+]

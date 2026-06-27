@@ -10,11 +10,17 @@ import {
   applyPracticeAttempt,
   applyLessonExposure,
   buildReportCard,
+  surfacedMisconceptions,
+  SOURCE_WEIGHT,
+  SURFACE_THRESHOLD,
+  SLIP_DISCOUNT,
+  MASTERY_STRONG_ACC,
+  MASTERY_MIN_ATTEMPTS,
   DEFAULT_RATING,
   ELO_K,
   ACC_ALPHA,
 } from './learnerModel';
-import type { SlotFirstTry } from './learnerModel';
+import type { SlotFirstTry, LearnerModel } from './learnerModel';
 
 const NOW = 1_700_000_000_000; // fixed epoch ms for determinism
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -550,5 +556,290 @@ describe('Elo math spot-check', () => {
     // delta = ELO_K * 1 * (0 - 0.5) = -12
     const expected = DEFAULT_RATING + ELO_K * 1 * (0 - 0.5);
     expect(m1.skills['combinations']!.rating).toBeCloseTo(expected, 8);
+  });
+});
+
+// ─── C-MC3: Confidence model — weighted accumulation ─────────────────────────
+
+describe('C-MC3 — misconception confidence model', () => {
+  describe('weighted score accumulation', () => {
+    it('trap source accumulates its source weight on first bump', () => {
+      const m0 = emptyModel(NOW);
+      const m1 = applyPracticeAttempt(m0, {
+        skills: ['combinations'],
+        wasCorrect: false,
+        misconceptionSignal: { key: 'ordered_vs_unordered', source: 'trap' },
+        now: NOW,
+      });
+      expect(m1.misconceptions['ordered_vs_unordered']?.count).toBe(1);
+      expect(m1.misconceptions['ordered_vs_unordered']?.score).toBeCloseTo(
+        SOURCE_WEIGHT.trap,
+        10,
+      );
+    });
+
+    it('chip source (weight 0.6) accumulates fractional score', () => {
+      const m0 = emptyModel(NOW);
+      const m1 = applyPracticeAttempt(m0, {
+        skills: ['combinations'],
+        wasCorrect: false,
+        misconceptionSignal: { key: 'gambler', source: 'chip' },
+        now: NOW,
+      });
+      expect(m1.misconceptions['gambler']?.count).toBe(1);
+      expect(m1.misconceptions['gambler']?.score).toBeCloseTo(SOURCE_WEIGHT.chip, 10);
+    });
+
+    it('llm source (weight 0.5) accumulates fractional score', () => {
+      const m0 = emptyModel(NOW);
+      const m1 = applyPracticeAttempt(m0, {
+        skills: ['combinations'],
+        wasCorrect: false,
+        misconceptionSignal: { key: 'gambler', source: 'llm' },
+        now: NOW,
+      });
+      expect(m1.misconceptions['gambler']?.score).toBeCloseTo(SOURCE_WEIGHT.llm, 10);
+    });
+
+    it('two chip hits accumulate to 1.2 (above threshold)', () => {
+      let m = emptyModel(NOW);
+      m = applyPracticeAttempt(m, {
+        skills: ['combinations'],
+        wasCorrect: false,
+        misconceptionSignal: { key: 'gambler', source: 'chip' },
+        now: NOW,
+      });
+      m = applyPracticeAttempt(m, {
+        skills: ['combinations'],
+        wasCorrect: false,
+        misconceptionSignal: { key: 'gambler', source: 'chip' },
+        now: NOW + 1,
+      });
+      expect(m.misconceptions['gambler']?.count).toBe(2);
+      expect(m.misconceptions['gambler']?.score).toBeCloseTo(
+        SOURCE_WEIGHT.chip * 2,
+        10,
+      );
+      expect(m.misconceptions['gambler']?.score).toBeGreaterThanOrEqual(SURFACE_THRESHOLD);
+    });
+
+    it('a single llm hit (0.5) stays below threshold', () => {
+      const m0 = emptyModel(NOW);
+      const m1 = applyPracticeAttempt(m0, {
+        skills: ['combinations'],
+        wasCorrect: false,
+        misconceptionSignal: { key: 'gambler', source: 'llm' },
+        now: NOW,
+      });
+      expect(m1.misconceptions['gambler']?.score).toBeLessThan(SURFACE_THRESHOLD);
+    });
+
+    it('misconceptionSignal overrides misconceptionKey when both supplied', () => {
+      const m0 = emptyModel(NOW);
+      const m1 = applyPracticeAttempt(m0, {
+        skills: ['combinations'],
+        wasCorrect: false,
+        misconceptionKey: 'gambler',
+        misconceptionSignal: { key: 'ordered_vs_unordered', source: 'llm' },
+        now: NOW,
+      });
+      // misconceptionSignal wins — only ordered_vs_unordered should be bumped
+      expect(m1.misconceptions['ordered_vs_unordered']?.count).toBe(1);
+      expect(m1.misconceptions['ordered_vs_unordered']?.score).toBeCloseTo(
+        SOURCE_WEIGHT.llm,
+        10,
+      );
+      expect(m1.misconceptions['gambler']).toBeUndefined();
+    });
+
+    it('legacy misconceptionKey is treated as source trap', () => {
+      const m0 = emptyModel(NOW);
+      const m1 = applyPracticeAttempt(m0, {
+        skills: ['combinations'],
+        wasCorrect: false,
+        misconceptionKey: 'ordered_vs_unordered',
+        now: NOW,
+      });
+      expect(m1.misconceptions['ordered_vs_unordered']?.score).toBeCloseTo(
+        SOURCE_WEIGHT.trap,
+        10,
+      );
+    });
+  });
+
+  describe('back-compat: {count, lastSeenAt} records without score', () => {
+    it('bumpMisconception seeds score from count * trap weight when score is absent', () => {
+      // Simulate a legacy persisted record (no score field).
+      const legacyModel: LearnerModel = {
+        ...emptyModel(NOW),
+        misconceptions: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          gambler: { count: 2, lastSeenAt: NOW } as any,
+        },
+      };
+      // Apply another trap bump. Legacy seed = count * trap, plus the new trap
+      // weight (no slip discount — legacyModel has no practiced skills).
+      const updated = applyPracticeAttempt(legacyModel, {
+        skills: ['combinations'],
+        wasCorrect: false,
+        misconceptionSignal: { key: 'gambler', source: 'trap' },
+        now: NOW + 1,
+      });
+      expect(updated.misconceptions['gambler']?.count).toBe(3);
+      expect(updated.misconceptions['gambler']?.score).toBeCloseTo(3 * SOURCE_WEIGHT.trap, 10);
+    });
+
+    it('surfacedMisconceptions normalises legacy {count, lastSeenAt} records (repetition gate)', () => {
+      const legacyModel: LearnerModel = {
+        ...emptyModel(NOW),
+        misconceptions: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ordered_vs_unordered: { count: 3, lastSeenAt: NOW } as any, // 3*0.7 = 2.1 → surfaces
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          gambler: { count: 1, lastSeenAt: NOW - 1000 } as any, // 1*0.7 = 0.7 → single hit, stays latent
+        },
+      };
+      const keys = surfacedMisconceptions(legacyModel);
+      expect(keys).toContain('ordered_vs_unordered');
+      expect(keys).not.toContain('gambler'); // a single legacy hit reads as a possible slip
+    });
+
+    it('back-compat record with count=0 does not surface (score=0 < 1.0)', () => {
+      const legacyModel: LearnerModel = {
+        ...emptyModel(NOW),
+        misconceptions: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          gambler: { count: 0, lastSeenAt: NOW } as any,
+        },
+      };
+      const keys = surfacedMisconceptions(legacyModel);
+      expect(keys).not.toContain('gambler');
+    });
+  });
+
+  describe('slip vs. systematic — repetition + mastery slip guard (D-MC5/D-MC6)', () => {
+    it('a single trap hit stays latent (possible slip)', () => {
+      const m = applyPracticeAttempt(emptyModel(NOW), {
+        skills: ['ordered-vs-unordered'],
+        wasCorrect: false,
+        misconceptionSignal: { key: 'ordered_vs_unordered', source: 'trap' },
+        now: NOW,
+      });
+      expect(m.misconceptions['ordered_vs_unordered']?.score).toBeCloseTo(SOURCE_WEIGHT.trap, 10);
+      expect(surfacedMisconceptions(m)).not.toContain('ordered_vs_unordered');
+    });
+
+    it('two trap hits surface (systematic repetition)', () => {
+      let m = emptyModel(NOW);
+      m = applyPracticeAttempt(m, { skills: ['ordered-vs-unordered'], wasCorrect: false, misconceptionSignal: { key: 'ordered_vs_unordered', source: 'trap' }, now: NOW });
+      m = applyPracticeAttempt(m, { skills: ['ordered-vs-unordered'], wasCorrect: false, misconceptionSignal: { key: 'ordered_vs_unordered', source: 'trap' }, now: NOW + 1 });
+      expect(m.misconceptions['ordered_vs_unordered']?.score).toBeCloseTo(2 * SOURCE_WEIGHT.trap, 10);
+      expect(surfacedMisconceptions(m)).toContain('ordered_vs_unordered');
+    });
+
+    it('a trap hit corroborated by a chip surfaces', () => {
+      let m = emptyModel(NOW);
+      m = applyPracticeAttempt(m, { skills: ['independence'], wasCorrect: false, misconceptionSignal: { key: 'gambler', source: 'trap' }, now: NOW });
+      expect(surfacedMisconceptions(m)).not.toContain('gambler');
+      m = applyPracticeAttempt(m, { skills: ['independence'], wasCorrect: false, misconceptionSignal: { key: 'gambler', source: 'chip' }, now: NOW + 1 });
+      expect(m.misconceptions['gambler']?.score).toBeCloseTo(SOURCE_WEIGHT.trap + SOURCE_WEIGHT.chip, 10);
+      expect(surfacedMisconceptions(m)).toContain('gambler');
+    });
+
+    it("slip guard: a strong learner's trap hit is discounted and does not surface", () => {
+      let m = emptyModel(NOW);
+      // Build strong mastery on combinations (recentCorrect >= 0.8, attempts >= 3).
+      for (let i = 0; i < 5; i++) {
+        m = applyPracticeAttempt(m, { skills: ['combinations'], wasCorrect: true, now: NOW + i });
+      }
+      expect(m.skills['combinations']!.recentCorrect).toBeGreaterThanOrEqual(MASTERY_STRONG_ACC);
+      expect(m.skills['combinations']!.attempts).toBeGreaterThanOrEqual(MASTERY_MIN_ATTEMPTS);
+
+      // A trap miss on a problem exercising the (already strong) combinations skill.
+      m = applyPracticeAttempt(m, {
+        skills: ['combinations'],
+        wasCorrect: false,
+        misconceptionSignal: { key: 'ordered_vs_unordered', source: 'trap' },
+        now: NOW + 100,
+      });
+      // Discounted at record time: trap (0.7) * SLIP_DISCOUNT (0.5) = 0.35.
+      expect(m.misconceptions['ordered_vs_unordered']?.score).toBeCloseTo(SOURCE_WEIGHT.trap * SLIP_DISCOUNT, 10);
+      expect(surfacedMisconceptions(m)).not.toContain('ordered_vs_unordered');
+    });
+
+    it('a non-strong learner needs only two trap hits (no discount)', () => {
+      let m = emptyModel(NOW);
+      m = applyPracticeAttempt(m, { skills: ['ordered-vs-unordered'], wasCorrect: false, misconceptionSignal: { key: 'ordered_vs_unordered', source: 'trap' }, now: NOW });
+      m = applyPracticeAttempt(m, { skills: ['ordered-vs-unordered'], wasCorrect: false, misconceptionSignal: { key: 'ordered_vs_unordered', source: 'trap' }, now: NOW + 1 });
+      expect(m.misconceptions['ordered_vs_unordered']?.score).toBeCloseTo(2 * SOURCE_WEIGHT.trap, 10);
+      expect(surfacedMisconceptions(m)).toContain('ordered_vs_unordered');
+    });
+  });
+
+  describe('surfacedMisconceptions ordering and threshold', () => {
+    it('returns keys sorted by score desc, then lastSeenAt desc', () => {
+      const m: LearnerModel = {
+        ...emptyModel(NOW),
+        misconceptions: {
+          gambler: { count: 1, score: 2.5, lastSeenAt: NOW },
+          ordered_vs_unordered: { count: 3, score: 3.0, lastSeenAt: NOW - 1000 },
+          complement_inversion: { count: 1, score: 2.5, lastSeenAt: NOW + 1000 },
+        },
+      };
+      const keys = surfacedMisconceptions(m);
+      // ordered_vs_unordered: score 3.0 → first
+      // complement_inversion: score 2.5, lastSeenAt NOW+1000 → second (newer)
+      // gambler: score 2.5, lastSeenAt NOW → third
+      expect(keys[0]).toBe('ordered_vs_unordered');
+      expect(keys[1]).toBe('complement_inversion');
+      expect(keys[2]).toBe('gambler');
+    });
+
+    it('excludes keys below the threshold', () => {
+      const m: LearnerModel = {
+        ...emptyModel(NOW),
+        misconceptions: {
+          gambler: { count: 1, score: 0.5, lastSeenAt: NOW },
+          ordered_vs_unordered: { count: 1, score: 1.0, lastSeenAt: NOW },
+        },
+      };
+      const keys = surfacedMisconceptions(m);
+      expect(keys).toContain('ordered_vs_unordered');
+      expect(keys).not.toContain('gambler');
+    });
+
+    it('respects a custom threshold', () => {
+      const m: LearnerModel = {
+        ...emptyModel(NOW),
+        misconceptions: {
+          gambler: { count: 1, score: 0.5, lastSeenAt: NOW },
+          ordered_vs_unordered: { count: 1, score: 1.0, lastSeenAt: NOW },
+        },
+      };
+      // threshold = 0.4: both should surface
+      const keys = surfacedMisconceptions(m, 0.4);
+      expect(keys).toContain('gambler');
+      expect(keys).toContain('ordered_vs_unordered');
+    });
+
+    it('filters out keys not in the closed MISCONCEPTIONS taxonomy', () => {
+      const m: LearnerModel = {
+        ...emptyModel(NOW),
+        misconceptions: {
+          gambler: { count: 2, score: 2.0, lastSeenAt: NOW },
+        },
+      };
+      // Inject a stale key that isn't in the taxonomy (simulates an old persisted doc).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (m.misconceptions as any)['stale_unknown_key'] = { count: 5, score: 5.0, lastSeenAt: NOW };
+      const keys = surfacedMisconceptions(m);
+      expect(keys).not.toContain('stale_unknown_key');
+      expect(keys).toContain('gambler');
+    });
+
+    it('returns empty array when model has no misconceptions', () => {
+      const m = emptyModel(NOW);
+      expect(surfacedMisconceptions(m)).toEqual([]);
+    });
   });
 });

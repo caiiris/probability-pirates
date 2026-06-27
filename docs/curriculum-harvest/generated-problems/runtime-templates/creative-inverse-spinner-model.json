@@ -1,0 +1,38 @@
+[
+  {
+    "id": "creative-inverse-spinner-model-p01",
+    "instanceId": "creative-inverse-spinner-model:2301608532",
+    "templateId": "creative-inverse-spinner-model",
+    "topic": "long-run",
+    "skills": [
+      "frequentist-view"
+    ],
+    "retrievalForm": "application",
+    "difficulty": 1330,
+    "params": {
+      "counts": [
+        24,
+        17,
+        9
+      ]
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "A spinner produced counts 24, 17, and 9 over 50 spins. Which spinner most likely generated it?",
+    "context": null,
+    "answer": "choice:correct",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Compare the observed frequencies",
+      "steps": [
+        "The observed shares are 24/50, 17/50, and 9/50.",
+        "These are closest to 1/2, 1/3, and 1/6.",
+        "That makes Spinner A the best match."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

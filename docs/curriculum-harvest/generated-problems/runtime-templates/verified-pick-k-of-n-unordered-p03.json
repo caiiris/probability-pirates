@@ -1,0 +1,38 @@
+[
+  {
+    "id": "verified-pick-k-of-n-unordered-p03-p01",
+    "instanceId": "verified-pick-k-of-n-unordered-p03:3248169788",
+    "templateId": "verified-pick-k-of-n-unordered-p03",
+    "topic": "counting",
+    "skills": [
+      "ordered-vs-unordered",
+      "combinations"
+    ],
+    "retrievalForm": "definition",
+    "difficulty": 900,
+    "params": {
+      "n": 7,
+      "k": 5
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "A committee of 5 people is chosen from a group of 7. How many different committees are possible? (Order does not matter.)",
+    "context": null,
+    "answer": "choice:combo",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Choosing 5 from 7 (unordered)",
+      "steps": [
+        "We want to count subsets of size 5 from 7 elements.",
+        "Order does not matter. {A,B} and {B,A} count as one committee.",
+        "Ordered selections (permutations): P(7,5) = 7!/(7−5)! = 2520.",
+        "Each unordered subset appears in 5! = 120 orderings, so divide by 5!.",
+        "C(7,5) = P(7,5) / 5! = 2520 / 120 = 21."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

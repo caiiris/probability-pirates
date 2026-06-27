@@ -1,0 +1,40 @@
+[
+  {
+    "id": "verified-at-least-one-via-complement-p04-p01",
+    "instanceId": "verified-at-least-one-via-complement-p04:956615306",
+    "templateId": "verified-at-least-one-via-complement-p04",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 830,
+    "params": {
+      "m": 2,
+      "n": 4
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair coin is flipped 4 times independently. What is the probability of getting heads at least once?",
+    "context": null,
+    "answer": "15/16",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(at least one head in 4 flips)",
+      "steps": [
+        "Complement rule: P(at least one) = 1 − P(zero occurrences).",
+        "P(miss on a single trial) = 1 − 1/2 = 1/2.",
+        "Trials are independent, so P(miss all 4) = (1/2)^4 = 1/16.",
+        "P(at least one) = 1 − 1/16 = 15/16."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.9375,
+      "simulationEstimate": 0.93798,
+      "absoluteDifference": 0.00048000000000003595,
+      "sigmaThreshold": 0.005412658773652742,
+      "passed": true
+    }
+  }
+]

@@ -58,13 +58,11 @@ export const CHAPTERS: Chapter[] = [
     id: 'compound',
     number: 3,
     title: 'Compound Experiments',
-    subtitle: 'When experiments combine, outcomes multiply.',
+    subtitle: 'When experiments combine, count by AND and OR.',
     accent: 'teal',
     lessonIds: [
-      'two-coins',
-      'two-dice',
-      'tree-diagrams',
       'multiplication-principle',
+      'addition-principle',
       'practice-counting-outcomes',
       'review-compound',
     ],
@@ -90,7 +88,6 @@ export const CHAPTERS: Chapter[] = [
     subtitle: 'Tools for when listing stops working.',
     accent: 'amber',
     lessonIds: [
-      'addition-principle',
       'inclusion-exclusion',
       'permutations',
       'combinations',
@@ -123,6 +120,7 @@ export const CHAPTERS: Chapter[] = [
     lessonIds: [
       'conditional-intuition',
       'conditional-formula',
+      'tree-diagrams',
       'independence-revisited',
       'bayes-theorem',
       'monty-hall',

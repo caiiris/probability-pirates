@@ -1,0 +1,37 @@
+[
+  {
+    "id": "creative-odds-evens-fairness-p01",
+    "instanceId": "creative-odds-evens-fairness:3960333201",
+    "templateId": "creative-odds-evens-fairness",
+    "topic": "counting",
+    "skills": [
+      "sample-space-enumeration",
+      "multiplication-principle"
+    ],
+    "retrievalForm": "application",
+    "difficulty": 1180,
+    "params": {
+      "evens": 3,
+      "odds": 4
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A bag has 3 even tokens and 4 odd tokens. Two tokens are drawn. What is the probability their sum is even?",
+    "context": null,
+    "answer": "3/7",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Same parity makes an even sum",
+      "steps": [
+        "An even sum comes from two evens or two odds.",
+        "Favorable pairs: C(3,2) + C(4,2) = 3 + 6 = 9.",
+        "All pairs: C(7,2) = 21.",
+        "The probability is 9/21 = 3/7."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

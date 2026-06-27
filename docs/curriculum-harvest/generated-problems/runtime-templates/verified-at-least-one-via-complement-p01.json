@@ -1,0 +1,40 @@
+[
+  {
+    "id": "verified-at-least-one-via-complement-p01-p01",
+    "instanceId": "verified-at-least-one-via-complement-p01:2175510829",
+    "templateId": "verified-at-least-one-via-complement-p01",
+    "topic": "complement",
+    "skills": [
+      "complement-rule",
+      "independence"
+    ],
+    "retrievalForm": "procedural",
+    "difficulty": 890,
+    "params": {
+      "m": 4,
+      "n": 5
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A fair 4-sided die is rolled 5 times independently. What is the probability of getting a 1 at least once?",
+    "context": null,
+    "answer": "781/1024",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "P(at least one 1 in 5 rolls)",
+      "steps": [
+        "Complement rule: P(at least one) = 1 − P(zero occurrences).",
+        "P(miss on a single trial) = 1 − 1/4 = 3/4.",
+        "Trials are independent, so P(miss all 5) = (3/4)^5 = 243/1024.",
+        "P(at least one) = 1 − 243/1024 = 781/1024."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-simulation",
+      "exactProbability": 0.7626953125,
+      "simulationEstimate": 0.75994,
+      "absoluteDifference": 0.002755312500000051,
+      "sigmaThreshold": 0.009512916818477057,
+      "passed": true
+    }
+  }
+]

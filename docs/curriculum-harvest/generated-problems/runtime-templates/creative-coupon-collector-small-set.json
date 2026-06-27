@@ -1,0 +1,35 @@
+[
+  {
+    "id": "creative-coupon-collector-small-set-p01",
+    "instanceId": "creative-coupon-collector-small-set:1107267843",
+    "templateId": "creative-coupon-collector-small-set",
+    "topic": "distributions",
+    "skills": [
+      "binomial-pmf"
+    ],
+    "retrievalForm": "application",
+    "difficulty": 1340,
+    "params": {
+      "stickerTypes": 4
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "There are 4 sticker types. Each pack has one random sticker. What is the expected number of packs needed to complete the set?",
+    "context": null,
+    "answer": "25/3",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Wait times for new stickers",
+      "steps": [
+        "The first new sticker takes 1 draw on average.",
+        "The next new sticker has chance 3/4 each draw, so it takes 4/3 draws on average.",
+        "Then the wait times are 2 and 4.",
+        "Total expected draws: 1 + 4/3 + 2 + 4 = 25/3."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

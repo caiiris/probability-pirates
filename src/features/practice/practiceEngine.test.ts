@@ -96,6 +96,21 @@ describe('answerToPayload', () => {
     expect(payload).toEqual({ numerator: 5, denominator: 1 });
   });
 
+  it('maps int to { value } for a number-fill variant', () => {
+    const answer: ExactAnswer = { kind: 'int', value: 10 };
+    const variant: Variant = {
+      id: 'nf',
+      interactionKind: 'number-fill',
+      prompt: 'How many groups?',
+      answer: 10,
+      feedbackCorrect: '',
+      feedbackDefault: '',
+    };
+    const payload = answerToPayload(answer, variant);
+    expect(payload).toEqual({ value: 10 });
+    expect(checkAnswer(variant, payload).wasCorrect).toBe(true);
+  });
+
   it('throws for int answer with multiple-choice variant', () => {
     const answer: ExactAnswer = { kind: 'int', value: 2 };
     const mcVariant = stubChoice.render({ question: 'x' });

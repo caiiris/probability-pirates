@@ -1,0 +1,38 @@
+[
+  {
+    "id": "verified-gambler-fallacy-mc-p05-p01",
+    "instanceId": "verified-gambler-fallacy-mc-p05:791400800",
+    "templateId": "verified-gambler-fallacy-mc-p05",
+    "topic": "long-run",
+    "skills": [
+      "long-run-vs-single-trial",
+      "independence"
+    ],
+    "retrievalForm": "definition",
+    "difficulty": 820,
+    "params": {
+      "streakLen": 6,
+      "flavor": 0
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "A fair coin has been flipped and landed on heads 6 times in a row. What is the probability the next flip lands tails?",
+    "context": null,
+    "answer": "choice:independent",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Independence and the gambler's fallacy",
+      "steps": [
+        "A fair coin has P(outcome) = 1/2 on every trial.",
+        "Each trial is independent: the outcome does not depend on previous results.",
+        "A streak of 6 heads is surprising, but it doesn't \"use up\" probability.",
+        "P(next outcome) = 1/2, exactly as before the streak began.",
+        "The gambler's fallacy is the mistaken belief that a streak makes the opposite outcome \"due.\""
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

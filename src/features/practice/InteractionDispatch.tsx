@@ -21,6 +21,7 @@ import { SimulateProportion } from '@/features/lesson/interactions/SimulatePropo
 import { ScrubTrials } from '@/features/lesson/interactions/ScrubTrials';
 import { FillText } from '@/features/lesson/interactions/FillText';
 import { MontyHall } from '@/features/lesson/interactions/MontyHall';
+import { NumberFillInteraction } from '@/features/practice/renderers/NumberFillInteraction';
 
 type Props = {
   variant: Variant;
@@ -57,6 +58,17 @@ export function InteractionDispatch({
             numeratorLabel: undefined,
             denominatorLabel: undefined,
           }}
+        />
+      );
+      break;
+    case 'number-fill':
+      // Free-response integer input (F2). Keyed so a new problem clears the field.
+      interaction = (
+        <NumberFillInteraction
+          key={variant.id}
+          variant={variant}
+          feedbackState={feedbackState}
+          onChange={onChange}
         />
       );
       break;

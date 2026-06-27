@@ -2,6 +2,18 @@ import { LineChart } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useLearnerModel } from '@/features/learner/useLearnerModel';
 import { StrengthsPanel } from '@/features/learner/StrengthsPanel';
+import { summarizeByTopic } from '@/features/learner/topicSummary';
+import type { Topic } from '@/content/skills';
+
+const TOPIC_LABELS: Record<Topic, string> = {
+  counting: 'Counting',
+  'permutations-combinations': 'Permutations & Combinations',
+  'inclusion-exclusion': 'Inclusion-Exclusion',
+  'long-run': 'Long-run',
+  complement: 'Complement',
+  conditional: 'Conditional',
+  distributions: 'Distributions',
+};
 
 /**
  * Progress page — WP-7 unlock.
@@ -13,6 +25,8 @@ export function ProgressPage() {
   const auth = useAuth();
   const uid = auth.status === 'authenticated' ? auth.user.uid : null;
   const { model, loading } = useLearnerModel(uid);
+
+  const topicSummary = model ? summarizeByTopic(model) : [];
 
   return (
     <div className="min-h-full bg-white">
@@ -29,6 +43,29 @@ export function ProgressPage() {
         </div>
 
         <StrengthsPanel model={model} loading={loading} />
+
+        {topicSummary.length > 0 && (
+          <section className="mt-8 space-y-2">
+            <div>
+              <h2 className="text-sm font-semibold leading-tight">By topic</h2>
+              <p className="text-[11px] text-muted-foreground leading-tight">
+                Practice solved and accuracy across each category
+              </p>
+            </div>
+            <ul className="divide-y divide-border/50 rounded-xl border bg-card/60 px-3">
+              {topicSummary.map((s) => (
+                <li key={s.topic} className="flex items-center justify-between gap-3 py-2">
+                  <span className="min-w-0 flex-1 truncate text-sm text-foreground">
+                    {TOPIC_LABELS[s.topic]}
+                  </span>
+                  <span className="num shrink-0 text-xs text-muted-foreground">
+                    {s.solved} solved · {s.accuracy}%
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Check, Snowflake } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Check, Snowflake, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useAllLessonProgress } from '@/features/progress/useAllLessonProgress';
@@ -11,6 +11,17 @@ import { CaptainsLog } from '@/features/captain/CaptainsLog';
 import { CoursePath } from './CoursePath';
 import { ScheduleReminder } from '@/features/schedule/ScheduleReminder';
 import { todayLocalDate } from '@/lib/streak';
+
+const GOAL_DONE_DISMISS_KEY = 'home.goalDonePill.dismissedFor';
+
+function readGoalPillDismissed(today: string): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(GOAL_DONE_DISMISS_KEY) === today;
+  } catch {
+    return false;
+  }
+}
 
 export function HomePage() {
   const auth = useAuth();
@@ -61,85 +72,138 @@ export function HomePage() {
 
   // Course-complete celebration only fires when the *whole* planned course is
   // done — not when the single currently-authored lesson is finished and the
-  // rest of the path is still locked roadmap previews. Pre-D91 this was
-  // `realLessons.every(...)`, which prematurely declared "all caught up"
-  // after one lesson on the new path layout.
+  // rest of the path is still locked roadmap previews.
   const allCompleted =
     lessons.length > 0 && lessons.every((l) => progressMap.get(l.id)?.state === 'completed');
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-      {/* Today's unfinished schedule items — pops at most once per day */}
-      {uid ? <ScheduleReminder uid={uid} /> : null}
+    <div
+      // Page-wide ocean gradient — same stops as the OceanScene card around
+      // the course path, so the page and the path read as one continuous sea
+      // instead of "card sitting on a paler page." The OceanScene's identical
+      // gradient compresses to its smaller card height (top→middle band),
+      // while the page version stretches across the whole scroll area.
+      className="min-h-full"
+      style={{
+        background:
+          'linear-gradient(180deg, #EAF5FF 0%, #CCE6FB 30%, #9DCDF0 65%, #74B5E0 100%)',
+      }}
+    >
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+        {/* Today's unfinished schedule items — pops at most once per day */}
+        {uid ? <ScheduleReminder uid={uid} /> : null}
 
-      {/* Today's nudge — streak / XP / coins now live in the persistent app bar;
-          this row carries the home-specific daily-goal cue and any streak freezes.
-          The pill states the actual goal when undone (per ui-directive.md:
-          empty/idle states tell the user what to do), and reads as a quiet
-          confirmation once done. */}
-      <div className="flex items-center gap-2.5 flex-wrap">
-        <span
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border ${
-            goalDone
-              ? 'bg-[color:var(--green-soft)] text-[color:var(--green-deep)] border-transparent'
-              : 'bg-card text-foreground border-border'
-          }`}
-          aria-label={goalDone ? 'Daily goal complete' : "Today's goal: finish one lesson"}
-        >
-          {goalDone ? <Check className="w-3.5 h-3.5" strokeWidth={3} aria-hidden="true" /> : null}
-          {goalDone ? 'Done today' : 'Finish 1 lesson today'}
-        </span>
-        {freezes > 0 ? (
-          <span
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-border bg-[color:var(--blue-soft)] text-[color:var(--blue-deep)] shadow-soft"
-            aria-label={`${freezes} streak freeze${freezes === 1 ? '' : 's'} ready`}
-            title="Streak Freeze ready — protects your streak on a missed day"
-          >
-            <Snowflake className="w-4 h-4" aria-hidden="true" />
-            {freezes > 1 ? <span className="text-xs font-bold leading-none">{freezes}</span> : null}
-          </span>
-        ) : null}
+        {/* "Done today" is now a one-time-per-day dismissable popup that ONLY
+            appears when the daily goal is met. The old always-on "Today's goal"
+            label was filler when undone (the path's current node already calls
+            the learner to action), and the "Done today" pill that stayed forever
+            once met was a permanent victory lap. Show, celebrate, dismiss. */}
+        <GoalDonePopup goalDone={goalDone} today={today} freezes={freezes} />
+
+        {/* Hero card — only for states the path can't express on its own: the
+            first-time welcome and the all-caught-up message. For the normal
+            returning case the path's current node is the single primary focus,
+            so we don't stack a second "Up next" CTA on top of it. */}
+        {isNewUser || allCompleted ? (
+          <HeroCard
+            lessons={lessons}
+            progressMap={progressMap}
+            uid={uid}
+            displayUsername={profile?.displayUsername ?? ''}
+            isNewUser={isNewUser}
+          />
+        ) : (
+          <CaptainsLog />
+        )}
+
+        {/* Course path */}
+        <section aria-label="Course path" className="pt-2">
+          <div className="mx-auto max-w-md flex items-baseline justify-between mb-6 px-1">
+            <h2 className="font-display text-lg font-bold tracking-tight">Path</h2>
+            {/* "X / Y lessons" reads as the user's share of the planned course
+                (D91). The old "X / Y done" implied finality, which looked odd
+                when only one lesson was authored ("1 / 1 done" while the path
+                clearly continued below). */}
+            <span
+              className="text-sm text-muted-foreground"
+              aria-label={`${completed} of ${total} lessons complete`}
+            >
+              <span className="num font-semibold text-foreground">{completed}</span> / {total} lessons
+            </span>
+          </div>
+          <CoursePath
+            lessons={lessons}
+            progressMap={progressMap}
+            currentLessonId={recommendation?.id ?? null}
+            uid={uid}
+            claimedChests={profile?.claimedChests ?? []}
+          />
+        </section>
       </div>
+    </div>
+  );
+}
 
-      {/* Hero card — only for states the path can't express on its own: the
-          first-time welcome and the all-caught-up message. For the normal
-          returning case the path's current node is the single primary focus,
-          so we don't stack a second "Up next" CTA on top of it. */}
-      {isNewUser || allCompleted ? (
-        <HeroCard
-          lessons={lessons}
-          progressMap={progressMap}
-          uid={uid}
-          displayUsername={profile?.displayUsername ?? ''}
-          isNewUser={isNewUser}
-        />
-      ) : (
-        <CaptainsLog />
-      )}
+/**
+ * Celebratory pill that appears only when the daily goal is met (one lesson
+ * complete today) AND the learner hasn't already dismissed it today. Stores
+ * dismissal in localStorage keyed by today's local date, so closing it hides
+ * it for the rest of the day but tomorrow's accomplishment shows fresh.
+ *
+ * Streak Freeze chip rides along (still always-on when freezes are owned)
+ * because it's a status indicator, not a celebration.
+ */
+function GoalDonePopup({
+  goalDone,
+  today,
+  freezes,
+}: {
+  goalDone: boolean;
+  today: string;
+  freezes: number;
+}) {
+  const [dismissed, setDismissed] = useState<boolean>(() => readGoalPillDismissed(today));
 
-      {/* Course path */}
-      <section aria-label="Course path" className="pt-2">
-        <div className="mx-auto max-w-md flex items-baseline justify-between mb-6 px-1">
-          <h2 className="font-display text-lg font-bold tracking-tight">Path</h2>
-          {/* "X / Y lessons" reads as the user's share of the planned course
-              (D91). The old "X / Y done" implied finality, which looked odd
-              when only one lesson was authored ("1 / 1 done" while the path
-              clearly continued below). */}
-          <span
-            className="text-sm text-muted-foreground"
-            aria-label={`${completed} of ${total} lessons complete`}
+  if (!goalDone && freezes === 0) return null;
+
+  function handleDismiss() {
+    try {
+      window.localStorage.setItem(GOAL_DONE_DISMISS_KEY, today);
+    } catch {
+      // Private mode: in-memory dismiss still hides it for the session.
+    }
+    setDismissed(true);
+  }
+
+  return (
+    <div className="flex items-center gap-2.5 flex-wrap">
+      {goalDone && !dismissed && (
+        <span
+          className="flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 rounded-full text-sm font-medium border bg-[color:var(--green-soft)] text-[color:var(--green-deep)] border-transparent"
+          aria-label="Daily goal complete"
+        >
+          <Check className="w-3.5 h-3.5" strokeWidth={3} aria-hidden="true" />
+          Done today
+          <button
+            type="button"
+            onClick={handleDismiss}
+            aria-label="Dismiss daily goal pill"
+            className="ml-0.5 grid h-5 w-5 place-items-center rounded-full text-[color:var(--green-deep)]/60 transition-colors hover:bg-[color:var(--green-deep)]/10 hover:text-[color:var(--green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <span className="num font-semibold text-foreground">{completed}</span> / {total} lessons
-          </span>
-        </div>
-        <CoursePath
-          lessons={lessons}
-          progressMap={progressMap}
-          currentLessonId={recommendation?.id ?? null}
-          uid={uid}
-          claimedChests={profile?.claimedChests ?? []}
-        />
-      </section>
+            <X className="h-3 w-3" aria-hidden="true" />
+          </button>
+        </span>
+      )}
+      {freezes > 0 ? (
+        <span
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-border bg-[color:var(--blue-soft)] text-[color:var(--blue-deep)] shadow-soft"
+          aria-label={`${freezes} streak freeze${freezes === 1 ? '' : 's'} ready`}
+          title="Streak Freeze ready — protects your streak on a missed day"
+        >
+          <Snowflake className="w-4 h-4" aria-hidden="true" />
+          {freezes > 1 ? <span className="text-xs font-bold leading-none">{freezes}</span> : null}
+        </span>
+      ) : null}
     </div>
   );
 }

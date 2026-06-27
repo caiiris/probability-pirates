@@ -7,14 +7,24 @@
 ## Runtime Source Of Truth
 
 The generated Markdown/JSON files in `docs/curriculum-harvest/generated-problems/`
-are review artifacts only. They are not imported by the app and are not the
-runtime problem bank.
+are review artifacts. Once a review set is approved, its verified parameter sets
+can be promoted into the runtime static seed bank:
+
+```text
+src/content/practiceProblems/verifiedTemplateSeeds.ts
+```
+
+Those seeds are runtime content. The app still does not import Markdown/JSON from
+`docs/`; it imports verified params from `src/content/practiceProblems/`.
 
 The runtime Track 1 bank is the registered template list:
 
 ```text
 src/features/practice/templates/index.ts      // ALL_TEMPLATES
 src/features/practice/practiceEngine.ts       // TEMPLATES, generateInstance, pickNextTemplate
+src/content/practiceProblems/verifiedTemplateSeeds.ts
+src/features/practice/templates/verifiedSeeds.ts
+src/features/practice/templates/creative/creative-hard.ts
 ```
 
 Each template lives in the D99 topic-folder layout:
@@ -49,7 +59,8 @@ The instance contains:
 
 1. Reads the signed-in user id from `useAuth`.
 2. Renders `TopicPicker` with all `TOPICS`.
-3. Passes the selected `topic` and `uid` to `PracticeSession`.
+3. Owns the per-topic practice state so the Bounty chip can render in the header.
+4. Passes `topic`, `uid`, rating state, and event callbacks to `PracticeSession`.
 
 `TopicPicker`:
 
@@ -65,14 +76,61 @@ The instance contains:
 3. Generates a `PracticeInstance`.
 4. Renders `instance.variant` through `InteractionDispatch`.
 5. Grades with `checkAnswer(instance.variant, currentAnswer)`.
-6. Reveals `instance.explanation` immediately after any checked answer.
-7. On correct answers:
+6. Uses a 3-try ladder:
+   - wrong try 1 or 2: show a nudge, keep the learner on the problem,
+   - correct answer: reveal the worked solution and allow next,
+   - wrong try 3: reveal the worked solution with no XP.
+7. On graded answers:
    - awards daily-capped practice XP through `usePracticeXp`,
    - records per-topic state through `recordResult`,
    - records per-skill Engine A mastery through `recordPracticeAttempt`.
 8. "Next problem" repeats the generation loop.
 
+`PracticePage` also owns a progress popup:
+
+- grouped by topic,
+- grouped within each topic by Easy / Medium / Hard / Extreme,
+- shows tried out of loaded counts,
+- persists in `localStorage` by user id or guest.
+
 No generated review artifact is needed at runtime.
+
+## Verified Static Seeds
+
+Approved generated problems are loaded as seed-backed templates:
+
+```text
+src/features/practice/templates/verifiedSeeds.ts
+```
+
+Each seed-backed template fixes `sample()` to one verified parameter set, then
+delegates to the base template's `solve`, `render`, `explain`, and `simulate`.
+This means the runtime answer path still comes from code, not copied answer
+strings.
+
+Regenerate the seed file from approved review JSON:
+
+```bash
+npm run harvest:write-seed-bank
+```
+
+## Verified Creative Templates
+
+Creative/harder candidates are verified separately:
+
+```bash
+npm run harvest:verify-creative
+```
+
+The current creative runtime templates live at:
+
+```text
+src/features/practice/templates/creative/creative-hard.ts
+```
+
+They are fixed-parameter templates, not generated families yet. Each one was
+math-verified in `docs/curriculum-harvest/generated-problems/creative-hard-verified.md`
+before being registered.
 
 ## Review Artifact Generation
 
@@ -96,7 +154,7 @@ The generator is:
 scripts/curriculum-harvest/generate-runtime-template-reviews.ts
 ```
 
-For each template, it:
+For each non-fixed template, it:
 
 1. Samples five unique parameter sets using a deterministic seeded RNG.
 2. Calls `template.solve(params)`.
@@ -113,13 +171,19 @@ For each template, it:
 
 8. If no simulator exists, records a structural verification note instead.
 
+Seed-backed and creative fixed templates generate one review item each because
+their `sample()` method intentionally returns one verified parameter set.
+
 ## Review Commands
 
 Run these before asking for content review:
 
 ```bash
 npm test -- templates
+npm test -- registry practiceEngine PracticeSession templates
+npm test -- hint useAiHint PracticeSession templates
 npm run harvest:audit-wording -- docs/curriculum-harvest/generated-problems/runtime-templates
+npm run harvest:audit-wording -- docs/curriculum-harvest/generated-problems/creative-hard-verified.md
 npm run typecheck
 npm run lint
 ```
@@ -130,6 +194,9 @@ so copied textbook wording is caught before content ships.
 ## Design Decisions Logged
 
 - D99: topic-folder runtime template layout.
+- D104: verified review examples enter the app as seed-backed templates.
+- D105: Bounty cannot decrease on below-level practice.
+- D106: practice hints use a 3-try no-spoiler ladder.
 - Runtime templates are executable Track 1 bank content.
 - Review Markdown/JSON stays in `docs/curriculum-harvest/`.
 - Future static Track 2 problems should live under `src/content/practiceProblems/`
@@ -137,10 +204,8 @@ so copied textbook wording is caught before content ships.
 
 ## Known Review Notes
 
-- Current runtime templates are the non-creative starter bank and are intentionally
-  rated inside the `Easy` bucket (`difficulty < 950`). Creative/harder harvested
-  families are tagged separately in `review-queue.md` and should use higher Elo
-  ranges when implemented.
+- Non-creative starter templates are intentionally rated inside the `Easy` bucket
+  (`difficulty < 950`). Creative/harder templates are loaded with higher ratings.
 - `conditional-bayes-2x2` now uses a neutral "rare signal" context rather than a
   medical disease context. This keeps the math structure while avoiding sensitive
   learner-facing copy.
@@ -148,4 +213,7 @@ so copied textbook wording is caught before content ships.
   streaks.
 - Runtime prompts should not contain Markdown emphasis markers because the
   existing interaction renderers display prompt strings as plain text.
+- Practice rendering strips fraction labels and multiple-choice subtext so
+  hints/options do not give away the structure before the learner answers.
+- AI hint prompts for try 1 and 2 do not include the correct answer.
 

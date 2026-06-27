@@ -1,24 +1,23 @@
 /**
  * Vetting test for pick-k-of-n-unordered template.
  *
- * Updated for I-WP-H fix (WP-6b): solve now returns { kind:'choice', optionId:'combo' }
- * instead of { kind:'int' }, so we can use answerToPayload + checkAnswer for round-trip
- * verification (risk R2 is resolved for this family).
+ * F2: converted MC → free-response `number-fill`. solve now returns
+ * { kind:'int', value: nCr(n,k) }, rendered via the number-fill interaction.
  *
  * Checks:
- * 1. solve returns { kind:'choice', optionId:'combo' } for all (n, k)
- * 2. The correct option's numeric label equals nCr(n,k) for sampled params
- * 3. answerToPayload + checkAnswer round-trips correctly (render-consistency)
- * 4. The ordered-count distractor is present and maps to ordered_vs_unordered misconception
- * 5. Rate monotonicity and Elo-range bounds
+ * 1. solve returns { kind:'int', value: nCr(n,k) } for all (n, k)
+ * 2. render is a number-fill variant whose `answer` equals nCr(n,k)
+ * 3. answerToPayload + checkAnswer round-trips correctly
+ * 4. the ordered-count value nPr(n,k) maps to the ordered_vs_unordered misconception
+ * 5. rate monotonicity and Elo-range bounds
  */
 
 import { describe, it, expect } from 'vitest';
 import { pickKOfNUnorderedTemplate as t } from './pick-k-of-n-unordered';
 import { answerToPayload } from '@/features/practice/practiceEngine';
 import { checkAnswer } from '@/lib/checkAnswer';
-import { nCr } from '@/lib/probability/exact';
-import type { MultipleChoiceVariant } from '@/content/types';
+import { nCr, nPr } from '@/lib/probability/exact';
+import type { NumberFillVariant } from '@/content/types';
 
 /** All (n, k) pairs in the template's sample space. */
 function allParams(): Array<{ n: number; k: number }> {
@@ -33,22 +32,20 @@ function allParams(): Array<{ n: number; k: number }> {
 }
 
 describe('pick-k-of-n-unordered', () => {
-  it('solve returns { kind:"choice", optionId:"combo" } for all valid (n, k)', () => {
+  it('solve returns { kind:"int", value: nCr(n,k) } for all valid (n, k)', () => {
     for (const params of allParams()) {
       const answer = t.solve(params);
-      expect(answer.kind).toBe('choice');
-      if (answer.kind !== 'choice') continue;
-      expect(answer.optionId).toBe('combo');
+      expect(answer.kind).toBe('int');
+      if (answer.kind !== 'int') continue;
+      expect(answer.value).toBe(Number(nCr(params.n, params.k)));
     }
   });
 
-  it('correct option label equals nCr(n,k) for all valid (n, k)', () => {
+  it('renders a number-fill variant whose answer equals nCr(n,k)', () => {
     for (const params of allParams()) {
-      const variant = t.render(params) as MultipleChoiceVariant;
-      const expected = Number(nCr(params.n, params.k));
-      const correctOpt = variant.options.find((o) => o.id === variant.correctOptionId);
-      expect(correctOpt).toBeDefined();
-      expect(Number(correctOpt?.label)).toBe(expected);
+      const variant = t.render(params) as NumberFillVariant;
+      expect(variant.interactionKind).toBe('number-fill');
+      expect(variant.answer).toBe(Number(nCr(params.n, params.k)));
     }
   });
 
@@ -56,45 +53,27 @@ describe('pick-k-of-n-unordered', () => {
     for (const params of allParams()) {
       const answer = t.solve(params);
       const variant = t.render(params);
-      // answerToPayload must not throw (I-WP-H fix: choice kind is valid for MC)
       const payload = answerToPayload(answer, variant);
-      const result = checkAnswer(variant, payload);
-      expect(result.wasCorrect).toBe(true);
+      expect(payload).toEqual({ value: Number(nCr(params.n, params.k)) });
+      expect(checkAnswer(variant, payload).wasCorrect).toBe(true);
     }
   });
 
-  it('render: correctOptionId is "combo"', () => {
+  it('the ordered-count value nPr(n,k) maps to the ordered_vs_unordered misconception', () => {
     for (const params of allParams()) {
-      const variant = t.render(params) as MultipleChoiceVariant;
-      expect(variant.interactionKind).toBe('multiple-choice');
-      expect(variant.correctOptionId).toBe('combo');
+      const variant = t.render(params) as NumberFillVariant;
+      const ordered = Number(nPr(params.n, params.k));
+      // k ≥ 2 guarantees nPr > nCr, so the trap value is distinct from the answer.
+      expect(ordered).not.toBe(variant.answer);
+      expect(variant.misconceptionByValue?.[ordered]).toBe('ordered_vs_unordered');
     }
   });
 
-  it('render: exactly one correct option', () => {
+  it('grades the ordered-count value as wrong', () => {
     for (const params of allParams()) {
-      const variant = t.render(params) as MultipleChoiceVariant;
-      const correctOpts = variant.options.filter((o) => o.id === variant.correctOptionId);
-      expect(correctOpts.length).toBe(1);
-    }
-  });
-
-  it('render: all 4 options have distinct labels', () => {
-    for (const params of allParams()) {
-      const variant = t.render(params) as MultipleChoiceVariant;
-      expect(variant.options).toHaveLength(4);
-      const labels = variant.options.map((o) => o.label);
-      const uniqueLabels = new Set(labels);
-      expect(uniqueLabels.size).toBe(4);
-    }
-  });
-
-  it('render: ordered-count distractor (perm) maps to ordered_vs_unordered misconception', () => {
-    for (const params of allParams()) {
-      const variant = t.render(params) as MultipleChoiceVariant;
-      const permOpt = variant.options.find((o) => o.id === 'perm');
-      expect(permOpt).toBeDefined();
-      expect(variant.misconceptionByOption?.perm).toBe('ordered_vs_unordered');
+      const variant = t.render(params);
+      const ordered = Number(nPr(params.n, params.k));
+      expect(checkAnswer(variant, { value: ordered }).wasCorrect).toBe(false);
     }
   });
 

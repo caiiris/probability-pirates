@@ -52,8 +52,7 @@ export const kHeadsInNTemplate: Template<Params> = {
       denominator: Number(den),
       feedbackCorrect: `Correct! C(${n},${k}) = ${Number(nCr(n, k))} favorable sequences out of 2^${n} = ${Number(1n << BigInt(n))}.`,
       feedbackDefault:
-        `Use the binomial formula: C(n,k) / 2^n. ` +
-        `C(${n},${k}) = ${Number(nCr(n, k))}, and 2^${n} = ${Number(1n << BigInt(n))}.`,
+        `Separate the job into two parts: choose which flips are heads, then count how many total flip sequences are possible.`,
       skills: ['binomial-pmf', 'independence'],
     };
   },

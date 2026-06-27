@@ -1,0 +1,34 @@
+[
+  {
+    "id": "creative-nonlinear-payoff-expected-value-p01",
+    "instanceId": "creative-nonlinear-payoff-expected-value:2936821473",
+    "templateId": "creative-nonlinear-payoff-expected-value",
+    "topic": "distributions",
+    "skills": [
+      "binomial-pmf"
+    ],
+    "retrievalForm": "application",
+    "difficulty": 1320,
+    "params": {
+      "kind": "gem-packs"
+    },
+    "interactionKind": "multiple-choice",
+    "prompt": "A shop sells gem packs. A 12-pack has a discount, so revenue is not just count times unit price. What is the expected revenue per customer?",
+    "context": null,
+    "answer": "choice:correct",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Expected payoff after converting outcomes",
+      "steps": [
+        "Convert each possible purchase into revenue first.",
+        "Compute 80(1/2) + 160(1/5) + 240(3/20) + 480(1/10) + 900(1/20).",
+        "The expected revenue is 201 cents, or $2.01."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

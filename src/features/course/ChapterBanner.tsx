@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Check, Lock } from 'lucide-react';
 import type { Lesson } from '@/content/types';
 import type { LessonProgress } from '@/features/progress/progressService';
@@ -12,7 +13,14 @@ type Props = {
 };
 
 /** A "world" header that opens each chapter of the path. Soft accent tint, a
- *  tactile number medallion, and a progress count — no gradients, on-brand. */
+ *  tactile number medallion, and a progress count — no gradients, on-brand.
+ *
+ *  Banner is clickable on unlocked chapters as a safety net for learners who
+ *  tap the chapter card thinking it's the lesson. It links to the chapter's
+ *  first playable lesson (completed → review mode, matching `LessonNode`).
+ *  No visual annotation beyond `cursor-pointer` + a barely-perceptible hover
+ *  brightness boost — the link must not compete with the actual lesson node
+ *  below for the click. Locked chapters stay as a static div (no target). */
 export function ChapterBanner({ chapter, lessons, progressMap }: Props) {
   const c = ACCENTS[chapter.accent];
   const available = lessons.filter((l) => !l.comingSoon);
@@ -23,14 +31,25 @@ export function ChapterBanner({ chapter, lessons, progressMap }: Props) {
   // "Soon" chip instead of a meaningless "0/0" count.
   const locked = total === 0;
 
-  return (
-    <div
-      className="flex items-center gap-3.5 rounded-2xl border p-4 shadow-soft backdrop-blur-sm"
-      style={{
-        background: `color-mix(in srgb, ${c.soft} 88%, #ffffff)`,
-        borderColor: `${c.base}40`,
-      }}
-    >
+  // First playable lesson, with the same mode logic LessonNode uses: a
+  // completed lesson opens in read-only review (no XP / streak / progress
+  // impact), anything else routes to the player normally.
+  const firstLesson = available[0];
+  const targetHref = firstLesson
+    ? progressMap.get(firstLesson.id)?.state === 'completed'
+      ? `/lesson/${firstLesson.id}?mode=review`
+      : `/lesson/${firstLesson.id}`
+    : null;
+
+  const cardClass =
+    'flex items-center gap-3.5 rounded-2xl border p-4 shadow-soft backdrop-blur-sm';
+  const cardStyle: React.CSSProperties = {
+    background: `color-mix(in srgb, ${c.soft} 88%, #ffffff)`,
+    borderColor: `${c.base}40`,
+  };
+
+  const inner = (
+    <>
       <div
         className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-lg font-bold text-white"
         style={{ background: c.base, boxShadow: `0 3px 0 ${c.deep}` }}
@@ -75,6 +94,25 @@ export function ChapterBanner({ chapter, lessons, progressMap }: Props) {
           {done}/{total}
         </span>
       )}
+    </>
+  );
+
+  if (targetHref && firstLesson) {
+    return (
+      <Link
+        to={targetHref}
+        aria-label={`Chapter ${chapter.number}: ${chapter.title} — open ${firstLesson.title}`}
+        className={`${cardClass} transition hover:brightness-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+        style={cardStyle}
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <div className={cardClass} style={cardStyle}>
+      {inner}
     </div>
   );
 }

@@ -43,11 +43,16 @@ export function CaptainsLog({ className = '' }: { className?: string }) {
     setDismissed(true);
   }
 
+  // Tone tuned 2026-06-26 per tester feedback ("shiny without payoff"):
+  // dropped the full violet wash + primary-tinted border in favor of a neutral
+  // hairline card, shrank the mascot slightly, and used the inner-card radius.
+  // The violet `Captain's log` eyebrow stays — it's the brand signature and a
+  // tiny dose of color is fine; what didn't work was the whole-card shine.
   return (
     <div
-      className={`relative flex items-center gap-3 rounded-2xl border border-primary/15 bg-[color:var(--primary-soft)] p-4 pr-10 ${className}`}
+      className={`relative flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-4 pr-10 ${className}`}
     >
-      <CaptainMascot className="h-12 w-12 shrink-0" />
+      <CaptainMascot className="h-10 w-10 shrink-0" />
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
           Captain&rsquo;s log
@@ -58,7 +63,7 @@ export function CaptainsLog({ className = '' }: { className?: string }) {
         type="button"
         onClick={handleDismiss}
         aria-label="Dismiss today's tip"
-        className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full text-primary/60 transition-colors hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <X className="h-4 w-4" aria-hidden="true" />
       </button>

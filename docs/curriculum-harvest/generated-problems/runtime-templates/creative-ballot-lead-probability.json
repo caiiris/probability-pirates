@@ -1,0 +1,35 @@
+[
+  {
+    "id": "creative-ballot-lead-probability-p01",
+    "instanceId": "creative-ballot-lead-probability:3573476162",
+    "templateId": "creative-ballot-lead-probability",
+    "topic": "counting",
+    "skills": [
+      "combinations"
+    ],
+    "retrievalForm": "application",
+    "difficulty": 1620,
+    "params": {
+      "a": 5,
+      "b": 3
+    },
+    "interactionKind": "fill-fraction",
+    "prompt": "A finishes with 5 votes and B with 3. If the votes are revealed in random order, what is the chance A is always ahead?",
+    "context": null,
+    "answer": "1/4",
+    "renderedCorrectness": true,
+    "explanation": {
+      "title": "Ballot lead by enumeration",
+      "steps": [
+        "There are 56 possible reveal orders.",
+        "In 14 of them, A stays strictly ahead after every revealed vote.",
+        "So the probability is 14/56 = 1/4."
+      ]
+    },
+    "verification": {
+      "method": "solver-render-structural",
+      "passed": true,
+      "note": "No simulator declared; structural render/answer check only."
+    }
+  }
+]

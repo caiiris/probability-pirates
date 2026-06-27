@@ -1,0 +1,207 @@
+{
+  "lane": "challenge-games",
+  "sourceCandidateFile": "docs/curriculum-harvest/candidates/challenge-games-batch.md",
+  "reviewOnly": true,
+  "generatedBy": "scripts/curriculum-harvest/verify-challenge-games.ts",
+  "verifiedCount": 6,
+  "missingTaxonomyIds": [
+    "misconception:assumes_each_draw_adds_new_type",
+    "misconception:assumes_transitivity",
+    "misconception:compares_averages_instead_of_win_probability",
+    "misconception:expected_count_as_probability",
+    "misconception:final_margin_equals_staying_ahead",
+    "misconception:ignores_duplicates",
+    "misconception:ignores_payout_weights",
+    "misconception:ignores_without_replacement_dependence",
+    "misconception:symmetry_means_fair",
+    "skill:ballot-path-counting",
+    "skill:coupon-collector",
+    "skill:expected-value",
+    "skill:fair-game",
+    "skill:pairwise-comparison",
+    "skill:simulation",
+    "skill:streak-survival"
+  ],
+  "results": [
+    {
+      "id": "challenge-game-0001",
+      "candidateId": "CG-CAND-0001",
+      "title": "Skyship non-transitive dice draft",
+      "category": "non-transitive dice / custom dice strategy",
+      "difficultyTag": "extreme",
+      "prompt": "In a skyship duel, your opponent picks one of three six-sided custom dice first. You may then pick either remaining die. A higher roll wins the round. Which reply should you make to each opponent die, and why is there no single best die?",
+      "answer": "Pick A against B, B against C, and C against A; each favored matchup wins 5/9 of rounds.",
+      "solver": "Enumerate the 36 equally likely roll pairs for each matchup and choose the die with more winning pairs.",
+      "exactMethod": "Exact enumeration over 36 ordered roll pairs per matchup.",
+      "skillTags": [
+        "sample-space-enumeration",
+        "favorable-over-total",
+        "pairwise-comparison",
+        "fair-game"
+      ],
+      "misconceptionTraps": [
+        "compares_averages_instead_of_win_probability",
+        "assumes_transitivity"
+      ],
+      "missingTaxonomyIds": [
+        "skill:pairwise-comparison",
+        "skill:fair-game",
+        "misconception:compares_averages_instead_of_win_probability",
+        "misconception:assumes_transitivity"
+      ],
+      "verification": [
+        "Die A faces: 4, 4, 6, 6, 11, 11; mean 7/1.",
+        "Die B faces: 3, 3, 8, 8, 10, 10; mean 7/1.",
+        "Die C faces: 5, 5, 7, 7, 9, 9; mean 7/1.",
+        "A beats B: 5/9.",
+        "B beats C: 5/9.",
+        "C beats A: 5/9."
+      ],
+      "passed": true
+    },
+    {
+      "id": "challenge-game-0002",
+      "candidateId": "CG-CAND-0002",
+      "title": "Three-token scoring booth",
+      "category": "fair/unfair token games",
+      "difficultyTag": "hard",
+      "prompt": "A booth has 5 amber, 4 blue, and 3 crimson tokens. Draw 3 without replacement. You score +5 for exactly two colors, -4 for all one color, and -2 for all three colors. Is the game fair to the player?",
+      "answer": "No. The expected score is 109/44 points, so the player has an edge.",
+      "solver": "Count unordered 3-token hands by color pattern, then average the score over all C(12, 3) hands.",
+      "exactMethod": "Exact combination counts for all 3-token hands.",
+      "skillTags": ["combinations", "favorable-over-total", "expected-value", "fair-game"],
+      "misconceptionTraps": [
+        "ordered_vs_unordered",
+        "symmetry_means_fair",
+        "ignores_payout_weights"
+      ],
+      "missingTaxonomyIds": [
+        "skill:expected-value",
+        "skill:fair-game",
+        "misconception:symmetry_means_fair",
+        "misconception:ignores_payout_weights"
+      ],
+      "verification": [
+        "Total hands: C(12, 3) = 220.",
+        "All one color: C(5, 3) + C(4, 3) + C(3, 3) = 15.",
+        "All three colors: 5 x 4 x 3 = 60.",
+        "Exactly two colors: 145.",
+        "Expected score: 5(145)/220 - 4(15)/220 - 2(60)/220 = 109/44."
+      ],
+      "passed": true
+    },
+    {
+      "id": "challenge-game-0003",
+      "candidateId": "CG-CAND-0003",
+      "title": "Streak survival finale",
+      "category": "last-one-standing streak survival",
+      "difficultyTag": "hard",
+      "prompt": "Fifteen finalists each flip a fair coin 5 times. A finalist survives if their row contains at least 4 heads in a row. What is the probability at least one finalist survives?",
+      "answer": "29149743115358977268619/37778931862957161709568 (0.772)",
+      "solver": "First enumerate the 32 possible 5-flip rows for one finalist, then use the complement that no finalist survives.",
+      "exactMethod": "Exact row enumeration plus formula 1 - (1 - 3/32)^15.",
+      "skillTags": [
+        "complement-rule",
+        "independence",
+        "long-run-vs-single-trial",
+        "streak-survival"
+      ],
+      "misconceptionTraps": ["gambler", "complement_inversion", "expected_count_as_probability"],
+      "missingTaxonomyIds": [
+        "skill:streak-survival",
+        "misconception:expected_count_as_probability"
+      ],
+      "verification": [
+        "3 of 32 one-player flip rows contain a run of 4 heads.",
+        "Individual survival probability: 3/32.",
+        "Exact formula: 1 - (1 - 3/32)^15 = 29149743115358977268619/37778931862957161709568.",
+        "Simulation sanity check over 120,000 contests: 0.773.",
+        "Absolute simulation difference: 0.001."
+      ],
+      "passed": true
+    },
+    {
+      "id": "challenge-game-0004",
+      "candidateId": "CG-CAND-0004",
+      "title": "Vault crest coupon chase",
+      "category": "coupon collector small sets",
+      "difficultyTag": "hard",
+      "prompt": "A puzzle vault has 4 equally likely crest tokens. You open 7 boxes, each with one random crest. What is the probability you have seen all 4 crests by then?",
+      "answer": "525/1024 (0.513)",
+      "solver": "Use inclusion-exclusion on missing crest types, and verify by enumerating all 4^7 draw strings.",
+      "exactMethod": "Exact inclusion-exclusion formula compared with exhaustive enumeration of all draw strings.",
+      "skillTags": [
+        "inclusion-exclusion",
+        "multiplication-principle",
+        "coupon-collector",
+        "simulation"
+      ],
+      "misconceptionTraps": ["ignores_duplicates", "assumes_each_draw_adds_new_type", "gambler"],
+      "missingTaxonomyIds": [
+        "skill:coupon-collector",
+        "skill:simulation",
+        "misconception:ignores_duplicates",
+        "misconception:assumes_each_draw_adds_new_type"
+      ],
+      "verification": [
+        "Formula count: 4^7 - 4 x 3^7 + 6 x 2^7 - 4 x 1^7 = 8400.",
+        "Enumeration count over 16384 draw strings: 8400.",
+        "Exact probability: 525/1024.",
+        "Simulation sanity check over 120,000 vaults: 0.514.",
+        "Absolute simulation difference: 0.001."
+      ],
+      "passed": true
+    },
+    {
+      "id": "challenge-game-0005",
+      "candidateId": "CG-CAND-0005",
+      "title": "Scoreboard lead lock",
+      "category": "ballot/lead probability for small totals",
+      "difficultyTag": "extreme",
+      "prompt": "A match ended Red 6, Blue 4. The 10 scoring cards are shuffled and revealed in random order. Given that final score, what is the chance Red is strictly ahead after every reveal?",
+      "answer": "1/5 (0.200)",
+      "solver": "Enumerate all scoring-card orders with six Red cards and four Blue cards, then compare to the ballot formula.",
+      "exactMethod": "Exact enumeration of C(10, 4) reveal orders, checked against (a - b) / (a + b).",
+      "skillTags": ["ordered-vs-unordered", "combinations", "ballot-path-counting"],
+      "misconceptionTraps": ["ordered_vs_unordered", "final_margin_equals_staying_ahead"],
+      "missingTaxonomyIds": [
+        "skill:ballot-path-counting",
+        "misconception:final_margin_equals_staying_ahead"
+      ],
+      "verification": [
+        "Total reveal orders: C(10, 4) = 210.",
+        "Strictly-ahead orders: 42.",
+        "Enumeration probability: 1/5.",
+        "Ballot formula check: (6 - 4) / (6 + 4) = 1/5."
+      ],
+      "passed": true
+    },
+    {
+      "id": "challenge-game-0006",
+      "candidateId": "CG-CAND-0006",
+      "title": "First-ruby token duel",
+      "category": "fair/unfair token games",
+      "difficultyTag": "hard",
+      "prompt": "A cup holds 4 ruby tokens and 5 slate tokens. Tokens are drawn without replacement until the first ruby appears. Mina wins if that first ruby is on an odd-numbered draw; Sol wins if it is on an even-numbered draw. Is the duel fair?",
+      "answer": "No. Mina wins with probability 40/63 (0.635).",
+      "solver": "Choose the positions of the 4 ruby tokens among 9 positions; Mina wins when the earliest ruby position is 1, 3, or 5.",
+      "exactMethod": "Exact position enumeration using combinations.",
+      "skillTags": ["combinations", "complement-rule", "fair-game", "ordered-vs-unordered"],
+      "misconceptionTraps": ["symmetry_means_fair", "ignores_without_replacement_dependence"],
+      "missingTaxonomyIds": [
+        "skill:fair-game",
+        "misconception:symmetry_means_fair",
+        "misconception:ignores_without_replacement_dependence"
+      ],
+      "verification": [
+        "Total ruby-position sets: C(9, 4) = 126.",
+        "Earliest ruby at position 1: C(8, 3) = 56.",
+        "Earliest ruby at position 3: C(6, 3) = 20.",
+        "Earliest ruby at position 5: C(4, 3) = 4.",
+        "Favorable sets: 80.",
+        "Mina win probability: 40/63."
+      ],
+      "passed": true
+    }
+  ]
+}
