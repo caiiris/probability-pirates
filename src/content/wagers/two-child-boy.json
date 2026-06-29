@@ -1,0 +1,18 @@
+{
+  "id": "two-child-boy",
+  "sequence": 2,
+  "openAt": "2026-06-30T00:00:00Z",
+  "prompt": "A family has two children. You are told at least one of them is a boy. What is the probability (in %) that both are boys? Assume each child is independently a boy or girl with probability 1/2.",
+  "unit": "percent",
+  "tags": ["conditional-probability", "sample-space", "two-child-problem"],
+  "flavor": "counterintuition",
+  "scoring": "log",
+  "relatedLessonId": "equally-likely-outcomes",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 33.3,
+  "source": "Classic conditional-probability problem; appears in Mlodinow, The Drunkard's Walk (2008), ch. 6, and in Mosteller, Fifty Challenging Problems in Probability (1965).",
+  "revealHeadline": "Conditioning changes the sample space.",
+  "revealExplanation": "Before any information, the four equally likely orderings are BB, BG, GB, GG. The condition \u2018at least one boy\u2019 rules out GG, leaving three equally likely outcomes: BB, BG, GB. Only one of the three is BB, so the probability is 1/3, not 1/2.",
+  "revealWorked": "P(BB | at least one boy) = P(BB and at least one boy) / P(at least one boy) = (1/4) / (3/4) = 1/3 \u2248 33.3%."
+}

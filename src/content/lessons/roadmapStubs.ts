@@ -20,13 +20,20 @@ import type { Lesson } from '../types';
  * therefore indicative; the catalog is the source of truth for display order.
  * Grouping into units lives in `src/features/course/chapters.ts`.
  *
- * Unit count: 7 — the course is **classical probability**, ending on expected
+ * Unit count: 6 — the course is **classical probability**, ending on expected
  * value applied to real games and decisions. D89 merged "Likelihood" into
- * "Sample Spaces" → "Defining Probability"; D90 narrowed Unit 7 to expected
- * value only and dropped the original Unit 8 ("Famous Distributions") because
- * RV-as-formal-abstraction, variance, binomial, normal, CLT, and Monte Carlo
- * sit on the statistics side of the HS taxonomy, not classical probability.
- * Those lessons would belong in a future Statistics course, not here.
+ * "Sample Spaces" → "Defining Probability"; D90 narrowed the final unit to
+ * expected value only and dropped the original "Famous Distributions" unit
+ * because RV-as-formal-abstraction, variance, binomial, normal, CLT, and
+ * Monte Carlo sit on the statistics side of the HS taxonomy, not classical
+ * probability. D99 dropped the standalone Events unit (its material is
+ * covered in Unit 1) and kept only the complement rule, moved into Counting
+ * Techniques. Those dropped lessons would belong in a future Statistics
+ * course, not here.
+ *
+ * The per-unit `practice-*` and `review-*` nodes were removed from the path:
+ * standalone adaptive practice lives at `/practice`, and spaced retrieval runs
+ * before each new lesson at `/warmup`, so dedicated path nodes were redundant.
  */
 
 function stub(
@@ -60,20 +67,6 @@ const unit1: Lesson[] = [
     'Equally likely outcomes',
     'When every outcome has the same chance, counting is everything.',
   ),
-  stub(
-    4,
-    'practice-single-events',
-    'Practice: single events',
-    'Sharpen the favorable-over-total move.',
-    3,
-  ),
-  stub(
-    5,
-    'review-sample-spaces',
-    'Defining probability review',
-    'Mixed practice on listing and counting outcomes.',
-    5,
-  ),
 ];
 
 // Unit 2 — Compound experiments (counting outcomes).
@@ -82,181 +75,107 @@ const unit1: Lesson[] = [
 // `multiplication-principle` (AND/OR twin pair).
 //
 // D98: dropped the `two-coins` and `two-dice` intro stubs and moved
-// `tree-diagrams` to the conditional-probability unit. The 2-coin and
-// 2-dice compound sample spaces are already built concretely in
-// `equally-likely-outcomes` (HT/TH trap, the 6×6 = 36 grid), and
-// `multiplication-principle` is discovery-first (outfit puzzle + road
-// fork) so it does not need three warm-up lessons re-teaching the same
-// ground. Tree diagrams earn their own lesson later, where branches
-// actually change between stages (dependent draws, conditioning).
+// `tree-diagrams` to the conditional-probability unit.
+//
+// D99: added `compound-experiments` as the chapter opener. It introduces
+// the structure of a compound experiment (each outcome an ordered
+// combination, systematic listing) and ends on the "this grows fast"
+// tension that the multiplication principle resolves.
 const unit2: Lesson[] = [
   stub(
     6,
+    'compound-experiments',
+    'Compound experiments',
+    'Stack experiments together and list every combination.',
+  ),
+  stub(
+    7,
     'multiplication-principle',
     'The multiplication principle',
     'Why independent choices multiply.',
   ),
   stub(
-    7,
+    8,
     'addition-principle',
     'The addition principle',
     "Add the ways when choices don't overlap.",
   ),
-  stub(
-    8,
-    'practice-counting-outcomes',
-    'Practice: counting outcomes',
-    'Count compound outcomes with confidence.',
-    3,
-  ),
-  stub(
-    9,
-    'review-compound',
-    'Compound experiments review',
-    'Mixed practice on combining experiments.',
-    5,
-  ),
 ];
 
-// Unit 3 — Events
+// Unit 3 — Counting techniques. D95 moved `addition-principle` out to
+// Unit 2; inclusion-exclusion is the meaningful "what if cases overlap?"
+// follow-up.
+//
+// D99: the old standalone Events unit (event-as-set, p-event-by-counting,
+// practice-events, review-events) was dropped — that material is already
+// covered in Unit 1 (`sample-space` defines event/sample space and states
+// k/N; `equally-likely-outcomes` drills it). Its one survivor, the
+// `complement-rule`, moved here and now opens the unit as the first
+// "count the smart way" tool, ahead of inclusion-exclusion.
 const unit3: Lesson[] = [
   stub(
-    10,
-    'event-as-set',
-    'An event is a set',
-    'Events are subsets of the sample space, not single outcomes.',
-  ),
-  stub(
     11,
-    'p-event-by-counting',
-    'P(event) by counting',
-    'Apply favorable-over-total to whole events.',
-  ),
-  stub(
-    12,
     'complement-rule',
     'The complement rule',
     'When counting the opposite is the faster path.',
   ),
-  stub(13, 'practice-events', 'Practice: events', 'Events on dice and cards.', 3),
-  stub(14, 'review-events', 'Events review', 'Mixed practice on events and complements.', 5),
-];
-
-// Unit 4 — Counting techniques. D95 moved `addition-principle` out to
-// Unit 2 (paired with multiplication-principle); inclusion-exclusion
-// is now the unit opener as the meaningful "what if cases overlap?"
-// follow-up.
-const unit4: Lesson[] = [
   stub(
-    15,
+    12,
     'inclusion-exclusion',
     'Inclusion and exclusion',
     'Fix double-counting when choices overlap.',
   ),
-  stub(16, 'permutations', 'Permutations', 'Count arrangements where order matters.'),
-  stub(17, 'combinations', 'Combinations', "Count selections where order doesn't matter."),
-  stub(
-    18,
-    'divide-by-k-factorial',
-    'Why divide by k!',
-    'The derivation behind the combinations formula.',
-  ),
-  stub(
-    19,
-    'practice-counting-techniques',
-    'Practice: counting techniques',
-    'Permutations and combinations word problems.',
-    3,
-  ),
-  stub(
-    20,
-    'review-counting-techniques',
-    'Counting techniques review',
-    'Mixed practice on advanced counting.',
-    5,
-  ),
+  stub(13, 'permutations', 'Permutations', 'Count arrangements where order matters.'),
+  stub(14, 'combinations', 'Combinations', "Count selections where order doesn't matter."),
+  // D103: dropped `divide-by-k-factorial` — its derivation ("why divide by
+  // k!") is now taught directly inside the `combinations` lesson.
 ];
 
-// Unit 5 — Probabilities of multiple events
-const unit5: Lesson[] = [
+// Unit 4 — Probabilities of multiple events.
+//
+// D103: dropped `at-least-one` (the complement-rule lesson already teaches
+// "at least one" via the complement) and `mutually-exclusive` (inclusion-
+// exclusion already covers P(A or B) = P(A) + P(B) as the disjoint special
+// case; the exclusive→add contrast will live inside `independent-events`).
+const unit4: Lesson[] = [
   stub(
-    21,
+    17,
     'independent-events',
     'Independent events',
     "Multiply probabilities when events don't affect each other.",
   ),
   stub(
-    22,
-    'mutually-exclusive',
-    'Mutually exclusive events',
-    "Add probabilities when events can't both happen.",
-  ),
-  stub(23, 'at-least-one', 'At least one', "Use the complement to handle 'at least one' cleanly."),
-  stub(
-    24,
+    18,
     'birthday-paradox',
     'The birthday paradox',
     'A surprising collision that counting explains.',
   ),
-  stub(
-    25,
-    'practice-multi-event',
-    'Practice: multiple events',
-    'Multi-step compound probability.',
-    3,
-  ),
-  stub(
-    26,
-    'review-combining',
-    'Combining probabilities review',
-    'Mixed practice on multi-event probability.',
-    5,
-  ),
 ];
 
-// Unit 6 — Conditional probability. D98 placed `tree-diagrams` here:
-// branching diagrams are the natural tool for sequential, dependent
-// choices, where the branches change at each stage (the conditional
-// setting), not for the independent compound experiments of Unit 2.
-const unit6: Lesson[] = [
+// Unit 5 — Conditional probability. D113 dropped the standalone
+// `tree-diagrams` lesson: conditioning, independence, and Bayes carry the
+// unit, and tree-style "multiply along, add across" reasoning is already
+// exercised inside the independence and Bayes lessons without needing a
+// dedicated branching-diagram lesson.
+const unit5: Lesson[] = [
   stub(
-    27,
+    21,
     'conditional-intuition',
     'Given that X happened',
     'How new information reshapes the sample space.',
   ),
-  stub(28, 'conditional-formula', 'The conditional formula', 'P(A given B), made precise.'),
+  stub(22, 'conditional-formula', 'The conditional formula', 'P(A given B), made precise.'),
   stub(
-    29,
-    'tree-diagrams',
-    'Tree diagrams',
-    'Draw branching choices to track probabilities stage by stage.',
-  ),
-  stub(
-    30,
+    23,
     'independence-revisited',
     'Independence revisited',
     'When conditioning changes nothing.',
   ),
-  stub(31, 'bayes-theorem', "Bayes' theorem", 'Flip a conditional probability around.'),
-  stub(32, 'monty-hall', 'Monty Hall', 'The switch-or-stay puzzle, settled by simulation.'),
-  stub(
-    33,
-    'practice-conditional',
-    'Practice: conditional probability',
-    'Trees and Bayes problems.',
-    3,
-  ),
-  stub(
-    34,
-    'review-conditional',
-    'Conditional probability review',
-    'Mixed practice on conditioning.',
-    5,
-  ),
+  stub(24, 'bayes-theorem', "Bayes' theorem", 'Flip a conditional probability around.'),
+  stub(25, 'monty-hall', 'Monty Hall', 'The switch-or-stay puzzle, settled by simulation.'),
 ];
 
-// Unit 7 — Expected Value (the probability capstone). D90 narrowed this from
+// Unit 6 — Expected Value (the probability capstone). D90 narrowed this from
 // the original "Random variables and expected value" / "Famous distributions"
 // scope: random-variable-as-formal-abstraction, variance, binomial, normal,
 // CLT, Monte Carlo, and the capstone problem set were all dropped because
@@ -264,34 +183,20 @@ const unit6: Lesson[] = [
 // probability. The course now ends on expected value applied to fair games
 // and real-world gambles/insurance — the natural payoff of "given a
 // probability, what payoff do you expect?"
-const unit7: Lesson[] = [
+const unit6: Lesson[] = [
   stub(
-    35,
+    29,
     'expected-value-intuition',
     'Expected value',
     'The long-run average payoff of a chance event.',
   ),
   stub(
-    36,
+    30,
     'computing-expected-value',
     'Computing E(X)',
     'Weighted sums on dice, spinners, and cards.',
   ),
-  stub(37, 'fair-games', 'Fair games', 'When is a bet fair? E(X) = 0 says break-even.'),
-  stub(
-    38,
-    'practice-expected-value',
-    'Practice: gambles and insurance',
-    'Lotteries, casinos, and insurance, settled by expected value.',
-    3,
-  ),
-  stub(
-    39,
-    'review-expected-value',
-    'Expected value review',
-    'Mixed practice on expected value.',
-    5,
-  ),
+  stub(31, 'fair-games', 'Fair games', 'When is a bet fair? E(X) = 0 says break-even.'),
 ];
 
 export const roadmapStubLessons: Lesson[] = [
@@ -301,5 +206,4 @@ export const roadmapStubLessons: Lesson[] = [
   ...unit4,
   ...unit5,
   ...unit6,
-  ...unit7,
 ];

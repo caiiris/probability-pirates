@@ -23,6 +23,11 @@
     "harvest:validate": "tsx scripts/curriculum-harvest/validate.ts",
     "harvest:verify-creative": "tsx scripts/curriculum-harvest/verify-creative-hard.ts",
     "harvest:write-seed-bank": "tsx scripts/curriculum-harvest/write-verified-seed-bank.ts",
+    "wager:validate": "tsx scripts/wager-validate.ts",
+    "wager:deploy": "tsx scripts/wager-deploy.ts",
+    "deploy:firebase": "firebase deploy --only firestore:rules,firestore:indexes,hosting",
+    "deploy:vercel": "vercel deploy --prod --yes --force",
+    "deploy": "npm run build && npm run deploy:firebase && npm run deploy:vercel",
     "verify": "npm run typecheck && npm run lint && npm run test"
   },
   "devDependencies": {

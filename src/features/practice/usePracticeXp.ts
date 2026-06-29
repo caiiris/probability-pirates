@@ -52,6 +52,11 @@ export function usePracticeXp(uid: string | null | undefined): PracticeXpHookRes
   const xpStateRef = useRef<PracticeXpState | undefined>(xpState);
   xpStateRef.current = xpState;
 
+  // True once the learner has been awarded this session. Guards against a slow
+  // initial fetch resolving AFTER an optimistic award and resetting the counter
+  // (which could re-open the daily cap and double-grant).
+  const dirtyRef = useRef(false);
+
   // Read the profile's weekKey to decide whether to reset weeklyXp or increment.
   const authState = useAuth();
   const profileWeekKey =
@@ -65,6 +70,8 @@ export function usePracticeXp(uid: string | null | undefined): PracticeXpHookRes
     const ref = doc(db, 'users', uid, 'practiceXp', 'today');
     getDoc(ref)
       .then((snap) => {
+        // Don't overwrite an award the learner already recorded while we waited.
+        if (dirtyRef.current) return;
         if (snap.exists()) {
           const data = snap.data() as PracticeXpState;
           // Only restore if the doc is for today; a stale date means the cap resets.
@@ -80,6 +87,7 @@ export function usePracticeXp(uid: string | null | undefined): PracticeXpHookRes
 
   const award = useCallback(
     (wasCorrect: boolean, opts: PracticeXpOpts = {}): PracticeXpAward => {
+      dirtyRef.current = true;
       const grant = grantPracticeXp(xpStateRef.current, todayLocalDate(), wasCorrect, opts);
 
       // Optimistic: update local state immediately so the next call sees the new cap.

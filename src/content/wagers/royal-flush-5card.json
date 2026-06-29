@@ -1,0 +1,18 @@
+{
+  "id": "royal-flush-5card",
+  "sequence": 6,
+  "openAt": "2026-07-12T00:00:00Z",
+  "prompt": "You draw 5 cards at random from a standard 52-card deck. The odds of getting a royal flush (10, J, Q, K, A of the same suit) are 1 in N. What is N?",
+  "unit": "count",
+  "tags": ["combinatorics", "card-probability", "poker"],
+  "flavor": "combinatorics",
+  "scoring": "log",
+  "relatedLessonId": "combinations",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 649740,
+  "source": "Standard 5-card draw combinatorics. C(52,5) = 2,598,960 possible hands; 4 are royal flushes (one per suit). 2,598,960 / 4 = 649,740.",
+  "revealHeadline": "Four hands out of two-and-a-half million.",
+  "revealExplanation": "There are C(52, 5) = 2,598,960 distinct 5-card hands, and only 4 are royal flushes (one per suit). The probability is 4 / 2,598,960 = 1 / 649,740. Most people sense this is rare but underestimate by 1\u20132 orders of magnitude.",
+  "revealWorked": "P(royal flush) = 4 / C(52, 5) = 4 / 2,598,960 \u2248 1.539 \u00d7 10^\u22126, i.e. 1 in 649,740."
+}

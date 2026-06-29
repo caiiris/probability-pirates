@@ -6,6 +6,7 @@ import { track } from '@/lib/analytics';
 import { CompassRose } from '@/components/illustrations/CompassRose';
 import { EmptyState } from '@/components/EmptyState';
 import { OceanScene } from '@/features/course/OceanScene';
+import { markAllUnreadNotificationsRead } from '@/features/notifications/notificationsService';
 import { searchUsers, type SocialUser } from './socialService';
 import { UserListItem } from './UserListItem';
 import { FollowCounts } from './FollowCounts';
@@ -14,6 +15,14 @@ import { Leaderboard } from './Leaderboard';
 export function SocialPage() {
   const auth = useAuth();
   const uid = auth.status === 'authenticated' ? auth.user.uid : '';
+
+  // Clear the Friends sidebar dot (and the inbox bell) when the user lands
+  // here. Today every notification is a social event, so a single mark-all
+  // covers the case. Background; failures are non-blocking.
+  useEffect(() => {
+    if (!uid) return;
+    void markAllUnreadNotificationsRead(uid);
+  }, [uid]);
 
   const [queryText, setQueryText] = useState('');
   const [results, setResults] = useState<SocialUser[] | null>(null);

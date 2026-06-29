@@ -81,14 +81,20 @@ export function gradeConceptualAnswer(answer: ExactAnswer, raw: string): boolean
 /**
  * XP multiplier applied when the LLM flags the reasoning. A code-correct answer
  * still earns mastery and *some* XP, but a flagged "why" costs half — "right
- * number, shaky reason". Only the confident negative classifications penalize;
- * 'correct-reasoning' and an absent/unjudged classification (AI off, fallback)
- * never reduce XP, so we never punish on no signal.
+ * number, shaky reason". The confident negative classifications penalize:
+ * 'misconception' (named error), 'incorrect-reasoning' (genuine but wrong/
+ * incomplete), and 'irrelevant' (non-genuine). 'correct-reasoning' and an
+ * absent/unjudged classification (AI off, fallback) never reduce XP, so we
+ * never punish on no signal.
  */
 export const REASONING_PENALTY = 0.5;
 
 export function reasoningMultiplier(classification: string | null | undefined): number {
-  if (classification === 'misconception' || classification === 'irrelevant') {
+  if (
+    classification === 'misconception' ||
+    classification === 'incorrect-reasoning' ||
+    classification === 'irrelevant'
+  ) {
     return REASONING_PENALTY;
   }
   return 1;

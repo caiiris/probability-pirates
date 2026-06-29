@@ -12,6 +12,7 @@ import { MultipleChoice } from './interactions/MultipleChoice';
 import { SimulateProportion } from './interactions/SimulateProportion';
 import { ScrubTrials } from './interactions/ScrubTrials';
 import { FillText } from './interactions/FillText';
+import { MultiplySteps } from './interactions/MultiplySteps';
 import { MontyHall } from './interactions/MontyHall';
 import { CaptainMascot } from '@/components/illustrations/CaptainMascot';
 
@@ -82,6 +83,9 @@ export function ProblemSlotView({
       break;
     case 'fill-text':
       interaction = <FillText {...sharedProps} variant={variant} />;
+      break;
+    case 'multiply-steps':
+      interaction = <MultiplySteps {...sharedProps} variant={variant} />;
       break;
     case 'monty-hall':
       interaction = <MontyHall {...sharedProps} variant={variant} />;

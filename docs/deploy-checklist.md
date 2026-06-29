@@ -4,13 +4,23 @@
 > `docs/prd.md` §9.8 and `docs/build-order.md`. Run top to bottom; do not deploy
 > with an open ❌.
 
-**Live URL:** https://probability-pirates.web.app
-**Host:** Firebase Hosting (project `brilliant-clone-102a7`, site `probability-pirates`, Spark plan)
-**Deploy command:** `npm run build && npx firebase-tools deploy --only hosting --project brilliant-clone-102a7`
+**Live URLs:** https://probability-pirates.web.app (Firebase Hosting) · https://brilliant-clone-gilt.vercel.app (Vercel)
+**Host:** Firebase Hosting (project `brilliant-clone-102a7`, site `probability-pirates`, Spark plan) + Vercel (project `brilliant-clone`, team `alpha-ai-engineering`).
 
-> Note on hosting choice: the PRD names Vercel, but the project ships on Firebase
-> Hosting because Auth/Firestore/CLI were already wired to the Firebase project,
-> giving a public URL with no extra account setup. Hosting is free on Spark.
+**Deploy commands (use these, not raw CLI invocations):**
+
+| Command | What it does |
+| --- | --- |
+| `npm run deploy` | Build → Firebase (rules + indexes + hosting) → Vercel prod. The safe default. |
+| `npm run deploy:firebase` | Firebase only: **rules + indexes + hosting** in one shot. **Always use this** when anything in `firebase/` changes — pushing hosting without rules has bitten us twice (silent `permission-denied` for the wager flow, 2026-06-27). |
+| `npm run deploy:vercel` | Vercel only (forced rebuild). Use after frontend-only changes when Firestore rules/indexes are already in sync. |
+| `npm run wager:deploy` | Push wager content from `src/content/wagers/*.json` to Firestore. Idempotent; safe to re-run. |
+
+> Note on dual hosting: the PRD names Vercel, but Firebase Hosting was added
+> because Auth/Firestore/CLI were already wired to the Firebase project, giving a
+> public URL with no extra account setup. Vercel is the canonical frontend host
+> (it owns the `/api/*` serverless routes for AI assist); Firebase Hosting is a
+> mirror for the marketing URL.
 
 ---
 
@@ -38,7 +48,7 @@
       `rg -o 'authDomain:"[^"]+"' dist/assets/index-*.js` → must show `probability-pirates.web.app`.
 - [ ] Built bundle is pointed at live Firebase, not the emulator:
       `rg -c "localhost:9099|localhost:8080" dist/assets/*.js` → `0`.
-- [ ] Firestore rules deployed: `npx firebase-tools deploy --only firestore:rules`.
+- [ ] Firestore rules **and** indexes deployed: `npm run deploy:firebase` (which bundles `firestore:rules,firestore:indexes,hosting`). Pushing only `hosting` has masked silent failures in the wager flow twice (2026-06-27 — both missing-index and missing-rule errors fell through to "empty list" until error UI was added).
 - [ ] Firebase Console → Authentication → Sign-in method: **Google provider enabled**
       and **"One account per email address"** on (required for the Google button; I031).
 - [ ] Firebase Console → Authentication → Settings → Authorized domains includes

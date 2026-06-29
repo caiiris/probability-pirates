@@ -1,6 +1,12 @@
-export const MILESTONE_THRESHOLDS = [3, 7, 14, 30, 60] as const;
+export const MILESTONE_THRESHOLDS = [3, 7, 14, 30, 60, 100] as const;
 
-export type MilestoneId = 'streak-3' | 'streak-7' | 'streak-14' | 'streak-30' | 'streak-60';
+export type MilestoneId =
+  | 'streak-3'
+  | 'streak-7'
+  | 'streak-14'
+  | 'streak-30'
+  | 'streak-60'
+  | 'streak-100';
 
 export const MILESTONE_TITLES: Record<MilestoneId, string> = {
   'streak-3': 'Warming up',
@@ -8,6 +14,7 @@ export const MILESTONE_TITLES: Record<MilestoneId, string> = {
   'streak-14': 'Locked in',
   'streak-30': 'Genuine habit',
   'streak-60': 'Probability lifer',
+  'streak-100': 'Inevitable',
 };
 
 /**

@@ -1,0 +1,19 @@
+{
+  "id": "powerball-jackpot",
+  "sequence": 9,
+  "openAt": "2026-07-21T00:00:00Z",
+  "prompt": "The odds of winning the US Powerball jackpot on a single ticket are 1 in N. What is N? (Powerball: pick 5 white balls from 69, plus 1 red Powerball from 26.)",
+  "unit": "count",
+  "tags": ["combinatorics", "lottery", "real-world"],
+  "flavor": "combinatorics",
+  "scoring": "log",
+  "relatedLessonId": "combinations",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 292201338,
+  "source": "Official Powerball odds (powerball.com). 5 white balls from 69 is C(69, 5) = 11,238,513 combinations; 1 of 26 Powerballs makes 11,238,513 \u00d7 26 = 292,201,338.",
+  "sourceUrl": "https://www.powerball.com/games/home",
+  "revealHeadline": "About 1 in 292 million.",
+  "revealExplanation": "C(69, 5) = 11,238,513 ways to pick the white balls, multiplied by 26 ways to pick the red Powerball, gives 292,201,338 distinct tickets. Most people know the odds are bad; few people sense just how bad. You'd need to buy a ticket every second for over 9 years to expect one jackpot.",
+  "revealWorked": "Total combinations = C(69, 5) \u00d7 26 = 11,238,513 \u00d7 26 = 292,201,338."
+}

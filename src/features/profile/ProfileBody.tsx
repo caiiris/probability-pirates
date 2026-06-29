@@ -4,6 +4,8 @@ import { OceanScene } from '@/features/course/OceanScene';
 import { FlairBadge } from '@/features/economy/FlairBadge';
 import { StrengthsPanel } from '@/features/learner/StrengthsPanel';
 import type { LearnerModel } from '@/features/learner/learnerModel';
+import { useWagerStats } from '@/features/wager/wagerService';
+import { WagerSparkline } from '@/features/wager/WagerSparkline';
 import { DefaultAvatar } from './DefaultAvatar';
 import { RankPanel } from './LevelBadge';
 import { StatsGrid } from './StatsGrid';
@@ -36,6 +38,8 @@ type Props = {
   learnerModel?: LearnerModel | null;
   /** WP-7 — true while the learner model is loading. */
   learnerModelLoading?: boolean;
+  /** WP-CW-H — uid for the wager stats subsection. Null/undefined hides the section. */
+  uid?: string | null;
 };
 
 /**
@@ -63,7 +67,10 @@ export function ProfileBody({
   counts,
   learnerModel,
   learnerModelLoading = false,
+  uid,
 }: Props) {
+  const { stats: wagerStats } = useWagerStats(uid ?? null);
+
   return (
     <>
       {/* Avatar + identity — the captain's portrait, set on the sea */}
@@ -121,6 +128,28 @@ export function ProfileBody({
       <Section title="Activity">
         <ActivityGrid activityDates={activityDates} />
       </Section>
+
+      {/* Wagers — hidden until the user has at least one wager submission. */}
+      {wagerStats !== null && (
+        <Section title="Wagers">
+          <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl bg-[color:var(--fill)] p-3.5 flex flex-col gap-1">
+                <span className="text-2xl font-bold">{wagerStats.totalSubmitted}</span>
+                <span className="text-xs text-muted-foreground">Submitted</span>
+              </div>
+              <div className="rounded-xl bg-[color:var(--fill)] p-3.5 flex flex-col gap-1">
+                <span className="num text-2xl font-bold">{Math.round(wagerStats.averageScore)} / 100</span>
+                <span className="text-xs text-muted-foreground">Average score</span>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Your last {wagerStats.last10Scores.length} wager{wagerStats.last10Scores.length === 1 ? '' : 's'}
+            </p>
+            <WagerSparkline scores={wagerStats.last10Scores} className="w-full max-w-xs" />
+          </div>
+        </Section>
+      )}
 
       {/* Strengths — compact read of Engine A practiced + Engine B introduced. */}
       <Section title="Strengths">

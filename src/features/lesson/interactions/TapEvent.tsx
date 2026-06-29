@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { TapEventVariant } from '@/content/types';
 import type { InteractionProps } from './InteractionProps';
@@ -10,10 +10,23 @@ const AFFORDANCE = 'Tap to mark. Tap again to unmark.';
 
 type Props = InteractionProps<TapEventVariant>;
 
-export function TapEvent({ variant, feedbackState, onChange }: Props) {
+export function TapEvent({ variant, feedbackState, wrongTick, onChange }: Props) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [flashWrong, setFlashWrong] = useState(false);
   const locked = feedbackState === 'correct';
   const [hintVisible, dismissHint] = useInteractionHint('tap-event');
+
+  // Localized wrong feedback (PRD §9.4 AC #5): on a wrong submission, flash only
+  // the INCORRECT selections rose; correct selections stay indigo. Keyed off
+  // wrongTick so it replays on every wrong Check.
+  const correctSet = useMemo(() => new Set(variant.correctOutcomes), [variant.correctOutcomes]);
+  useEffect(() => {
+    if (feedbackState === 'wrong') {
+      setFlashWrong(true);
+      const timer = setTimeout(() => setFlashWrong(false), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [wrongTick]); // re-flash only when a new wrong submission arrives
 
   function toggle(outcome: string) {
     if (locked) return;
@@ -38,20 +51,25 @@ export function TapEvent({ variant, feedbackState, onChange }: Props) {
         {variant.sampleSpace.map((outcome) => {
           const isSelected = selected.has(outcome);
           const isRed = outcome === '♥' || outcome === '♦';
+          const isWrongSelected = flashWrong && isSelected && !correctSet.has(outcome);
 
           return (
             <motion.button
               key={outcome}
+              animate={isWrongSelected ? { x: [0, -4, 4, -3, 3, 0] } : undefined}
+              transition={isWrongSelected ? { duration: 0.4 } : MOTION.pop}
               className={`
                 min-w-[44px] min-h-[44px] md:min-w-[56px] md:min-h-[56px]
                 px-4 py-2 rounded-xl border-2 font-semibold text-lg
                 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
                 ${
-                  isSelected
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : isRed
-                      ? 'border-border bg-card text-[color:var(--coral-base)] hover:border-[color:var(--coral-base)]/40'
-                      : 'border-border bg-card text-foreground hover:border-primary/50'
+                  isWrongSelected
+                    ? 'border-[color:var(--coral-base)] bg-[color:var(--coral-soft)] text-[color:var(--coral-deep)]'
+                    : isSelected
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : isRed
+                        ? 'border-border bg-card text-[color:var(--coral-base)] hover:border-[color:var(--coral-base)]/40'
+                        : 'border-border bg-card text-foreground hover:border-primary/50'
                 }
                 ${locked ? 'cursor-default' : 'cursor-pointer'}
               `}
@@ -60,7 +78,6 @@ export function TapEvent({ variant, feedbackState, onChange }: Props) {
               onClick={() => toggle(outcome)}
               disabled={locked}
               whileTap={locked ? {} : { scale: 0.94 }}
-              transition={MOTION.pop}
             >
               {outcome}
             </motion.button>

@@ -37,14 +37,14 @@ describe('equally-likely-outcomes (Unit 1.3) invariants', () => {
     ]);
   });
 
-  it('opens the trap with a commit-once MCQ so the next slot teaches, not consoles', () => {
-    // Same pedagogical pattern as long-run-frequency's `the-puzzle`:
-    // the learner commits to a guess, sees feedback, and continues
-    // regardless. The resolve concept slot does the teaching.
+  it('opens the trap with a retryable MCQ so the two-tier hint flow works', () => {
+    // Retryable (not commit-once): a first wrong shows the targeted feedback,
+    // a second wrong reveals the explanation. The resolve concept slot still
+    // does the teaching.
     const slot = equallyLikelyOutcomes.slots.find((s) => s.id === 'the-puzzle');
     expect(slot?.kind).toBe('problem');
     if (slot?.kind === 'problem') {
-      expect(slot.commitOnce).toBe(true);
+      expect(slot.commitOnce).not.toBe(true);
       expect(slot.interactionKind).toBe('multiple-choice');
       const v = slot.variants[0] as MultipleChoiceVariant;
       expect(v.correctOptionId).toBe('one-half');

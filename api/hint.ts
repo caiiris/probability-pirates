@@ -109,6 +109,16 @@ export function checkRateLimit(
 type HintMode = 'computational' | 'conceptual';
 type TryNumber = 1 | 2 | 3;
 
+interface AnswerDiagnosis {
+  authoredFeedback?: string;
+  misconception?: string;
+}
+
+interface PriorHint {
+  answer: string;
+  hint: string;
+}
+
 interface HintRequestBody {
   mode: HintMode;
   tryNumber: TryNumber;
@@ -116,9 +126,16 @@ interface HintRequestBody {
   learnerAnswer: unknown;
   ground: GroundComputational | GroundConceptual;
   learnerSummary?: LearnerSummary;
+  diagnosis?: AnswerDiagnosis;
+  history?: PriorHint[];
+  solutionOutline?: string[];
 }
 
-type Classification = 'correct-reasoning' | 'misconception' | 'irrelevant';
+type Classification =
+  | 'correct-reasoning'
+  | 'misconception'
+  | 'incorrect-reasoning'
+  | 'irrelevant';
 
 interface HintResponseBody {
   text: string;
@@ -130,6 +147,7 @@ interface HintResponseBody {
 const VALID_CLASSIFICATIONS: readonly string[] = [
   'correct-reasoning',
   'misconception',
+  'incorrect-reasoning',
   'irrelevant',
 ];
 
@@ -161,6 +179,34 @@ export function parseAndValidateBody(raw: unknown): HintRequestBody | null {
     if (!la || typeof la.why !== 'string') return null;
   }
 
+  // Optional: authored diagnosis of the current wrong answer.
+  const diagRec = asRecord(b.diagnosis);
+  const diagnosis: AnswerDiagnosis | undefined = diagRec
+    ? {
+        authoredFeedback:
+          typeof diagRec.authoredFeedback === 'string' ? diagRec.authoredFeedback : undefined,
+        misconception:
+          typeof diagRec.misconception === 'string' ? diagRec.misconception : undefined,
+      }
+    : undefined;
+
+  // Optional: prior (answer, hint) pairs this problem. Cap to 2 (only tries 1–2 exist).
+  const history: PriorHint[] | undefined = Array.isArray(b.history)
+    ? b.history
+        .map((h) => asRecord(h))
+        .filter(
+          (h): h is Record<string, unknown> =>
+            h !== null && typeof h.answer === 'string' && typeof h.hint === 'string',
+        )
+        .slice(0, 2)
+        .map((h) => ({ answer: h.answer as string, hint: h.hint as string }))
+    : undefined;
+
+  // Optional: redacted correct-method steps (numbers already hidden client-side).
+  const solutionOutline: string[] | undefined = Array.isArray(b.solutionOutline)
+    ? b.solutionOutline.filter((s): s is string => typeof s === 'string').slice(0, 10)
+    : undefined;
+
   return {
     mode: mode as HintMode,
     tryNumber: tryNumber as TryNumber,
@@ -171,6 +217,9 @@ export function parseAndValidateBody(raw: unknown): HintRequestBody | null {
     learnerAnswer,
     ground: gnd as unknown as GroundComputational | GroundConceptual,
     learnerSummary: asRecord(b.learnerSummary) as LearnerSummary | undefined,
+    diagnosis,
+    history,
+    solutionOutline,
   };
 }
 
@@ -243,10 +292,14 @@ export function validateModelOutput(
     return null;
   }
 
+  // A misconception key is only meaningful for the "misconception" class; null it
+  // out otherwise so a stray key on incorrect-reasoning/irrelevant never records.
+  const finalKey = classification === 'misconception' ? (misconceptionKey ?? null) : null;
+
   return {
     text: parsed.text,
     classification: (classification ?? null) as Classification | null,
-    misconceptionKey: (misconceptionKey ?? null) as string | null,
+    misconceptionKey: finalKey as string | null,
     modelVersion: process.env.OPENAI_MODEL ?? 'unknown',
   };
 }
@@ -317,7 +370,17 @@ export default async function handler(
     return;
   }
 
-  const { mode, tryNumber, problem, learnerAnswer, ground, learnerSummary } = body;
+  const {
+    mode,
+    tryNumber,
+    problem,
+    learnerAnswer,
+    ground,
+    learnerSummary,
+    diagnosis,
+    history,
+    solutionOutline,
+  } = body;
 
   // 4. Build prompt messages (ground is loaded from request — never from the model).
   let messages;
@@ -328,6 +391,9 @@ export default async function handler(
       ground: ground as GroundComputational,
       tryNumber,
       learnerSummary,
+      diagnosis,
+      history,
+      solutionOutline,
     });
   } else {
     const la = learnerAnswer as { answer: unknown; why: string };

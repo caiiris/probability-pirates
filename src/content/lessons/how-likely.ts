@@ -93,6 +93,7 @@ export const howLikely: Lesson = {
           },
           explanation:
             'Each face is one outcome, and a fair die favors none of them, so all six are equally likely.',
+          skills: ['sample-space-enumeration'],
         },
       ],
     },
@@ -137,6 +138,7 @@ export const howLikely: Lesson = {
           },
           explanation:
             'Just one face shows a 5, and a die has six faces in all. Count the faces that win for the top, then put the total on the bottom.',
+          skills: ['favorable-over-total'],
         },
       ],
     },
@@ -167,6 +169,7 @@ export const howLikely: Lesson = {
           },
           explanation:
             'The even faces are 2, 4, and 6, and a die has six faces in all. Count the even faces for the top, then put the total on the bottom.',
+          skills: ['favorable-over-total'],
         },
       ],
     },
@@ -197,6 +200,7 @@ export const howLikely: Lesson = {
           },
           explanation:
             'More favorable faces means a bigger top number, so a bigger fraction, so it happens more often. Count how many faces are even, then how many are a 5, and see which has more.',
+          skills: ['favorable-over-total'],
         },
       ],
     },
@@ -263,6 +267,7 @@ export const howLikely: Lesson = {
           },
           explanation:
             'Only the 5 and the 6 beat a 4, and a die has six faces in all. Count the faces that win for the top, then put the total on the bottom.',
+          skills: ['favorable-over-total'],
         },
       ],
     },
@@ -296,6 +301,7 @@ export const howLikely: Lesson = {
           },
           explanation:
             'Just one face shows a 14, and this die has 67 faces in all. Count the winning faces for the top, then put the total on the bottom.',
+          skills: ['favorable-over-total'],
         },
       ],
     },
@@ -326,6 +332,7 @@ export const howLikely: Lesson = {
           },
           explanation:
             'A total of 7 can happen many ways, but a total of 2 only one way, so Pascal would win far more often.',
+          skills: ['equally-likely-outcomes'],
         },
       ],
     },
@@ -363,6 +370,7 @@ export const howLikely: Lesson = {
           },
           explanation:
             'The equal outcomes are the rolls of the two dice. Count the rolls that total 7, then divide by all the rolls.',
+          skills: ['equally-likely-outcomes', 'favorable-over-total'],
         },
       ],
     },
@@ -392,6 +400,7 @@ export const howLikely: Lesson = {
             label:
               'Rolls with the same total line up on a diagonal. Shown here are the two rolls that add to 3.',
           },
+          skills: ['sample-space-enumeration'],
         },
         {
           id: 'sum-six',
@@ -413,6 +422,7 @@ export const howLikely: Lesson = {
             label:
               'Rolls with the same total line up on a diagonal. Shown here is a total of 3: only (1,2) and (2,1). Find the matching diagonal for 6.',
           },
+          skills: ['sample-space-enumeration'],
         },
       ],
     },

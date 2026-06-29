@@ -8,7 +8,7 @@
  * ./learnerModel.
  */
 
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, runTransaction, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import {
   emptyModel,
@@ -37,6 +37,8 @@ export async function recordPracticeAttempt(
     skills: SkillId[];
     wasCorrect: boolean;
     difficulty?: number;
+    /** Which try (1-based) it was solved on — weights the mastery signal. */
+    solvedOnTry?: number;
     /** Legacy back-compat field — treated as source 'trap'. */
     misconceptionKey?: MisconceptionKey | null;
     /** Preferred C-MC3 field. If present, overrides misconceptionKey. */
@@ -45,13 +47,17 @@ export async function recordPracticeAttempt(
 ): Promise<void> {
   try {
     const ref = stateRef(uid);
-    const snap = await getDoc(ref);
-    const now = Date.now();
-    const current: LearnerModel = snap.exists()
-      ? (snap.data() as LearnerModel)
-      : emptyModel(now);
-    const updated = applyPracticeAttempt(current, { ...input, now });
-    await setDoc(ref, updated);
+    // Transaction so concurrent practice events (two tabs, rapid answers) can't
+    // clobber each other's Elo / misconception updates with a stale snapshot.
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(ref);
+      const now = Date.now();
+      const current: LearnerModel = snap.exists()
+        ? (snap.data() as LearnerModel)
+        : emptyModel(now);
+      const updated = applyPracticeAttempt(current, { ...input, now });
+      tx.set(ref, updated);
+    });
   } catch (err) {
     console.warn('[learnerModelService] recordPracticeAttempt failed:', err);
   }
@@ -74,13 +80,17 @@ export async function recordLessonExposure(
 ): Promise<void> {
   try {
     const ref = stateRef(uid);
-    const snap = await getDoc(ref);
-    const now = Date.now();
-    const current: LearnerModel = snap.exists()
-      ? (snap.data() as LearnerModel)
-      : emptyModel(now);
-    const updated = applyLessonExposure(current, { ...input, now });
-    await setDoc(ref, updated);
+    // Transaction: lesson exposure + a concurrent practice attempt both write
+    // this same doc, so a read-modify-write without one can drop an update.
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(ref);
+      const now = Date.now();
+      const current: LearnerModel = snap.exists()
+        ? (snap.data() as LearnerModel)
+        : emptyModel(now);
+      const updated = applyLessonExposure(current, { ...input, now });
+      tx.set(ref, updated);
+    });
   } catch (err) {
     console.warn('[learnerModelService] recordLessonExposure failed:', err);
   }

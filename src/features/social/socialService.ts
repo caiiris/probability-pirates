@@ -58,6 +58,25 @@ function edgePayload(user: SocialUser) {
   };
 }
 
+/**
+ * True if the user already holds `achievementId`, read from the server doc so a
+ * non-idempotent coin grant can't fire twice. Falls back to the client-passed
+ * snapshot only if the read fails (best-effort; never throws).
+ */
+async function hasAchievement(
+  uid: string,
+  achievementId: AchievementId,
+  clientSnapshot?: string[],
+): Promise<boolean> {
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    const server = (snap.data()?.achievements as string[] | undefined) ?? [];
+    return server.includes(achievementId);
+  } catch {
+    return (clientSnapshot ?? []).includes(achievementId);
+  }
+}
+
 function toSocialUser(id: string, data: Record<string, unknown>): SocialUser {
   return {
     uid: (data.uid as string) ?? id,
@@ -85,7 +104,11 @@ export async function follow(
     // part of the same batch so the follow + notif land together.
     queueFollowNotification(batch, me, target.uid);
 
-    const earnsFirst = !(myAchievements ?? []).includes('new-connection');
+    // Decide the one-time coin grant from the SERVER's achievement list, not the
+    // caller-passed snapshot. The client prop can be stale (re-follow after an
+    // unfollow, a second tab, or a cache that predates a prior grant), and the
+    // `coins` increment below is NOT idempotent — so trusting it can double-pay.
+    const earnsFirst = !(await hasAchievement(me.uid, 'new-connection', myAchievements));
     if (earnsFirst) {
       const union = arrayUnion('new-connection');
       // Coins are private — only the users doc gets them.
@@ -197,7 +220,7 @@ export async function sendKudos(
       createdAt: serverTimestamp(),
     });
 
-    const earnsFirst = !(myAchievements ?? []).includes('cheerleader');
+    const earnsFirst = !(await hasAchievement(me.uid, 'cheerleader', myAchievements));
     if (earnsFirst) {
       const union = arrayUnion('cheerleader');
       // Coins are private — only the users doc gets them.

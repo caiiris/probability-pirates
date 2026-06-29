@@ -8,6 +8,7 @@ import {
   signOut,
   deleteUser,
   sendEmailVerification,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -23,6 +24,41 @@ import type { AuthError, AuthResult } from '@/lib/errors';
 // ---------------------------------------------------------------------------
 
 export type { AuthErrorCode, AuthError, AuthResult } from '@/lib/errors';
+
+// ---------------------------------------------------------------------------
+// New-account document factory
+//
+// registerUser (email/password) and claimUsername (Google first-time) create the
+// identical `/users/{uid}` shape — only the email source differs. Keep it in one
+// place so the new-account defaults (xp/streak/coins/cosmetics) never drift apart.
+// ---------------------------------------------------------------------------
+
+function newUserDocFields(params: { username: string; displayUsername: string; email: string }) {
+  return {
+    username: params.username,
+    displayUsername: params.displayUsername,
+    email: params.email,
+    bio: '',
+    avatarUrl: null,
+    xp: 0,
+    lessonsCompleted: 0,
+    stepsCompleted: 0,
+    currentStreak: 0,
+    bestStreak: 0,
+    lastActiveDate: null,
+    milestonesReached: [],
+    activityDates: [],
+    achievements: [],
+    coins: 0,
+    claimedChests: [],
+    streakFreezes: 0,
+    avatarStyle: 'classic',
+    ownedAvatarStyles: ['classic'],
+    profileFlair: 'none',
+    ownedFlair: ['none'],
+    createdAt: serverTimestamp(),
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Registration
@@ -59,6 +95,9 @@ export async function registerUser(params: {
       const userRef = doc(db, 'users', firebaseUser.uid);
       const publicRef = doc(db, 'publicProfiles', firebaseUser.uid);
 
+      // The sentinel stays PII-free ({ uid, createdAt }). Login is email-only,
+      // so we never need to resolve username -> email from this public doc —
+      // which keeps emails out of any public-readable collection.
       tx.set(usernameRef, {
         uid: firebaseUser.uid,
         createdAt: serverTimestamp(),
@@ -67,30 +106,7 @@ export async function registerUser(params: {
       // PII-free public projection (no email), seeded alongside the private doc.
       tx.set(publicRef, publicProfileSeed({ username: lowercased, displayUsername: username }));
 
-      tx.set(userRef, {
-        username: lowercased,
-        displayUsername: username,
-        email,
-        bio: '',
-        avatarUrl: null,
-        xp: 0,
-        lessonsCompleted: 0,
-        stepsCompleted: 0,
-        currentStreak: 0,
-        bestStreak: 0,
-        lastActiveDate: null,
-        milestonesReached: [],
-        activityDates: [],
-        achievements: [],
-        coins: 0,
-        claimedChests: [],
-        streakFreezes: 0,
-        avatarStyle: 'classic',
-        ownedAvatarStyles: ['classic'],
-        profileFlair: 'none',
-        ownedFlair: ['none'],
-        createdAt: serverTimestamp(),
-      });
+      tx.set(userRef, newUserDocFields({ username: lowercased, displayUsername: username, email }));
     });
   } catch (err) {
     // Roll back the Firebase Auth account so no orphan is left behind
@@ -140,30 +156,55 @@ export async function signIn(params: {
     message: ERROR_COPY.auth.invalidCredentials,
   };
 
-  let email = identifier;
-
-  // If identifier doesn't look like an email, resolve it via the username sentinel
-  if (!identifier.includes('@')) {
-    const usernameRef = doc(db, 'usernames', identifier.toLowerCase());
-    const usernameSnap = await getDoc(usernameRef);
-    if (!usernameSnap.exists()) {
-      return { ok: false, error: GENERIC_ERROR };
-    }
-    const uid = usernameSnap.data().uid as string;
-    const userRef = doc(db, 'users', uid);
-    const userSnap = await getDoc(userRef);
-    if (!userSnap.exists()) {
-      return { ok: false, error: GENERIC_ERROR };
-    }
-    email = userSnap.data().email as string;
-  }
-
+  // Login is EMAIL-ONLY by design (D48 privacy posture): resolving a username to
+  // an email client-side would require exposing emails in the public `usernames`
+  // doc (no Cloud Functions on Spark), which we will not do for a minor audience.
+  // A username-shaped identifier fails closed with the generic credential error
+  // (Firebase rejects the malformed email), so the form never hangs (B2) and
+  // never reveals whether an account exists (D50).
   try {
-    await signInWithEmailAndPassword(auth, email, password);
+    await signInWithEmailAndPassword(auth, identifier, password);
     track('login', { method: 'email_password' });
     return { ok: true };
   } catch {
     return { ok: false, error: GENERIC_ERROR };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Password reset
+//
+// Sends a Firebase reset email. Reset is keyed on EMAIL only (not username):
+// `sendPasswordResetEmail` needs an email, and resolving username -> email
+// would require reading another user's owner-only profile doc. Google-only
+// accounts have no password; Firebase handles that case server-side.
+//
+// Enumeration-safe (D50): `auth/user-not-found` is reported as success so the
+// caller can show a single generic "if an account exists..." message and never
+// reveal whether the email is registered. Only actionable errors (bad email
+// format, rate limit, network) surface to the user.
+// ---------------------------------------------------------------------------
+
+export async function sendPasswordReset(email: string): Promise<AuthResult> {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return { ok: true };
+  } catch (err) {
+    const code = (err as { code?: string }).code;
+    if (code === 'auth/user-not-found') {
+      return { ok: true };
+    }
+    if (code === 'auth/invalid-email') {
+      return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.emailInvalid } };
+    }
+    if (code === 'auth/too-many-requests') {
+      return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.tooManyRequests } };
+    }
+    if (code === 'auth/network-request-failed') {
+      return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.network } };
+    }
+    console.error('[sendPasswordReset]', code, err);
+    return { ok: false, error: { code: 'unknown', message: ERROR_COPY.auth.unknown } };
   }
 }
 
@@ -396,6 +437,7 @@ export async function claimUsername(params: { username: string }): Promise<AuthR
       const userRef = doc(db, 'users', firebaseUser.uid);
       const publicRef = doc(db, 'publicProfiles', firebaseUser.uid);
 
+      // PII-free sentinel (login is email-only — see registerUser).
       tx.set(usernameRef, {
         uid: firebaseUser.uid,
         createdAt: serverTimestamp(),
@@ -404,30 +446,14 @@ export async function claimUsername(params: { username: string }): Promise<AuthR
       // PII-free public projection (no email), seeded alongside the private doc.
       tx.set(publicRef, publicProfileSeed({ username: lowercased, displayUsername: username }));
 
-      tx.set(userRef, {
-        username: lowercased,
-        displayUsername: username,
-        email: firebaseUser.email ?? '',
-        bio: '',
-        avatarUrl: null,
-        xp: 0,
-        lessonsCompleted: 0,
-        stepsCompleted: 0,
-        currentStreak: 0,
-        bestStreak: 0,
-        lastActiveDate: null,
-        milestonesReached: [],
-        activityDates: [],
-        achievements: [],
-        coins: 0,
-        claimedChests: [],
-        streakFreezes: 0,
-        avatarStyle: 'classic',
-        ownedAvatarStyles: ['classic'],
-        profileFlair: 'none',
-        ownedFlair: ['none'],
-        createdAt: serverTimestamp(),
-      });
+      tx.set(
+        userRef,
+        newUserDocFields({
+          username: lowercased,
+          displayUsername: username,
+          email: firebaseUser.email ?? '',
+        }),
+      );
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : '';

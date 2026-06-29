@@ -1,0 +1,17 @@
+{
+  "id": "left-handed-us-adults",
+  "sequence": 3,
+  "openAt": "2026-07-03T00:00:00Z",
+  "prompt": "What percentage of US adults are left-handed?",
+  "unit": "percent",
+  "tags": ["base-rate", "real-world-frequency"],
+  "flavor": "frequency",
+  "scoring": "log",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 10.6,
+  "source": "Papadatou-Pastou et al., 2020, Psychological Bulletin meta-analysis of 200+ studies across 2.4M individuals: prevalence of left-handedness \u2248 10.6%. Consistent with Hardyck & Petrinovich (1977).",
+  "sourceUrl": "https://doi.org/10.1037/bul0000229",
+  "revealHeadline": "About 1 in 10.",
+  "revealExplanation": "Base-rate estimation is the foundation of probabilistic reasoning. Most people guess in the 5\u201320% range, which is the right order of magnitude. The actual prevalence has been stable across cultures and decades, hovering near 10%."
+}

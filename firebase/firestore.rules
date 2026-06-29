@@ -73,6 +73,11 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == uid;
       }
 
+      // spec-spaced-review — owner-only spaced-retrieval schedule
+      match /reviewSchedule/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
       match /practiceState/{topicId} {
         allow read, write: if request.auth != null && request.auth.uid == uid;
       }
@@ -220,6 +225,85 @@ service cloud.firestore {
       allow delete: if request.auth != null
                     && resource.data.uid == request.auth.uid;
       allow update: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // /wagers/{wagerId} — Captain's Wager (WP-CW-C)
+    // The public wager doc is readable by any authenticated user.
+    // The /private/answer sub-doc and the submissions sub-collection are
+    // gated: you must have your own submission before you can read either.
+    // Scoring is client-authoritative (D-CW8 / R-W3); the rules enforce
+    // the exact WagerSubmission shape (C-W1) and the one-shot invariant.
+    // ------------------------------------------------------------------
+    match /wagers/{wagerId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+
+      match /private/{stateDoc} {
+        // Gated: only readable after the user has a submission for this wager.
+        allow read: if request.auth != null
+                   && exists(/databases/$(database)/documents/wagers/$(wagerId)/submissions/$(request.auth.uid));
+        allow write: if false;
+      }
+
+      match /submissions/{uid} {
+        // One-shot create: auth uid must match the doc id, no prior submission
+        // may exist, and the payload must carry exactly the C-W1 fields with
+        // the correct types.
+        allow create: if request.auth != null
+                      && request.auth.uid == uid
+                      && !exists(/databases/$(database)/documents/wagers/$(wagerId)/submissions/$(uid))
+                      && request.resource.data.keys().hasOnly(['uid', 'guess', 'logError', 'score', 'submittedAt'])
+                      && request.resource.data.uid == uid
+                      && request.resource.data.guess is number
+                      && request.resource.data.logError is number
+                      && request.resource.data.score is number
+                      && request.resource.data.submittedAt is timestamp;
+        // GET and LIST split because Firestore evaluates LIST rules against
+        // the QUERY, not per-doc. A rule that references the `{uid}` path
+        // wildcard (like `request.auth.uid == uid`) can't be proven safe for
+        // a collection scan — so it correctly works for own-doc gets but
+        // denies the histogram LIST query. Split:
+        //
+        //   GET (single-doc read): own-doc always, or others if you have your
+        //   own submission. Lets submitWager's duplicate-check `getDoc` work
+        //   before the placeholder exists (the earlier `exists()`-only rule
+        //   was the chicken-and-egg that broke first-time submitters).
+        //
+        //   LIST (collection scan for the histogram): uniform `exists()` check,
+        //   no per-doc condition — Firestore CAN prove this safe.
+        allow get:  if request.auth != null
+                    && (
+                      request.auth.uid == uid
+                      || exists(/databases/$(database)/documents/wagers/$(wagerId)/submissions/$(request.auth.uid))
+                    );
+        allow list: if request.auth != null
+                    && exists(/databases/$(database)/documents/wagers/$(wagerId)/submissions/$(request.auth.uid));
+        // One-time score-patch: allowed only from the placeholder state where both
+        // score and logError are still 0 (the sentinel values written by the placeholder
+        // create in the two-step submit flow). Once either field is non-zero the gate
+        // closes, making the patch idempotent. Only score and logError may change;
+        // uid, guess, and submittedAt are immutable commitments.
+        allow update: if request.auth != null
+                      && request.auth.uid == uid
+                      && resource.data.score == 0
+                      && resource.data.logError == 0
+                      && request.resource.data.diff(resource.data).affectedKeys()
+                           .hasOnly(['score', 'logError'])
+                      && request.resource.data.uid == resource.data.uid
+                      && request.resource.data.guess == resource.data.guess
+                      && request.resource.data.submittedAt == resource.data.submittedAt
+                      && request.resource.data.score is number
+                      && request.resource.data.logError is number;
+        allow delete: if false;
+      }
+    }
+
+    // /users/{uid}/wagerStats/{statDoc} — owner read/write only.
+    // Kept as a separate top-level match so it doesn't require amending the
+    // existing /users/{uid} block; Firestore evaluates them independently.
+    match /users/{uid}/wagerStats/{statDoc} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
     }
   }
 }

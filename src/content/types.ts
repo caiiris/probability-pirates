@@ -91,12 +91,21 @@ export type ConceptSlot = {
    * shape.
    */
   figure?: ConceptFigure;
+  /**
+   * Renders the "Challenge question" banner (Captain Pascal mascot) above the
+   * concept content, mirroring the ProblemSlot `challenge` flag. Use to keep a
+   * multi-page challenge walkthrough visually marked as a challenge even on the
+   * teaching pages between the graded ones. Presentation only.
+   */
+  challenge?: boolean;
 };
 
 export type ConceptFigure =
   | SettlingLineFigure
   | TwoCoinsGridFigure
   | SubsetPickerFigure
+  | OrderBuilderFigure
+  | CircleBuilderFigure
   | TreeDiagramFigure
   | RoadForkFigure;
 
@@ -159,6 +168,38 @@ export type TwoCoinsGridFigure = {
 export type SubsetPickerFigure = {
   kind: 'subset-picker';
   /** Optional caption shown beneath the picker. */
+  caption?: string;
+};
+
+/**
+ * Playful "build an order" picker for permutations. The learner taps three
+ * named people (Ana, Ben, Cleo) one at a time to fill an ordered row of
+ * spots, then logs that arrangement. Distinct orders accumulate toward 3! =
+ * 6, so the learner discovers the count by hand before the formula names it.
+ *
+ * Same spirit as `subset-picker`: not graded, no XP, no blocking. It is a
+ * manipulative that makes "arrangement" concrete (order matters: ABC is not
+ * the same as ACB).
+ */
+export type OrderBuilderFigure = {
+  kind: 'order-builder';
+  /** Optional caption shown beneath the picker. */
+  caption?: string;
+};
+
+/**
+ * Interactive circular-seating builder for the permutations circular-
+ * arrangement challenge. The learner picks how many pirates sit around a
+ * round table (n), taps them into seats, and logs distinct seatings. Two
+ * seatings that differ only by a rotation are detected as the same circle, so
+ * the running count lands on (n − 1)! — the pattern the learner is meant to
+ * discover by hand.
+ *
+ * Same contract as the other pickers: not graded, no XP, no blocking.
+ */
+export type CircleBuilderFigure = {
+  kind: 'circle-builder';
+  /** Optional caption shown beneath the builder. */
   caption?: string;
 };
 
@@ -264,6 +305,7 @@ export type InteractionKind =
   | 'simulate-proportion'
   | 'scrub-trials'
   | 'fill-text'
+  | 'multiply-steps'
   | 'monty-hall';
 
 export type Variant =
@@ -276,6 +318,7 @@ export type Variant =
   | SimulateProportionVariant
   | ScrubTrialsVariant
   | FillTextVariant
+  | MultiplyStepsVariant
   | MontyHallVariant;
 
 type BaseVariant = {
@@ -511,6 +554,31 @@ export type FillTextVariant = BaseVariant & {
   combinationPicker?: CombinationPickerConfig;
   /** Keyed by normalized wrong input. The default covers the rest. */
   feedbackByWrongAnswer?: Record<string, string>;
+};
+
+/**
+ * Guided "multiply it down" input (D106). Rather than typing one final
+ * number, the learner answers a short series of sub-questions, one per
+ * factor ("how many ways for the first spot? the second?"). Each correct
+ * number locks in and joins a running product (4, then 4 × 3 = 12, ...),
+ * until the full expression and its result are revealed.
+ *
+ * Pedagogy: makes the multiplication principle behind a permutation count
+ * explicit, instead of asking the learner to produce n! in one leap. Each
+ * step is graded in the renderer; a wrong entry shows the step's `hint` and
+ * clears for a retry. The slot is "correct" once every step is filled
+ * correctly (the built product equals the product of the step answers).
+ */
+export type MultiplyStepsVariant = BaseVariant & {
+  interactionKind: 'multiply-steps';
+  /**
+   * The ordered factors. Each step shows its own `prompt` and grades the
+   * learner's number against `answer`. The final result is the product of
+   * all the answers.
+   */
+  steps: { prompt: string; answer: number; hint?: string }[];
+  /** Noun for the running total, e.g. "orders". Used in the final readout. */
+  resultNoun?: string;
 };
 
 /**

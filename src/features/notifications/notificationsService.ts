@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import {
   collection,
   doc,
+  getDocs,
   limit,
   onSnapshot,
   orderBy,
@@ -157,6 +158,34 @@ export async function markNotificationRead(uid: string, notifId: string): Promis
     await updateDoc(doc(db, 'users', uid, 'notifications', notifId), { read: true });
   } catch (err) {
     console.warn('[notifications] mark read failed', err);
+  }
+}
+
+/**
+ * Mark every unread notification read by querying for them server-side. Use
+ * when the caller doesn't already have the items loaded (e.g. the Friends
+ * page wants to clear the sidebar dot on visit without subscribing to the
+ * full inbox first). Capped to 50 to bound the batch size; in practice the
+ * inbox is tiny so the cap never matters.
+ *
+ * When new notification types arrive and we need a Friends-only clear, add a
+ * `type` filter here — that will require a composite index on `(read, type)`.
+ */
+export async function markAllUnreadNotificationsRead(uid: string): Promise<void> {
+  if (!uid) return;
+  try {
+    const q = query(
+      collection(db, 'users', uid, 'notifications'),
+      where('read', '==', false),
+      limit(50),
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) return;
+    const batch = writeBatch(db);
+    snap.docs.forEach((d) => batch.update(d.ref, { read: true }));
+    await batch.commit();
+  } catch (err) {
+    console.warn('[notifications] mark-all-unread-by-query failed', err);
   }
 }
 

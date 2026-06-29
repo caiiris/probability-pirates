@@ -5,6 +5,9 @@ import { Home, User, CalendarDays, Users, LineChart, Dumbbell, Lock } from 'luci
 import { useIsMobile } from '@/hooks/use-mobile';
 import { AppHeader } from '@/components/AppHeader';
 import { AppFooter } from '@/components/AppFooter';
+import { WagerSidebarLink } from '@/features/wager/WagerSidebarLink';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { useUnreadCount } from '@/features/notifications/notificationsService';
 import {
   Sidebar,
   SidebarContent,
@@ -32,15 +35,16 @@ const NAV_ITEMS: NavEntry[] = [
 ];
 
 /** Routes where all navigation chrome is hidden (immersive screens). */
-const CHROMELESS_PREFIXES = ['/lesson/', '/celebration/'];
+const CHROMELESS_PREFIXES = ['/lesson/', '/celebration/', '/warmup'];
 
 function isActive(to: string, pathname: string): boolean {
   return to === '/' ? pathname === '/' : pathname.startsWith(to);
 }
 
 /** Desktop sidebar row — icon sits in a rounded tile that fills with the accent
- *  when active, matching the app's tactile disc/medallion language. */
-function NavItem({ to, label, icon: Icon, locked }: NavEntry) {
+ *  when active, matching the app's tactile disc/medallion language.
+ *  `hasUnread` lights a small violet dot on the icon (matches WagerSidebarLink). */
+function NavItem({ to, label, icon: Icon, locked, hasUnread }: NavEntry & { hasUnread?: boolean }) {
   const { pathname } = useLocation();
   const active = isActive(to, pathname);
 
@@ -65,6 +69,12 @@ function NavItem({ to, label, icon: Icon, locked }: NavEntry) {
             <Lock className="h-2 w-2" strokeWidth={3} aria-hidden="true" />
           </span>
         )}
+        {hasUnread && !locked && (
+          <span
+            className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-[color:var(--sidebar)]"
+            aria-label={`${label}, new activity`}
+          />
+        )}
       </motion.span>
       <span
         className={`text-sm transition-colors ${
@@ -86,7 +96,7 @@ function NavItem({ to, label, icon: Icon, locked }: NavEntry) {
 
 /** Mobile bottom-nav tab — icon lifts into a colored pill when active, with a
  *  little press squish for tactility. */
-function BottomTab({ to, label, icon: Icon, locked }: NavEntry) {
+function BottomTab({ to, label, icon: Icon, locked, hasUnread }: NavEntry & { hasUnread?: boolean }) {
   const { pathname } = useLocation();
   const active = isActive(to, pathname);
 
@@ -112,6 +122,12 @@ function BottomTab({ to, label, icon: Icon, locked }: NavEntry) {
           <span className="absolute right-3 top-0 grid h-3.5 w-3.5 place-items-center rounded-full bg-muted text-muted-foreground ring-2 ring-background">
             <Lock className="h-2 w-2" strokeWidth={3} aria-hidden="true" />
           </span>
+        )}
+        {hasUnread && !locked && (
+          <span
+            className="absolute right-3.5 top-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background"
+            aria-label={`${label}, new activity`}
+          />
         )}
       </motion.span>
       <span
@@ -142,9 +158,9 @@ function RoutedPage({ scrollRef }: { scrollRef: React.RefObject<HTMLElement | nu
   return (
     <motion.div
       key={pathname}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.22, ease: 'easeOut' }}
+      initial={{ opacity: 0, y: 14, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
     >
       <Outlet />
     </motion.div>
@@ -155,12 +171,25 @@ export function AppShell() {
   const { pathname } = useLocation();
   const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLElement | null>(null);
+  const auth = useAuth();
+  // Drive the Friends-tab dot off the inbox unread count. Today every
+  // notification type ('follow') is a social event, so the count IS the
+  // friends-dot signal. When more types arrive (achievements, kudos, etc.),
+  // either split the read flag per type or filter the hook by type — see
+  // notificationsService.markAllUnreadNotificationsRead's comment.
+  // The hook short-circuits on empty uid, so this is a no-op when signed out.
+  const uid = auth.status === 'authenticated' ? auth.user.uid : '';
+  const unreadFollows = useUnreadCount(uid);
 
   const isChromeless = CHROMELESS_PREFIXES.some((p) => pathname.startsWith(p));
 
   // Lesson player and celebration are full-screen — no chrome at all
   if (isChromeless) {
     return <Outlet />;
+  }
+
+  function withUnread(item: NavEntry): NavEntry & { hasUnread?: boolean } {
+    return item.to === '/friends' ? { ...item, hasUnread: unreadFollows > 0 } : item;
   }
 
   // Mobile: persistent top bar + bottom nav
@@ -179,7 +208,7 @@ export function AppShell() {
           aria-label="Main navigation"
         >
           {NAV_ITEMS.map((item) => (
-            <BottomTab key={item.to} {...item} />
+            <BottomTab key={item.to} {...withUnread(item)} />
           ))}
         </nav>
       </div>
@@ -200,9 +229,12 @@ export function AppShell() {
             <SidebarMenu>
               {NAV_ITEMS.map((item) => (
                 <SidebarMenuItem key={item.to}>
-                  <NavItem {...item} />
+                  <NavItem {...withUnread(item)} />
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <WagerSidebarLink />
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
         </Sidebar>

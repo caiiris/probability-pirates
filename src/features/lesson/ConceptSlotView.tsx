@@ -8,8 +8,11 @@ import { DerivationCard } from './DerivationCard';
 import { SettlingLineFigure } from './SettlingLineFigure';
 import { TwoCoinsGridFigure } from './TwoCoinsGridFigure';
 import { SubsetPickerFigure } from './SubsetPickerFigure';
+import { OrderBuilderFigure } from './OrderBuilderFigure';
+import { CircleBuilderFigure } from './CircleBuilderFigure';
 import { TreeDiagramFigure } from './TreeDiagramFigure';
 import { RoadForkFigure } from './RoadForkFigure';
+import { CaptainMascot } from '@/components/illustrations/CaptainMascot';
 
 type Props = { slot: ConceptSlot };
 
@@ -48,6 +51,18 @@ export function ConceptSlotView({ slot }: Props) {
   return (
     <div className="min-h-full flex flex-col">
       <div className="my-auto px-4 py-8 space-y-6 max-w-prose mx-auto w-full">
+        {slot.challenge && (
+          <div className="mx-auto flex max-w-sm items-center gap-3 rounded-xl border-2 border-primary/30 bg-[color:var(--primary-soft)]/50 px-4 py-3">
+            <CaptainMascot className="h-10 w-10 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary">
+                Challenge question
+              </p>
+              <p className="text-xs text-muted-foreground">Captain Pascal wants to play a game.</p>
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-center">
           <IllustrationBlock kind={slot.illustration.kind} />
         </div>
@@ -83,6 +98,34 @@ export function ConceptSlotView({ slot }: Props) {
           </figure>
         )}
 
+        {/* Theorem renders before definition so that when a slot carries
+            both callouts, the named claim (violet) leads and a supporting
+            notation/definition box (blue) follows. Slots with only one are
+            unaffected. */}
+        {slot.theorem && (
+          <aside
+            aria-label={slot.theorem.name ? `Theorem: ${slot.theorem.name}` : 'Theorem'}
+            className="rounded-xl border border-t-4 border-t-primary bg-primary-soft/50 px-4 py-3.5 space-y-1.5"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-deep">
+              {slot.theorem.name ? (
+                <>
+                  Theorem{' '}
+                  <span aria-hidden="true" className="opacity-60">
+                    ·
+                  </span>{' '}
+                  {slot.theorem.name}
+                </>
+              ) : (
+                'Theorem'
+              )}
+            </p>
+            <p className="text-[0.95rem] leading-relaxed text-foreground">
+              {renderInlineMath(slot.theorem.statement)}
+            </p>
+          </aside>
+        )}
+
         {slot.definition && (
           <aside
             aria-label={
@@ -109,30 +152,6 @@ export function ConceptSlotView({ slot }: Props) {
           </aside>
         )}
 
-        {slot.theorem && (
-          <aside
-            aria-label={slot.theorem.name ? `Theorem: ${slot.theorem.name}` : 'Theorem'}
-            className="rounded-xl border border-t-4 border-t-primary bg-primary-soft/50 px-4 py-3.5 space-y-1.5"
-          >
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-deep">
-              {slot.theorem.name ? (
-                <>
-                  Theorem{' '}
-                  <span aria-hidden="true" className="opacity-60">
-                    ·
-                  </span>{' '}
-                  {slot.theorem.name}
-                </>
-              ) : (
-                'Theorem'
-              )}
-            </p>
-            <p className="text-[0.95rem] leading-relaxed text-foreground">
-              {renderInlineMath(slot.theorem.statement)}
-            </p>
-          </aside>
-        )}
-
         {slot.body && slot.body.length > 0 && (
           <div className="space-y-3 text-[0.95rem] leading-relaxed text-muted-foreground">
             {slot.body.map((para, i) => (
@@ -144,6 +163,8 @@ export function ConceptSlotView({ slot }: Props) {
         {slot.figure?.kind === 'settling-line' && <SettlingLineFigure {...slot.figure} />}
         {slot.figure?.kind === 'two-coins-grid' && <TwoCoinsGridFigure {...slot.figure} />}
         {slot.figure?.kind === 'subset-picker' && <SubsetPickerFigure {...slot.figure} />}
+        {slot.figure?.kind === 'order-builder' && <OrderBuilderFigure {...slot.figure} />}
+        {slot.figure?.kind === 'circle-builder' && <CircleBuilderFigure {...slot.figure} />}
         {slot.figure?.kind === 'tree-diagram' && <TreeDiagramFigure {...slot.figure} />}
         {slot.figure?.kind === 'road-fork' && <RoadForkFigure {...slot.figure} />}
 

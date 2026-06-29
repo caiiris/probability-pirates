@@ -31,6 +31,7 @@ import { practiceXpBaseForDifficulty } from '@/lib/practiceXp';
 import type { PracticeXpHookResult } from '@/features/practice/usePracticeXp';
 import type { ConceptualProblem } from '@/content/conceptual/types';
 import type { ExactAnswer } from '@/lib/probability/exact';
+import { MISCONCEPTIONS } from '@/content/misconceptions';
 import type { MisconceptionKey } from '@/content/misconceptions';
 import type { Topic } from '@/content/skills';
 
@@ -94,9 +95,11 @@ export function ConceptualRound({ problem, uid, topic, awardXp, onAnswered, onNe
     setLoading(false);
 
     const classification = res.fallbackUsed ? null : (res.classification ?? null);
-    const misconceptionKey = (res.fallbackUsed ? null : (res.misconceptionKey ?? null)) as
-      | MisconceptionKey
-      | null;
+    const rawKey = res.fallbackUsed ? null : (res.misconceptionKey ?? null);
+    // The model can return an unrecognized/hallucinated key. Only persist one
+    // that is in our closed taxonomy, so the learner model never records junk.
+    const misconceptionKey: MisconceptionKey | null =
+      rawKey && rawKey in MISCONCEPTIONS ? (rawKey as MisconceptionKey) : null;
     // Reasoning penalty only bites a correct answer ("right number, shaky why").
     const reasoningMult = wasCorrect ? reasoningMultiplier(classification) : 1;
 
@@ -121,6 +124,8 @@ export function ConceptualRound({ problem, uid, topic, awardXp, onAnswered, onNe
         skills: problem.skills,
         wasCorrect,
         difficulty: CONCEPTUAL_DIFFICULTY,
+        // Try-weighted mastery (first-try correct earns full credit, later less).
+        solvedOnTry,
         misconceptionSignal: misconceptionKey ? { key: misconceptionKey, source: 'llm' } : null,
       });
     }

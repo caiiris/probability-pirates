@@ -113,6 +113,16 @@ export function checkAnswer(variant: Variant, payload: AttemptPayload): CheckRes
       };
     }
 
+    case 'multiply-steps': {
+      // The renderer validates each factor and reports the built product
+      // once every step is filled correctly. Correct iff that product
+      // equals the product of the step answers.
+      const p = payload as { value: number };
+      const expected = variant.steps.reduce((acc, s) => acc * s.answer, 1);
+      if (p.value === expected) return { wasCorrect: true };
+      return { wasCorrect: false, matchedWrongKey: String(p.value) };
+    }
+
     case 'monty-hall': {
       const p = payload as { games: number };
       if (p.games >= variant.minGames) return { wasCorrect: true };

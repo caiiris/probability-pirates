@@ -44,6 +44,11 @@ export const ERROR_COPY = {
     usernameInvalid: 'Usernames are 3 to 20 characters: letters, numbers, and underscores only.',
     // Stays deliberately vague: never reveal whether the identifier exists (D50).
     invalidCredentials: 'That login does not match our records. Check your details and try again.',
+    emailInvalid: 'Enter a valid email address.',
+    // Shown after a password-reset request. Deliberately generic so it never
+    // reveals whether an account exists for that email (D50 enumeration policy).
+    resetEmailSent:
+      'If an account exists for that email, a reset link is on its way. Check your inbox and spam folder.',
     tooManyRequests: 'Too many tries just now. Wait a moment, then try again.',
     network: 'We cannot reach the network. Check your connection and try again.',
     // Operator-facing: shown when email/password sign-in is not enabled in Firebase.

@@ -3,7 +3,7 @@ import { permutationsArrangeTemplate as t } from './permutations-arrange-k-of-n'
 import { expectExactEnumeration } from '../testUtils';
 import { answerToPayload } from '@/features/practice/practiceEngine';
 import { checkAnswer } from '@/lib/checkAnswer';
-import { nPr, nCr } from '@/lib/probability/exact';
+import { nPr, nCr, factorial } from '@/lib/probability/exact';
 import type { NumberFillVariant } from '@/content/types';
 
 function allParams(): Array<{ n: number; k: number }> {
@@ -35,6 +35,16 @@ describe('permutations-arrange-k-of-n', () => {
       expect(combo).not.toBe(variant.answer); // k ≥ 2 ⇒ nPr > nCr
       expect(variant.misconceptionByValue?.[combo]).toBe('ordered_vs_unordered');
       expect(checkAnswer(variant, { value: combo }).wasCorrect).toBe(false);
+    }
+  });
+
+  it('k! maps to the arrange_without_selecting misconception (arranged the k, did not choose from n)', () => {
+    for (const params of allParams()) {
+      const variant = t.render(params) as NumberFillVariant;
+      const arrangeOnly = Number(factorial(params.k)); // e.g. 3! = 6 for 6P3
+      expect(arrangeOnly).not.toBe(variant.answer); // k < n ⇒ nPr > k!
+      expect(variant.misconceptionByValue?.[arrangeOnly]).toBe('arrange_without_selecting');
+      expect(checkAnswer(variant, { value: arrangeOnly }).wasCorrect).toBe(false);
     }
   });
 

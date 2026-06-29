@@ -36,11 +36,11 @@ describe('multiplication-principle (Unit 2.4) invariants', () => {
     ]);
   });
 
-  it('uses commit-once fill-text with combination picker on the outfit puzzle', () => {
+  it('uses fill-text with combination picker on the outfit puzzle', () => {
     const slot = multiplicationPrinciple.slots.find((s) => s.id === 'outfit-puzzle');
     expect(slot?.kind).toBe('problem');
     if (slot?.kind === 'problem') {
-      expect(slot.commitOnce).toBe(true);
+      expect(slot.commitOnce).not.toBe(true);
       expect(slot.interactionKind).toBe('fill-text');
       const v = slot.variants[0] as FillTextVariant;
       expect(checkAnswer(v, { text: '6' }).wasCorrect).toBe(true);

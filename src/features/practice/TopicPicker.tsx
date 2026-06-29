@@ -85,7 +85,10 @@ export function TopicPicker({ selectedTopic, onSelect, uid, autoSuggest = true }
     if (defaultApplied.current) return;
     if (suggestedTopic === null) return;
     defaultApplied.current = true;
-    // Only override if the parent is still on the initial default.
+    // Only override if the parent is STILL on the initial default. If the learner
+    // already tapped a chip (or a deep link set a topic) before the model
+    // resolved, respect that choice instead of clobbering it.
+    if (selectedTopicRef.current !== TOPICS[0]) return;
     onSelect(suggestedTopic);
   }, [suggestedTopic, onSelect, autoSuggest]);
 

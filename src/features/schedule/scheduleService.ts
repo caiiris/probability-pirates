@@ -107,22 +107,31 @@ export function subscribeToMonthEvents(
     orderBy('date'),
   );
 
-  return onSnapshot(q, (snap) => {
-    const events: StudyEvent[] = snap.docs.map((d) => {
-      const data = d.data();
-      return {
-        id: d.id,
-        title: data.title as string,
-        date: data.date as string,
-        eventType: eventTypeOf(data.eventType),
-        time: (data.time as string | undefined) || undefined,
-        lessonId: data.lessonId as string | undefined,
-        notes: data.notes as string | undefined,
-        completed: data.completed as boolean,
-      };
-    });
-    onData(events);
-  });
+  return onSnapshot(
+    q,
+    (snap) => {
+      const events: StudyEvent[] = snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          title: data.title as string,
+          date: data.date as string,
+          eventType: eventTypeOf(data.eventType),
+          time: (data.time as string | undefined) || undefined,
+          lessonId: data.lessonId as string | undefined,
+          notes: data.notes as string | undefined,
+          completed: data.completed as boolean,
+        };
+      });
+      onData(events);
+    },
+    (err) => {
+      // Surface as "no events" rather than leaving consumers stuck in `loading`
+      // forever on a permission/index/transient failure.
+      console.warn('[scheduleService] subscribeToMonthEvents error:', err);
+      onData([]);
+    },
+  );
 }
 
 /**
@@ -138,22 +147,29 @@ export function subscribeToDayEvents(
 ): () => void {
   const q = query(eventsRef(uid), where('date', '==', dateStr));
 
-  return onSnapshot(q, (snap) => {
-    const events: StudyEvent[] = snap.docs.map((d) => {
-      const data = d.data();
-      return {
-        id: d.id,
-        title: data.title as string,
-        date: data.date as string,
-        eventType: eventTypeOf(data.eventType),
-        time: (data.time as string | undefined) || undefined,
-        lessonId: data.lessonId as string | undefined,
-        notes: data.notes as string | undefined,
-        completed: data.completed as boolean,
-      };
-    });
-    onData(events);
-  });
+  return onSnapshot(
+    q,
+    (snap) => {
+      const events: StudyEvent[] = snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          title: data.title as string,
+          date: data.date as string,
+          eventType: eventTypeOf(data.eventType),
+          time: (data.time as string | undefined) || undefined,
+          lessonId: data.lessonId as string | undefined,
+          notes: data.notes as string | undefined,
+          completed: data.completed as boolean,
+        };
+      });
+      onData(events);
+    },
+    (err) => {
+      console.warn('[scheduleService] subscribeToDayEvents error:', err);
+      onData([]);
+    },
+  );
 }
 
 function toDateString(d: Date): string {

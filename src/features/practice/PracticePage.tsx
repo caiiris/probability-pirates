@@ -2,8 +2,8 @@
  * PracticePage — top-level route for /practice.
  *
  * Layout: a slim page header (`Practice` heading + the active topic's adaptive
- * rating, named **Bounty** for the pirate-theme) → topic chips → the solve
- * loop. The Bounty chip replaces the older two-tile stats bar (level tile was
+ * per-topic **Rating**) → topic chips → the solve
+ * loop. The Rating chip replaces the older two-tile stats bar (level tile was
  * redundant with the global header level bar; the rating tile was demoted to a
  * compact chip and the explanatory sub-description was cut).
  *
@@ -156,7 +156,7 @@ export function PracticePage() {
   // header. PracticeSession receives the rating + recordResult as props.
   const { rating, recentTemplateIds, recordResult } = usePracticeState(uid, topic);
 
-  // The most recent rating change, for the +/- delta chip beside the bounty.
+  // The most recent rating change, for the +/- delta chip beside the rating.
   // Reset whenever the topic switches (the new topic has its own rating).
   const [ratingDelta, setRatingDelta] = useState<number | null>(null);
   const [progress, setProgress] = useState<TopicProgress>(() => readStoredProgress(uid));
@@ -195,7 +195,7 @@ export function PracticePage() {
         </span>
         <h1 className="font-display text-xl font-semibold tracking-tight">Practice</h1>
         <ProgressDialog progress={progress} selectedTopic={topic} />
-        <BountyChip rating={rating} delta={ratingDelta} />
+        <RatingChip rating={rating} delta={ratingDelta} />
       </header>
 
       <TopicPicker
@@ -354,12 +354,12 @@ function topicTotals(progress: TopicProgress, topic: Topic) {
 }
 
 /**
- * Compact rating display in the page header. Numeric bounty + a small trend
- * chip showing the most recent delta. Quiet by default; the delta colors in
- * (green up / coral down) for a couple of seconds of feedback after each
- * graded answer.
+ * Compact per-topic practice rating in the page header — an Alcumus/chess-style
+ * "Rating" number plus a small trend chip showing the most recent delta. Quiet
+ * by default; the delta colors in (green up / coral down) for a couple of
+ * seconds of feedback after each graded answer.
  */
-function BountyChip({ rating, delta }: { rating: number; delta: number | null }) {
+function RatingChip({ rating, delta }: { rating: number; delta: number | null }) {
   const rounded = Math.round(rating);
   const showDelta = delta !== null && Math.abs(delta) >= 0.5;
   const up = (delta ?? 0) > 0;
@@ -368,12 +368,12 @@ function BountyChip({ rating, delta }: { rating: number; delta: number | null })
   return (
     <span
       className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-muted/40 px-2.5 py-1"
-      aria-label={`Bounty rating ${rounded}${
+      aria-label={`Practice rating ${rounded}${
         showDelta ? `, ${up ? 'up' : 'down'} ${deltaRounded}` : ''
       }`}
     >
       <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-        Bounty
+        Rating
       </span>
       <span className="num text-sm font-bold leading-none text-foreground">{rounded}</span>
       {showDelta && (

@@ -81,7 +81,9 @@ export type SkillStat = {
   rating: number;
   attempts: number;
   correct: number;
-  /** [0,1] recency-weighted accuracy; bootstrapped at 0.5. */
+  /** [0,1] recency-weighted MASTERY (try-weighted: first-try correct = full
+   *  credit, later tries less, wrong = 0); bootstrapped at 0.5. Drives the
+   *  Strengths-panel level + pips. */
   recentCorrect: number;
   lastSeenAt: number;
   firstSeenAt: number;
@@ -207,6 +209,26 @@ export function emptyModel(now: number): LearnerModel {
   };
 }
 
+// ─── Mastery credit (try-weighted) ────────────────────────────────────────────
+
+/**
+ * How much *mastery* a correct answer earns, weighted by how much help it took.
+ * Getting it right first try is full mastery; getting it right only after a hint
+ * (try 2/3) counts less; a wrong/revealed answer counts as zero. This feeds the
+ * recency-weighted mastery signal (`recentCorrect`) that drives the Strengths
+ * panel's level + pips — so "right after two hints" no longer reads as mastered.
+ *
+ * Weights are tunable. When `solvedOnTry` is omitted, a correct answer earns full
+ * credit (back-compat for callers/lessons that don't track tries).
+ */
+export const MASTERY_CREDIT_BY_TRY: Record<number, number> = { 1: 1, 2: 0.5, 3: 0.25 };
+
+export function masteryCreditForTry(wasCorrect: boolean, solvedOnTry?: number): number {
+  if (!wasCorrect) return 0;
+  if (solvedOnTry === undefined) return 1;
+  return MASTERY_CREDIT_BY_TRY[solvedOnTry] ?? 0.25;
+}
+
 // ─── Engine A: applyPracticeAttempt ──────────────────────────────────────────
 
 /**
@@ -216,6 +238,10 @@ export function emptyModel(now: number): LearnerModel {
  * Accepts either the new `misconceptionSignal` field (C-MC3) or the legacy
  * `misconceptionKey` field (back-compat, treated as source `'trap'`). When
  * both are supplied, `misconceptionSignal` takes precedence.
+ *
+ * `solvedOnTry` (1-based) makes the *mastery* signal (`recentCorrect`) try-
+ * weighted: first-try correct earns full credit, later tries less. The literal
+ * `correct`/`attempts` counters and the Elo `rating` stay outcome-based.
  */
 export function applyPracticeAttempt(
   model: LearnerModel,
@@ -223,6 +249,8 @@ export function applyPracticeAttempt(
     skills: SkillId[];
     wasCorrect: boolean;
     difficulty?: number;
+    /** Which try (1-based) the learner got it right on — weights mastery credit. */
+    solvedOnTry?: number;
     /** Legacy back-compat field — treated as source 'trap'. */
     misconceptionKey?: MisconceptionKey | null;
     /** Preferred C-MC3 field. If present, overrides misconceptionKey. */
@@ -234,11 +262,14 @@ export function applyPracticeAttempt(
     skills: skillIds,
     wasCorrect,
     difficulty = DEFAULT_RATING,
+    solvedOnTry,
     misconceptionKey,
     misconceptionSignal,
     now,
   } = input;
   const actual = wasCorrect ? 1 : 0;
+  // Mastery credit is try-weighted (drives recentCorrect); rating/counters use `actual`.
+  const masteryCredit = masteryCreditForTry(wasCorrect, solvedOnTry);
 
   const newSkills = { ...model.skills };
 
@@ -262,7 +293,7 @@ export function applyPracticeAttempt(
     const bonus = wasCorrect ? Math.min(1 + daysSinceLastSeen / 10, 1.5) : 1;
     const expected = 1 / (1 + Math.pow(10, (difficulty - stat.rating) / 400));
     const newRating = stat.rating + ELO_K * bonus * (actual - expected);
-    const newRecentCorrect = ACC_ALPHA * actual + (1 - ACC_ALPHA) * stat.recentCorrect;
+    const newRecentCorrect = ACC_ALPHA * masteryCredit + (1 - ACC_ALPHA) * stat.recentCorrect;
 
     newSkills[skillId] = {
       ...stat,

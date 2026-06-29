@@ -75,7 +75,6 @@ export const additionPrinciple: Lesson = {
       id: 'the-puzzle',
       kind: 'problem',
       interactionKind: 'multiple-choice',
-      commitOnce: true,
       variants: [
         {
           id: 'sandwich-or-salad',
@@ -103,6 +102,7 @@ export const additionPrinciple: Lesson = {
           },
           explanation:
             'You pick one item from the combined menu. The 3 sandwiches and the 5 salads are all valid orders, so the total is 3 + 5 = 8 choices. Multiplication would apply if you picked a sandwich AND a salad together.',
+          skills: ['addition-principle'],
         },
       ],
     },
@@ -196,6 +196,7 @@ export const additionPrinciple: Lesson = {
           },
           explanation:
             'Two steps. First, the main: 4 sandwiches OR 3 salads gives 4 + 3 = 7 mains (addition principle, disjoint cases). Second, drinks: each of those 7 mains pairs with 2 drink options, giving 7 × 2 = 14 orders (multiplication principle).',
+          skills: ['addition-principle', 'multiplication-principle'],
         },
       ],
     },

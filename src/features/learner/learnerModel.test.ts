@@ -104,6 +104,53 @@ describe('applyPracticeAttempt (Engine A)', () => {
     expect(m1.skills['permutations']!.recentCorrect).toBeCloseTo(expected, 10);
   });
 
+  it('mastery is try-weighted: a first-try solve beats a 2nd/3rd-try solve, which beats a reveal', () => {
+    const first = applyPracticeAttempt(emptyModel(NOW), {
+      skills: ['permutations'],
+      wasCorrect: true,
+      solvedOnTry: 1,
+      now: NOW,
+    }).skills['permutations']!.recentCorrect;
+    const second = applyPracticeAttempt(emptyModel(NOW), {
+      skills: ['permutations'],
+      wasCorrect: true,
+      solvedOnTry: 2,
+      now: NOW,
+    }).skills['permutations']!.recentCorrect;
+    const third = applyPracticeAttempt(emptyModel(NOW), {
+      skills: ['permutations'],
+      wasCorrect: true,
+      solvedOnTry: 3,
+      now: NOW,
+    }).skills['permutations']!.recentCorrect;
+    const revealed = applyPracticeAttempt(emptyModel(NOW), {
+      skills: ['permutations'],
+      wasCorrect: false,
+      solvedOnTry: 3,
+      now: NOW,
+    }).skills['permutations']!.recentCorrect;
+
+    expect(first).toBeGreaterThan(second);
+    expect(second).toBeGreaterThan(third);
+    expect(third).toBeGreaterThan(revealed);
+    // first-try uses full credit 1.0; reveal uses 0.
+    expect(first).toBeCloseTo(ACC_ALPHA * 1 + (1 - ACC_ALPHA) * 0.5, 10);
+    expect(second).toBeCloseTo(ACC_ALPHA * 0.5 + (1 - ACC_ALPHA) * 0.5, 10);
+  });
+
+  it('counters and rating stay outcome-based even when mastery credit is partial', () => {
+    const m = applyPracticeAttempt(emptyModel(NOW), {
+      skills: ['permutations'],
+      wasCorrect: true,
+      solvedOnTry: 3, // partial mastery credit (0.25)
+      now: NOW,
+    });
+    // A correct answer still counts as correct + raises the rating, regardless of try.
+    expect(m.skills['permutations']!.correct).toBe(1);
+    expect(m.skills['permutations']!.attempts).toBe(1);
+    expect(m.skills['permutations']!.rating).toBeGreaterThan(DEFAULT_RATING);
+  });
+
   it('attempts and correct counters are monotonically increasing', () => {
     let m = emptyModel(NOW);
     for (let i = 0; i < 5; i++) {

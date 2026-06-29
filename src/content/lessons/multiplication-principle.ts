@@ -44,7 +44,6 @@ export const multiplicationPrinciple: Lesson = {
       id: 'outfit-puzzle',
       kind: 'problem',
       interactionKind: 'fill-text',
-      commitOnce: true,
       variants: [
         {
           id: 'outfit-count',
@@ -74,6 +73,7 @@ export const multiplicationPrinciple: Lesson = {
           },
           explanation:
             'Each of the 3 shirts can pair with either of the 2 pants, giving 3 × 2 = 6 outfits: (Shirt 1, Pants A), (Shirt 1, Pants B), and so on.',
+          skills: ['multiplication-principle'],
         },
       ],
     },
@@ -140,6 +140,7 @@ export const multiplicationPrinciple: Lesson = {
           },
           explanation:
             'Trail 1 has lookouts A, B, C, D. Trail 2 also has A, B, C, D. That is 2 × 4 = 8 trail-and-lookout pairs.',
+          skills: ['multiplication-principle'],
         },
       ],
     },
@@ -185,6 +186,7 @@ export const multiplicationPrinciple: Lesson = {
           },
           explanation:
             'Two independent choices with 42 options each: 42 × 42 = 1,764 ordered pairs.',
+          skills: ['multiplication-principle'],
         },
       ],
     },
@@ -216,6 +218,7 @@ export const multiplicationPrinciple: Lesson = {
           },
           explanation:
             'Four dials, each independent and each with 10 digits, gives 10 × 10 × 10 × 10 = 10^4 = 10,000 codes.',
+          skills: ['multiplication-principle'],
         },
       ],
     },
@@ -250,6 +253,7 @@ export const multiplicationPrinciple: Lesson = {
           },
           explanation:
             'Three independent choices: 4 sandwiches, 3 sides, 2 drinks. By the multiplication principle, 4 × 3 × 2 = 24 different meals.',
+          skills: ['multiplication-principle'],
         },
       ],
     },

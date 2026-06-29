@@ -27,9 +27,16 @@ describe('newMilestonesFor', () => {
     expect(newMilestonesFor(2, [])).toEqual([]);
   });
 
-  it('returns all 5 milestones at streak 100', () => {
+  it('returns all 6 milestones at streak 100', () => {
     const result = newMilestonesFor(100, []);
-    expect(result).toHaveLength(5);
-    expect(result).toEqual(['streak-3', 'streak-7', 'streak-14', 'streak-30', 'streak-60']);
+    expect(result).toHaveLength(6);
+    expect(result).toEqual([
+      'streak-3',
+      'streak-7',
+      'streak-14',
+      'streak-30',
+      'streak-60',
+      'streak-100',
+    ]);
   });
 });

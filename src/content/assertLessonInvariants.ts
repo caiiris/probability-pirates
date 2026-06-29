@@ -241,6 +241,22 @@ function assertVariantInvariants(lesson: Lesson, slot: ProblemSlot, variant: Var
       }
       break;
     }
+    case 'multiply-steps': {
+      if (variant.steps.length < 2) {
+        throw new Error(`${basePath}.steps must have at least 2 factors`);
+      }
+      for (let i = 0; i < variant.steps.length; i++) {
+        const step = variant.steps[i];
+        assertNonEmptyString(step.prompt, `${basePath}.steps[${i}].prompt`);
+        if (!Number.isInteger(step.answer) || step.answer < 0) {
+          throw new Error(`${basePath}.steps[${i}].answer must be a non-negative integer`);
+        }
+        if (step.hint !== undefined) {
+          assertNonEmptyString(step.hint, `${basePath}.steps[${i}].hint`);
+        }
+      }
+      break;
+    }
     case 'monty-hall': {
       if (variant.minGames <= 0) {
         throw new Error(`${basePath}: minGames must be positive`);
@@ -366,6 +382,18 @@ function assertSlotInvariants(lesson: Lesson, slot: Lesson['slots'][number]): vo
             break;
           }
           case 'subset-picker': {
+            if (slot.figure.caption !== undefined) {
+              assertNonEmptyString(slot.figure.caption, `${basePath}.figure.caption`);
+            }
+            break;
+          }
+          case 'order-builder': {
+            if (slot.figure.caption !== undefined) {
+              assertNonEmptyString(slot.figure.caption, `${basePath}.figure.caption`);
+            }
+            break;
+          }
+          case 'circle-builder': {
             if (slot.figure.caption !== undefined) {
               assertNonEmptyString(slot.figure.caption, `${basePath}.figure.caption`);
             }

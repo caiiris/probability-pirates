@@ -1529,3 +1529,274 @@ wrap              → close, preview dependent choices (no segue — next
 lesson tests; the rest is parallel-branch test growth).
 
 ---
+
+## D99: Author compound-experiments + complement-rule; drop the Events unit — 2026-06-27
+
+### Why
+
+Owner asked to author two more lessons in the Lesson 1–3 style (sequencing, interactivity, varied question types, non-AI prose, content broken into small beats, rigor without jargon) and to simplify the spine: remove the standalone Events unit, keeping only the complement rule and moving it into Counting Techniques.
+
+### Structural change
+
+- **Events unit dropped.** `event-as-set`, `p-event-by-counting`, `practice-events`, `review-events` removed. That material is already taught in Unit 1: `sample-space` defines event / sample space and states k/N, and `equally-likely-outcomes` drills it. A separate unit re-covered it.
+- **`complement-rule` moved into Counting Techniques** as the unit opener, ahead of inclusion-exclusion. "Count the opposite" and "fix double-counting" are the same family of count-smarter tools.
+- Course is now **6 units** (was 7): Defining Probability, Compound Experiments, Counting Techniques, Combining Probabilities, Conditional Probability, Expected Value. `tree-diagrams` stays in Conditional (D98). Chapters and stub numbers renumbered; `chapters.ts` Events chapter removed.
+- **Fixed a mid-edit regression**: `additionPrinciple` had been dropped from `authoredRoadmapLessons` (so it rendered as a locked stub) while tests + Remote Config still expected it live. Restored it to the live array.
+
+### Lesson: compound-experiments (Unit 2 opener, the single intro lesson)
+
+The chapter opener we deferred in D98 ("at most one intro"), now authored. Job: the **structure** of a compound experiment (each outcome an ordered combination; systematic listing), distinct from `equally-likely-outcomes` (which used the same coin/dice but to make the equal-likelihood point). Anchored on a **fresh** compound experiment — flip a coin AND roll a die — to avoid re-showing the two-coins grid that already appears in L3 and L4.
+
+```
+welcome → define-compound (definition callout) → recap-one-die (tap-outcomes)
+→ build-coin-die (systematic listing of 12) → type-outcome (fill-text)
+→ count-outcomes (MCQ, 12, counted by listing) → it-grows (tension)
+→ wrap → multiplication-principle
+```
+
+Discovery beat: listing always works but explodes (two dice 36, ten coins 1024), which sets up multiplication. The count slot deliberately adds rows (6 + 6) rather than naming "2 × 6", so it does not steal the next lesson's punchline. Interaction mix: tap-outcomes, fill-text, MCQ.
+
+### Lesson: complement-rule (Counting Techniques opener)
+
+Job: P(not A) = 1 − P(A); count the opposite when the event is a chore. Killer app: "at least one", whose opposite is the single case "none".
+
+```
+welcome → the-puzzle (commit-once: P(≥1 six in two rolls), trap 1/3)
+→ define-complement (definition) → the-rule (theorem)
+→ not-a-six (fill-fraction 5/6) → at-least-one (resolve the puzzle: 1 − 25/36 = 11/36)
+→ three-coins (MCQ: ≥1 head = 7/8 via complement) → spot-complement (MCQ: name the complement)
+→ wrap (preview inclusion-exclusion, no segue)
+```
+
+Conventions held: "complement" is a new word → blue definition callout; the rule is a derivable claim → violet theorem callout (one word, one claim, two slots). Commit-once discovery trap like L2/L4/L5/L6. Interaction mix: MCQ, fill-fraction, MCQ, MCQ.
+
+### Tests delta
+
+- New `compound-experiments.test.ts` (10) and `complement-rule.test.ts` (11): slot order, definition-vs-theorem discipline, fill-text/fill-fraction grading and traps, no-spoiler (compound count must not name the multiply rule), wrap/segue rules, interaction-mix.
+- `01-what-is-probability.test.ts` playable-head updated to 8 authored lessons (adds compound-experiments before multiplication, complement-rule after addition). `chapters.test.ts` still green (every catalog lesson chaptered, no duplicates, no leftovers).
+
+**Numbers update**: 85 test files, **817 tests**, all green; production build clean.
+
+---
+
+## D100: Inclusion-exclusion lesson + a no-name teaser challenge in complement-rule — 2026-06-27
+
+### Why
+
+Owner asked (1) whether the complement-rule lesson could hint at inclusion-exclusion as a challenge question without naming it, and (2) to author the inclusion-exclusion lesson.
+
+### Complement-rule: challenge teaser
+
+Added a slot-level `challenge: true` MCQ (Captain Pascal banner) right before the wrap: "13 hearts and 4 queens, how many are a heart OR a queen?" The pull is 13 + 4 = 17; the answer is 16 because the queen of hearts is in both groups. The challenge copy never says "inclusion-exclusion", it just makes the learner feel the double-count. This reuses the exact example the addition-principle wrap flagged ("the queen of hearts is both a heart AND a queen"), so the three lessons chain: addition (disjoint) → complement (challenge surfaces overlap) → inclusion-exclusion (resolves it).
+
+The complement-rule wrap now **segues to inclusion-exclusion** (it previously had no segue, because IE was an unauthored stub; now it is authored and is the next lesson in the unit).
+
+### Lesson: inclusion-exclusion (Counting Techniques, right after complement-rule)
+
+Job: count "A OR B" when the groups overlap — |A or B| = |A| + |B| − |A and B| — the sequel to the addition principle's disjoint OR.
+
+```
+welcome (callback to addition's no-overlap condition) → the-puzzle (commit-once:
+12 soccer, 9 basketball, 5 both → trap 21, correct 16) → resolve (why subtract once)
+→ the-rule (theorem) → cards-count (hearts or face cards, 13 + 12 − 3 = 22)
+→ as-probability (divide by N; disjoint is the zero-overlap special case)
+→ heart-or-queen (fill-fraction P = 16/52, the complement challenge now formalized)
+→ add-or-subtract (recognition: overlap needs subtraction, disjoint does not)
+→ wrap (preview permutations/combinations; no segue, next stub unauthored)
+```
+
+Conventions held: commit-once discovery trap; theorem callout (a claim, not a new term); the rule is shown to *contain* the addition principle as the no-overlap case; the probability application reuses the hearts-or-queens numbers from the complement teaser to close the loop. Interaction mix: MCQ, MCQ, fill-fraction, MCQ.
+
+### Wiring
+
+`inclusion-exclusion` added to `authoredRoadmapLessons`, Remote Config defaults, and the catalog test's playable head. It already sat in the Counting Techniques chapter (right after complement-rule), so no chapter change was needed. Playable head is now 9 authored lessons.
+
+### Tests delta
+
+- New `inclusion-exclusion.test.ts` (10): slot order, commit-once overlap trap, theorem-not-definition with the disjoint special case, the hearts-or-face count, the 16/52 fill-fraction (with 4/13 also accepted and 17/52 as the forgot-overlap trap), recognition, wrap/no-segue, interaction mix.
+- `complement-rule.test.ts` updated: new `challenge-overlap` slot (asserts `challenge: true`, 16 correct, and that the challenge copy does NOT name inclusion-exclusion), wrap now segues to inclusion-exclusion, interaction mix grew to 5.
+
+**Numbers update**: 86 test files, **832 tests**, all green; production build clean.
+
+---
+
+## D101: Permutations lesson + theorem-before-definition dual callout — 2026-06-27
+
+### Inclusion-exclusion follow-up (same session)
+
+Owner flagged that the IE "rule" slide led with |A or B| = |A| + |B| − |A and B|, but learners have not been taught the |X| cardinality bars. Fixed by leading with the probability form they know and supporting it with a notation box:
+- **Main box (theorem):** P(A or B) = P(A) + P(B) − P(A and B).
+- **Second box (definition, "If counting is easier"):** explains |A| means "the number of outcomes in A" and gives the count-over-total form P(A or B) = |A or B| ÷ N.
+- To make the main formula lead, `ConceptSlotView` now renders the **theorem callout before the definition callout**. Only slots carrying both are affected (none did before; now IE's rule slot and permutations' two dual-box slots). The redundant standalone "same rule for probabilities" slot was removed.
+
+### Lesson: permutations (Counting Techniques, after inclusion-exclusion)
+
+Job: count arrangements, where order matters. Explicitly the multiplication principle applied to a shrinking pool; introduces factorial notation.
+
+```
+welcome (race finish: order is the point) → the-puzzle (commit-once: 3 friends
+in a photo line = 6; traps 3 count, 9 repeats) → resolve (multiplication
+principle, pool shrinks 3→2→1) → factorial (theorem: arrange n = n!; definition:
+n! notation) → line-four (fill-text: 4! = 24) → partial (theorem: k descending
+factors; definition: nPk = n!/(n−k)!; worked 8×7×6 = 336) → medals (MCQ:
+10×9×8 = 720; traps 1,000 repeats, 13 add) → order-matters (recognition MCQ:
+medals is the permutation; study group / pizza / card hand tee up combinations)
+→ wrap (preview combinations, no segue — combinations is an unauthored stub)
+```
+
+Conventions held: commit-once discovery trap; factorial is a new word → blue definition, the arrangement count is a claim → violet theorem; two slots use the new theorem-first dual-box layout. Built explicitly on the multiplication principle so the n! formula is felt, not memorized. The recognition slot's order-free distractors (team, pizza, hand) set up combinations without naming them. Interaction mix: MCQ, fill-text, MCQ, MCQ.
+
+### Wiring + tests
+
+`permutations` added to `authoredRoadmapLessons`, Remote Config defaults, and the catalog playable-head test (now 10 authored lessons). New `permutations.test.ts` (11) and `inclusion-exclusion.test.ts` updated for the probability-first theorem + |X| definition box and the dropped as-probability slot. `complement-rule.test.ts` updated earlier for the challenge teaser.
+
+**Numbers update**: 97 test files, **1030 tests**, all green; production build clean.
+
+---
+
+## D102: Combinations lesson — 2026-06-27
+
+### Lesson: combinations (Counting Techniques, after permutations)
+
+Job: count selections where order does NOT matter. The direct sequel to permutations: the arrangement count over-counts each group once per ordering, so divide by k!, giving C(n, k) = n! ÷ (k! × (n − k)!).
+
+```
+welcome (callback: teams/hands/committees ignore order) → the-puzzle (commit-once:
+3-person committee from 5; trap 60 ordered, correct 10) → resolve (the 60 counts
+each committee 3! = 6 times, so 60 ÷ 6 = 10) → the-rule (theorem: C(n,k) formula;
+definition: "n choose k" notation) → toppings (fill-text: C(4,2) = 6) → p-vs-c
+(same 5 people: gold/silver = 20 permutations vs 2-person team = 10 combinations,
+÷ 2!) → handshakes (MCQ: C(6,2) = 15; traps 30 ordered, 36 repeats) → recognition
+(MCQ: role-free team is the combination; podium/PIN/batting order are permutations)
+→ wrap (ties counts back to k/N probability; no segue, next stub unauthored)
+```
+
+Conventions held: commit-once discovery trap; the formula is a claim → violet theorem, "n choose k" is the new notation → blue definition (theorem-first dual-box layout from D101). Built directly on permutations — combinations = permutations ÷ k! — so the k! denominator is felt as the over-count fix, not a memorized symbol. The recognition slot mirrors permutations' (flipped: find the order-free one). Interaction mix: MCQ, fill-text, MCQ, MCQ.
+
+### Wiring + tests
+
+`combinations` added to `authoredRoadmapLessons`, Remote Config defaults, and the catalog playable-head test (now 11 authored lessons). New `combinations.test.ts` (12). With combinations authored, the `divide-by-k-factorial` stub ("the derivation behind the combinations formula") is now largely covered by this lesson's resolve + rule beats — a candidate to drop or repurpose later.
+
+**Numbers update**: 98 test files, **1042 tests**, all green; production build clean.
+
+---
+
+## D109: Circular-arrangement challenge as a 4-page pirate walkthrough — 2026-06-28
+
+Owner wanted the single circular-arrangement challenge MCQ expanded into a walked-through, pirate-themed sequence, with the challenge banner running across every page.
+
+- **Challenge banner on concept slots.** Added an optional `challenge?: boolean` to `ConceptSlot` and rendered the same Captain Pascal "Challenge question" banner in `ConceptSlotView`, so teaching pages between the graded ones stay marked as part of the challenge.
+- **New interactive figure `circle-builder`** (`CircleBuilderFigure`). Pick how many pirates (2–4) sit around a round table, tap them into seats, and log seatings. Rotations are canonicalized (rotate to start at the lowest id), so a spun-around copy is detected as "the same circle, just spun," and the running count lands on (n − 1)!. Not graded, same contract as the other pickers.
+- **Replaced `challenge-circle` with four slots**, all carrying `challenge: true`:
+  1. `circle-intro` (MCQ, commit-once): "You and four of your pirate crew... is a round table different from a line?" yes/no.
+  2. `circle-explore` (concept + circle-builder): build seatings for 2/3/4 pirates, discover the 1, 1, 2, 6 pattern, "do you see a pattern?"
+  3. `circle-why` (concept + theorem + flippable derivation): rotations collapse n! line orders into n!/n = (n − 1)!; the "pin one pirate" derivation card.
+  4. `circle-answer` (fill-text): five pirates around the table = (5 − 1)! = 24, with the 5! = 120 line trap tailored.
+
+Triple wiring for the figure (`types.ts`, `assertLessonInvariants.ts`, `ConceptSlotView.tsx`).
+
+### Tests delta
+
+- `permutations.test.ts` (→ 18): slot order now ends with the four circle slots; new tests for the challenge flag on all four pages, the pirate intro MCQ, the circle-builder figure on explore, the (n−1)! derivation on why, and the 24/120 fill-text grading. Interaction-mix array updated (adds a trailing fill-text).
+
+**Numbers update**: 99 test files, **1083 tests**, all green; production build clean.
+
+---
+
+## D108: Harder recognition distractors for permutations — 2026-06-28
+
+Owner felt the `order-matters` recognition MCQ choices were too obviously "not order." Replaced them with subtle near-misses that test whether a sequence in the story actually means order matters.
+
+- **Correct (permutation):** "Assigning the roles of captain, vice-captain, and treasurer to 3 of 20 club members" — looks like a "choose 3" combination, but distinct roles make it a permutation.
+- **Lottery trap:** "Picking 6 winning numbers, drawn one at a time" — a real draw order that does not matter for winning (classic misconception).
+- **Shuffle-playlist trap:** "Choosing 8 songs for a playlist that plays on shuffle" — the play order is random, but the playlist is a set.
+- **Committee trap:** "A 5-person committee with no titles" — order-free; the feedback notes that adding roles would flip it to a permutation.
+
+Context line nudges the learner to look past whether things happen in a sequence.
+
+### Tests delta
+
+- `permutations.test.ts`: recognition test updated to expect `roles` correct and to check the lottery near-miss feedback names the draw/set distinction. Count stays 14.
+
+**Numbers update**: 99 test files, **1079 tests**, all green; production build clean.
+
+---
+
+## D107: Dedicated derivation for the nPk formula — 2026-06-28
+
+Owner flagged that the partial-permutations slot dumped the compact formula nPk = n!/(n−k)! without intuition, confusing anyone who does not already get it. Split into two slots.
+
+- **`partial` (part 1, simplified):** keeps only the intuitive method — multiply k descending factors, one per spot, stop when spots run out (8 × 7 × 6 = 336). The opaque compact-form definition box was removed from here.
+- **`partial-formula` (part 2, new):** introduces nPk = n!/(n−k)! as the named theorem, and derives it with a flippable `derivation` card using the owner's "winners and non-winners" idea: line up all 8 runners (8!), the first 3 are winners and last 5 are non-winners; shuffling the 5 non-winners (5! ways) does not change the medals, so 8! counts each result 5! times → 8!/5! = 336. Generalizes to nPk = n!/(n−k)!. A body note shows the formula and the descending-factor method always agree.
+
+### Tests delta
+
+- `permutations.test.ts` (+1 → 14): slot order includes `partial-formula`; the partial test now asserts the intuitive rule with NO definition box; a new test checks the formula theorem plus the winners/non-winners derivation steps (split, 5! over-count, divide-out).
+
+**Numbers update**: 99 test files, **1078 tests**, all green; production build clean.
+
+---
+
+## D106: Guided "multiply it down" interaction for permutations — 2026-06-28
+
+Owner asked the 4-person line problem to prompt for each spot's count one at a time and multiply the numbers together until the answer appears, instead of typing the final 24.
+
+- New interaction kind **`multiply-steps`** + `MultiplySteps` renderer. The learner answers one sub-question per factor ("how many for the first spot? the second?"); each correct number locks in as a chip and joins a running product (4, then 4 × 3, ...), until the full expression and result (`= 24 orders`) are revealed. Wrong entries show that step's tailored `hint` and clear for a retry; the slot grades correct once every step is right (built product equals the product of the step answers).
+- Replaced the `line-four` fill-text in permutations with a `multiply-steps` variant whose four steps are 4 → 3 → 2 → 1, each with its own prompt and hint.
+- Full new-kind wiring: `types.ts` (InteractionKind + Variant unions + `MultiplyStepsVariant`), `checkAnswer.ts` (product check), `assertLessonInvariants.ts` (≥2 integer steps, non-empty prompts/hints), `ProblemSlotView.tsx` (dispatch), and the `scripts/audit-feedback.ts` exhaustive `Record<interactionKind>` map (empty entry — hints live inside `steps`).
+
+### Tests delta
+
+- `permutations.test.ts`: the line-four test now asserts `multiply-steps` with steps [4,3,2,1], per-step prompts+hints, and that `checkAnswer` grades the built product (24 correct, 12 not). Interaction-mix array updated. Count stays 13.
+
+**Numbers update**: 99 test files, **1077 tests**, all green; production build clean (the new kind passes the exhaustive `checkAnswer` / invariant / audit switches).
+
+---
+
+## D105: Interactive order-builder manipulative for permutations — 2026-06-28
+
+Owner asked for a "pick and build an order" interaction on permutations, in the spirit of the sample-space subset picker.
+
+- New `ConceptFigure` kind **`order-builder`** + `OrderBuilderFigure` component. The learner taps Ana, Ben, and Cleo one at a time to fill three ordered spots, logs the arrangement, and watches distinct orders pile up toward 3! = 6 (with a "that is 3 × 2 × 1" payoff once all six are found). Same contract as `subset-picker`: not graded, no XP, no blocking; the point is the manipulative that order matters (ABC is not ACB).
+- Wired onto the permutations **`resolve`** slot, so the learner builds the six orders by hand right where the 3 × 2 × 1 logic is explained (manipulative alongside the abstraction).
+- Triple wiring as with prior figures: `types.ts` (union + type), `assertLessonInvariants.ts` (caption check), `ConceptSlotView.tsx` (import + render).
+
+### Tests delta
+
+- `permutations.test.ts` (+1 → 13): asserts the resolve slot carries an `order-builder` figure with a caption.
+
+**Numbers update**: 99 test files, **1077 tests**, all green; production build clean.
+
+---
+
+## D104: Challenge problems for permutations and combinations — 2026-06-28
+
+Owner asked for a Captain Pascal challenge problem on each, in the style of the lesson-1 challenge (commit-once + `challenge: true` banner).
+
+- **Permutations — circular arrangements.** New `challenge-circle` slot before the wrap: five friends around a round table, where rotations count as the same seating, so the answer is (n − 1)! = 4! = 24, not 5! = 120. The 120 line-arrangement reflex is the tailored trap; the explanation teaches the fix-one-seat idea and the general (n − 1)! result.
+- **Combinations — stars and bars.** New `challenge-stars-bars` slot before the wrap: 6 identical lollipops handed to 3 children (zero allowed) = C(8, 2) = 28. Traps: 20 = C(6,3) (plain choose), 18 = 6×3, 729 = 3^6 (distinct-items reflex). The explanation draws the 6 stars + 2 bars picture (**|***|* = 2,3,1) and names the technique.
+
+Both are commit-once predictions whose payoff is the reveal, so a wrong guess still continues. Interaction mix for each grew by one MCQ.
+
+### Tests delta
+
+- `permutations.test.ts` (+1 → 12) and `combinations.test.ts` (+1 → 13): slot-order arrays include the new challenge slot, plus a dedicated test asserting `challenge: true`, the correct answer, the signature trap, and that the explanation teaches the (n−1)! / stars-and-bars idea. Interaction-mix arrays updated.
+
+**Numbers update**: 99 test files, **1074 tests**, all green; production build clean.
+
+---
+
+## D103: Prune redundant stubs (divide-by-k!, at-least-one, mutually-exclusive) — 2026-06-27
+
+Owner pruned the roadmap of lessons now covered elsewhere.
+
+- **`divide-by-k-factorial` dropped.** Its derivation ("why divide by k!") is taught directly in the `combinations` lesson (D102): the resolve slot shows the ordered count over-counts each group k! times, and the rule slot states C(n,k) = n!/(k!(n−k)!).
+- **`at-least-one` dropped.** The `complement-rule` lesson (D99) already teaches "at least one" via the complement as its killer application.
+- **`mutually-exclusive` dropped.** Inclusion-exclusion (D100) already covers P(A or B) = P(A) + P(B) as the disjoint special case (overlap term 0). The exclusive→add contrast will live inside `independent-events` when it is authored.
+- **`independent-events` kept.** It is genuinely new: multiplying *probabilities* (P(A and B) = P(A)·P(B)), not counting outcomes. It underpins the birthday paradox, "at least one" via 1 − (1−p)^n, and conditional probability.
+
+Stub numbers renumbered across units 3–6; `chapters.ts` Counting Techniques and Combining Probabilities lesson lists updated. Course still 6 units. No code references the dropped ids (the `at-least-one-via-complement` practice templates are a separate system and untouched).
+
+**Numbers update**: 98 test files, **1042 tests**, all green; production build clean.
+
+---

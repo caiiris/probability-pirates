@@ -1,0 +1,19 @@
+{
+  "id": "birthday-paradox-23",
+  "sequence": 1,
+  "openAt": "2026-06-27T00:00:00Z",
+  "prompt": "In a group of 23 randomly chosen people, what is the probability (in %) that at least two of them share a birthday?",
+  "unit": "percent",
+  "tags": ["birthday-paradox", "complement", "combinatorics"],
+  "flavor": "counterintuition",
+  "scoring": "log",
+  "relatedLessonId": "complement-rule",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 50.7,
+  "source": "Standard birthday-paradox derivation. See Grinstead & Snell, Introduction to Probability, §3.1.",
+  "sourceUrl": "https://math.dartmouth.edu/~prob/prob/prob.pdf",
+  "revealHeadline": "Pairs grow faster than people.",
+  "revealExplanation": "23 people make C(23, 2) = 253 distinct pairs, and each pair has roughly a 1/365 chance of matching. Most people anchor on \u201823 versus 365\u2019 and miss that pair-multiplication, which is why the probability crosses 50% so much earlier than intuition suggests.",
+  "revealWorked": "P(at least one match) = 1 \u2212 P(all distinct) = 1 \u2212 (365 \u00d7 364 \u00d7 \u2026 \u00d7 343) / 365^23 \u2248 0.5073."
+}

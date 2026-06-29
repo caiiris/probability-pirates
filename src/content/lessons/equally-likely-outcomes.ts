@@ -80,7 +80,6 @@ export const equallyLikelyOutcomes: Lesson = {
       id: 'the-puzzle',
       kind: 'problem',
       interactionKind: 'multiple-choice',
-      commitOnce: true,
       variants: [
         {
           id: 'two-coins-one-head',
@@ -107,6 +106,7 @@ export const equallyLikelyOutcomes: Lesson = {
           },
           explanation:
             'The four equally-likely pairs of two flips are HH, HT, TH, and TT. Of those, two have exactly one heads (HT and TH), so P(exactly one heads) = 2/4 = 1/2.',
+          skills: ['equally-likely-outcomes'],
         },
       ],
     },
@@ -173,8 +173,6 @@ export const equallyLikelyOutcomes: Lesson = {
           feedbackByWrongAnswer: {
             '1/11':
               'You counted 7 as one of the 11 sums (2 through 12). But not every sum is equally likely, so the 11 sums cannot be the sample space.',
-            '1/6':
-              'That is the simplified value, and it is correct. The grader is looking for k/N in its raw form: pairs that sum to 7 over total pairs.',
             '6/11':
               'Six is the right count for k. But N here is the count of equally-likely outcomes — pairs of dice — not the count of distinct sums.',
             '1/36':
@@ -185,6 +183,7 @@ export const equallyLikelyOutcomes: Lesson = {
           explanation:
             'The 36 equally-likely pairs are (d1, d2) for d1, d2 in 1..6. The pairs summing to 7 are (1,6), (2,5), (3,4), (4,3), (5,2), and (6,1). So P(sum=7) = 6/36 = 1/6.',
           afterNote: 'P(sum=7) = k/N = 6/36 = 1/6.',
+          skills: ['equally-likely-outcomes', 'favorable-over-total'],
         },
       ],
     },
@@ -221,6 +220,7 @@ export const equallyLikelyOutcomes: Lesson = {
           },
           explanation:
             'There are two outcomes, but they are not equally likely: red is 270/360 = 3/4 and blue is 90/360 = 1/4.',
+          skills: ['equally-likely-outcomes'],
         },
       ],
     },
@@ -249,6 +249,7 @@ export const equallyLikelyOutcomes: Lesson = {
           },
           explanation:
             'A thumbtack is not symmetric, so {up, down} are not equally likely. Only repeated trials reveal the real split.',
+          skills: ['equally-likely-outcomes'],
         },
       ],
     },
@@ -284,6 +285,7 @@ export const equallyLikelyOutcomes: Lesson = {
           },
           explanation:
             'A shuffle makes all 52 cards equally likely. Grouping them by suit (13 each) or by rank (4 each) keeps the groups equal, so every one of these lists is equally likely.',
+          skills: ['equally-likely-outcomes'],
         },
       ],
     },
@@ -318,6 +320,7 @@ export const equallyLikelyOutcomes: Lesson = {
           },
           explanation:
             'The possible sums are 2 through 12, which is 11 values. They are not equally likely, but there are 11 of them.',
+          skills: ['equally-likely-outcomes'],
         },
       ],
     },
@@ -348,6 +351,7 @@ export const equallyLikelyOutcomes: Lesson = {
           },
           explanation:
             'The equally likely sample space is the 36 ordered pairs (first die, second die), since 6 × 6 = 36.',
+          skills: ['equally-likely-outcomes'],
         },
       ],
     },

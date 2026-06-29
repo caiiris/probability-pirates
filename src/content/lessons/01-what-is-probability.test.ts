@@ -138,22 +138,44 @@ describe('course catalog', () => {
   it('opens on the authored lessons as the playable head of the catalog', () => {
     const playable = lessons.filter((l) => !l.comingSoon);
     // Authored, in catalog order. Add ids here as new roadmap lessons are
-    // authored (D88, D92, D93, D94, D95, …). Every other lesson is a
-    // blank, locked stub. Note (D95): `addition-principle` was moved
-    // from Unit 4 into Unit 2 right after `multiplication-principle`,
-    // so it appears immediately after it on the path.
+    // authored (D88, D92–D95, D99, …). The per-unit practice-*/review-*
+    // stubs were removed, so this list is now the entire catalog. D99 added
+    // `compound-experiments` (opens Unit 2, ahead
+    // of multiplication-principle) and `complement-rule` (opens Counting
+    // Techniques). D107–D112 completed the teaching path: the conditional
+    // unit (`independence-revisited`, `bayes-theorem`) and the Expected
+    // Value unit (`expected-value-intuition`, `computing-expected-value`,
+    // `fair-games`). D113 dropped the standalone `tree-diagrams` lesson.
     expect(playable.map((l) => l.id)).toEqual([
       'how-likely',
       'long-run-frequency',
       'sample-space',
       'equally-likely-outcomes',
+      'compound-experiments',
       'multiplication-principle',
       'addition-principle',
+      'complement-rule',
+      'inclusion-exclusion',
+      'permutations',
+      'combinations',
+      'independent-events',
+      'birthday-paradox',
+      'conditional-intuition',
+      'conditional-formula',
+      'independence-revisited',
+      'bayes-theorem',
+      'monty-hall',
+      'expected-value-intuition',
+      'computing-expected-value',
+      'fair-games',
     ]);
     expect(playable.every((l) => l.slots.length > 0)).toBe(true);
+    // The per-unit practice-*/review-* stubs were the last locked previews.
+    // With them removed, every node on the path is authored and playable;
+    // standalone practice (/practice) and spaced review (/warmup) cover what
+    // the dedicated path nodes would have.
     const locked = lessons.filter((l) => l.comingSoon);
-    expect(locked.length).toBeGreaterThan(0);
-    expect(locked.every((l) => l.slots.length === 0)).toBe(true);
+    expect(locked.length).toBe(0);
   });
 
   it('leads the path with how-likely → long-run-frequency → sample-space at numbers 1, 2, 3', () => {

@@ -1,4 +1,4 @@
-import { Fragment, memo, useState, useCallback, useEffect } from 'react';
+import { Fragment, memo, useState, useCallback, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { GridEventVariant } from '@/content/types';
 import type { InteractionProps } from './InteractionProps';
@@ -60,6 +60,14 @@ export function GridEvent({ variant, feedbackState, wrongTick, onChange }: Props
   const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
   const [flashWrong, setFlashWrong] = useState(false);
   const locked = feedbackState === 'correct';
+
+  // Keys of the correct cells, so the wrong-answer flash can be LOCALIZED to
+  // only the incorrect selections (PRD §9.4 AC #5) — a correct cell the learner
+  // also tapped stays indigo, only the genuinely-wrong taps flash rose.
+  const correctKeys = useMemo(
+    () => new Set(variant.correctCells.map(([r, c]) => `${r},${c}`)),
+    [variant.correctCells],
+  );
 
   // Re-flash on every wrong submission (keyed off wrongTick so it fires each time)
   useEffect(() => {
@@ -154,7 +162,7 @@ export function GridEvent({ variant, feedbackState, wrongTick, onChange }: Props
                         col={col}
                         label={`${row}+${col}`}
                         isSelected={selectedCells.has(key)}
-                        flashWrong={flashWrong}
+                        flashWrong={flashWrong && selectedCells.has(key) && !correctKeys.has(key)}
                         locked={locked}
                         onToggle={toggle}
                       />

@@ -6,9 +6,9 @@
 import { doc, runTransaction, increment, arrayUnion, writeBatch } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ERROR_COPY } from '@/lib/errors';
-import { STREAK_FREEZE_COST, MAX_STREAK_FREEZES } from '@/lib/coins';
-import { DEFAULT_AVATAR_STYLE } from './avatarStyles';
-import { DEFAULT_FLAIR } from './profileFlair';
+import { STREAK_FREEZE_COST, MAX_STREAK_FREEZES, TROPHY_REWARD } from '@/lib/coins';
+import { DEFAULT_AVATAR_STYLE, getAvatarStyle, isAvatarStyle } from './avatarStyles';
+import { DEFAULT_FLAIR, getFlair, isFlair } from './profileFlair';
 
 export type ClaimChestResult =
   | { ok: true; awarded: number; alreadyClaimed: boolean }
@@ -26,6 +26,10 @@ export async function claimChest(
   reward: number,
 ): Promise<ClaimChestResult> {
   if (!uid || !chestId) return { ok: false, error: 'Missing uid or chest.' };
+  // Clamp to the maximum legitimate chest payout so a tampered caller can't mint
+  // arbitrary coins through this path. Real rewards (CHEST_REWARD / TROPHY_REWARD)
+  // pass through unchanged.
+  const safeReward = Math.min(Math.max(0, Math.round(reward)), TROPHY_REWARD);
   try {
     const userRef = doc(db, 'users', uid);
     const awarded = await runTransaction(db, async (tx) => {
@@ -33,10 +37,10 @@ export async function claimChest(
       const claimed: string[] = (snap.data()?.claimedChests as string[]) ?? [];
       if (claimed.includes(chestId)) return 0;
       tx.update(userRef, {
-        coins: increment(reward),
+        coins: increment(safeReward),
         claimedChests: arrayUnion(chestId),
       });
-      return reward;
+      return safeReward;
     });
     return { ok: true, awarded, alreadyClaimed: awarded === 0 };
   } catch (err) {
@@ -93,6 +97,13 @@ export async function buyAvatarStyle(
   price: number,
 ): Promise<BuyAvatarStyleResult> {
   if (!uid || !styleId) return { ok: false, reason: 'error', error: 'Missing uid or style.' };
+  // Price is authoritative from the catalog, not the caller. Reject unknown or
+  // free styles, and a caller-supplied price that doesn't match the catalog.
+  if (!isAvatarStyle(styleId)) return { ok: false, reason: 'error', error: 'Unknown style.' };
+  const canonicalPrice = getAvatarStyle(styleId).price;
+  if (canonicalPrice <= 0 || price !== canonicalPrice) {
+    return { ok: false, reason: 'error', error: 'Price mismatch.' };
+  }
   try {
     const userRef = doc(db, 'users', uid);
     const outcome = await runTransaction(db, async (tx) => {
@@ -102,9 +113,9 @@ export async function buyAvatarStyle(
         DEFAULT_AVATAR_STYLE,
       ];
       if (owned.includes(styleId)) return 'owned' as const;
-      if (coins < price) return 'insufficient' as const;
+      if (coins < canonicalPrice) return 'insufficient' as const;
       tx.update(userRef, {
-        coins: increment(-price),
+        coins: increment(-canonicalPrice),
         ownedAvatarStyles: arrayUnion(styleId),
       });
       return 'ok' as const;
@@ -147,6 +158,12 @@ export async function buyProfileFlair(
   price: number,
 ): Promise<BuyFlairResult> {
   if (!uid || !flairId) return { ok: false, reason: 'error', error: 'Missing uid or flair.' };
+  // Price is authoritative from the catalog, not the caller.
+  if (!isFlair(flairId)) return { ok: false, reason: 'error', error: 'Unknown flair.' };
+  const canonicalPrice = getFlair(flairId).price;
+  if (canonicalPrice <= 0 || price !== canonicalPrice) {
+    return { ok: false, reason: 'error', error: 'Price mismatch.' };
+  }
   try {
     const userRef = doc(db, 'users', uid);
     const outcome = await runTransaction(db, async (tx) => {
@@ -154,9 +171,9 @@ export async function buyProfileFlair(
       const coins: number = (snap.data()?.coins as number) ?? 0;
       const owned: string[] = (snap.data()?.ownedFlair as string[]) ?? [DEFAULT_FLAIR];
       if (owned.includes(flairId)) return 'owned' as const;
-      if (coins < price) return 'insufficient' as const;
+      if (coins < canonicalPrice) return 'insufficient' as const;
       tx.update(userRef, {
-        coins: increment(-price),
+        coins: increment(-canonicalPrice),
         ownedFlair: arrayUnion(flairId),
       });
       return 'ok' as const;

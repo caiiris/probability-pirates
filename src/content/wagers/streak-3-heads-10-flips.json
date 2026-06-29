@@ -1,0 +1,19 @@
+{
+  "id": "streak-3-heads-10-flips",
+  "sequence": 11,
+  "openAt": "2026-07-27T00:00:00Z",
+  "prompt": "Flip a fair coin 10 times. What is the probability (in %) that you'll see at least one streak of 3 or more heads in a row?",
+  "unit": "percent",
+  "tags": ["streaks", "complement", "tribonacci", "psychology-of-randomness"],
+  "flavor": "counterintuition",
+  "scoring": "log",
+  "relatedLessonId": "complement-rule",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 50.8,
+  "source": "Standard tribonacci-recurrence derivation. Discussed in Mlodinow, The Drunkard's Walk (2008), ch. 9, and Diaconis & Mosteller, 'Methods for Studying Coincidences', JASA 1989.",
+  "sourceUrl": "https://www.jstor.org/stable/2289950",
+  "revealHeadline": "Streaks are more common than they feel.",
+  "revealExplanation": "When people are asked to write down a \u2018random\u2019 sequence of 10 flips, they almost always avoid runs of 3 or more. Real random sequences contain runs that often. Just 10 flips already cross the 50/50 line, which is why fake-randomness studies (Diaconis, Mlodinow) can distinguish people's guesses from real coin data with high accuracy.",
+  "revealWorked": "Let f(n) count binary sequences of length n with NO HHH substring. The tribonacci recurrence f(n) = f(n\u22121) + f(n\u22122) + f(n\u22123) with f(0)=1, f(1)=2, f(2)=4 gives f(10) = 504. So P(no HHH in 10 flips) = 504 / 2^10 = 504/1024, and P(at least one HHH) = 1 \u2212 504/1024 = 520/1024 \u2248 0.508."
+}

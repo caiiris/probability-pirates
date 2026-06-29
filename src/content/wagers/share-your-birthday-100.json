@@ -1,0 +1,19 @@
+{
+  "id": "share-your-birthday-100",
+  "sequence": 7,
+  "openAt": "2026-07-15T00:00:00Z",
+  "prompt": "You are in a room with 100 randomly chosen people. What is the probability (in %) that at least one of them shares YOUR specific birthday?",
+  "unit": "percent",
+  "tags": ["complement", "independence", "birthday-paradox-cousin"],
+  "flavor": "counterintuition",
+  "scoring": "log",
+  "relatedLessonId": "complement-rule",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 24,
+  "source": "Standard independent-trials derivation, often paired with the birthday paradox to distinguish \u2018any match\u2019 from \u2018match with you\u2019. See Grinstead & Snell, Introduction to Probability, §3.1.",
+  "sourceUrl": "https://math.dartmouth.edu/~prob/prob/prob.pdf",
+  "revealHeadline": "This is NOT the birthday paradox.",
+  "revealExplanation": "When the match must be with YOUR specific date, the pair-multiplication disappears. Each of the 100 people independently has a 364/365 chance of not sharing your birthday, and you need all 100 to miss. People who just learned the birthday paradox often overshoot this one badly.",
+  "revealWorked": "P(at least one match with you) = 1 \u2212 (364/365)^100 \u2248 1 \u2212 0.760 \u2248 0.240, i.e. ~24%."
+}

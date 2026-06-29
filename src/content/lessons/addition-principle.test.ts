@@ -30,11 +30,11 @@ describe('addition-principle (Unit 2.5, D95) invariants', () => {
     ]);
   });
 
-  it('uses the same commit-once trap pattern as L2/L4/L5: predict, see feedback, continue', () => {
+  it('opens with the sandwich-or-salad trap (retryable, two-tier hints)', () => {
     const slot = additionPrinciple.slots.find((s) => s.id === 'the-puzzle');
     expect(slot?.kind).toBe('problem');
     if (slot?.kind === 'problem') {
-      expect(slot.commitOnce).toBe(true);
+      expect(slot.commitOnce).not.toBe(true);
       const v = slot.variants[0] as MultipleChoiceVariant;
       expect(v.correctOptionId).toBe('add');
       // The multiply-by-reflex distractor (15 = 3 × 5) is the canonical
@@ -148,16 +148,16 @@ describe('addition-principle (Unit 2.5, D95) invariants', () => {
     }
   });
 
-  it('keeps two-problem variety: a commit-once MCQ and a non-committing recognition MCQ', () => {
+  it('keeps two-problem variety: two retryable MCQs (discovery trap + recognition)', () => {
     const problems = additionPrinciple.slots.filter((s) => s.kind === 'problem') as ProblemSlot[];
     expect(problems.map((p) => p.interactionKind)).toEqual([
       'multiple-choice',
       'multiple-choice',
     ]);
-    // The first one is the commit-once discovery trap; the second is
-    // not commit-once (the learner gets to keep trying until they get
-    // recognition right).
-    expect(problems[0].commitOnce).toBe(true);
+    // Both are retryable now (no commit-once), so each gets the two-tier
+    // hint flow: a first wrong shows feedback, a second reveals the
+    // explanation.
+    expect(problems[0].commitOnce).toBeFalsy();
     expect(problems[1].commitOnce).toBeFalsy();
   });
 });

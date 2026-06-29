@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -45,6 +45,12 @@ const ProgressPage = lazy(() =>
 const PracticePage = lazy(() =>
   import('@/features/practice/PracticePage').then((m) => ({ default: m.PracticePage })),
 );
+const WagerListPage = lazy(() => import('@/features/wager/WagerListPage'));
+const WagerCardPage = lazy(() => import('@/features/wager/WagerCardPage'));
+const WarmupPage = lazy(() =>
+  import('@/features/review/WarmupPage').then((m) => ({ default: m.WarmupPage })),
+);
+const NotFoundPage = lazy(() => import('@/features/notFound/NotFoundPage'));
 
 export function App() {
   return (
@@ -79,6 +85,7 @@ export function App() {
                     >
                       <Route path="/" element={<HomePage />} />
                       <Route path="/lesson/:lessonId" element={<LessonPlayer />} />
+                      <Route path="/warmup" element={<WarmupPage />} />
                       <Route path="/celebration/:lessonId" element={<CelebrationScreen />} />
                       <Route path="/practice" element={<PracticePage />} />
                       <Route path="/schedule" element={<SchedulePage />} />
@@ -87,10 +94,15 @@ export function App() {
                       <Route path="/store" element={<StorePage />} />
                       <Route path="/profile" element={<ProfilePage />} />
                       <Route path="/u/:username" element={<PublicProfilePage />} />
+                      <Route path="/wager" element={<WagerListPage />} />
+                      <Route path="/wager/:id" element={<WagerCardPage />} />
                     </Route>
 
-                    {/* Catch-all */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    {/* Catch-all — themed NotFound page (was a silent
+                        redirect to "/"). Sits OUTSIDE RequireAuth so signed-
+                        out users hitting a typo URL see the same page; the
+                        component itself adapts its CTAs to auth state. */}
+                    <Route path="*" element={<NotFoundPage />} />
                   </Routes>
                 </Suspense>
                 <Toaster position="top-center" />

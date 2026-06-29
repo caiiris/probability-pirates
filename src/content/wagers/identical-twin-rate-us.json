@@ -1,0 +1,17 @@
+{
+  "id": "identical-twin-rate-us",
+  "sequence": 8,
+  "openAt": "2026-07-18T00:00:00Z",
+  "prompt": "What percentage of all US live births are identical (monozygotic) twins?",
+  "unit": "percent",
+  "tags": ["base-rate", "real-world-frequency", "biology"],
+  "flavor": "frequency",
+  "scoring": "log",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 0.35,
+  "source": "CDC National Vital Statistics Reports: total US twin birth rate is ~3.2% of live births; the monozygotic (identical) rate is roughly constant at ~3.5 per 1,000 births (~0.35%) and is largely independent of maternal age or fertility treatment, unlike fraternal twinning.",
+  "sourceUrl": "https://www.cdc.gov/nchs/data/nvsr/nvsr72/nvsr72-01.pdf",
+  "revealHeadline": "The identical-twin rate is biologically constant.",
+  "revealExplanation": "While the OVERALL twin rate has risen with fertility treatments, the identical-twin rate has stayed near 0.35% of births worldwide for as long as we have data. It's a striking case of a stable base rate independent of culture, time, or maternal age."
+}

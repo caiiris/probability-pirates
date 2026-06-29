@@ -53,6 +53,7 @@ import { InteractionDispatch } from '@/features/practice/InteractionDispatch';
 import { ConceptualRound } from '@/features/practice/ConceptualRound';
 import { pickConceptualProblem } from '@/features/practice/conceptual';
 import { diagnoseWrongAnswer } from '@/features/practice/diagnoseWrongAnswer';
+import { MISCONCEPTIONS } from '@/content/misconceptions';
 import type { ConceptualProblem } from '@/content/conceptual/types';
 
 // ─── Ground-truth helpers (for the AI hint request) ─────────────────────────────
@@ -75,6 +76,64 @@ function formatExactAnswer(answer: ExactAnswer, variant: Variant): string {
       return answer.optionId;
     }
   }
+}
+
+/** Render the learner's submitted answer as a short readable string for the
+ *  hint request's diagnosis + within-problem history (MC → option label). */
+function formatLearnerAnswer(variant: Variant, payload: AttemptPayload): string {
+  if ('optionId' in payload) {
+    if (variant.interactionKind === 'multiple-choice') {
+      return variant.options.find((o) => o.id === payload.optionId)?.label ?? String(payload.optionId);
+    }
+    return String(payload.optionId);
+  }
+  if ('value' in payload) return String(payload.value);
+  if ('numerator' in payload && 'denominator' in payload) {
+    return `${payload.numerator}/${payload.denominator}`;
+  }
+  return JSON.stringify(payload);
+}
+
+/**
+ * Build the authored diagnosis of the learner's CURRENT wrong answer: the
+ * template's hand-written per-answer feedback (if it keyed this answer) plus the
+ * matched misconception's label + fix. This is what makes the AI hint tuned to
+ * what the learner actually did — the model rephrases this, it doesn't invent it.
+ * Returns undefined when neither signal is available (→ generic nudge).
+ */
+function buildDiagnosis(
+  variant: Variant,
+  payload: AttemptPayload,
+): { authoredFeedback?: string; misconception?: string } | undefined {
+  let authoredFeedback: string | undefined;
+  if (variant.interactionKind === 'multiple-choice' && 'optionId' in payload) {
+    authoredFeedback = variant.feedbackByOption?.[payload.optionId];
+  } else if (variant.interactionKind === 'number-fill' && 'value' in payload) {
+    authoredFeedback = variant.feedbackByWrongAnswer?.[String(payload.value)];
+  } else if (
+    variant.interactionKind === 'fill-fraction' &&
+    'numerator' in payload &&
+    'denominator' in payload
+  ) {
+    authoredFeedback = variant.feedbackByWrongAnswer?.[`${payload.numerator}/${payload.denominator}`];
+  }
+
+  const key = diagnoseWrongAnswer(variant, payload);
+  const misconception = key ? `${MISCONCEPTIONS[key].label}: ${MISCONCEPTIONS[key].fix}` : undefined;
+
+  if (!authoredFeedback && !misconception) return undefined;
+  return { authoredFeedback, misconception };
+}
+
+/**
+ * Redact every number (integers, decimals, fractions) from a solution step so
+ * the hint model can see the METHOD's shape — and locate where the learner
+ * diverged — without ever seeing the answer's values. "P = 781/1024 = 0.76"
+ * becomes "P = ▢ = ▢". Keeps the leak-safety of withholding the answer on
+ * hint turns while still grounding "how far did they get".
+ */
+function redactNumbers(step: string): string {
+  return step.replace(/\d+(?:\.\d+)?(?:\/\d+)?/g, '▢');
 }
 
 /** How many wrong tries before the canonical solution is revealed (F2). */
@@ -151,6 +210,10 @@ export function PracticeSession({
   const templateStreakRef = useRef(1); // the initial problem is a template
   const recentConceptualRef = useRef<string[]>([]);
 
+  // Within-problem hint memory: prior (answer, hint) pairs for THIS instance so
+  // each new hint can build on the last. Cleared on every new problem.
+  const attemptLogRef = useRef<{ answer: string; hint: string }[]>([]);
+
   // Reset the loop whenever the topic changes (controlled by PracticePage).
   useEffect(() => {
     const seed = Date.now() ^ (++counterRef.current * 0x9e3779b9);
@@ -165,6 +228,7 @@ export function PracticeSession({
     setConceptual(null);
     templateStreakRef.current = 1;
     recentConceptualRef.current = [];
+    attemptLogRef.current = [];
     setCurrentAnswer(null);
     setResolved(false);
     setHint(null);
@@ -187,6 +251,13 @@ export function PracticeSession({
         answer: formatExactAnswer(instance.answer, instance.variant),
         canonicalWhy: instance.explanation.steps.join(' '),
       },
+      // Personalization: authored diagnosis of THIS wrong answer + the hints
+      // already shown this problem (so try 2 builds on try 1).
+      diagnosis: currentAnswer ? buildDiagnosis(instance.variant, currentAnswer) : undefined,
+      history: attemptLogRef.current.length > 0 ? [...attemptLogRef.current] : undefined,
+      // Number-redacted method steps → lets the hint localize how far the learner
+      // got (model tracing) without exposing the answer's values.
+      solutionOutline: instance.explanation.steps.map(redactNumbers),
     };
   }
 
@@ -227,6 +298,9 @@ export function PracticeSession({
         skills: instance.skills,
         wasCorrect,
         difficulty: instance.difficulty,
+        // Try-weighted mastery: a 2nd/3rd-try solve counts as less mastery than a
+        // first-try solve (a reveal is wasCorrect=false → zero credit).
+        solvedOnTry,
         misconceptionSignal: diagnosedKey ? { key: diagnosedKey, source: 'trap' } : null,
       });
     }
@@ -264,7 +338,14 @@ export function PracticeSession({
     setHintLoading(true);
     const result = await requestHint(buildHintRequest(thisTry as 1 | 2));
     setHintLoading(false);
-    setHint(result.fallbackUsed || !result.text ? instance.variant.feedbackDefault : result.text);
+    const shown =
+      result.fallbackUsed || !result.text ? instance.variant.feedbackDefault : result.text;
+    setHint(shown);
+    // Record this (answer, hint) pair so the NEXT try's hint can build on it.
+    attemptLogRef.current = [
+      ...attemptLogRef.current,
+      { answer: formatLearnerAnswer(instance.variant, currentAnswer), hint: shown },
+    ];
   }
 
   /**
@@ -277,6 +358,7 @@ export function PracticeSession({
     setResolved(false);
     setHint(null);
     setHintLoading(false);
+    attemptLogRef.current = [];
 
     const seed = Date.now() ^ (++counterRef.current * 0x9e3779b9);
     const rng = mulberry32(seed);
@@ -345,7 +427,15 @@ export function PracticeSession({
               </span>
             </div>
 
+            {/*
+             * Key by instance.instanceId so every new problem fully remounts
+             * the interaction renderer. Stateless renderers reset by remount;
+             * this clears any internal input state (NumberFill value,
+             * FillFraction num/den, MultipleChoice selection, etc.) so the
+             * previous answer never carries over to the next problem.
+             */}
             <InteractionDispatch
+              key={instance.instanceId}
               variant={instance.variant}
               attemptNumber={state.attemptNumber}
               feedbackState={state.feedbackState}

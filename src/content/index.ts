@@ -9,8 +9,23 @@ import { howLikely } from './lessons/how-likely';
 import { longRunFrequency } from './lessons/long-run-frequency';
 import { sampleSpace } from './lessons/sample-space';
 import { equallyLikelyOutcomes } from './lessons/equally-likely-outcomes';
+import { compoundExperiments } from './lessons/compound-experiments';
 import { multiplicationPrinciple } from './lessons/multiplication-principle';
 import { additionPrinciple } from './lessons/addition-principle';
+import { complementRule } from './lessons/complement-rule';
+import { inclusionExclusion } from './lessons/inclusion-exclusion';
+import { permutations } from './lessons/permutations';
+import { combinations } from './lessons/combinations';
+import { independentEvents } from './lessons/independent-events';
+import { birthdayParadox } from './lessons/birthday-paradox';
+import { conditionalIntuition } from './lessons/conditional-intuition';
+import { conditionalFormula } from './lessons/conditional-formula';
+import { independenceRevisited } from './lessons/independence-revisited';
+import { bayesTheorem } from './lessons/bayes-theorem';
+import { montyHall } from './lessons/monty-hall';
+import { expectedValueIntuition } from './lessons/expected-value-intuition';
+import { computingExpectedValue } from './lessons/computing-expected-value';
+import { fairGames } from './lessons/fair-games';
 import { roadmapStubLessons } from './lessons/roadmapStubs';
 import type { Lesson } from './types';
 
@@ -39,16 +54,27 @@ import type { Lesson } from './types';
 // list). To author another one: write the file, import it, add it here.
 // `how-likely` is excluded — it's the dedicated course opener (no roadmap
 // stub mirrors it; it sits ahead of Unit 1 in the path).
-//
-// `additionPrinciple` is authored but intentionally NOT included here, so the
-// path renders its locked roadmap stub instead. To unlock it later, just add
-// `additionPrinciple` back to this array — the import + re-export below stay
-// so the file is one edit away from going live.
 const authoredRoadmapLessons: Lesson[] = [
   longRunFrequency,
   sampleSpace,
   equallyLikelyOutcomes,
+  compoundExperiments,
   multiplicationPrinciple,
+  additionPrinciple,
+  complementRule,
+  inclusionExclusion,
+  permutations,
+  combinations,
+  independentEvents,
+  birthdayParadox,
+  conditionalIntuition,
+  conditionalFormula,
+  independenceRevisited,
+  bayesTheorem,
+  montyHall,
+  expectedValueIntuition,
+  computingExpectedValue,
+  fairGames,
 ];
 const authoredRoadmapById = new Map<string, Lesson>(
   authoredRoadmapLessons.map((lesson) => [lesson.id, lesson]),
@@ -91,8 +117,23 @@ export {
   longRunFrequency,
   sampleSpace,
   equallyLikelyOutcomes,
+  compoundExperiments,
   multiplicationPrinciple,
   additionPrinciple,
+  complementRule,
+  inclusionExclusion,
+  permutations,
+  combinations,
+  independentEvents,
+  birthdayParadox,
+  conditionalIntuition,
+  conditionalFormula,
+  independenceRevisited,
+  bayesTheorem,
+  montyHall,
+  expectedValueIntuition,
+  computingExpectedValue,
+  fairGames,
 };
 export type { Lesson } from './types';
 export * from './types';

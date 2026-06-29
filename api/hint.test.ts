@@ -161,6 +161,84 @@ describe('buildComputationalMessages', () => {
     expect(user).toContain('gambler-fallacy');
     expect(user).toContain('gambler');
   });
+
+  it('injects the authored diagnosis of the current wrong answer (rephrase, no reveal)', () => {
+    const msgs = buildComputationalMessages({
+      ...validComputationalBody,
+      diagnosis: {
+        authoredFeedback: 'You multiplied the two drink groups instead of adding them.',
+        misconception: 'Adds when it should multiply (or vice versa): AND multiplies, OR adds.',
+      },
+    });
+    const user = msgs[1].content;
+    expect(user).toContain('You multiplied the two drink groups instead of adding them.');
+    expect(user).toContain('Adds when it should multiply');
+    // System prompt references the diagnosis, forbids the rigid multi-part template,
+    // and never reveals. Naming a misconception is conditional, not forced.
+    expect(msgs[0].content).toMatch(/DIAGNOSIS/i);
+    expect(msgs[0].content).toMatch(/do not invent one/i);
+    expect(msgs[0].content).toMatch(/DO NOT write a multi-part/i);
+    expect(msgs[0].content).toMatch(/NEVER reveal/i);
+  });
+
+  it('caps an early hint to one sentence and forbids the worksheet template', () => {
+    const sys = buildComputationalMessages({ ...validComputationalBody, tryNumber: 1 })[0].content;
+    expect(sys).toMatch(/ONE sentence/i);
+    expect(sys).toMatch(/numbered list|template/i);
+  });
+
+  it('includes the redacted solution outline + a divergence-localization instruction (hint turns)', () => {
+    const msgs = buildComputationalMessages({
+      ...validComputationalBody,
+      tryNumber: 2,
+      solutionOutline: [
+        'Recognize "at least one" → use the complement',
+        'Find P(miss) on a single trial',
+        'Raise to the power of the number of trials',
+        'Subtract from ▢',
+      ],
+    });
+    expect(msgs[1].content).toContain('Recognize "at least one"');
+    expect(msgs[1].content).toMatch(/numbers hidden|locate where they diverged/i);
+    expect(msgs[0].content).toMatch(/FIRST step they seem to have gotten wrong|how far/i);
+  });
+
+  it('omits the solution outline on the reveal turn (tryNumber 3)', () => {
+    const msgs = buildComputationalMessages({
+      ...validComputationalBody,
+      tryNumber: 3,
+      solutionOutline: ['Recognize the complement step'],
+    });
+    expect(msgs[1].content).not.toContain('Recognize the complement step');
+  });
+
+  it('injects within-problem hint history so try 2 builds on try 1', () => {
+    const msgs = buildComputationalMessages({
+      ...validComputationalBody,
+      tryNumber: 2,
+      history: [{ answer: '12', hint: 'Look at how the two stages combine.' }],
+    });
+    const user = msgs[1].content;
+    expect(user).toContain('Hints already given');
+    expect(user).toContain('Look at how the two stages combine.');
+    expect(user).toContain('12');
+    expect(msgs[0].content).toMatch(/NEVER repeat/i);
+  });
+
+  it('omits history on the reveal turn (tryNumber 3)', () => {
+    const msgs = buildComputationalMessages({
+      ...validComputationalBody,
+      tryNumber: 3,
+      history: [{ answer: '12', hint: 'earlier nudge' }],
+    });
+    expect(msgs[1].content).not.toContain('Hints already given');
+  });
+
+  it('omits diagnosis/history lines when not provided', () => {
+    const msgs = buildComputationalMessages(validComputationalBody);
+    expect(msgs[1].content).not.toContain('Diagnosis of the learner');
+    expect(msgs[1].content).not.toContain('Hints already given');
+  });
 });
 
 describe('buildConceptualMessages', () => {
@@ -394,6 +472,30 @@ describe('validateModelOutput', () => {
         misconceptionKey: null,
       });
       expect(validateModelOutput(raw, 'conceptual', 1, [])).not.toBeNull();
+    });
+
+    it('accepts incorrect-reasoning (genuine but wrong) with a null misconceptionKey', () => {
+      const raw = JSON.stringify({
+        text: 'Not quite — think about what the question is actually asking.',
+        classification: 'incorrect-reasoning',
+        misconceptionKey: null,
+      });
+      const out = validateModelOutput(raw, 'conceptual', 1, ['gambler']);
+      expect(out).not.toBeNull();
+      expect(out!.classification).toBe('incorrect-reasoning');
+      expect(out!.misconceptionKey).toBeNull();
+    });
+
+    it('nulls a stray misconceptionKey when the class is NOT misconception', () => {
+      const raw = JSON.stringify({
+        text: 'Close.',
+        classification: 'incorrect-reasoning',
+        misconceptionKey: 'gambler',
+      });
+      const out = validateModelOutput(raw, 'conceptual', 1, ['gambler']);
+      expect(out).not.toBeNull();
+      // A key only sticks for the "misconception" class.
+      expect(out!.misconceptionKey).toBeNull();
     });
 
     it('allows any misconceptionKey when no closed set is provided', () => {

@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CaptainPascal } from '@/features/captain/CaptainPascal';
+import { CaptainMascot } from '@/components/illustrations/CaptainMascot';
 import type { Lesson } from '@/content/types';
 import type { LessonProgress } from '@/features/progress/progressService';
 import { MOTION } from '@/lib/motion';
@@ -148,10 +149,26 @@ function WelcomeHero({
   onStart: () => void;
   onDismiss: () => void;
 }) {
+  // Intentionally NOT using the shared compact CaptainPascal here: that layout
+  // crams mascot + eyebrow + a long welcome line into one row, which wraps the
+  // tagline awkwardly on common widths. The welcome is a one-time first
+  // impression — worth a deliberate centered "headline + tagline" structure
+  // instead of a row that almost-but-not-quite fits.
   return (
-    <div className="relative flex flex-col gap-4 pr-8">
-      <CaptainPascal context="welcome" name={displayUsername} compact />
-      <Button onClick={onStart} className="w-full">
+    <div className="relative flex flex-col items-center text-center gap-4 px-2">
+      <CaptainMascot className="h-14 w-14" aria-hidden="true" />
+      <div className="space-y-1.5">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
+          Captain Pascal
+        </p>
+        <p className="font-display text-xl font-bold tracking-tight leading-snug">
+          Welcome aboard, {displayUsername}.
+        </p>
+        <p className="mx-auto max-w-sm text-sm text-foreground/75 text-balance">
+          Probability is a strange sea. Let&rsquo;s sail it together.
+        </p>
+      </div>
+      <Button onClick={onStart} className="w-full max-w-xs">
         Start your first lesson
       </Button>
       <DismissButton onClick={onDismiss} label="Dismiss welcome" />

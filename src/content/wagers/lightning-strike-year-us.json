@@ -1,0 +1,17 @@
+{
+  "id": "lightning-strike-year-us",
+  "sequence": 10,
+  "openAt": "2026-07-24T00:00:00Z",
+  "prompt": "What is the probability that a randomly chosen US resident will be struck by lightning in any given year? Express the answer as 1 in N. What is N?",
+  "unit": "count",
+  "tags": ["base-rate", "rare-event", "real-world"],
+  "flavor": "frequency",
+  "scoring": "log",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 1222000,
+  "source": "US National Weather Service lightning safety data: approximately 270 lightning strike injuries per year in a US population of ~330 million, giving roughly 1 in 1,222,000 per year.",
+  "sourceUrl": "https://www.weather.gov/safety/lightning-odds",
+  "revealHeadline": "Rarer than most people guess.",
+  "revealExplanation": "About 270 people are struck by lightning each year in the US (population ~330 million), so the annual per-person risk is roughly 1 in 1.2 million. Over an 80-year life the cumulative risk climbs to about 1 in 15,000. Famous as a benchmark for \u2018rare event\u2019 intuition: things people compare to \u2018lightning\u2019 are usually much more common."
+}

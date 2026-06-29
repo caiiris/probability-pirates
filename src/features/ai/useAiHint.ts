@@ -17,6 +17,12 @@ export type HintRequest = {
     misconceptions?: string[];
   };
   learnerSummary?: { topWeakness: string; recentMisconception: string };
+  /** Authored diagnosis of the learner's CURRENT wrong answer (computational). */
+  diagnosis?: { authoredFeedback?: string; misconception?: string };
+  /** Prior (answer, hint) pairs on THIS problem so the next hint builds on them. */
+  history?: { answer: string; hint: string }[];
+  /** Correct-method steps with numbers redacted (▢) — for divergence localization. */
+  solutionOutline?: string[];
 };
 
 /** Shape returned to callers. `fallbackUsed: true` → show authored copy. */

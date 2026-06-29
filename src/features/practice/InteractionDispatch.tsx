@@ -62,10 +62,8 @@ export function InteractionDispatch({
       );
       break;
     case 'number-fill':
-      // Free-response integer input (F2). Keyed so a new problem clears the field.
       interaction = (
         <NumberFillInteraction
-          key={variant.id}
           variant={variant}
           feedbackState={feedbackState}
           onChange={onChange}

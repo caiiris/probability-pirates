@@ -9,6 +9,7 @@ import { signIn } from './userService';
 import { takeAuthRedirectError } from './authRedirect';
 import { useAuth } from './AuthProvider';
 import { GoogleSignInButton } from './GoogleSignInButton';
+import { ForgotPasswordDialog } from './ForgotPasswordDialog';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   useEffect(() => {
     const redirectError = takeAuthRedirectError();
@@ -75,11 +77,11 @@ export function LoginPage() {
               )}
 
               <div className="space-y-1">
-                <Label htmlFor="identifier">Email or username</Label>
+                <Label htmlFor="identifier">Email</Label>
                 <Input
                   id="identifier"
-                  type="text"
-                  autoComplete="username"
+                  type="email"
+                  autoComplete="email"
                   required
                   value={identifier}
                   onChange={(e) => {
@@ -90,7 +92,16 @@ export function LoginPage() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <button
+                    type="button"
+                    onClick={() => setForgotOpen(true)}
+                    className="text-xs text-primary underline-offset-4 hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
                 <Input
                   id="password"
                   type="password"
@@ -125,6 +136,12 @@ export function LoginPage() {
           </Link>
         </p>
       </div>
+
+      <ForgotPasswordDialog
+        open={forgotOpen}
+        onOpenChange={setForgotOpen}
+        initialEmail={identifier.includes('@') ? identifier : ''}
+      />
     </div>
   );
 }

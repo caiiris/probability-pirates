@@ -1,0 +1,17 @@
+{
+  "id": "met-online-couples-2017",
+  "sequence": 5,
+  "openAt": "2026-07-09T00:00:00Z",
+  "prompt": "Of new heterosexual couples that formed in the US in 2017, what percentage first met online?",
+  "unit": "percent",
+  "tags": ["base-rate", "real-world-frequency"],
+  "flavor": "frequency",
+  "scoring": "log",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 39,
+  "source": "Rosenfeld, Thomas & Hausen, 2019, 'Disintermediating your friends: How online dating in the United States displaces other ways of meeting', Proceedings of the National Academy of Sciences 116(36).",
+  "sourceUrl": "https://www.pnas.org/doi/10.1073/pnas.1908630116",
+  "revealHeadline": "Online is now the single most common way couples meet.",
+  "revealExplanation": "By 2017, 39% of new heterosexual couples in the US first met online, up from roughly 0% in 1995. \u2018Meeting through friends\u2019 fell from ~33% to ~20% over the same period. Calibrating to fast-changing social statistics is its own probabilistic skill."
+}

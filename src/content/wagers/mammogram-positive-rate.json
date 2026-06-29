@@ -1,0 +1,18 @@
+{
+  "id": "mammogram-positive-rate",
+  "sequence": 4,
+  "openAt": "2026-07-06T00:00:00Z",
+  "prompt": "A woman in her 40s gets a routine screening mammogram. Her result comes back positive. What is the probability (in %) that she actually has breast cancer?",
+  "unit": "percent",
+  "tags": ["bayes-theorem", "base-rate-fallacy", "real-world", "medical-screening"],
+  "flavor": "bayesian",
+  "scoring": "log",
+  "status": "live",
+  "createdBy": "system",
+  "trueAnswer": 8,
+  "source": "Gigerenzer, Reckoning with Risk (2002), ch. 4: prevalence \u22481%, sensitivity \u224880%, false-positive rate \u22489.6% \u2192 PPV \u22487.8%. Consistent with modern Breast Cancer Surveillance Consortium data (~5\u201310% PPV per recalled screen for women in this age group).",
+  "sourceUrl": "https://www.bcsc-research.org/statistics/screening-performance-benchmarks",
+  "revealHeadline": "A positive test isn't the same as a diagnosis.",
+  "revealExplanation": "Across 1,000 women in this age group: ~10 have breast cancer (low base rate). The test correctly catches ~8 of them. But it also falsely flags ~95 of the 990 who DON'T have cancer. So ~103 women get a positive result, and only ~8 of those actually have cancer: roughly 8%. The intuition trap is anchoring on \u2018the test is 80% accurate\u2019 and forgetting how rare the disease is to begin with.",
+  "revealWorked": "P(cancer | positive) = P(positive | cancer) \u00d7 P(cancer) / P(positive) = (0.80 \u00d7 0.01) / (0.80 \u00d7 0.01 + 0.096 \u00d7 0.99) \u2248 0.008 / 0.103 \u2248 0.078, i.e. ~8%."
+}

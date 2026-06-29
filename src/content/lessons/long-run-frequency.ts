@@ -95,6 +95,7 @@ export const longRunFrequency: Lesson = {
           },
           explanation:
             'A single flip is unpredictable. "1/2" is a sharp prediction about many flips, not any single stretch of 10.',
+          skills: ['long-run-vs-single-trial'],
         },
       ],
     },
@@ -139,6 +140,7 @@ export const longRunFrequency: Lesson = {
           },
           explanation:
             'Flip enough and the fraction settles on a single number. That number is the probability.',
+          skills: ['frequentist-view'],
         },
       ],
     },
@@ -202,6 +204,7 @@ export const longRunFrequency: Lesson = {
           },
           explanation:
             'When you cannot count outcomes, the way to find a probability is to repeat the event many times and read off the fraction. The more flips you run, the less it wobbles and the more you can trust the answer.',
+          skills: ['frequentist-view'],
         },
       ],
     },
@@ -233,6 +236,7 @@ export const longRunFrequency: Lesson = {
           },
           explanation:
             'The fraction settles for any event you can repeat, and it lands on that event\u2019s own number: about 1/2 for heads, about 1/6 for a six.',
+          skills: ['frequentist-view'],
         },
       ],
     },
@@ -268,6 +272,7 @@ export const longRunFrequency: Lesson = {
           },
           explanation:
             'Each flip stands on its own: still 1/2, whatever came before. Here is the part people get backwards. The fraction settles down NOT because the coin fixes its mistakes, but because after thousands of flips a few early heads barely move the average at all.',
+          skills: ['long-run-vs-single-trial'],
         },
       ],
     },
@@ -302,6 +307,7 @@ export const longRunFrequency: Lesson = {
           },
           explanation:
             'After many flips, the fraction stays near the true probability. Small wobbles like 47 or 53 are common. Big swings like 30 are very unlikely for a fair coin.',
+          skills: ['long-run-vs-single-trial'],
         },
       ],
     },

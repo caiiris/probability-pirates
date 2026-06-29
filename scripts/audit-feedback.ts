@@ -29,6 +29,9 @@ const FEEDBACK_FIELDS_BY_KIND: Record<
   // `fill-text` has too large an input space to enumerate per-key feedback;
   // per-input hints are optional and the default carries most failures.
   'fill-text': [{ field: 'feedbackByWrongAnswer', requirement: 'optional' }],
+  // `multiply-steps` carries per-factor hints inside `steps`, not a flat
+  // feedback record, so there is no top-level field to audit here.
+  'multiply-steps': [],
   'monty-hall': [{ field: 'feedbackByWrongValue', requirement: 'optional' }],
 };
 

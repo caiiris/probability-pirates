@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Check, Snowflake, X } from 'lucide-react';
+import { Check, Map as MapIcon, Snowflake, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useAllLessonProgress } from '@/features/progress/useAllLessonProgress';
@@ -116,20 +116,28 @@ export function HomePage() {
           <CaptainsLog />
         )}
 
-        {/* Course path */}
-        <section aria-label="Course path" className="pt-2">
-          <div className="mx-auto max-w-md flex items-baseline justify-between mb-6 px-1">
-            <h2 className="font-display text-lg font-bold tracking-tight">Path</h2>
-            {/* "X / Y lessons" reads as the user's share of the planned course
-                (D91). The old "X / Y done" implied finality, which looked odd
-                when only one lesson was authored ("1 / 1 done" while the path
-                clearly continued below). */}
-            <span
-              className="text-sm text-muted-foreground"
+        {/* Course path.
+            Header used to be a `Path` h2 + `X / N lessons` stat row at
+            max-w-md, which read as a dry dashboard label disconnected from
+            the playful islands below. Replaced with a single small "voyage
+            progress" chip styled as a translucent map-label that sits over
+            the ocean gradient — it shares the same visual world as the path
+            instead of floating above it on the plain page bg. The chip is
+            decorative-meets-functional: it shows the progress number without
+            stacking a second column of headings above each Chapter banner
+            (which already does the framing). */}
+        <section aria-label="Course path" className="pt-2 space-y-3">
+          <div className="flex justify-center">
+            <div
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/60 bg-white/65 px-3.5 py-1.5 text-xs font-semibold text-foreground/85 shadow-soft backdrop-blur-sm"
               aria-label={`${completed} of ${total} lessons complete`}
             >
-              <span className="num font-semibold text-foreground">{completed}</span> / {total} lessons
-            </span>
+              <MapIcon className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+              <span className="num text-foreground">{completed}</span>
+              <span className="text-muted-foreground">of</span>
+              <span className="num text-foreground">{total}</span>
+              <span className="text-muted-foreground">islands explored</span>
+            </div>
           </div>
           <CoursePath
             lessons={lessons}
@@ -208,26 +216,45 @@ function GoalDonePopup({
   );
 }
 
+/**
+ * Tuned to match the loaded HomePage layout: ocean-gradient background, an
+ * optional hero/Captain's Log card, the centered voyage-progress chip, and
+ * the weaving course path. Previously this skeleton used two pill chips at
+ * the top that no longer correspond to anything on the live page (was the
+ * old "Today's goal" / "Done today" pills) — kept the path skeleton intact.
+ */
 function HomePageSkeleton() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-      <div className="flex gap-3">
-        <Skeleton className="h-8 w-28 rounded-full" />
-        <Skeleton className="h-8 w-16 rounded-full" />
-      </div>
-      <Skeleton className="h-24 w-full rounded-2xl" />
-      <div className="mx-auto max-w-md flex flex-col gap-10 pt-2">
-        {[0.5, 0.74, 0.5, 0.26, 0.5, 0.74].map((f, i) => (
-          <div key={i} className="w-full">
-            <div
-              className="-translate-x-1/2 flex flex-col items-center gap-2"
-              style={{ marginInlineStart: `${f * 100}%`, width: 140 }}
-            >
-              <Skeleton className="w-[68px] h-[68px] rounded-full" />
-              <Skeleton className="h-4 w-24 rounded" />
+    <div
+      className="min-h-full"
+      style={{
+        background:
+          'linear-gradient(180deg, #EAF5FF 0%, #CCE6FB 30%, #9DCDF0 65%, #74B5E0 100%)',
+      }}
+    >
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+        {/* Hero / Captain's Log placeholder */}
+        <Skeleton className="h-24 w-full rounded-2xl" />
+
+        {/* Voyage progress chip */}
+        <div className="flex justify-center">
+          <Skeleton className="h-7 w-56 rounded-full" />
+        </div>
+
+        {/* Path nodes — same weaving fractions as the real CoursePath */}
+        <div className="mx-auto max-w-md flex flex-col gap-10 pt-2">
+          {[0.5, 0.74, 0.5, 0.26, 0.5, 0.74].map((f, i) => (
+            <div key={i} className="w-full">
+              <div
+                className="-translate-x-1/2 flex flex-col items-center gap-2"
+                style={{ marginInlineStart: `${f * 100}%`, width: 140 }}
+              >
+                <Skeleton className="w-[68px] h-[68px] rounded-full" />
+                <Skeleton className="h-4 w-24 rounded" />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

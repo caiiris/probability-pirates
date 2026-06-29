@@ -264,4 +264,31 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* Roaring-streak flame flicker — slight scale + opacity wobble suggesting a
+     live flame. Subtle on purpose; not meant to draw the eye away from the
+     content. Disabled by the reduced-motion media query above. */
+  @keyframes streak-flicker {
+    0%,
+    100% {
+      transform: scale(1);
+      filter: brightness(1);
+    }
+    25% {
+      transform: scale(1.05) translateY(-0.5px);
+      filter: brightness(1.1);
+    }
+    55% {
+      transform: scale(0.97) translateY(0.5px);
+      filter: brightness(0.95);
+    }
+    80% {
+      transform: scale(1.03);
+      filter: brightness(1.08);
+    }
+  }
+  .streak-flicker {
+    animation: streak-flicker 1.8s ease-in-out infinite;
+    transform-origin: center bottom;
+  }
 }

@@ -128,8 +128,18 @@ export function NotificationBell({ uid }: { uid: string }) {
             )}
 
             {list.status === 'ready' && list.items.length === 0 && (
-              <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-                No notifications yet.
+              <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+                <span
+                  className="grid h-10 w-10 place-items-center rounded-full bg-muted text-muted-foreground"
+                  aria-hidden="true"
+                >
+                  <Bell className="h-5 w-5" />
+                </span>
+                <p className="text-sm font-semibold text-foreground">All quiet on deck.</p>
+                <p className="max-w-[18rem] text-xs text-muted-foreground">
+                  We&rsquo;ll ping you here when someone follows you or your wager scores
+                  land.
+                </p>
               </div>
             )}
 

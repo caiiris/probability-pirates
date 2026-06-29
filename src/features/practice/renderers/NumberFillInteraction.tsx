@@ -3,9 +3,10 @@
  * `NumberFill` input with the local value state and the `AttemptPayload`
  * contract the practice loop expects.
  *
- * Stateless renderers in this app reset by remounting; the dispatcher keys this
- * adapter by `variant.id`, so a new problem starts with an empty field. Emits
- * `{ value }` payloads (graded by `checkAnswer`'s 'number-fill' case).
+ * Stateless renderers in this app reset by remounting; PracticeSession keys
+ * the whole InteractionDispatch by `instance.instanceId`, so every new problem
+ * remounts this adapter with an empty field. Emits `{ value }` payloads
+ * (graded by `checkAnswer`'s 'number-fill' case).
  */
 
 import { useState } from 'react';

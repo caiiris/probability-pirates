@@ -128,6 +128,7 @@ export const sampleSpace: Lesson = {
           },
           explanation:
             'Heads is one outcome. Tails is another. Together they make {H, T}, the full sample space of one flip.',
+          skills: ['sample-space-enumeration'],
         },
       ],
     },
@@ -265,6 +266,7 @@ export const sampleSpace: Lesson = {
           },
           explanation:
             '"At least one heads" means one or two heads. HH (two), HT (one), and TH (one) all qualify. TT has zero heads, so it stays out.',
+          skills: ['sample-space-enumeration'],
         },
       ],
     },
@@ -324,6 +326,7 @@ export const sampleSpace: Lesson = {
           },
           explanation:
             'Outcomes have to be as specific as the experiment is. One draw makes one specific card, so the sample space has to list every possible card.',
+          skills: ['sample-space-enumeration'],
         },
       ],
     },
@@ -354,8 +357,6 @@ export const sampleSpace: Lesson = {
           feedbackDefault:
             'k is the count of outcomes in the event (clubs). N is the total count in the sample space (cards). Type k on top, N on bottom.',
           feedbackByWrongAnswer: {
-            '1/4':
-              'That is the simplified value, and it is correct. The grader is looking for k/N in its raw form first: count of clubs on top, count of all cards on bottom.',
             '4/52':
               'There are 4 suits in a deck, but here you want clubs, not suits. How many cards are clubs?',
             '13/13':
@@ -368,6 +369,7 @@ export const sampleSpace: Lesson = {
           explanation:
             'There are 13 clubs in a standard deck and 52 cards total, so k = 13 and N = 52. P(club) = k/N = 13/52, which is 1/4.',
           afterNote: 'P(club) = k/N = 13/52 = 1/4.',
+          skills: ['favorable-over-total'],
         },
       ],
     },
@@ -399,6 +401,7 @@ export const sampleSpace: Lesson = {
           },
           explanation:
             'The sample space of three flips is the eight strings of three letters where each letter is H or T: HHH, HHT, HTH, HTT, THH, THT, TTH, TTT. Any of those is a valid outcome.',
+          skills: ['sample-space-enumeration'],
         },
       ],
     },

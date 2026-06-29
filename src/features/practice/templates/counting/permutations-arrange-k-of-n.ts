@@ -7,13 +7,15 @@
  * Parameters: n ∈ {4..8}, k ∈ {2..min(n-1, 4)}
  * Solve:      { kind: 'int', value: nPr(n,k) } — ordered arrangements
  *
- * The mirror image of pick-k-of-n-unordered: here order DOES matter. Typing the
- * combination count nCr(n,k) (treating an ordered arrangement as unordered) flags
- * the `ordered_vs_unordered` misconception via misconceptionByValue.
+ * The mirror image of pick-k-of-n-unordered: here order DOES matter. Two traps
+ * are flagged via misconceptionByValue:
+ *   - nCr(n,k)  → `ordered_vs_unordered`     (treated the arrangement as unordered)
+ *   - k!        → `arrange_without_selecting` (only arranged the k, didn't choose
+ *                                              which k of the n — e.g. "3! = 6" for 6P3)
  */
 
 import type { Template } from '../types';
-import { nPr, nCr } from '@/lib/probability/exact';
+import { nPr, nCr, factorial } from '@/lib/probability/exact';
 
 type Params = { n: number; k: number };
 
@@ -43,6 +45,34 @@ export const permutationsArrangeTemplate: Template<Params> = {
     const { n, k } = params;
     const correct = Number(nPr(n, k));
     const unordered = Number(nCr(n, k)); // combinations = the order-doesn't-matter trap
+
+    // Build trap maps, guarding against value collisions (with the answer or each
+    // other) so a single number never maps to two misconceptions.
+    const misconceptionByValue: Record<number, 'ordered_vs_unordered' | 'arrange_without_selecting'> =
+      {};
+    const feedbackByWrongAnswer: Record<string, string> = {};
+
+    // Trap 1: combinations — treated the ordered arrangement as unordered.
+    if (unordered !== correct) {
+      misconceptionByValue[unordered] = 'ordered_vs_unordered';
+      feedbackByWrongAnswer[String(unordered)] =
+        'That counts unordered selections (combinations). Here the order on the shelf matters, so each ordering counts separately.';
+    }
+
+    // Trap 2: ANY plausible factorial m! the learner might enter — they only
+    // ARRANGED some items and skipped CHOOSING which k of the n. k! is the most
+    // common (e.g. "3! = 6" for 6P3); n! ("arranged all of them") and the others
+    // are caught too. Bounded by the number-fill input cap (9999).
+    const INPUT_CAP = 9999;
+    for (let m = 2; m <= n; m++) {
+      const f = Number(factorial(m));
+      if (f > INPUT_CAP) break; // factorials only grow — nothing larger can be entered
+      if (f === correct || f in misconceptionByValue) continue;
+      misconceptionByValue[f] = 'arrange_without_selecting';
+      feedbackByWrongAnswer[String(f)] =
+        `${f} is ${m}! — that only arranges ${m} items in order. You still have to CHOOSE which ${k} of the ${n} to place, so multiply ${n} × ${n - 1} × … for ${k} factors.`;
+    }
+
     return {
       id: `permutations-arrange-k-of-n:n=${n},k=${k}`,
       interactionKind: 'number-fill',
@@ -51,11 +81,8 @@ export const permutationsArrangeTemplate: Template<Params> = {
         `(Order matters.)`,
       answer: correct,
       answerLabel: 'arrangements',
-      misconceptionByValue: { [unordered]: 'ordered_vs_unordered' },
-      feedbackByWrongAnswer: {
-        [String(unordered)]:
-          'That counts unordered selections (combinations). Here the order on the shelf matters, so each ordering counts separately.',
-      },
+      misconceptionByValue,
+      feedbackByWrongAnswer,
       feedbackCorrect: `Correct! P(${n},${k}) = ${correct} ordered arrangements.`,
       feedbackDefault:
         `Order matters here. Count the choices for the first position, then the next, and so on.`,

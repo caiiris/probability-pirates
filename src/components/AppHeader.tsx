@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Brandmark, Wordmark } from '@/components/Brandmark';
-import { FlameIcon } from '@/components/icons/StatIcons';
+import { StreakChip } from '@/components/StreakChip';
 import { CoinChip } from '@/features/economy/CoinChip';
 import { DefaultAvatar } from '@/features/profile/DefaultAvatar';
 import { LevelBadge } from '@/features/profile/LevelBadge';
@@ -103,13 +103,7 @@ export function AppHeader() {
           "0" pill for new learners). Raw XP isn't repeated here because the
           centered level bar already shows it as progress + remaining-to-next. */}
       <div className="flex shrink-0 items-center justify-end gap-2">
-        {streak > 0 && (
-          <MiniStat
-            icon={<FlameIcon className="h-4 w-4" />}
-            value={streak}
-            label={`${streak} day streak`}
-          />
-        )}
+        <StreakChip streak={streak} />
         <Link
           to="/store"
           aria-label={`${coins} coins — open store`}
@@ -124,22 +118,3 @@ export function AppHeader() {
   );
 }
 
-function MiniStat({
-  icon,
-  value,
-  label,
-}: {
-  icon: React.ReactNode;
-  value: string | number;
-  label: string;
-}) {
-  return (
-    <span
-      className="flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 shadow-soft"
-      aria-label={label}
-    >
-      {icon}
-      <span className="text-sm font-bold leading-none text-foreground">{value}</span>
-    </span>
-  );
-}

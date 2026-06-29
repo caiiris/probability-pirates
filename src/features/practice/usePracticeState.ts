@@ -98,14 +98,24 @@ export function usePracticeState(
   const stateRef = useRef(state);
   stateRef.current = state;
 
+  // True once the learner has answered at least once this (uid, topic) session.
+  // Guards against a slow initial fetch resolving AFTER an optimistic update and
+  // clobbering it with the pre-answer snapshot.
+  const dirtyRef = useRef(false);
+
   // Fetch the doc once on (uid, topic) mount.
   useEffect(() => {
     if (!uid) return;
+    // New (uid, topic) → fresh optimistic baseline; allow the fetch to hydrate.
+    dirtyRef.current = false;
     const ref = doc(db, 'users', uid, 'practiceState', topic);
     getDoc(ref)
       .then((snap) => {
+        // Don't overwrite an answer the learner already recorded while we waited.
+        if (dirtyRef.current) return;
         if (snap.exists()) {
-          setState(snap.data() as PracticeStateDoc);
+          const data = snap.data() as PracticeStateDoc;
+          setState({ ...data, lastSeenTemplateIds: data.lastSeenTemplateIds ?? [] });
         }
       })
       .catch((err) => {
@@ -115,6 +125,7 @@ export function usePracticeState(
 
   const recordResult = useCallback(
     (wasCorrect: boolean, difficulty: number, templateId: string) => {
+      dirtyRef.current = true;
       const prev = stateRef.current;
       const newRating = applyElo(prev.rating, difficulty, wasCorrect);
       const newState: PracticeStateDoc = {

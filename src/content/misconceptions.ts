@@ -55,6 +55,12 @@ export const MISCONCEPTIONS = {
     fix: 'Inclusion–exclusion: |A ∪ B| = |A| + |B| − |A ∩ B|. Subtract what you counted twice.',
     relatedSkills: ['inclusion-exclusion'],
   },
+  arrange_without_selecting: {
+    label: 'Arranges without selecting',
+    description: 'Counts only the internal ordering of the k items (k!) and forgets they are first chosen from n distinct options.',
+    fix: 'A permutation P(n, k) both chooses AND orders: multiply n × (n−1) × … for k decreasing factors — that is far more than just k!.',
+    relatedSkills: ['permutations', 'ordered-vs-unordered'],
+  },
 } as const;
 
 export type MisconceptionKey = keyof typeof MISCONCEPTIONS;

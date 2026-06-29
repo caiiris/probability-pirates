@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowLeft, Check, Snowflake, Lock } from 'lucide-react';
+import { Check, Snowflake, Lock, Palette, Award, Trophy } from 'lucide-react';
 import { Coin } from '@/components/illustrations/Coin';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { DefaultAvatar } from '@/features/profile/DefaultAvatar';
 import { track } from '@/lib/analytics';
@@ -119,14 +118,9 @@ export function StorePage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-8">
-      <Link
-        to="/profile"
-        className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'gap-1.5 -ml-2' })}
-      >
-        <ArrowLeft className="w-4 h-4" aria-hidden="true" /> Back
-      </Link>
-
-      {/* Treasure-shop banner */}
+      {/* Treasure-shop banner — kept as the page header (no separate back
+          button row; the sidebar / bottom-nav owns navigation, matching the
+          pattern used by every other top-level page). */}
       <OceanScene calm>
         <div className="flex flex-col items-center gap-2 py-3 text-center">
           <Chest open className="w-16 drop-shadow-sm" />
@@ -140,9 +134,14 @@ export function StorePage() {
         </div>
       </OceanScene>
 
+      {/* Coin-earning hint — answers "where do I get more coins?" inline
+          instead of leaving the question hanging. Quiet by default; sits
+          right under the wallet so it reads as a hint, not an upsell. */}
+      <EarnCoinsHint />
+
       {/* Avatar styles */}
       <section className="space-y-3">
-        <h2 className="font-display text-lg font-bold tracking-tight">Avatar styles</h2>
+        <SectionHeader icon={<Palette className="h-4 w-4" />} title="Avatar styles" />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {AVATAR_STYLES.map((style) => {
             const equipped = equippedStyle === style.id;
@@ -205,25 +204,41 @@ export function StorePage() {
         </div>
       </section>
 
-      {/* Streak Freeze — purchasable. Single-item section: name it plainly
-          rather than wrapping the one item in a metaphor ("Forgiveness"). */}
+      {/* Streak Freeze — single-item utility. Upgraded from a plain bordered
+          card to an icy gradient "magical item" treatment so it reads as the
+          only consumable in the shop, distinct from the cosmetic sections
+          above and below. */}
       <section className="space-y-3">
-        <h2 className="font-display text-lg font-bold tracking-tight">Streak Freeze</h2>
-        <div className="rounded-2xl border border-border/70 bg-card p-4 space-y-3">
-          <div className="flex items-center gap-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[color:var(--blue-soft)] text-[color:var(--blue-deep)]">
-              <Snowflake className="h-5 w-5" aria-hidden="true" />
+        <SectionHeader icon={<Snowflake className="h-4 w-4" />} title="Streak Freeze" />
+        <div className="relative overflow-hidden rounded-2xl border border-[color:var(--blue-base)]/30 bg-gradient-to-br from-[color:var(--blue-soft)]/80 via-card to-card p-4 shadow-soft">
+          {/* Decorative frost glints — purely cosmetic */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-4 -right-4 h-24 w-24 rounded-full bg-[color:var(--blue-base)]/10 blur-2xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-6 -left-6 h-20 w-20 rounded-full bg-white/40 blur-2xl"
+          />
+
+          <div className="relative flex items-center gap-4">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white text-[color:var(--blue-deep)] shadow-sm">
+              <Snowflake className="h-6 w-6" aria-hidden="true" />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-sm text-muted-foreground">
-                Automatically protects your streak on a day you miss. Everyone has off days.
+              <p className="text-sm font-semibold text-foreground leading-tight">
+                Protect your streak on a missed day.
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Auto-consumed when you forget. Everyone has off days.
               </p>
             </div>
             <CoinChip coins={STREAK_FREEZE_COST} />
           </div>
-          <div className="flex items-center justify-between">
+
+          <div className="relative mt-3 flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
-              Owned: {owned} / {MAX_STREAK_FREEZES}
+              Owned: <span className="font-bold text-foreground">{owned}</span> / {MAX_STREAK_FREEZES}
             </span>
             <Button
               size="sm"
@@ -244,7 +259,7 @@ export function StorePage() {
 
       {/* Profile flair */}
       <section className="space-y-3">
-        <h2 className="font-display text-lg font-bold tracking-tight">Flair</h2>
+        <SectionHeader icon={<Award className="h-4 w-4" />} title="Flair" />
         <p className="text-xs text-muted-foreground">A title badge shown under your name.</p>
         <div className="space-y-2">
           {PROFILE_FLAIR.map((flair) => {
@@ -304,6 +319,50 @@ export function StorePage() {
           })}
         </div>
       </section>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Small helpers — kept inline since they're store-specific presentational bits.
+// ---------------------------------------------------------------------------
+
+/** Iconified section title: tiny icon disc + label. Distinguishes the three
+ *  shop sections (Avatar / Streak Freeze / Flair) without each h2 reading the
+ *  same as the others. */
+function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="grid h-7 w-7 place-items-center rounded-lg bg-[color:var(--amber-soft)] text-[color:var(--amber-deep)]">
+        {icon}
+      </span>
+      <h2 className="font-display text-lg font-bold tracking-tight">{title}</h2>
+    </div>
+  );
+}
+
+/** Inline answer to "where do coins come from?" so the question doesn't hang
+ *  on a learner with a 0 balance. Quiet card; doesn't push for a purchase. */
+function EarnCoinsHint() {
+  return (
+    <div className="rounded-2xl border border-border bg-muted/30 p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+        How to earn coins
+      </p>
+      <ul className="space-y-1.5 text-sm">
+        <li className="flex items-center gap-2.5">
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[color:var(--amber-soft)] text-[color:var(--amber-deep)]">
+            <Coin className="h-3.5 w-3.5" />
+          </span>
+          <span className="text-foreground/85">Open chapter chests on your course path.</span>
+        </li>
+        <li className="flex items-center gap-2.5">
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[color:var(--violet-soft)] text-[color:var(--violet-deep)]">
+            <Trophy className="h-3.5 w-3.5" />
+          </span>
+          <span className="text-foreground/85">Unlock achievements as you learn.</span>
+        </li>
+      </ul>
     </div>
   );
 }

@@ -48,6 +48,7 @@ export function ProfilePage() {
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
       <ProfileBody
+        uid={uid}
         displayUsername={profile.displayUsername}
         bio={profile.bio}
         emptyBioText="Tap Edit to add a bio."
@@ -127,19 +128,61 @@ export function ProfilePage() {
   );
 }
 
+/**
+ * Skeleton tuned to match the loaded ProfileBody + wallet + logout layout so
+ * the page doesn't visibly shift when data arrives. Previously this only
+ * drew an avatar + 6 stat tiles; the real page has a banner, multiple
+ * sections (rank/stats/activity/strengths/treasure), a wallet card, and a
+ * logout button — the mismatch caused a big jump on load.
+ */
 function ProfileSkeleton() {
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
-      <div className="flex flex-col items-center gap-3">
-        <Skeleton className="w-24 h-24 rounded-full" />
-        <Skeleton className="h-6 w-32 rounded" />
-        <Skeleton className="h-4 w-48 rounded" />
+      {/* Identity banner — mirrors the OceanScene block in ProfileBody */}
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="flex flex-col items-center gap-3 py-6 px-4">
+          <Skeleton className="w-24 h-24 rounded-full" />
+          <Skeleton className="h-6 w-40 rounded" />
+          <Skeleton className="h-4 w-56 rounded" />
+          <Skeleton className="h-8 w-28 rounded-md mt-1" />
+          <div className="flex gap-2 mt-1">
+            <Skeleton className="h-7 w-20 rounded-full" />
+            <Skeleton className="h-7 w-20 rounded-full" />
+          </div>
+        </div>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {Array.from({ length: 6 }, (_, i) => (
-          <Skeleton key={i} className="h-20 rounded-xl" />
-        ))}
-      </div>
+
+      {/* Five section cards (rank, stats, activity, strengths, treasure shelf).
+          Each has the same "header row + content block" silhouette as the
+          real <Section> component. */}
+      {[
+        { content: <Skeleton className="h-20 w-full rounded-xl" /> },
+        {
+          content: (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {Array.from({ length: 6 }, (_, i) => (
+                <Skeleton key={i} className="h-20 rounded-xl" />
+              ))}
+            </div>
+          ),
+        },
+        { content: <Skeleton className="h-28 w-full rounded-xl" /> },
+        { content: <Skeleton className="h-24 w-full rounded-xl" /> },
+        { content: <Skeleton className="h-32 w-full rounded-xl" /> },
+      ].map((row, i) => (
+        <div key={i} className="space-y-3">
+          <Skeleton className="h-4 w-24 rounded" />
+          {row.content}
+        </div>
+      ))}
+
+      {/* Wallet row */}
+      <Skeleton className="h-16 rounded-2xl" />
+
+      <Separator />
+
+      {/* Logout button */}
+      <Skeleton className="h-11 w-full rounded-md" />
     </div>
   );
 }

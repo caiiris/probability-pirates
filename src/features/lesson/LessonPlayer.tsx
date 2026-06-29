@@ -18,6 +18,7 @@ import {
   applySlotAdvance,
 } from '@/features/habit/habitService';
 import { checkAnswer } from '@/lib/checkAnswer';
+import { xpForAttempt, LESSON_COMPLETION_BONUS } from '@/lib/xp';
 import { useSlotState } from './useSlotState';
 import { LessonHeader } from './LessonHeader';
 import { LessonFooter } from './LessonFooter';
@@ -26,6 +27,13 @@ import { WrapSlotView } from './WrapSlotView';
 import { ProblemSlotView } from './ProblemSlotView';
 import { CaptainPascal } from '@/features/captain/CaptainPascal';
 import { useLessonById, useLessons } from '@/features/flags/useLessons';
+import { useDueReviews } from '@/features/review/useDueReviews';
+import { seedReviewSkills } from '@/features/review/reviewService';
+import { lessonSkills } from '@/features/review/lessonSkills';
+import { recordLessonExposure } from '@/features/learner/learnerModelService';
+import { buildReportCard } from '@/features/learner/learnerModel';
+import type { SlotFirstTry } from '@/features/learner/learnerModel';
+import { diagnoseWrongAnswer } from '@/features/practice/diagnoseWrongAnswer';
 import type { AttemptPayload } from '@/features/progress/progressService';
 import type { Lesson } from '@/content/types';
 import type { UserProfile } from '@/features/auth/AuthProvider';
@@ -72,8 +80,53 @@ function ComingSoonRedirect() {
 }
 
 // ---------------------------------------------------------------------------
+// LessonLoadingSkeleton — shown while progress (or the warm-up gate decision)
+// is still resolving.
+// ---------------------------------------------------------------------------
+function LessonLoadingSkeleton() {
+  return (
+    <div className="flex flex-col h-screen bg-card">
+      <Skeleton className="h-14 w-full rounded-none" />
+      <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
+        <Skeleton className="h-32 w-32 rounded-xl" />
+        <Skeleton className="h-6 w-64 rounded" />
+        <Skeleton className="h-4 w-48 rounded" />
+      </div>
+      <Skeleton className="h-20 w-full rounded-none" />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // LessonPlayer — outer guard (hooks run unconditionally after this)
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Slot transition direction
+//
+// When the learner advances (Continue / Forward arrow) we slide the new slot
+// in from the right and exit the old one to the left — like turning a page
+// forward. Going back reverses both. The `custom` prop carries the direction
+// (+1 forward, -1 back) into the variants. Tracked with a ref so we have
+// the value synchronously during render without an extra state flip.
+// ---------------------------------------------------------------------------
+
+type SlotDirection = 1 | -1;
+
+const SLOT_VARIANTS = {
+  enter: (dir: SlotDirection) => ({ x: 48 * dir, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: SlotDirection) => ({ x: -48 * dir, opacity: 0 }),
+};
+
+function useSlotDirection(displayIndex: number): SlotDirection {
+  const lastIndex = useRef(displayIndex);
+  const direction = useRef<SlotDirection>(1);
+  if (displayIndex > lastIndex.current) direction.current = 1;
+  else if (displayIndex < lastIndex.current) direction.current = -1;
+  lastIndex.current = displayIndex;
+  return direction.current;
+}
+
 export function LessonPlayer() {
   const { lessonId = '' } = useParams<{ lessonId: string }>();
   const auth = useAuth();
@@ -108,6 +161,8 @@ function LessonPlayerInner({
   // nothing is written and no XP/completion is re-awarded.
   const isReview = searchParams.get('mode') === 'review';
   const progressState = useLessonProgress(uid, lesson.id);
+  // Spaced-review warm-up gate status (spec-spaced-review). Fails open.
+  const dueReviews = useDueReviews(uid);
   // Whole planned course as the denominator (live + locked roadmap stubs),
   // so the 'course-cleared' achievement only fires after every lesson — not
   // when the single currently-authored lesson is finished and the rest of
@@ -126,6 +181,11 @@ function LessonPlayerInner({
   //   hadComeback — at least one correct answer followed a wrong one (=> 'bounce-back')
   const allFirstTryRef = useRef(true);
   const hadComebackRef = useRef(false);
+  // Engine B (spec-learner-model): first-committed-attempt-per-slot results for
+  // this lesson session, used to build the celebration report card and feed the
+  // exposure/misconception model. `recordedSlotsRef` guards one entry per slot.
+  const firstTriesRef = useRef<SlotFirstTry[]>([]);
+  const recordedSlotsRef = useRef<Set<string>>(new Set());
   // Wall-clock start of this lesson session, for the `lesson_complete` event
   const sessionStartedAtRef = useRef<number>(Date.now());
   // Guard so `lesson_start` only fires once per mount (progress snapshot can
@@ -174,6 +234,14 @@ function LessonPlayerInner({
   const isReviewMode = isReview || viewSlotIndex < slotIndex;
   const displayIndex = Math.min(viewSlotIndex, slots.length - 1);
   const slot = slots[displayIndex];
+
+  // Direction-aware slot transition: when the learner advances (forward arrow
+  // / auto-advance) the new slot slides in from the right and the old one
+  // slides out to the left, like turning a page forward. When they go back
+  // (back arrow), it reverses. Subtle but it matches the cognitive direction
+  // and stops every navigation from feeling identical. Tracked via ref so
+  // the value is available synchronously during render.
+  const slotDirection = useSlotDirection(displayIndex);
 
   const { state: slotState, dispatch } = useSlotState(slot.id);
 
@@ -234,19 +302,37 @@ function LessonPlayerInner({
     const result = checkAnswer(variant, currentAnswer);
 
     const attemptNumber = slotState.attemptNumber;
-    const xpAwarded = result.wasCorrect
-      ? attemptNumber === 1
-        ? 10
-        : attemptNumber === 2
-          ? 5
-          : 2
-      : 0;
+    const xpAwarded = xpForAttempt(attemptNumber, result.wasCorrect);
 
     // Record achievement signals for this lesson before mutating slot state.
     if (!result.wasCorrect) {
       allFirstTryRef.current = false; // any wrong attempt rules out 'flawless'
     } else if (attemptNumber > 1) {
       hadComebackRef.current = true; // correct after a wrong attempt => 'bounce-back'
+    }
+
+    // Engine B (spec-learner-model F3/F3b): capture the FIRST committed attempt
+    // per slot — this is the durable lesson signal (review/no-bail-out grind is
+    // excluded). Feeds the exposure/misconception model and the report card.
+    if (!isReview && attemptNumber === 1 && !recordedSlotsRef.current.has(slot.id)) {
+      recordedSlotsRef.current.add(slot.id);
+      const skills = variant.skills ?? [];
+      const misconceptionKey = !result.wasCorrect
+        ? (diagnoseWrongAnswer(variant, currentAnswer) ?? undefined)
+        : undefined;
+      firstTriesRef.current.push({
+        slotId: slot.id,
+        skills,
+        firstTryCorrect: result.wasCorrect,
+        misconceptionKey,
+      });
+      if (uid) {
+        void recordLessonExposure(uid, {
+          skills,
+          firstTryCorrect: result.wasCorrect,
+          misconceptionKey: misconceptionKey ?? null,
+        });
+      }
     }
 
     // Show the verdict immediately, before any persistence. The Firestore
@@ -327,6 +413,20 @@ function LessonPlayerInner({
     const isLastSlot = viewSlotIndex >= slots.length - 1;
 
     if (isLastSlot) {
+      // Idempotency guard: if this lesson is ALREADY completed (e.g. the learner
+      // pressed browser Back from the celebration and tapped Continue again),
+      // do NOT re-run the completion awards — that would double-count XP,
+      // lessonsCompleted, stepsCompleted, and weeklyXp. Just return to the
+      // (refresh-safe) celebration without awarding anything again.
+      if (progressState.status === 'ready' && progressState.data.state === 'completed') {
+        navigate(
+          `/celebration/${lesson.id}?xp=0&streak=${profile?.currentStreak ?? 0}` +
+            `&streakDelta=0&milestones=&completed=${profile?.lessonsCompleted ?? 0}` +
+            `&total=${profile?.xp ?? 0}`,
+        );
+        return;
+      }
+
       // Increment stepsCompleted for the final wrap slot (B008)
       if (slot.kind !== 'problem' && uid) {
         applySlotAdvance(uid).catch(console.error);
@@ -339,9 +439,13 @@ function LessonPlayerInner({
         return;
       }
 
+      // Spaced review (spec-spaced-review): schedule the skills this lesson
+      // taught for future retrieval. Best-effort; never blocks completion.
+      void seedReviewSkills(uid, lessonSkills(lesson));
+
       const progress = progressState.status === 'ready' ? progressState.data : null;
       const xpEarned = progress?.xpEarnedThisAttempt ?? 0;
-      let xpEarnedThisLesson = xpEarned + 50;
+      let xpEarnedThisLesson = xpEarned + LESSON_COMPLETION_BONUS;
       let celebrationParams = `xp=${xpEarnedThisLesson}&streak=0&streakDelta=0&milestones=&completed=1`;
       let finalCurrentStreak = 0;
       let finalIsNewStreakDay = false;
@@ -422,10 +526,22 @@ function LessonPlayerInner({
         });
       }
 
-      // New running XP total → lets the celebration detect a level-up. Derived
-      // from the (client) pre-lesson total + what this lesson awarded.
-      const totalXpAfter = (profile?.xp ?? 0) + xpEarnedThisLesson;
-      navigate(`/celebration/${lesson.id}?${celebrationParams}&total=${totalXpAfter}`);
+      // New running XP total → lets the celebration detect a level-up.
+      // `profile.xp` already reflects the per-check XP written live during the
+      // lesson (applyAttemptOutcome), so the only XP NOT yet in it is the
+      // completion bonus added just above. Adding the full `xpEarnedThisLesson`
+      // here would double-count the per-check XP and show an inflated level.
+      const totalXpAfter = (profile?.xp ?? 0) + LESSON_COMPLETION_BONUS;
+      // Engine B payoff (F3b): a Khan-style "what you nailed / worth a review"
+      // recap built purely from this session's first-attempt results. Passed via
+      // router state (not URL) — on a hard refresh the card is simply omitted.
+      const reportCard =
+        firstTriesRef.current.length > 0
+          ? buildReportCard(lesson.id, firstTriesRef.current)
+          : undefined;
+      navigate(`/celebration/${lesson.id}?${celebrationParams}&total=${totalXpAfter}`, {
+        state: reportCard ? { reportCard } : undefined,
+      });
       return;
     }
 
@@ -487,8 +603,13 @@ function LessonPlayerInner({
       }
 
       // Right arrow: only fire when Continue would be available. Problem slots
-      // require a correct answer first; review mode lets you scroll freely.
-      const continueVisible = slot.kind !== 'problem' || slotState.feedbackState === 'correct';
+      // require a correct answer first — except commit-once prediction slots,
+      // where a single committed answer (right OR wrong) unlocks Continue.
+      // Review mode lets you scroll freely.
+      const committedWrong =
+        slot.kind === 'problem' && slot.commitOnce === true && slotState.feedbackState === 'wrong';
+      const continueVisible =
+        slot.kind !== 'problem' || slotState.feedbackState === 'correct' || committedWrong;
       if (isReviewMode || continueVisible) {
         e.preventDefault();
         advanceRef.current();
@@ -557,20 +678,35 @@ function LessonPlayerInner({
   // -------------------------------------------------------------------------
 
   if (progressState.status === 'loading' || progressState.status === 'empty') {
-    return (
-      <div className="flex flex-col h-screen bg-card">
-        <Skeleton className="h-14 w-full rounded-none" />
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
-          <Skeleton className="h-32 w-32 rounded-xl" />
-          <Skeleton className="h-6 w-64 rounded" />
-          <Skeleton className="h-4 w-48 rounded" />
-        </div>
-        <Skeleton className="h-20 w-full rounded-none" />
-      </div>
-    );
+    return <LessonLoadingSkeleton />;
   }
 
   const progress = progressState.status === 'ready' ? progressState.data : null;
+
+  // Spaced-review warm-up gate (spec-spaced-review §6). Only a FRESH start of a
+  // not-completed lesson is gated — never a resume, a review, or a replay
+  // already in progress. On a fresh start we wait for the review status to
+  // resolve so the lesson never flashes before redirecting; any error path
+  // resolves to `due: []`, so the gate fails open and the lesson just opens.
+  const isFreshStart =
+    !isReview && progress?.state !== 'completed' && (progress?.slotIndex ?? 0) === 0;
+  if (isFreshStart && dueReviews.status === 'loading') {
+    return <LessonLoadingSkeleton />;
+  }
+  if (
+    isFreshStart &&
+    dueReviews.status === 'ready' &&
+    !dueReviews.satisfiedToday &&
+    dueReviews.due.length > 0
+  ) {
+    return (
+      <Navigate
+        to={`/warmup?next=${encodeURIComponent('/lesson/' + lesson.id)}`}
+        replace
+      />
+    );
+  }
+
   const streak = profile?.currentStreak ?? 0;
   const currentXp = profile?.xp ?? 0;
 
@@ -618,12 +754,14 @@ function LessonPlayerInner({
       {/* Slot body */}
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto w-full h-full">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" custom={slotDirection}>
             <motion.div
               key={slot.id}
-              initial={{ x: 40, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -40, opacity: 0 }}
+              custom={slotDirection}
+              variants={SLOT_VARIANTS}
+              initial="enter"
+              animate="center"
+              exit="exit"
               transition={MOTION.slide}
               className="h-full"
             >
@@ -657,6 +795,7 @@ function LessonPlayerInner({
         explanationRevealed={slotState.explanationRevealed}
         isReady={currentAnswer !== null}
         isSubmitting={submitting}
+        allowContinueOnWrong={slot.kind === 'problem' && slot.commitOnce === true}
         onCheck={isReviewMode ? handleCheckReview : handleCheck}
         onContinue={isReviewMode ? handleContinueReview : handleContinue}
       />

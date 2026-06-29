@@ -56,6 +56,7 @@ describe('gradeConceptualAnswer — accepts any equivalent form', () => {
 describe('reasoningMultiplier', () => {
   it('penalizes only confident negative classifications', () => {
     expect(reasoningMultiplier('misconception')).toBe(REASONING_PENALTY);
+    expect(reasoningMultiplier('incorrect-reasoning')).toBe(REASONING_PENALTY);
     expect(reasoningMultiplier('irrelevant')).toBe(REASONING_PENALTY);
   });
 
